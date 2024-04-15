@@ -679,7 +679,9 @@ namespace SDL2Engine
 
         private World world;
         private bool running = false;
-        public bool showDebug = false;
+        private bool showDebug = false;
+        private bool fullscreen = false;
+
 
         // SDL variables
         private IntPtr window;
@@ -740,6 +742,17 @@ namespace SDL2Engine
                     break;
                 case SDL.SDL_Keycode.SDLK_F3:
                     showDebug = !showDebug;
+                    break;
+                case SDL.SDL_Keycode.SDLK_F11:
+                    fullscreen = !fullscreen;
+                    if (fullscreen)
+                    {
+                        SDL.SDL_SetWindowFullscreen(window, (uint)SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    }
+                    else
+                    {
+                        SDL.SDL_SetWindowFullscreen(window, 0);
+                    }
                     break;
                 default:
                     break;

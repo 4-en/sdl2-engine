@@ -104,22 +104,22 @@ namespace SDL2Engine
             return this / Length();
         }
 
-        public static bool operator>(Vec2D a, Vec2D b)
+        public static bool operator >(Vec2D a, Vec2D b)
         {
             return a.LengthSquared() > b.LengthSquared();
         }
 
-        public static bool operator<(Vec2D a, Vec2D b)
+        public static bool operator <(Vec2D a, Vec2D b)
         {
             return a.LengthSquared() < b.LengthSquared();
         }
 
-        public static bool operator>=(Vec2D a, Vec2D b)
+        public static bool operator >=(Vec2D a, Vec2D b)
         {
             return a.LengthSquared() >= b.LengthSquared();
         }
 
-        public static bool operator<=(Vec2D a, Vec2D b)
+        public static bool operator <=(Vec2D a, Vec2D b)
         {
             return a.LengthSquared() <= b.LengthSquared();
         }
@@ -234,22 +234,22 @@ namespace SDL2Engine
             return this / Length();
         }
 
-        public static bool operator>(Vec3D a, Vec3D b)
+        public static bool operator >(Vec3D a, Vec3D b)
         {
             return a.LengthSquared() > b.LengthSquared();
         }
 
-        public static bool operator<(Vec3D a, Vec3D b)
+        public static bool operator <(Vec3D a, Vec3D b)
         {
             return a.LengthSquared() < b.LengthSquared();
         }
 
-        public static bool operator>=(Vec3D a, Vec3D b)
+        public static bool operator >=(Vec3D a, Vec3D b)
         {
             return a.LengthSquared() >= b.LengthSquared();
         }
 
-        public static bool operator<=(Vec3D a, Vec3D b)
+        public static bool operator <=(Vec3D a, Vec3D b)
         {
             return a.LengthSquared() <= b.LengthSquared();
         }
@@ -270,29 +270,30 @@ namespace SDL2Engine
 
     public class Camera2D : ICamera
     {
-        private Vec2D position;
-        private Vec2D size;
+        private Vec2D Position { get; set; }
+        private Vec2D Size { get; set; }
 
-        private Vec2D screenSize;
+        private Vec2D ScreenSize { get; set; }
 
         public Camera2D(Vec2D position = new Vec2D())
         {
-            this.position = position;
-            this.size = new Vec2D(1920, 1080);
-            this.screenSize = new Vec2D(1920, 1080);
+            this.Position = position;
+            this.Size = new Vec2D(1920, 1080);
+            this.ScreenSize = new Vec2D(1920, 1080);
         }
 
         public Vec2D GetScreenPosition(Vec2D worldPosition)
         {
-            return new Vec2D((worldPosition.x - position.x) * screenSize.x / size.x, (worldPosition.y - position.y) * screenSize.y / size.y);
+            return new Vec2D((worldPosition.x - Position.x) * ScreenSize.x / Size.x, (worldPosition.y - Position.y) * ScreenSize.y / Size.y);
         }
+
     }
 
     // Base class for all scripts
     // Add to a GameObject to provide custom functionality
     public class Component
     {
-        GameObject gameObject;
+        protected GameObject gameObject;
 
         public Component(GameObject gameObject)
         {
@@ -321,27 +322,27 @@ namespace SDL2Engine
     public class GameObject
     {
         // Position of the GameObject
-        private Vec2D position;
-        private Vec2D parentPosition;
-        private GameObject? parent;
-        private GameObject? root;
-        private List<GameObject> children = [];
-        private List<Component> scripts = [];
+        protected Vec2D Position { get; set; }
+        protected Vec2D ParentPosition { get; set; }
+        protected GameObject? Parent { get; set; }
+        protected GameObject? Root { get; set; }
+        private readonly List<GameObject> children = [];
+        private readonly List<Component> scripts = [];
 
         public GameObject()
         {
-            this.position = new Vec2D();
-            this.parentPosition = new Vec2D();
-            this.parent = null;
-            this.root = null;
+            this.Position = new Vec2D();
+            this.ParentPosition = new Vec2D();
+            this.Parent = null;
+            this.Root = null;
         }
 
         public GameObject(GameObject root)
         {
-            this.position = new Vec2D();
-            this.parentPosition = new Vec2D();
-            this.parent = null;
-            this.root = root;
+            this.Position = new Vec2D();
+            this.ParentPosition = new Vec2D();
+            this.Parent = null;
+            this.Root = root;
         }
 
         public void UpdateChildPositions()
@@ -355,8 +356,8 @@ namespace SDL2Engine
 
         public void SetParent(GameObject? parent)
         {
-            this.parent = parent;
-            
+            this.Parent = parent;
+
             if (parent != null)
             {
                 this.SetParentPosition(parent.GetPosition());
@@ -369,35 +370,35 @@ namespace SDL2Engine
 
         public GameObject? GetParent()
         {
-            return parent;
+            return Parent;
         }
 
         public void RemoveParent()
         {
-            this.parent = null;
+            this.Parent = null;
             this.SetParentPosition(new Vec2D());
         }
 
         public Vec2D GetPosition()
         {
-            return this.parentPosition + this.position;
+            return this.ParentPosition + this.Position;
         }
 
         public void SetPosition(Vec2D position)
         {
-            this.position = position;
+            this.Position = position;
             this.UpdateChildPositions();
 
         }
 
         public void SetParentPosition(Vec2D position)
         {
-            this.parentPosition = position;
+            this.ParentPosition = position;
             this.UpdateChildPositions();
         }
 
 
-        
+
         public void AddChild(GameObject child)
         {
             child.SetParentPosition(this.GetPosition());
@@ -497,7 +498,7 @@ namespace SDL2Engine
                 child.Update();
             }
         }
-        
+
         // Override this method to draw custom graphics
         // By default, this method does nothing
         virtual public void Draw(ICamera camera)
@@ -514,6 +515,44 @@ namespace SDL2Engine
             }
         }
 
+    }
+
+
+    public class World : GameObject
+    {
+        private ICamera camera;
+        public World()
+        {
+            this.Position = new Vec2D();
+            this.ParentPosition = new Vec2D();
+            this.Parent = null;
+            this.Root = null;
+            this.camera = new Camera2D(new Vec2D());
+        }
+
+        public World(ICamera camera)
+        {
+            this.Position = new Vec2D();
+            this.ParentPosition = new Vec2D();
+            this.Parent = null;
+            this.Root = null;
+            this.camera = camera;
+        }
+
+
+        public override void Draw(ICamera camera)
+        {
+            // Draw all children
+            foreach (GameObject child in GetChildren())
+            {
+                child.Draw(camera);
+            }
+        }
+
+        public ICamera GetCamera()
+        {
+            return camera;
+        }
     }
 
     public class Time
@@ -535,53 +574,31 @@ namespace SDL2Engine
         }
     }
 
+
     public class Engine
     {
-        private List<GameObject> gameObjects = [];
-        private ICamera camera;
 
-        public Engine()
+        private World world;
+
+        public Engine(World world)
         {
-            this.camera = new Camera2D(new Vec2D());
+            this.world = world;
         }
 
-        public Engine(ICamera camera)
-        {
-            this.camera = camera;
-        }
-
-        public void AddGameObject(GameObject gameObject)
-        {
-            gameObjects.Add(gameObject);
-        }
-
-        public void RemoveGameObject(GameObject gameObject)
-        {
-            gameObjects.Remove(gameObject);
-        }
 
         public void Start()
         {
-            foreach (GameObject gameObject in gameObjects)
-            {
-                gameObject.Start();
-            }
+            world.Start();
         }
 
         public void Update()
         {
-            foreach (GameObject gameObject in gameObjects)
-            {
-                gameObject.Update();
-            }
+            world.Update();
         }
 
-        public void Draw(ICamera camera)
+        public void Draw()
         {
-            foreach (GameObject gameObject in gameObjects)
-            {
-                gameObject.DrawAll(camera);
-            }
+            world.DrawAll(world.GetCamera());
         }
 
         public void Run()
@@ -590,7 +607,7 @@ namespace SDL2Engine
             while (true)
             {
                 this.Update();
-                this.Draw(camera);
+                this.Draw();
                 Time.time += Time.deltaTime;
             }
         }

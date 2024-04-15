@@ -561,10 +561,14 @@ namespace SDL2Engine
     {
         public static double time = 0;
         public static double deltaTime = 0;
-        public static double fixedDeltaTime = 1.0 / 60.0; // 60 FPS
 
         public static double lastDrawTime = 0;
         public static double lastUpdateTime = 0;
+
+        public static double updateDuration = 0;
+        public static double drawDuration = 0;
+        public static double totalDuration = 0;
+        public static double freeDuration = 0;
 
         public static double GetFPS()
         {
@@ -681,6 +685,7 @@ namespace SDL2Engine
         private bool running = false;
         private bool showDebug = false;
         private bool fullscreen = false;
+        public static UInt32 targetFPS = 60;
 
 
         // SDL variables
@@ -699,6 +704,12 @@ namespace SDL2Engine
             if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) < 0)
             {
                 Console.WriteLine("SDL could not initialize! SDL Error: " + SDL.SDL_GetError());
+                return;
+            }
+
+            if (SDL_ttf.TTF_Init() < 0)
+            {
+                Console.WriteLine("SDL_ttf could not initialize! SDL_ttf Error: " + SDL.SDL_GetError());
                 return;
             }
 
@@ -794,35 +805,53 @@ namespace SDL2Engine
 
         private void DrawDebug()
         {
-            // Draw debug information
-            SDL.SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF); // Red
-            SDL.SDL_Rect rect = new SDL.SDL_Rect();
-            rect.x = 10;
-            rect.y = 10;
-            rect.w = 100;
-            rect.h = 100;
-            SDL.SDL_RenderFillRect(renderer, ref rect);
+           // Draw debug information
 
-            double fps = Time.GetFPS();
-            string fpsText = "FPS: " + fps.ToString("0.00");
-            IntPtr font = SDL_ttf.TTF_OpenFont("arial.ttf", 24);
+            
             SDL.SDL_Color color = new SDL.SDL_Color();
-            color.r = 0xFF;
-            color.g = 0xFF;
-            color.b = 0xFF;
-            color.a = 0xFF;
-            IntPtr surface = SDL_ttf.TTF_RenderText_Solid(font, fpsText, color);
-            IntPtr texture = SDL.SDL_CreateTextureFromSurface(renderer, surface);
-            SDL.SDL_FreeSurface(surface);
-            SDL.SDL_Rect textRect = new SDL.SDL_Rect();
-            textRect.x = 10;
-            textRect.y = 10;
-            SDL.SDL_QueryTexture(texture, out _, out _, out textRect.w, out textRect.h);
-            SDL.SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref textRect);
-            SDL.SDL_DestroyTexture(texture);
+            color.r = 255;
+            color.g = 255;
+            color.b = 255;
+            color.a = 255;
+            IntPtr font = SDL_ttf.TTF_OpenFont("Assets/Fonts/Roboto-Regular.ttf", 24);
+
+            if (font == IntPtr.Zero)
+            {
+                Console.WriteLine("Failed to load font! SDL_ttf");
+                return;
+            }
+
+            string[] debugStrings =
+            {
+                "FPS: " + Time.GetFPS().ToString("0.00"),
+                "Update Duration: " + Time.updateDuration.ToString("0.00") + " ms",
+                "Draw Duration: " + Time.drawDuration.ToString("0.00") + " ms",
+                "Total Duration: " + Time.totalDuration.ToString("0.00") + " ms",
+                "Free Duration: " + Time.freeDuration.ToString("0.00") + " ms"
+            };
+
+            for (int i = 0; i < debugStrings.Length; i++)
+            {
+                IntPtr surface = SDL_ttf.TTF_RenderText_Solid(font, debugStrings[i], color);
+                IntPtr texture = SDL.SDL_CreateTextureFromSurface(renderer, surface);
+
+                int texW = 0;
+                int texH = 0;
+                SDL.SDL_QueryTexture(texture, out _, out _, out texW, out texH);
+
+                SDL.SDL_Rect dst = new SDL.SDL_Rect();
+                dst.x = 10;
+                dst.y = 10 + i * 30;
+                dst.w = texW;
+                dst.h = texH;
+
+                SDL.SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dst);
+
+                SDL.SDL_DestroyTexture(texture);
+                SDL.SDL_FreeSurface(surface);
+            }
+
             SDL_ttf.TTF_CloseFont(font);
-
-
         }
 
         private void Draw()
@@ -854,26 +883,34 @@ namespace SDL2Engine
             Init();
 
 
+            Time.lastUpdateTime = (double)SDL.SDL_GetTicks();
+            Time.lastDrawTime = (double)SDL.SDL_GetTicks();
+
             Time.time = 0;
+            uint beforeUpdate = SDL.SDL_GetTicks();
             while (running)
             {
                 // Handle events on queue
                 HandleEvents();
 
-                this.Update();
-                this.Draw();
+                beforeUpdate = SDL.SDL_GetTicks();
+                Time.deltaTime = (beforeUpdate - Time.lastUpdateTime) / 1000.0;
                 Time.time += Time.deltaTime;
+                this.Update();
+                Time.lastUpdateTime = SDL.SDL_GetTicks();
+                Time.updateDuration = Time.lastUpdateTime - beforeUpdate;
+                this.Draw();
+                Time.lastDrawTime = SDL.SDL_GetTicks();
+                Time.drawDuration = Time.lastDrawTime - Time.lastUpdateTime;
 
                 // Cap the frame rate
-                double currentTime = SDL.SDL_GetTicks();
-                double elapsedTime = currentTime - Time.lastDrawTime;
-                if (elapsedTime < 1000.0 / 60.0)
+                Time.totalDuration = Time.lastDrawTime - beforeUpdate;
+                Time.freeDuration = 0;
+                if (Time.totalDuration < 1000.0 / targetFPS)
                 {
-                    SDL.SDL_Delay((uint)(1000.0 / 60.0 - elapsedTime));
+                    Time.freeDuration = 1000.0 / targetFPS - Time.totalDuration;
+                    SDL.SDL_Delay((uint)(1000.0 / targetFPS - Time.totalDuration));
                 }
-                Time.deltaTime = (SDL.SDL_GetTicks() - Time.lastUpdateTime) / 1000.0;
-                Time.lastUpdateTime = SDL.SDL_GetTicks();
-                Time.lastDrawTime = SDL.SDL_GetTicks();
 
             }
 

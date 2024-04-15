@@ -290,11 +290,11 @@ namespace SDL2Engine
 
     // Base class for all scripts
     // Add to a GameObject to provide custom functionality
-    public class Script
+    public class Component
     {
         GameObject gameObject;
 
-        public Script(GameObject gameObject)
+        public Component(GameObject gameObject)
         {
             this.gameObject = gameObject;
         }
@@ -324,14 +324,24 @@ namespace SDL2Engine
         private Vec2D position;
         private Vec2D parentPosition;
         private GameObject? parent;
+        private GameObject? root;
         private List<GameObject> children = [];
-        private List<Script> scripts = [];
+        private List<Component> scripts = [];
 
         public GameObject()
         {
             this.position = new Vec2D();
             this.parentPosition = new Vec2D();
             this.parent = null;
+            this.root = null;
+        }
+
+        public GameObject(GameObject root)
+        {
+            this.position = new Vec2D();
+            this.parentPosition = new Vec2D();
+            this.parent = null;
+            this.root = root;
         }
 
         public void UpdateChildPositions()
@@ -410,24 +420,61 @@ namespace SDL2Engine
             return children;
         }
 
-        public void AddScript(Script script)
+        // Gets first child of type T
+        public T? GetChild<T>() where T : GameObject
+        {
+            foreach (GameObject child in children)
+            {
+                if (child is T)
+                {
+                    return (T)child;
+                }
+            }
+
+            // no child of type T found, search recursively
+            foreach (GameObject child in children)
+            {
+                T? foundChild = child.GetChild<T>();
+                if (foundChild != null)
+                {
+                    return foundChild;
+                }
+            }
+            return null;
+        }
+
+        public void AddComponent(Component script)
         {
             scripts.Add(script);
         }
 
-        public void RemoveScript(Script script)
+        public void RemoveComponent(Component script)
         {
             scripts.Remove(script);
         }
 
-        public List<Script> GetScripts()
+        // Gets first component of type T
+        public T? GetComponent<T>() where T : Component
+        {
+            foreach (Component script in scripts)
+            {
+                if (script is T)
+                {
+                    return (T)script;
+                }
+            }
+
+            return null;
+        }
+
+        public List<Component> GetScripts()
         {
             return scripts;
         }
 
         public void Start()
         {
-            foreach (Script script in scripts)
+            foreach (Component script in scripts)
             {
                 script.Start();
             }
@@ -440,7 +487,7 @@ namespace SDL2Engine
 
         public void Update()
         {
-            foreach (Script script in scripts)
+            foreach (Component script in scripts)
             {
                 script.Update();
             }

@@ -1,4 +1,6 @@
-﻿
+﻿using SDL2;
+using static SDL2.SDL;
+using System;
 
 namespace SDL2Engine
 {
@@ -579,37 +581,130 @@ namespace SDL2Engine
     {
 
         private World world;
+        private bool running = false;
+
+        // SDL variables
+        private IntPtr window;
+        public static IntPtr renderer;
+        private SDL.SDL_Event sdlEvent;
 
         public Engine(World world)
         {
             this.world = world;
         }
 
-
-        public void Start()
+        private void Init()
         {
-            world.Start();
+            // Initialize SDL2
+            if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) < 0)
+            {
+                Console.WriteLine("SDL could not initialize! SDL Error: " + SDL.SDL_GetError());
+                return;
+            }
+
+            // Create window
+            window = SDL.SDL_CreateWindow("SDL2 Engine Test",
+                SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED,
+                800, 600, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
+            if (window == IntPtr.Zero)
+            {
+                Console.WriteLine("Window could not be created! SDL Error: " + SDL.SDL_GetError());
+                return;
+            }
+
+            // Create renderer for window
+            renderer = SDL.SDL_CreateRenderer(window, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+            if (renderer == IntPtr.Zero)
+            {
+                Console.WriteLine("Renderer could not be created! SDL Error: " + SDL.SDL_GetError());
+                return;
+            }
+
+            // Initialize renderer color
+            SDL.SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+
         }
 
-        public void Update()
+        private void HandleEvents()
+        {
+
+            while (SDL.SDL_PollEvent(out sdlEvent) != 0)
+            {
+                switch (sdlEvent.type)
+                {
+                    case SDL.SDL_EventType.SDL_QUIT:
+                        running = false;
+                        break;
+
+                    case SDL.SDL_EventType.SDL_MOUSEMOTION:
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void Update()
         {
             world.Update();
         }
 
-        public void Draw()
+        private void Draw()
         {
+            // Clear screen
+            SDL.SDL_SetRenderDrawColor(renderer, 0x1F, 0x1F, 0x1F, 0xFF); // Dark gray
+            SDL.SDL_RenderClear(renderer);
+
             world.DrawAll(world.GetCamera());
+
+            // Update screen
+            SDL.SDL_RenderPresent(renderer);
         }
 
         public void Run()
         {
-            Time.time = 0;
-            while (true)
+            if (running)
             {
+                return;
+            }
+            running = true;
+
+            // Initialize SDL2
+            Init();
+
+
+            Time.time = 0;
+            while (running)
+            {
+                // Handle events on queue
+                HandleEvents();
+
                 this.Update();
                 this.Draw();
                 Time.time += Time.deltaTime;
+
+                // Cap the frame rate
+                double currentTime = SDL.SDL_GetTicks();
+                double elapsedTime = currentTime - Time.lastDrawTime;
+                if (elapsedTime < 1000.0 / 60.0)
+                {
+                    SDL.SDL_Delay((uint)(1000.0 / 60.0 - elapsedTime));
+                }
+                Time.deltaTime = (SDL.SDL_GetTicks() - Time.lastUpdateTime) / 1000.0;
+                Time.lastUpdateTime = SDL.SDL_GetTicks();
+                Time.lastDrawTime = SDL.SDL_GetTicks();
+
             }
+
+            // Destroy window
+            SDL.SDL_DestroyRenderer(renderer);
+            SDL.SDL_DestroyWindow(window);
+
+            // Quit SDL subsystems
+            SDL.SDL_Quit();
+
         }
     }
 }

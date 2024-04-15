@@ -574,10 +574,102 @@ namespace SDL2Engine
 
     public class Input
     {
+        public static UInt32[] DownKeys = new UInt32[16];
+        public static UInt32[] PressedKeys = new UInt32[16];
+        public static UInt32[] ReleasedKeys = new UInt32[16];
+
         // TODO: Implement static methods for getting inputs
-        public static bool GetKeyDown(int key)
+        public static bool IsKeyDown(int key)
         {
+            for (int i = 0; i < DownKeys.Length; i++)
+            {
+                if (DownKeys[i] == key)
+                {
+                    return true;
+                }
+            }
+
             return false;
+        }
+
+        public static bool IsKeyPressed(int key)
+        {
+            for (int i = 0; i < PressedKeys.Length; i++)
+            {
+                if (PressedKeys[i] == key)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool IsKeyReleased(int key)
+        {
+            for (int i = 0; i < ReleasedKeys.Length; i++)
+            {
+                if (ReleasedKeys[i] == key)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static void SetKeyDown(int key)
+        {
+            for (int i = 0; i < DownKeys.Length; i++)
+            {
+                if (DownKeys[i] == 0)
+                {
+                    DownKeys[i] = (UInt32)key;
+                    break;
+                }
+            }
+        }
+
+        public static void SetKeyPressed(int key)
+        {
+            for (int i = 0; i < PressedKeys.Length; i++)
+            {
+                if (PressedKeys[i] == 0)
+                {
+                    PressedKeys[i] = (UInt32)key;
+                    break;
+                }
+            }
+        }
+
+        public static void SetKeyReleased(int key)
+        {
+            for (int i = 0; i < ReleasedKeys.Length; i++)
+            {
+                if (ReleasedKeys[i] == 0)
+                {
+                    ReleasedKeys[i] = (UInt32)key;
+                    break;
+                }
+            }
+        }
+
+        public static void ClearKeys()
+        {
+            for (int i = 0; i < DownKeys.Length; i++)
+            {
+                DownKeys[i] = 0;
+            }
+
+            for (int i = 0; i < PressedKeys.Length; i++)
+            {
+                PressedKeys[i] = 0;
+            }
+
+            for (int i = 0; i < ReleasedKeys.Length; i++)
+            {
+                ReleasedKeys[i] = 0;
+            }
         }
     }
 

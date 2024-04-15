@@ -565,6 +565,11 @@ namespace SDL2Engine
 
         public static double lastDrawTime = 0;
         public static double lastUpdateTime = 0;
+
+        public static double GetFPS()
+        {
+            return 1.0 / deltaTime;
+        }
     }
 
     public class Input
@@ -582,6 +587,7 @@ namespace SDL2Engine
 
         private World world;
         private bool running = false;
+        public bool showDebug = false;
 
         // SDL variables
         private IntPtr window;
@@ -626,6 +632,21 @@ namespace SDL2Engine
 
         }
 
+        private void HandleKeyboardEvent(SDL.SDL_KeyboardEvent keyEvent)
+        {
+            switch (keyEvent.keysym.sym)
+            {
+                case SDL.SDL_Keycode.SDLK_ESCAPE:
+                    running = false;
+                    break;
+                case SDL.SDL_Keycode.SDLK_F3:
+                    showDebug = !showDebug;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void HandleEvents()
         {
 
@@ -640,6 +661,11 @@ namespace SDL2Engine
                     case SDL.SDL_EventType.SDL_MOUSEMOTION:
                         break;
 
+                    // Handle keyboard events
+                    case SDL.SDL_EventType.SDL_KEYDOWN:
+                        this.HandleKeyboardEvent(sdlEvent.key);
+                        break;
+
                     default:
                         break;
                 }
@@ -651,6 +677,39 @@ namespace SDL2Engine
             world.Update();
         }
 
+        private void DrawDebug()
+        {
+            // Draw debug information
+            SDL.SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF); // Red
+            SDL.SDL_Rect rect = new SDL.SDL_Rect();
+            rect.x = 10;
+            rect.y = 10;
+            rect.w = 100;
+            rect.h = 100;
+            SDL.SDL_RenderFillRect(renderer, ref rect);
+
+            double fps = Time.GetFPS();
+            string fpsText = "FPS: " + fps.ToString("0.00");
+            IntPtr font = SDL_ttf.TTF_OpenFont("arial.ttf", 24);
+            SDL.SDL_Color color = new SDL.SDL_Color();
+            color.r = 0xFF;
+            color.g = 0xFF;
+            color.b = 0xFF;
+            color.a = 0xFF;
+            IntPtr surface = SDL_ttf.TTF_RenderText_Solid(font, fpsText, color);
+            IntPtr texture = SDL.SDL_CreateTextureFromSurface(renderer, surface);
+            SDL.SDL_FreeSurface(surface);
+            SDL.SDL_Rect textRect = new SDL.SDL_Rect();
+            textRect.x = 10;
+            textRect.y = 10;
+            SDL.SDL_QueryTexture(texture, out _, out _, out textRect.w, out textRect.h);
+            SDL.SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref textRect);
+            SDL.SDL_DestroyTexture(texture);
+            SDL_ttf.TTF_CloseFont(font);
+
+
+        }
+
         private void Draw()
         {
             // Clear screen
@@ -658,6 +717,11 @@ namespace SDL2Engine
             SDL.SDL_RenderClear(renderer);
 
             world.DrawAll(world.GetCamera());
+
+            if (showDebug)
+            {
+                DrawDebug();
+            }
 
             // Update screen
             SDL.SDL_RenderPresent(renderer);

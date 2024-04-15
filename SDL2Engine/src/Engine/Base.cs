@@ -579,7 +579,7 @@ namespace SDL2Engine
         public static UInt32[] ReleasedKeys = new UInt32[16];
 
         // TODO: Implement static methods for getting inputs
-        public static bool IsKeyDown(int key)
+        public static bool IsKeyDown(UInt32 key)
         {
             for (int i = 0; i < DownKeys.Length; i++)
             {
@@ -592,7 +592,7 @@ namespace SDL2Engine
             return false;
         }
 
-        public static bool IsKeyPressed(int key)
+        public static bool IsKeyPressed(UInt32 key)
         {
             for (int i = 0; i < PressedKeys.Length; i++)
             {
@@ -605,7 +605,7 @@ namespace SDL2Engine
             return false;
         }
 
-        public static bool IsKeyReleased(int key)
+        public static bool IsKeyReleased(UInt32 key)
         {
             for (int i = 0; i < ReleasedKeys.Length; i++)
             {
@@ -618,7 +618,7 @@ namespace SDL2Engine
             return false;
         }
 
-        public static void SetKeyDown(int key)
+        public static void SetKeyDown(UInt32 key)
         {
             for (int i = 0; i < DownKeys.Length; i++)
             {
@@ -630,7 +630,7 @@ namespace SDL2Engine
             }
         }
 
-        public static void SetKeyPressed(int key)
+        public static void SetKeyPressed(UInt32 key)
         {
             for (int i = 0; i < PressedKeys.Length; i++)
             {
@@ -642,7 +642,7 @@ namespace SDL2Engine
             }
         }
 
-        public static void SetKeyReleased(int key)
+        public static void SetKeyReleased(UInt32 key)
         {
             for (int i = 0; i < ReleasedKeys.Length; i++)
             {
@@ -726,6 +726,13 @@ namespace SDL2Engine
 
         private void HandleKeyboardEvent(SDL.SDL_KeyboardEvent keyEvent)
         {
+
+            // add key to pressed keys
+            if (keyEvent.repeat == 0)
+            {
+                Input.SetKeyPressed(((uint)keyEvent.keysym.sym));
+            }
+
             switch (keyEvent.keysym.sym)
             {
                 case SDL.SDL_Keycode.SDLK_ESCAPE:
@@ -741,6 +748,9 @@ namespace SDL2Engine
 
         private void HandleEvents()
         {
+
+            // clear keys
+            Input.ClearKeys();
 
             while (SDL.SDL_PollEvent(out sdlEvent) != 0)
             {

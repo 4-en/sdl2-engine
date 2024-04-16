@@ -52,9 +52,15 @@ public static Scene CreateScene()
 This function sets up a scene with a single GameObject that includes a `RotatingSquare` component for visual rendering and a `MouseTracker` component for mouse position tracking.
 
 ## Requirements
+```bash
+git clone --recurse-submodules https://github.com/4-en/sdl2-engine.git
+```
 - SDL2
 - SDL2_ttf (for text rendering)
 - .NET compatible development environment
+
+Windows DLLs are already provided.
+For Linux, use install_requirements.sh to install libraries or build from source manually.
 
 ## Building and Running
 1. Ensure SDL2 and SDL2_ttf libraries are installed and correctly linked in your project settings.

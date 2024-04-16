@@ -2,7 +2,7 @@
 # SDL2 C# Engine
 
 ## Overview
-This engine is a custom software development kit for creating 2D and 3D games using SDL2 and C#. It allows for easy manipulation of game objects and components through a straightforward API. The engine supports basic vector operations, input handling, game object management, and rendering capabilities.
+This simple engine for creating 2D games using SDL2 and C#. It allows for easy manipulation of game objects and components through a straightforward API. The engine supports basic vector operations, input handling, game object management, and rendering capabilities.
 
 ## Structure
 The engine is organized into several key classes and components:
@@ -57,8 +57,3 @@ This function sets up a scene with a single GameObject that includes a `Rotating
 2. Compile the project with a C# compiler that supports C# 8.0 or higher.
 3. Run the output executable to start the engine.
 
-## Contributing
-Contributions to the engine are welcome! Please fork the repository, make your changes, and submit a pull request.
-
-## License
-Specify your license here or indicate that the project is licensed under an MIT license, which is common for open-source projects.

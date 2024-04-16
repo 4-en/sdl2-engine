@@ -5,6 +5,54 @@ using System;
 namespace SDL2Engine
 {
 
+    public interface ICamera
+    {
+        public Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D());
+    }
+
+    public class Camera2D : ICamera
+    {
+        private Vec2D Position { get; set; }
+        private Vec2D Size { get; set; }
+
+        public bool keepAspectRatio = true;
+
+
+        public Camera2D(Vec2D position = new Vec2D())
+        {
+            this.Position = position;
+            this.Size = new Vec2D(1920, 1080);
+        }
+
+        public Vec2D GetScreenSize()
+        {
+            if (keepAspectRatio)
+            {
+                double aspectRatio = Size.x / Size.y;
+                double windowAspectRatio = Engine.windowWidth / Engine.windowHeight;
+
+                // constant scale for both axes
+                if (aspectRatio > windowAspectRatio)
+                {
+                    return new Vec2D(Engine.windowWidth, Engine.windowWidth / aspectRatio);
+                }
+                else
+                {
+                    return new Vec2D(Engine.windowHeight * aspectRatio, Engine.windowHeight);
+                }
+            }
+
+            return new Vec2D(Engine.windowWidth, Engine.windowHeight);
+        }
+
+        public Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D())
+        {
+            Vec2D screenSize = GetScreenSize();
+            return new Vec2D((worldPosition.x + rootPosition.x) / Size.x * screenSize.x + Position.x, (worldPosition.y + rootPosition.y) / Size.y * screenSize.y + Position.y);
+        }
+
+    }
+
     // Base class for all drawable components
     // these components are called by their GameObjects to draw themselves
     public class Drawable : Component
@@ -36,11 +84,13 @@ namespace SDL2Engine
             double time = Time.time;
             double angle = time * 2 * Math.PI * rotationsPerSecond;
 
+            var root = this.gameObject;
+
             // set the color to dark blue
             SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
 
             Vec2D center = new Vec2D(0, 0);
-            center = camera.WorldToScreen(center);
+            center = camera.WorldToScreen(center, root.GetPosition());
             // define the square
             List<Vec2D> points = new List<Vec2D>();
             points.Add(new Vec2D(-250, -250));
@@ -53,7 +103,7 @@ namespace SDL2Engine
             {
                 // rotate around center
                 Vec2D p = points[i];
-                p = camera.WorldToScreen(p);
+                p = camera.WorldToScreen(p, root.GetPosition());
                 double x = p.x - center.x;
                 double y = p.y - center.y;
                 points[i] = new Vec2D(

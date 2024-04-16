@@ -16,11 +16,12 @@ namespace SDL2Engine
             var gameObject = new GameObject(world);
 
             // add a drawable component to the game object
-            var drawable = gameObject.AddComponent<RotatingSquare>();
+            var _ = gameObject.AddComponent<RotatingSquare>();
 
             // add the game object to the world
             world.AddChild(gameObject);
 
+            gameObject.SetPosition(new Vec2D(500, 500));
 
             return world;
         }

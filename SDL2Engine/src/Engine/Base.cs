@@ -290,38 +290,6 @@ namespace SDL2Engine
      * functionality to GameObjects.
      */
 
-    public interface ICamera
-    {
-        public Vec2D WorldToScreen(Vec2D worldPosition);
-    }
-
-    public class Camera2D : ICamera
-    {
-        private Vec2D Position { get; set; }
-        private Vec2D Size { get; set; }
-
-
-        public Camera2D(Vec2D position = new Vec2D())
-        {
-            this.Position = position;
-            this.Size = new Vec2D(1920, 1080);
-        }
-
-        public Vec2D GetScreenSize()
-        {
-            return new Vec2D(Engine.windowWidth, Engine.windowHeight);
-        }
-
-        public Vec2D WorldToScreen(Vec2D worldPosition)
-        {
-            Vec2D screenSize = GetScreenSize();
-            return new Vec2D((worldPosition.x - Position.x) * screenSize.x / Size.x, (worldPosition.y - Position.y) * screenSize.y / Size.y);
-        }
-
-    }
-
-    // Base class for all scripts
-    // Add to a GameObject to provide custom functionality
     public class Component
     {
         protected GameObject gameObject;

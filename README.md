@@ -58,7 +58,9 @@ git clone --recurse-submodules https://github.com/4-en/sdl2-engine.git
 ```
 
 Update submodules afterwards:
+```bash
 git submodule update --init --recursive
+```
 
 Required Libraries (so far):
 - SDL2

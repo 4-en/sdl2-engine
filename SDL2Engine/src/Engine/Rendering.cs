@@ -13,10 +13,10 @@ namespace SDL2Engine
 
         public static Camera? GetCamera(GameObject gameObject)
         {
-            var root = gameObject.GetRoot();
+            var root = gameObject.GetScene();
             if (root != null)
             {
-                Scene scene = (Scene)root;
+                Scene scene = root;
                 return scene.GetCamera();
             }
             return null;

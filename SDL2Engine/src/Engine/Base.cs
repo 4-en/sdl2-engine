@@ -328,7 +328,7 @@ namespace SDL2Engine
         protected Vec2D Position { get; set; }
         protected Vec2D ParentPosition { get; set; }
         protected GameObject? Parent { get; set; }
-        protected GameObject? Root { get; set; }
+        protected Scene? scene;
         private readonly List<GameObject> children = [];
         private readonly List<Component> scripts = [];
 
@@ -337,15 +337,15 @@ namespace SDL2Engine
             this.Position = new Vec2D();
             this.ParentPosition = new Vec2D();
             this.Parent = null;
-            this.Root = null;
+            this.scene = null;
         }
 
-        public GameObject(GameObject root)
+        public GameObject(Scene scene)
         {
             this.Position = new Vec2D();
             this.ParentPosition = new Vec2D();
             this.Parent = null;
-            this.Root = root;
+            this.scene = scene;
         }
 
         public void UpdateChildPositions()
@@ -382,14 +382,14 @@ namespace SDL2Engine
             this.SetParentPosition(new Vec2D());
         }
 
-        public GameObject? GetRoot()
+        public Scene? GetScene()
         {
-            return Root;
+            return scene;
         }
 
-        protected void SetRoot(GameObject? root)
+        protected void SetScene(Scene? scene)
         {
-            this.Root = root;
+            this.scene = scene;
         }
 
         public Vec2D GetPosition()
@@ -416,7 +416,7 @@ namespace SDL2Engine
         {
             child.SetParentPosition(this.GetPosition());
             child.SetParent(this);
-            child.SetRoot(this.Root);
+            child.SetScene(this.scene);
             children.Add(child);
 
         }
@@ -571,7 +571,7 @@ namespace SDL2Engine
             this.Position = new Vec2D();
             this.ParentPosition = new Vec2D();
             this.Parent = null;
-            this.Root = this;
+            this.scene = this;
             this.camera = new Camera2D(new Vec2D());
         }
 
@@ -580,7 +580,7 @@ namespace SDL2Engine
             this.Position = new Vec2D();
             this.ParentPosition = new Vec2D();
             this.Parent = null;
-            this.Root = this;
+            this.scene = this;
             this.camera = camera;
         }
 

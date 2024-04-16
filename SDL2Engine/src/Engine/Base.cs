@@ -382,9 +382,9 @@ namespace SDL2Engine
 
         public T? GetComponentInChildren<T>() where T : Component
         {
-            T? GetComponentInChildrenHelper<T>(GameObject parent) where T : Component
+            U? GetComponentInChildrenHelper<U>(GameObject parent) where U : Component
             {
-                T? component = parent.GetComponent<T>();
+                U? component = parent.GetComponent<U>();
                 if (component != null)
                 {
                     return component;
@@ -393,7 +393,7 @@ namespace SDL2Engine
                 List<GameObject> children = parent.GetChildren();
                 foreach (GameObject child in children)
                 {
-                    T? foundComponent = GetComponentInChildrenHelper<T>(child);
+                    U? foundComponent = GetComponentInChildrenHelper<U>(child);
                     if (foundComponent != null)
                     {
                         return foundComponent;
@@ -408,16 +408,16 @@ namespace SDL2Engine
 
         public List<T> GetComponentsInChildren<T>() where T : Component
         {
-            List<T> GetComponentsInChildrenHelper<T>(GameObject parent) where T : Component
+            List<U> GetComponentsInChildrenHelper<U>(GameObject parent) where U : Component
             {
-                List<T> foundComponents = new List<T>();
-                List<T> components = parent.GetComponents<T>();
+                List<U> foundComponents = new();
+                List<U> components = parent.GetComponents<U>();
                 foundComponents.AddRange(components);
 
                 List<GameObject> children = parent.GetChildren();
                 foreach (GameObject child in children)
                 {
-                    List<T> foundChildComponents = GetComponentsInChildrenHelper<T>(child);
+                    List<U> foundChildComponents = GetComponentsInChildrenHelper<U>(child);
                     foundComponents.AddRange(foundChildComponents);
                 }
 
@@ -429,7 +429,7 @@ namespace SDL2Engine
 
         public List<T> GetComponentsInParent<T>() where T : Component
         {
-            List<T> foundComponents = new List<T>();
+            List<T> foundComponents = new();
             GameObject? parent = gameObject.GetParent();
             while (parent != null)
             {
@@ -446,6 +446,7 @@ namespace SDL2Engine
             return gameObject;
         }
 
+        // SendMessage method to call methods on other components
         public bool SendMessage(string methodName, object[]? args, out object? result)
         {
             result = null;

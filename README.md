@@ -4,6 +4,10 @@
 ## Overview
 This simple engine for creating 2D games using SDL2 and C#. It allows for easy manipulation of game objects and components through a straightforward API. The engine supports basic vector operations, input handling, game object management, and rendering capabilities.
 
+```bash
+git clone --recurse-submodules this-repo
+```
+
 ## Structure
 The engine is organized into several key classes and components:
 

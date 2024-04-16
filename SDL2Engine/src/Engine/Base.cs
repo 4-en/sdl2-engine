@@ -294,7 +294,12 @@ namespace SDL2Engine
     {
         protected GameObject gameObject;
 
-        public Component(GameObject gameObject)
+        protected Component()
+        {
+            gameObject = new GameObject();
+        }
+
+        public void Init(GameObject gameObject)
         {
             this.gameObject = gameObject;
         }
@@ -379,6 +384,16 @@ namespace SDL2Engine
             this.SetParentPosition(new Vec2D());
         }
 
+        public GameObject? GetRoot()
+        {
+            return Root;
+        }
+
+        protected void SetRoot(GameObject? root)
+        {
+            this.Root = root;
+        }
+
         public Vec2D GetPosition()
         {
             return this.ParentPosition + this.Position;
@@ -402,6 +417,8 @@ namespace SDL2Engine
         public void AddChild(GameObject child)
         {
             child.SetParentPosition(this.GetPosition());
+            child.SetParent(this);
+            child.SetRoot(this.Root);
             children.Add(child);
 
         }
@@ -447,11 +464,13 @@ namespace SDL2Engine
         public T? AddComponent<T>() where T : Component
         {
             
-            T? newComponent = (T?)Activator.CreateInstance(typeof(T), this);
+            T? newComponent = (T?)Activator.CreateInstance(typeof(T));
             
             if (newComponent != null)
             {
+                newComponent.Init(this);
                 scripts.Add(newComponent);
+                newComponent.Start();
             } else
             {
                 Console.WriteLine("Failed to create component of type " + typeof(T).Name);
@@ -525,7 +544,7 @@ namespace SDL2Engine
 
         // Override this method to draw custom graphics
         // By default, this method does nothing
-        public void Draw(ICamera camera)
+        public void Draw(Camera camera)
         {
             // draw drawables
             foreach (Component script in scripts)
@@ -548,30 +567,32 @@ namespace SDL2Engine
 
     public class World : GameObject
     {
-        private ICamera camera;
+        private Camera camera;
         public World()
         {
             this.Position = new Vec2D();
             this.ParentPosition = new Vec2D();
             this.Parent = null;
-            this.Root = null;
+            this.Root = this;
             this.camera = new Camera2D(new Vec2D());
         }
 
-        public World(ICamera camera)
+        public World(Camera camera)
         {
             this.Position = new Vec2D();
             this.ParentPosition = new Vec2D();
             this.Parent = null;
-            this.Root = null;
+            this.Root = this;
             this.camera = camera;
         }
 
 
-        public ICamera GetCamera()
+        public Camera GetCamera()
         {
             return camera;
         }
+
+
     }
 
     public class Time

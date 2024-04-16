@@ -5,12 +5,25 @@ using System;
 namespace SDL2Engine
 {
 
-    public interface ICamera
+    public abstract class Camera : Component
     {
-        public Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D());
+        public abstract Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D());
+        public abstract Vec2D GetScreenSize();
+        public abstract Vec2D ScreenToWorld(Vec2D screenPosition);
+
+        public static Camera? GetCamera(GameObject gameObject)
+        {
+            var root = gameObject.GetRoot();
+            if (root != null)
+            {
+                World world = (World)root;
+                return world.GetCamera();
+            }
+            return null;
+        }
     }
 
-    public class Camera2D : ICamera
+    public class Camera2D : Camera
     {
         private Vec2D Position { get; set; }
         private Vec2D Size { get; set; }
@@ -24,7 +37,7 @@ namespace SDL2Engine
             this.Size = new Vec2D(1920, 1080);
         }
 
-        public Vec2D GetScreenSize()
+        public override Vec2D GetScreenSize()
         {
             if (keepAspectRatio)
             {
@@ -45,7 +58,13 @@ namespace SDL2Engine
             return new Vec2D(Engine.windowWidth, Engine.windowHeight);
         }
 
-        public Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D())
+        public override Vec2D ScreenToWorld(Vec2D screenPosition)
+        {
+            Vec2D screenSize = GetScreenSize();
+            return new Vec2D((screenPosition.x - Position.x) / screenSize.x * Size.x, (screenPosition.y - Position.y) / screenSize.y * Size.y);
+        }
+
+        public override Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D())
         {
             Vec2D screenSize = GetScreenSize();
             return new Vec2D((worldPosition.x + rootPosition.x) / Size.x * screenSize.x + Position.x, (worldPosition.y + rootPosition.y) / Size.y * screenSize.y + Position.y);
@@ -58,11 +77,7 @@ namespace SDL2Engine
     public class Drawable : Component
     {
 
-        public Drawable(GameObject gameObject) : base(gameObject)
-        {
-        }
-
-        public virtual void Draw(ICamera camera)
+        public virtual void Draw(Camera camera)
         {
             throw new NotImplementedException();
         }
@@ -73,11 +88,9 @@ namespace SDL2Engine
     {
 
         public double rotationsPerSecond = 0.3;
-        public RotatingSquare(GameObject gameObject) : base(gameObject)
-        {
-        }
 
-        public override void Draw(ICamera camera)
+
+        public override void Draw(Camera camera)
         {
             // draw a square that rotates around its center
             var renderer = Engine.renderer;

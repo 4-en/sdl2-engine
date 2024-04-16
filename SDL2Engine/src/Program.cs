@@ -5,6 +5,23 @@ using static SDL2.SDL;
 namespace SDL2Engine
 {
 
+    class MouseTracker : Component
+    {
+        public override void Update()
+        {
+            var mouseState = SDL_GetMouseState(out int x, out int y);
+            var mousePosition = new Vec2D(x, y);
+            
+            var gameObject = this.gameObject;
+            var camera = Camera.GetCamera(gameObject);
+            if (camera != null)
+            {
+                mousePosition = camera.ScreenToWorld(mousePosition);
+            }
+
+            gameObject.SetPosition(mousePosition);
+        }
+    }
     
     internal class Program
     {
@@ -16,7 +33,10 @@ namespace SDL2Engine
             var gameObject = new GameObject(world);
 
             // add a drawable component to the game object
-            var _ = gameObject.AddComponent<RotatingSquare>();
+            _ = gameObject.AddComponent<RotatingSquare>();
+
+            // add a mouse tracker component to the game object
+            _ = gameObject.AddComponent<MouseTracker>();
 
             // add the game object to the world
             world.AddChild(gameObject);

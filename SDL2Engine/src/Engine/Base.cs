@@ -1,4 +1,5 @@
 ﻿using SDL2;
+using System.Reflection;
 
 namespace SDL2Engine
 {
@@ -290,6 +291,7 @@ namespace SDL2Engine
     public class Component
     {
         protected GameObject gameObject;
+        private bool active = false;
 
         protected Component()
         {
@@ -299,6 +301,41 @@ namespace SDL2Engine
         public void Init(GameObject gameObject)
         {
             this.gameObject = gameObject;
+            this.SetActive(gameObject.IsActive());
+        }
+
+        // Destructor in case the component is removed
+        ~Component()
+        {
+            this.SetActive(false);
+        }
+
+        public void SetActive(bool active)
+        {
+            if (active == this.active)
+            {
+                return;
+            }
+            this.active = active;
+
+            if (active)
+            {
+                GetScene()?.ActivateComponent(this);
+            }
+            else
+            {
+                GetScene()?.DeactivateComponent(this);
+            }
+        }
+
+        public bool IsActive()
+        {
+            return active;
+        }
+
+        public Scene? GetScene()
+        {
+            return gameObject.GetScene();
         }
 
         // Usefull methods to interact with other components
@@ -409,6 +446,33 @@ namespace SDL2Engine
             return gameObject;
         }
 
+        public bool SendMessage(string methodName, object[]? args, out object? result)
+        {
+            result = null;
+            var components = gameObject.GetComponents<Component>();
+            foreach (Component component in components)
+            {
+                if (component != this) // Ensure not to call on itself unless intended
+                {
+                    MethodInfo? method = component.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (method != null)
+                    {
+                        try
+                        {
+                            result = method.Invoke(component, args);
+                            return true; // Return true if at least one method is successfully invoked
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Exception occurred while invoking method: " + e.Message);
+                            continue; // Optionally continue to try other components or break out
+                        }
+                    }
+                }
+            }
+
+            return false; // Return false if no method was found and invoked
+        }
 
         // Override this method to provide custom functionality
         public virtual void Start()
@@ -433,13 +497,15 @@ namespace SDL2Engine
      */
     public class GameObject
     {
+        public uint layer = 0;
+        private bool active = true;
         // Position of the GameObject
         protected Vec2D Position { get; set; }
         protected Vec2D ParentPosition { get; set; }
         protected GameObject? Parent { get; set; }
         protected Scene? scene;
         private readonly List<GameObject> children = [];
-        private readonly List<Component> scripts = [];
+        private readonly List<Component> components = [];
 
         public GameObject()
         {
@@ -464,6 +530,21 @@ namespace SDL2Engine
             {
                 child.SetParentPosition(myPosition);
             }
+        }
+
+        public void SetActive(bool active)
+        {
+            this.active = active;
+
+            for (int i = 0; i < components.Count; i++)
+            {
+                components[i].SetActive(active);
+            }
+        }
+
+        public bool IsActive()
+        {
+            return active;
         }
 
         public void SetParent(GameObject? parent)
@@ -576,7 +657,7 @@ namespace SDL2Engine
             if (newComponent != null)
             {
                 newComponent.Init(this);
-                scripts.Add(newComponent);
+                components.Add(newComponent);
                 newComponent.Start();
             } else
             {
@@ -588,16 +669,16 @@ namespace SDL2Engine
 
         public bool RemoveComponent(Component script)
         {
-            return scripts.Remove(script);
+            return components.Remove(script);
         }
 
         public bool RemoveComponent<T>() where T : Component
         {
-            foreach (Component script in scripts)
+            foreach (Component script in components)
             {
                 if (script is T)
                 {
-                    return scripts.Remove(script);
+                    return components.Remove(script);
                 }
             }
 
@@ -607,7 +688,7 @@ namespace SDL2Engine
         // Gets first component of type T
         public T? GetComponent<T>() where T : Component
         {
-            foreach (Component script in scripts)
+            foreach (Component script in components)
             {
                 if (script is T)
                 {
@@ -622,7 +703,7 @@ namespace SDL2Engine
         public List<T> GetComponents<T>() where T : Component
         {
             List<T> foundComponents = new List<T>();
-            foreach (Component script in scripts)
+            foreach (Component script in components)
             {
                 if (script is T)
                 {
@@ -635,12 +716,12 @@ namespace SDL2Engine
 
         public List<Component> GetScripts()
         {
-            return scripts;
+            return components;
         }
 
         public void Start()
         {
-            foreach (Component script in scripts)
+            foreach (Component script in components)
             {
                 script.Start();
             }
@@ -654,9 +735,9 @@ namespace SDL2Engine
         public void Update()
         {
             // Update all scripts
-            for(int i = 0; i < scripts.Count; i++)
+            for(int i = 0; i < components.Count; i++)
             {
-                scripts[i].Update();
+                components[i].Update();
             }
 
             // Update all children
@@ -671,7 +752,7 @@ namespace SDL2Engine
         public void Draw(Camera camera)
         {
             // draw drawables
-            foreach (Component script in scripts)
+            foreach (Component script in components)
             {
                 if (script is Drawable)
                 {

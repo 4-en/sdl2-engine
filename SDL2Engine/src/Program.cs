@@ -67,6 +67,7 @@ namespace SDL2Engine
 
             return world;
         }
+#if ENGINE_TEST
         static void Main(string[] args)
         {
             Console.WriteLine("Starting SDL2 Engine...");
@@ -81,5 +82,6 @@ namespace SDL2Engine
 
             Console.WriteLine("Exiting SDL2 Engine...");
         }
+#endif
     }
 }

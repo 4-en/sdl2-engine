@@ -20,6 +20,11 @@ namespace SDL2Engine
             square.SetPosition(this.gameObject.GetPosition());
             
         }
+
+        public override void Start()
+        {
+            Console.WriteLine("MouseTracker Start");
+        }
         public override void Update()
         {
             var mousePosition = Input.GetMousePosition();

@@ -101,6 +101,11 @@ namespace SDL2Engine
             return x * x + y * y;
         }
 
+        public static double Distance(Vec2D a, Vec2D b)
+        {
+            return (a - b).Length();
+        }
+
         public Vec2D Normalize()
         {
             return this / Length();
@@ -226,9 +231,29 @@ namespace SDL2Engine
             return Math.Sqrt(x * x + y * y + z * z);
         }
 
+        public double Length2D()
+        {
+            return Math.Sqrt(x * x + y * y);
+        }
+
         public double LengthSquared()
         {
             return x * x + y * y + z * z;
+        }
+
+        public double LengthSquared2D()
+        {
+            return x * x + y * y;
+        }
+
+        public static double Distance(Vec3D a, Vec3D b)
+        {
+            return (a - b).Length();
+        }
+
+        public static double Distance2D(Vec3D a, Vec3D b)
+        {
+            return (a - b).Length2D();
         }
 
         public Vec3D Normalize()
@@ -267,7 +292,7 @@ namespace SDL2Engine
 
     public interface ICamera
     {
-        public Vec2D GetScreenPosition(Vec2D worldPosition);
+        public Vec2D WorldToScreen(Vec2D worldPosition);
     }
 
     public class Camera2D : ICamera
@@ -275,18 +300,22 @@ namespace SDL2Engine
         private Vec2D Position { get; set; }
         private Vec2D Size { get; set; }
 
-        private Vec2D ScreenSize { get; set; }
 
         public Camera2D(Vec2D position = new Vec2D())
         {
             this.Position = position;
             this.Size = new Vec2D(1920, 1080);
-            this.ScreenSize = new Vec2D(1920, 1080);
         }
 
-        public Vec2D GetScreenPosition(Vec2D worldPosition)
+        public Vec2D GetScreenSize()
         {
-            return new Vec2D((worldPosition.x - Position.x) * ScreenSize.x / Size.x, (worldPosition.y - Position.y) * ScreenSize.y / Size.y);
+            return new Vec2D(Engine.windowWidth, Engine.windowHeight);
+        }
+
+        public Vec2D WorldToScreen(Vec2D worldPosition)
+        {
+            Vec2D screenSize = GetScreenSize();
+            return new Vec2D((worldPosition.x - Position.x) * screenSize.x / Size.x, (worldPosition.y - Position.y) * screenSize.y / Size.y);
         }
 
     }
@@ -314,6 +343,7 @@ namespace SDL2Engine
         }
 
     }
+
     /*
      * Base class for all game objects
      * 
@@ -446,14 +476,38 @@ namespace SDL2Engine
             return null;
         }
 
-        public void AddComponent(Component script)
+        public T? AddComponent<T>() where T : Component
         {
-            scripts.Add(script);
+            
+            T? newComponent = (T?)Activator.CreateInstance(typeof(T), this);
+            
+            if (newComponent != null)
+            {
+                scripts.Add(newComponent);
+            } else
+            {
+                Console.WriteLine("Failed to create component of type " + typeof(T).Name);
+            }
+
+            return newComponent;
         }
 
-        public void RemoveComponent(Component script)
+        public bool RemoveComponent(Component script)
         {
-            scripts.Remove(script);
+            return scripts.Remove(script);
+        }
+
+        public bool RemoveComponent<T>() where T : Component
+        {
+            foreach (Component script in scripts)
+            {
+                if (script is T)
+                {
+                    return scripts.Remove(script);
+                }
+            }
+
+            return false;
         }
 
         // Gets first component of type T
@@ -503,17 +557,21 @@ namespace SDL2Engine
 
         // Override this method to draw custom graphics
         // By default, this method does nothing
-        virtual public void Draw(ICamera camera)
+        public void Draw(ICamera camera)
         {
-            // Do nothing
-        }
+            // draw drawables
+            foreach (Component script in scripts)
+            {
+                if (script is Drawable)
+                {
+                    ((Drawable)script).Draw(camera);
+                }
+            }
 
-        public void DrawAll(ICamera camera)
-        {
-            Draw(camera);
+            // Draw all children
             foreach (GameObject child in children)
             {
-                child.DrawAll(camera);
+                child.Draw(camera);
             }
         }
 
@@ -541,15 +599,6 @@ namespace SDL2Engine
             this.camera = camera;
         }
 
-
-        public override void Draw(ICamera camera)
-        {
-            // Draw all children
-            foreach (GameObject child in GetChildren())
-            {
-                child.Draw(camera);
-            }
-        }
 
         public ICamera GetCamera()
         {
@@ -686,6 +735,8 @@ namespace SDL2Engine
         private bool showDebug = false;
         private bool fullscreen = false;
         public static UInt32 targetFPS = 60;
+        public static int windowWidth = 800;
+        public static int windowHeight = 600;
 
 
         // SDL variables
@@ -716,7 +767,7 @@ namespace SDL2Engine
             // Create window
             window = SDL.SDL_CreateWindow("SDL2 Engine Test",
                 SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED,
-                800, 600, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
+                windowWidth, windowHeight, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
             if (window == IntPtr.Zero)
             {
                 Console.WriteLine("Window could not be created! SDL Error: " + SDL.SDL_GetError());
@@ -792,8 +843,17 @@ namespace SDL2Engine
                         this.HandleKeyboardEvent(sdlEvent.key);
                         break;
 
+                    // window resize event
+                    case SDL.SDL_EventType.SDL_WINDOWEVENT:
+                        if (sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED)
+                        {
+                            windowWidth = sdlEvent.window.data1;
+                            windowHeight = sdlEvent.window.data2;
+                        }
+                        break;
                     default:
                         break;
+
                 }
             }
         }
@@ -860,7 +920,7 @@ namespace SDL2Engine
             SDL.SDL_SetRenderDrawColor(renderer, 0x1F, 0x1F, 0x1F, 0xFF); // Dark gray
             SDL.SDL_RenderClear(renderer);
 
-            world.DrawAll(world.GetCamera());
+            world.Draw(world.GetCamera());
 
             if (showDebug)
             {

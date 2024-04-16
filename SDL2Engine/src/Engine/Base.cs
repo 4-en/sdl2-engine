@@ -300,6 +300,116 @@ namespace SDL2Engine
         {
             this.gameObject = gameObject;
         }
+
+        // Usefull methods to interact with other components
+        public T? GetComponent<T>() where T : Component
+        {
+            return gameObject.GetComponent<T>();
+        }
+
+        public List<T> GetComponents<T>() where T : Component
+        {
+            return gameObject.GetComponents<T>();
+        }
+
+        public T? AddComponent<T>() where T : Component
+        {
+            return gameObject.AddComponent<T>();
+        }
+
+        public bool RemoveComponent(Component script)
+        {
+            return gameObject.RemoveComponent(script);
+        }
+
+        public bool RemoveComponent<T>() where T : Component
+        {
+            return gameObject.RemoveComponent<T>();
+        }
+
+        public T? GetComponentInParent<T>() where T : Component
+        {
+            GameObject? parent = gameObject.GetParent();
+            while (parent != null)
+            {
+                T? component = parent.GetComponent<T>();
+                if (component != null)
+                {
+                    return component;
+                }
+                parent = parent.GetParent();
+            }
+
+            return null;
+        }
+
+        public T? GetComponentInChildren<T>() where T : Component
+        {
+            T? GetComponentInChildrenHelper<T>(GameObject parent) where T : Component
+            {
+                T? component = parent.GetComponent<T>();
+                if (component != null)
+                {
+                    return component;
+                }
+
+                List<GameObject> children = parent.GetChildren();
+                foreach (GameObject child in children)
+                {
+                    T? foundComponent = GetComponentInChildrenHelper<T>(child);
+                    if (foundComponent != null)
+                    {
+                        return foundComponent;
+                    }
+                }
+
+                return null;
+            }
+
+            return GetComponentInChildrenHelper<T>(gameObject);
+        }
+
+        public List<T> GetComponentsInChildren<T>() where T : Component
+        {
+            List<T> GetComponentsInChildrenHelper<T>(GameObject parent) where T : Component
+            {
+                List<T> foundComponents = new List<T>();
+                List<T> components = parent.GetComponents<T>();
+                foundComponents.AddRange(components);
+
+                List<GameObject> children = parent.GetChildren();
+                foreach (GameObject child in children)
+                {
+                    List<T> foundChildComponents = GetComponentsInChildrenHelper<T>(child);
+                    foundComponents.AddRange(foundChildComponents);
+                }
+
+                return foundComponents;
+            }
+
+            return GetComponentsInChildrenHelper<T>(gameObject);
+        }
+
+        public List<T> GetComponentsInParent<T>() where T : Component
+        {
+            List<T> foundComponents = new List<T>();
+            GameObject? parent = gameObject.GetParent();
+            while (parent != null)
+            {
+                List<T> components = parent.GetComponents<T>();
+                foundComponents.AddRange(components);
+                parent = parent.GetParent();
+            }
+
+            return foundComponents;
+        }
+
+        public GameObject GetGameObject()
+        {
+            return gameObject;
+        }
+
+
         // Override this method to provide custom functionality
         public virtual void Start()
         {
@@ -506,6 +616,21 @@ namespace SDL2Engine
             }
 
             return null;
+        }
+
+        // Gets all components of type T
+        public List<T> GetComponents<T>() where T : Component
+        {
+            List<T> foundComponents = new List<T>();
+            foreach (Component script in scripts)
+            {
+                if (script is T)
+                {
+                    foundComponents.Add((T)script);
+                }
+            }
+
+            return foundComponents;
         }
 
         public List<Component> GetScripts()

@@ -25,9 +25,9 @@ namespace SDL2Engine
     
     internal class Program
     {
-        static World CreateWorld()
+        static Scene CreateWorld()
         {
-            var world = new World();
+            var world = new Scene();
 
             // create a new game object
             var gameObject = new GameObject(world);

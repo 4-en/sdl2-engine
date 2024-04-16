@@ -16,8 +16,8 @@ namespace SDL2Engine
             var root = gameObject.GetRoot();
             if (root != null)
             {
-                World world = (World)root;
-                return world.GetCamera();
+                Scene scene = (Scene)root;
+                return scene.GetCamera();
             }
             return null;
         }

@@ -1,6 +1,4 @@
 ﻿using SDL2;
-using static SDL2.SDL;
-using System;
 
 namespace SDL2Engine
 {
@@ -565,10 +563,10 @@ namespace SDL2Engine
     }
 
 
-    public class World : GameObject
+    public class Scene : GameObject
     {
         private Camera camera;
-        public World()
+        public Scene()
         {
             this.Position = new Vec2D();
             this.ParentPosition = new Vec2D();
@@ -577,7 +575,7 @@ namespace SDL2Engine
             this.camera = new Camera2D(new Vec2D());
         }
 
-        public World(Camera camera)
+        public Scene(Camera camera)
         {
             this.Position = new Vec2D();
             this.ParentPosition = new Vec2D();
@@ -719,7 +717,7 @@ namespace SDL2Engine
     public class Engine
     {
 
-        private World world;
+        private Scene scene;
         private bool running = false;
         private bool showDebug = false;
         private bool fullscreen = false;
@@ -733,9 +731,9 @@ namespace SDL2Engine
         public static IntPtr renderer;
         private SDL.SDL_Event sdlEvent;
 
-        public Engine(World world)
+        public Engine(Scene scene)
         {
-            this.world = world;
+            this.scene = scene;
         }
 
         private void Init()
@@ -849,7 +847,7 @@ namespace SDL2Engine
 
         private void Update()
         {
-            world.Update();
+            scene.Update();
         }
 
         private void DrawDebug()
@@ -909,7 +907,7 @@ namespace SDL2Engine
             SDL.SDL_SetRenderDrawColor(renderer, 0x1F, 0x1F, 0x1F, 0xFF); // Dark gray
             SDL.SDL_RenderClear(renderer);
 
-            world.Draw(world.GetCamera());
+            scene.Draw(scene.GetCamera());
 
             if (showDebug)
             {

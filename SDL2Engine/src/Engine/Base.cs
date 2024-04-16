@@ -529,14 +529,16 @@ namespace SDL2Engine
 
         public void Update()
         {
-            foreach (Component script in scripts)
+            // Update all scripts
+            for(int i = 0; i < scripts.Count; i++)
             {
-                script.Update();
+                scripts[i].Update();
             }
 
-            foreach (GameObject child in children)
+            // Update all children
+            for(int i = 0; i < children.Count; i++)
             {
-                child.Update();
+                children[i].Update();
             }
         }
 

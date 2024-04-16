@@ -7,6 +7,19 @@ namespace SDL2Engine
 
     class MouseTracker : Component
     {
+        private void AddSquare()
+        {
+            var square = new GameObject();
+            var parent = this.gameObject.GetParent();
+            if (parent == null)
+            {
+                return;
+            }
+            parent.AddChild(square);
+            _ = square.AddComponent<RotatingSquare>();
+            square.SetPosition(this.gameObject.GetPosition());
+            
+        }
         public override void Update()
         {
             var mousePosition = Input.GetMousePosition();
@@ -19,6 +32,11 @@ namespace SDL2Engine
             }
 
             gameObject.SetPosition(mousePosition);
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                AddSquare();
+            }
         }
     }
     

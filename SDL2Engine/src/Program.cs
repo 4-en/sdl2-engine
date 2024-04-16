@@ -42,7 +42,7 @@ namespace SDL2Engine
     
     internal class Program
     {
-        static Scene CreateWorld()
+        static Scene CreateScene()
         {
             var world = new Scene();
 
@@ -67,7 +67,7 @@ namespace SDL2Engine
             Console.WriteLine("Starting SDL2 Engine...");
 
             // create an empty world and add it to the engine
-            var myWorld = CreateWorld();
+            var myWorld = CreateScene();
             var engine = new Engine(myWorld);
 
 

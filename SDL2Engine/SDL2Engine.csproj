@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishSingleFile>true</PublishSingleFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -16,9 +17,6 @@
     <DefineConstants>$(DefineConstants);ENGINE_TEST</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="SDL2-CS.NetCore" Version="2.0.8" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Update="Assets\Fonts\Roboto-Regular.ttf">

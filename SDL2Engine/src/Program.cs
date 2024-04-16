@@ -9,8 +9,7 @@ namespace SDL2Engine
     {
         public override void Update()
         {
-            var mouseState = SDL_GetMouseState(out int x, out int y);
-            var mousePosition = new Vec2D(x, y);
+            var mousePosition = Input.GetMousePosition();
             
             var gameObject = this.gameObject;
             var camera = Camera.GetCamera(gameObject);

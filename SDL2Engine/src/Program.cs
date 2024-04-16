@@ -45,9 +45,9 @@ namespace SDL2Engine
         }
     }
     
-    internal class Program
+    internal class EngineTest
     {
-        static Scene CreateScene()
+        public static Scene CreateScene()
         {
             var world = new Scene();
 

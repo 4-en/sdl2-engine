@@ -7,17 +7,24 @@ namespace SDL2Engine
 
     class MouseTracker : Component
     {
-        private void AddSquare()
+        private GameObject? AddSquare(GameObject? parent = null)
         {
-            var square = new GameObject();
-            var parent = this.gameObject.GetParent();
+            var square = new GameObject("Child Square");
             if (parent == null)
             {
-                return;
+                parent = this.gameObject.GetParent();
             }
+            if (parent == null)
+            {
+                return null;
+            }
+
             parent.AddChild(square);
             _ = square.AddComponent<RotatingSquare>();
             square.SetPosition(this.gameObject.GetPosition());
+
+
+            return square;
             
         }
 
@@ -41,6 +48,26 @@ namespace SDL2Engine
             if (Input.GetMouseButtonDown(0))
             {
                 AddSquare();
+            } else if (Input.GetMouseButtonDown(2))
+            {
+                var square = AddSquare(gameObject);
+                if (square != null)
+                {
+                    var rand = new Random();
+                    square.SetLocalPosition(new Vec2D(rand.Next(-100, 100), rand.Next(-100, 100)));
+                }
+            } else if (Input.GetMouseButtonDown(1))
+            {
+                // add 1000 squares
+                for (int i = 0; i < 1000; i++)
+                {
+                    var square = AddSquare(gameObject);
+                    if (square != null)
+                    {
+                        var rand = new Random();
+                        square.SetLocalPosition(new Vec2D(rand.Next(-100, 100), rand.Next(-100, 100)));
+                    }
+                }
             }
         }
     }
@@ -49,10 +76,10 @@ namespace SDL2Engine
     {
         public static Scene CreateScene()
         {
-            var world = new Scene();
+            var world = new Scene("World");
 
             // create a new game object
-            var gameObject = new GameObject(world);
+            var gameObject = new GameObject("Mouse Square", world);
 
             // add a drawable component to the game object
             _ = gameObject.AddComponent<RotatingSquare>();

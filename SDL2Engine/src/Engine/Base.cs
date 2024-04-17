@@ -624,7 +624,7 @@ namespace SDL2Engine
         private bool active = true;
         public string name = "GameObject";
         // Position of the GameObject
-        protected Transform _transform = new();
+        protected Transform _transform = new Transform();
         protected GameObject? Parent { get; set; }
         protected Scene? scene;
         private readonly List<GameObject> children = [];
@@ -636,13 +636,9 @@ namespace SDL2Engine
             this.Parent = null;
             this.scene = null;
             this.name = name;
+            this.transform.Init(this);
         }
 
-        public GameObject(Scene scene)
-        {
-            this.Parent = null;
-            this.scene = scene;
-        }
 
         public static GameObject Default
         {
@@ -743,10 +739,12 @@ namespace SDL2Engine
 
         public void AddChild(GameObject child)
         {
-            child.SetParentPosition(this.GetPosition());
             child.SetParent(this);
             child.SetScene(this.scene);
             children.Add(child);
+            child.SetParentPosition(this.GetPosition());
+
+
 
         }
 
@@ -795,6 +793,12 @@ namespace SDL2Engine
             
             if (newComponent != null)
             {
+                // prevent transform from being added as a component
+                if (newComponent is Transform)
+                {
+                    return null;
+                }
+
                 newComponent.Init(this);
                 components.Add(newComponent);
                 newComponent.Start();
@@ -827,6 +831,12 @@ namespace SDL2Engine
         // Gets first component of type T
         public T? GetComponent<T>() where T : Component
         {
+            // if component is transform, return transform
+            if (typeof(T) == typeof(Transform))
+            {
+                return (T)(Component)_transform;
+            }
+
             foreach (Component script in components)
             {
                 if (script is T)
@@ -841,6 +851,12 @@ namespace SDL2Engine
         // Gets all components of type T
         public List<T> GetComponents<T>() where T : Component
         {
+            if (typeof(T) == typeof(Transform))
+            {
+                List<T> transformList = [(T)(Component)_transform];
+                return transformList;
+            }
+
             List<T> foundComponents = new List<T>();
             foreach (Component script in components)
             {

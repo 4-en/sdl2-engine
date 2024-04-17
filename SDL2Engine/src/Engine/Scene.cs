@@ -13,12 +13,19 @@ namespace SDL2Engine
             this.scene = this;
             this.camera = new Camera2D(new Vec2D());
         }
-
         public Scene(Camera camera)
         {
             this.Parent = null;
             this.scene = this;
             this.camera = camera;
+        }
+
+        public Scene(string name)
+        {
+            this.Parent = null;
+            this.scene = this;
+            this.camera = new Camera2D(new Vec2D());
+            this.name = name;
         }
 
 

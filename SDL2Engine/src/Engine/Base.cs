@@ -783,6 +783,7 @@ namespace SDL2Engine
 
     public class Time
     {
+        public static ulong tick = 0;
         public static double time = 0;
         public static double deltaTime = 0;
 
@@ -1034,6 +1035,7 @@ namespace SDL2Engine
             Time.lastDrawTime = (double)SDL.SDL_GetTicks();
 
             Time.time = 0;
+            Time.tick = 0;
             uint beforeUpdate = SDL.SDL_GetTicks();
             while (running)
             {
@@ -1043,6 +1045,7 @@ namespace SDL2Engine
                 beforeUpdate = SDL.SDL_GetTicks();
                 Time.deltaTime = (beforeUpdate - Time.lastUpdateTime) / 1000.0;
                 Time.time += Time.deltaTime;
+                Time.tick++;
                 this.Update();
                 Time.lastUpdateTime = SDL.SDL_GetTicks();
                 Time.updateDuration = Time.lastUpdateTime - beforeUpdate;

@@ -5,7 +5,7 @@ using static SDL2.SDL;
 namespace SDL2Engine
 {
 
-    class MouseTracker : Component
+    class MouseTracker : Script
     {
         private GameObject? AddSquare(GameObject? parent = null)
         {

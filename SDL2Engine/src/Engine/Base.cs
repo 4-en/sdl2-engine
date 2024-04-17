@@ -524,17 +524,58 @@ namespace SDL2Engine
             return false; // Return false if no method was found and invoked
         }
 
-        // Override this method to provide custom functionality
+    }
+
+    public class Script : Component
+    {
+        // Base class for all scripts
+        // These scripts have a few virtual methods that can be overridden for custom functionality
+
+        // Virtual Methods in order of execution
+        // Override these method to provide custom funcionality
+
+        // 1.
+        // This method is called once when the Component is created
+        public virtual void Awake()
+        {
+            // Do nothing
+        }
+
+        // 2.
+        // This method is called during the first frame the script is active
         public virtual void Start()
         {
             // Do nothing
         }
 
-        // Override this method to provide custom functionality
+        // 3.
+        // This method is called every frame
         public virtual void Update()
         {
             // Do nothing
         }
+
+        // 4.
+        // This method is called every time the script is enabled. Probaly during Update()
+        public virtual void OnEnable()
+        {
+            // Do nothing
+        }
+
+        // 4.
+        // This method is called every time the script is disabled. Probaly during Update()
+        public virtual void OnDisable()
+        {
+            // Do nothing
+        }
+
+        // 5.
+        // This method is called every frame after all Update() methods are called
+        public virtual void LateUpdate()
+        {
+            // Do nothing
+        }
+
 
     }
 
@@ -801,7 +842,7 @@ namespace SDL2Engine
 
                 newComponent.Init(this);
                 components.Add(newComponent);
-                newComponent.Start();
+                //newComponent.Start();
             } else
             {
                 Console.WriteLine("Failed to create component of type " + typeof(T).Name);
@@ -878,7 +919,13 @@ namespace SDL2Engine
         {
             foreach (Component script in components)
             {
-                script.Start();
+
+                // TODO: optimize this by keeping a list of scripts in scene
+                // check if script is a script
+                if (script is Script)
+                {
+                    ((Script)script).Start();
+                }
             }
 
             foreach (GameObject child in children)
@@ -889,10 +936,15 @@ namespace SDL2Engine
 
         public void Update()
         {
+            // TODO: optimize this by keeping a list of scripts in scene
             // Update all scripts
             for(int i = 0; i < components.Count; i++)
             {
-                components[i].Update();
+                // check if script is a script
+                if (components[i] is Script)
+                {
+                    ((Script)components[i]).Update();
+                }
             }
 
             // Update all children

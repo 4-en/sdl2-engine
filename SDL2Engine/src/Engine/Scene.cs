@@ -7,6 +7,8 @@ namespace SDL2Engine
         private Camera camera;
 
         private List<Drawable> drawableList = new();
+        private List<Collider> colliderList = new();
+        private List<Script> scripts = new();
         public Scene()
         {
             this.Parent = null;
@@ -37,34 +39,34 @@ namespace SDL2Engine
         public void ActivateComponent<T>(T component) where T : Component
         {
             // Store some component types in lists for quick access
-            if (component is Drawable)
+            switch (component)
             {
-                Drawable? drawable = component as Drawable;
-                if (drawable == null)
-                {
-                    Console.WriteLine("Error: Drawable is null");
-                    return;
-                }
-                drawableList.Add(drawable);
-
-                return;
+                case Drawable drawable:
+                    drawableList.Add(drawable);
+                    break;
+                case Collider collider:
+                    colliderList.Add(collider);
+                    break;
+                case Script script:
+                    scripts.Add(script);
+                    break;
             }
         }
 
         public void DeactivateComponent<T>(T component) where T : Component
         {
             // Remove some component types from lists
-            if (component is Drawable)
+            switch (component)
             {
-                Drawable? drawable = component as Drawable;
-                if (drawable == null)
-                {
-                    Console.WriteLine("Error: Drawable is null");
-                    return;
-                }
-                drawableList.Remove(drawable);
-
-                return;
+                case Drawable drawable:
+                    drawableList.Remove(drawable);
+                    break;
+                case Collider collider:
+                    colliderList.Remove(collider);
+                    break;
+                case Script script:
+                    scripts.Remove(script);
+                    break;
             }
         }
 

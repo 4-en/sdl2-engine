@@ -66,4 +66,19 @@ namespace SDL2Engine
         }
 
     }
+
+    public class SceneManager
+    {
+        private static Scene? activeScene;
+
+        public static Scene? GetActiveScene()
+        {
+            return activeScene;
+        }
+
+        public static void SetActiveScene(Scene scene)
+        {
+            activeScene = scene;
+        }
+    }
 }

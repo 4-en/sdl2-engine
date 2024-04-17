@@ -7,7 +7,7 @@ namespace SDL2Engine
     /// 
     /// Has various methods to check if a key is pressed, released or held down
     /// </summary>
-    public class Input
+    public static class Input
     {
         private static readonly UInt32[] downKeys = new UInt32[16];
         private static readonly UInt32[] pressedKeys = new UInt32[16];

@@ -70,7 +70,7 @@ namespace SDL2Engine
 
     }
 
-    public class SceneManager
+    public static class SceneManager
     {
         private static Scene? activeScene;
 

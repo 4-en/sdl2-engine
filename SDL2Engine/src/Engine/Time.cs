@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SDL2Engine
 {
-    public class Time
+    public static class Time
     {
         public static ulong tick = 0;
         public static double time = 0;

@@ -19,7 +19,7 @@ namespace SDL2Engine
         // This class should contain information about a collision between a ray and a collider
         private Collider? collider;
     }
-    public class Physics
+    public static class Physics
     {
         public static bool Raycast(Vec2D origin, Vec2D direction, double distance, out RaycastHit hit)
         {

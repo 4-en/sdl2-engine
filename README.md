@@ -4,6 +4,10 @@
 ## Overview
 This simple engine for creating 2D games using SDL2 and C#. It allows for easy manipulation of game objects and components through a straightforward API. The engine supports basic vector operations, input handling, game object management, and rendering capabilities.
 
+```bash
+git clone --recurse-submodules https://github.com/4-en/sdl2-engine.git
+```
+
 ## Structure
 The engine is organized into several key classes and components:
 
@@ -48,9 +52,22 @@ public static Scene CreateScene()
 This function sets up a scene with a single GameObject that includes a `RotatingSquare` component for visual rendering and a `MouseTracker` component for mouse position tracking.
 
 ## Requirements
+Clone this repository including submodules:
+```bash
+git clone --recurse-submodules https://github.com/4-en/sdl2-engine.git
+```
+
+Update submodules afterwards:
+```bash
+git submodule update --init --recursive
+```
+
+Required Libraries (so far):
 - SDL2
 - SDL2_ttf (for text rendering)
-- .NET compatible development environment
+
+Windows DLLs are already provided.
+For Linux, use install_requirements.sh to install libraries or build from source manually.
 
 ## Building and Running
 1. Ensure SDL2 and SDL2_ttf libraries are installed and correctly linked in your project settings.

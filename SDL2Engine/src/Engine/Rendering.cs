@@ -132,6 +132,20 @@ namespace SDL2Engine
     public class RotatingSquare : Drawable
     {
 
+        SDL_Rect rect;
+
+        public RotatingSquare()
+        {
+            // load sdl rect
+            /*
+            rect = new SDL_Rect();
+
+            rect.w = 333;
+            rect.h = 333;
+            */
+
+        }
+
         public double rotationsPerSecond = 0.3;
 
 
@@ -177,6 +191,14 @@ namespace SDL2Engine
                 Vec2D p2 = points[(i + 1) % points.Count];
                 SDL_RenderDrawLine(renderer, (int)(p1.x + center.x), (int)(p1.y + center.y), (int)(p2.x + center.x), (int)(p2.y + center.y));
             }
+
+            // render the square
+            /*
+            rect.x = (int)(center.x - rect.w / 2);
+            rect.y = (int)(center.y - rect.h / 2);
+
+            SDL_RenderDrawRect(renderer, ref rect);
+            */
 
             
         }

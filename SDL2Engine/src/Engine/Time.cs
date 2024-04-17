@@ -8,6 +8,8 @@ namespace SDL2Engine
 {
     public static class Time
     {
+
+        // all time values are in seconds
         public static ulong tick = 0;
         public static double time = 0;
         public static double deltaTime = 0;

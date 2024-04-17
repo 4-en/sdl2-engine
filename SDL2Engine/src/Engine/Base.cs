@@ -1,5 +1,7 @@
 ﻿using SDL2;
+using System.Diagnostics;
 using System.Reflection;
+using static System.Diagnostics.Stopwatch;
 
 namespace SDL2Engine
 {
@@ -844,10 +846,10 @@ namespace SDL2Engine
             string[] debugStrings =
             {
                 "FPS: " + Time.GetFPS().ToString("0.00"),
-                "Update Duration: " + Time.updateDuration.ToString("0.00") + " ms",
-                "Draw Duration: " + Time.drawDuration.ToString("0.00") + " ms",
-                "Total Duration: " + Time.totalDuration.ToString("0.00") + " ms",
-                "Free Duration: " + Time.freeDuration.ToString("0.00") + " ms"
+                "Update Duration: " + (1000*Time.updateDuration).ToString("0.00") + " ms",
+                "Draw Duration: " + (1000*Time.drawDuration).ToString("0.00") + " ms",
+                "Total Duration: " + (1000*Time.totalDuration).ToString("0.00") + " ms",
+                "Free Duration: " + (1000*Time.freeDuration).ToString("0.00") + " ms"
             };
 
             for (int i = 0; i < debugStrings.Length; i++)
@@ -902,36 +904,39 @@ namespace SDL2Engine
             // Initialize SDL2
             Init();
 
-
-            Time.lastUpdateTime = (double)SDL.SDL_GetTicks();
-            Time.lastDrawTime = (double)SDL.SDL_GetTicks();
+            double ticksToSec = 1.0 / Stopwatch.Frequency;
+            long tickStart = Stopwatch.GetTimestamp();
+            long beforeUpdate = tickStart;
+            double beforeUpdateSec = ticksToSec * beforeUpdate;
+            Time.lastUpdateTime = ticksToSec * tickStart;
+            Time.lastDrawTime = Time.lastUpdateTime;
 
             Time.time = 0;
             Time.tick = 0;
-            uint beforeUpdate = SDL.SDL_GetTicks();
             while (running)
             {
                 // Handle events on queue
                 HandleEvents();
 
-                beforeUpdate = SDL.SDL_GetTicks();
-                Time.deltaTime = (beforeUpdate - Time.lastUpdateTime) / 1000.0;
+                beforeUpdate = Stopwatch.GetTimestamp();
+                beforeUpdateSec = ticksToSec * beforeUpdate;
+                Time.deltaTime = (beforeUpdateSec - Time.lastUpdateTime);
                 Time.time += Time.deltaTime;
                 Time.tick++;
                 this.Update();
-                Time.lastUpdateTime = SDL.SDL_GetTicks();
-                Time.updateDuration = Time.lastUpdateTime - beforeUpdate;
+                Time.lastUpdateTime = ticksToSec * Stopwatch.GetTimestamp();
+                Time.updateDuration = Time.lastUpdateTime - beforeUpdateSec;
                 this.Draw();
-                Time.lastDrawTime = SDL.SDL_GetTicks();
+                Time.lastDrawTime = ticksToSec * Stopwatch.GetTimestamp();
                 Time.drawDuration = Time.lastDrawTime - Time.lastUpdateTime;
 
                 // Cap the frame rate
-                Time.totalDuration = Time.lastDrawTime - beforeUpdate;
+                Time.totalDuration = Time.lastDrawTime - beforeUpdateSec;
                 Time.freeDuration = 0;
-                if (Time.totalDuration < 1000.0 / targetFPS)
+                if (Time.totalDuration < 1.0 / targetFPS)
                 {
-                    Time.freeDuration = 1000.0 / targetFPS - Time.totalDuration;
-                    SDL.SDL_Delay((uint)(1000.0 / targetFPS - Time.totalDuration));
+                    Time.freeDuration = 1.0 / targetFPS - Time.totalDuration;
+                    SDL.SDL_Delay((uint)(Time.freeDuration * 1000));
                 }
 
             }

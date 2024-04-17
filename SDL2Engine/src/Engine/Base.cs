@@ -364,6 +364,16 @@ namespace SDL2Engine
             return gameObject.RemoveComponent<T>();
         }
 
+        public Camera? GetCamera()
+        {
+            var scene = gameObject.GetScene();
+            if (scene != null)
+            {
+                return scene.GetCamera();
+            }
+            return null;
+        }
+
         public T? GetComponentInParent<T>() where T : Component
         {
             GameObject? parent = gameObject.GetParent();

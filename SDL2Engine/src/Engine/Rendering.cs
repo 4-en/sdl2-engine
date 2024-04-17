@@ -5,6 +5,20 @@ using System;
 namespace SDL2Engine
 {
 
+    // Used to calculate origin relative to GameObject position
+    public enum AnchorPoint
+    {
+        TopLeft,
+        TopCenter,
+        TopRight,
+        CenterLeft,
+        Center,
+        CenterRight,
+        BottomLeft,
+        BottomCenter,
+        BottomRight
+    }
+
     public abstract class Camera : Component
     {
         public abstract Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D());
@@ -77,9 +91,28 @@ namespace SDL2Engine
     public class Drawable : Component
     {
 
+        protected AnchorPoint anchorPoint = AnchorPoint.Center;
+
         public virtual void Draw(Camera camera)
         {
             throw new NotImplementedException();
+        }
+
+        public virtual Vec2D GetDrawRoot()
+        {
+            var goRoot = this.gameObject.GetPosition();
+
+            // for implemented Drawables, we should use the outline of the drawable to calculate the root with the anchor point
+            // in this case, we ignore the anchor point and just return the position of the GameObject
+
+            Camera? camera = GetCamera();
+            if (camera != null)
+            {
+                return camera.WorldToScreen(goRoot);
+            }
+
+            return goRoot;
+
         }
     }
 

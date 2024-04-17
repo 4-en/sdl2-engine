@@ -782,28 +782,6 @@ namespace SDL2Engine
 
     }
 
-
-    public class Time
-    {
-        public static ulong tick = 0;
-        public static double time = 0;
-        public static double deltaTime = 0;
-
-        public static double lastDrawTime = 0;
-        public static double lastUpdateTime = 0;
-
-        public static double updateDuration = 0;
-        public static double drawDuration = 0;
-        public static double totalDuration = 0;
-        public static double freeDuration = 0;
-
-        public static double GetFPS()
-        {
-            return 1.0 / deltaTime;
-        }
-    }
-
-
     public class Engine
     {
 

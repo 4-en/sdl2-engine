@@ -19,6 +19,18 @@ namespace SDL2Engine
         BottomRight
     }
 
+    // DepthBuffer class to store depth values for each pixel of the screen
+    // Can be used for occlusion culling
+    public class DepthBuffer
+    {
+        private float[,] buffer = new float[Engine.windowWidth, Engine.windowHeight];
+        private float minDepth = 0;
+        private float maxDepth = 1;
+
+        // TODO: Implement DepthBuffer class
+        // maybe this is not necessary for now, but keep in mind if performance is an issue
+    }
+
     public abstract class Camera : Component
     {
         public abstract Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D());

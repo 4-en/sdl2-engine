@@ -4,7 +4,7 @@ namespace SDL2Engine
 {
     public class Scene : GameObject
     {
-        private Camera camera;
+        private Camera mainCamera;
 
         private List<Drawable> drawableList = new();
         private List<Collider> colliderList = new();
@@ -13,27 +13,27 @@ namespace SDL2Engine
         {
             this.Parent = null;
             this.scene = this;
-            this.camera = new Camera2D(new Vec2D());
+            this.mainCamera = new Camera2D(new Vec2D());
         }
         public Scene(Camera camera)
         {
             this.Parent = null;
             this.scene = this;
-            this.camera = camera;
+            this.mainCamera = camera;
         }
 
         public Scene(string name)
         {
             this.Parent = null;
             this.scene = this;
-            this.camera = new Camera2D(new Vec2D());
+            this.mainCamera = new Camera2D(new Vec2D());
             this.name = name;
         }
 
 
         public Camera GetCamera()
         {
-            return camera;
+            return mainCamera;
         }
 
         public void ActivateComponent<T>(T component) where T : Component

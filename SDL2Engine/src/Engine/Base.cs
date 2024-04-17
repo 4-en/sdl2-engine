@@ -510,6 +510,7 @@ namespace SDL2Engine
     {
         public uint layer = 0;
         private bool active = true;
+        public string name = "GameObject";
         // Position of the GameObject
         protected Vec2D Position { get; set; }
         protected Vec2D ParentPosition { get; set; }
@@ -518,12 +519,13 @@ namespace SDL2Engine
         private readonly List<GameObject> children = [];
         private readonly List<Component> components = [];
 
-        public GameObject()
+        public GameObject(string name = "GameObject", Scene? scene = null)
         {
             this.Position = new Vec2D();
             this.ParentPosition = new Vec2D();
             this.Parent = null;
             this.scene = null;
+            this.name = name;
         }
 
         public GameObject(Scene scene)

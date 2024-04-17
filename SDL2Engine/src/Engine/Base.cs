@@ -577,6 +577,20 @@ namespace SDL2Engine
         }
 
 
+        public Transform transform
+        {
+            get
+            {
+                return gameObject.transform;
+            }
+
+            set
+            {
+                gameObject.transform = value;
+            
+            }
+        }
+
     }
 
     /*
@@ -703,7 +717,8 @@ namespace SDL2Engine
 
             set
             {
-                _transform = value;
+                // instead of switching the transform, update the position
+                _transform.position = value.position;
             }
         }
 

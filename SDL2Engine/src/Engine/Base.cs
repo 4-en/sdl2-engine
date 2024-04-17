@@ -6,63 +6,65 @@ namespace SDL2Engine
 
     public struct Vec2D
     {
-        public double x;
-        public double y;
+        public double x=0;
+        public double y=0;
+        public double z=0; // Vec2D has a z component for layering
 
-        public Vec2D(double x = 0, double y = 0)
+        public Vec2D(double x = 0, double y = 0, double z = 0)
         {
             this.x = x;
             this.y = y;
+            this.z = z;
         }
 
         public static Vec2D operator +(Vec2D a, Vec2D b)
         {
-            return new Vec2D(a.x + b.x, a.y + b.y);
+            return new Vec2D(a.x + b.x, a.y + b.y, a.z);
         }
 
         public static Vec2D operator -(Vec2D a, Vec2D b)
         {
-            return new Vec2D(a.x - b.x, a.y - b.y);
+            return new Vec2D(a.x - b.x, a.y - b.y, a.z);
         }
 
         public static Vec2D operator *(Vec2D a, double b)
         {
-            return new Vec2D(a.x * b, a.y * b);
+            return new Vec2D(a.x * b, a.y * b, a.z);
         }
 
         public static Vec2D operator /(Vec2D a, double b)
         {
-            return new Vec2D(a.x / b, a.y / b);
+            return new Vec2D(a.x / b, a.y / b, a.z);
         }
 
         public static Vec2D operator *(double a, Vec2D b)
         {
-            return new Vec2D(a * b.x, a * b.y);
+            return new Vec2D(a * b.x, a * b.y, b.z);
         }
 
         public static Vec2D operator /(double a, Vec2D b)
         {
-            return new Vec2D(a / b.x, a / b.y);
+            return new Vec2D(a / b.x, a / b.y, b.z);
         }
 
         public static Vec2D operator *(Vec2D a, Vec2D b)
         {
-            return new Vec2D(a.x * b.x, a.y * b.y);
+            return new Vec2D(a.x * b.x, a.y * b.y, a.z);
         }
 
         public static Vec2D operator /(Vec2D a, Vec2D b)
         {
-            return new Vec2D(a.x / b.x, a.y / b.y);
+            return new Vec2D(a.x / b.x, a.y / b.y, a.z);
         }
 
         public static Vec2D operator -(Vec2D a)
         {
-            return new Vec2D(-a.x, -a.y);
+            return new Vec2D(-a.x, -a.y, a.z);
         }
 
         public static Vec2D operator +(Vec2D a)
         {
-            return new Vec2D(+a.x, +a.y);
+            return new Vec2D(+a.x, +a.y, a.z);
         }
 
         public static bool operator ==(Vec2D a, Vec2D b)
@@ -70,7 +72,12 @@ namespace SDL2Engine
             return a.x == b.x && a.y == b.y;
         }
 
-        public override readonly bool Equals(object? obj)
+        public static bool Equals3D(Vec2D a, Vec2D b)
+        {
+            return a.x == b.x && a.y == b.y && a.z == b.z;
+        }
+
+        public override bool Equals(object? obj)
         {
             return obj is Vec2D v && this == v;
         }
@@ -90,9 +97,19 @@ namespace SDL2Engine
             return a.x * b.x + a.y * b.y;
         }
 
+        public static double Dot3D(Vec2D a, Vec2D b)
+        {
+            return a.x * b.x + a.y * b.y + a.z * b.z;
+        }
+
         public double Length()
         {
             return Math.Sqrt(x * x + y * y);
+        }
+
+        public double Length3D()
+        {
+            return Math.Sqrt(x * x + y * y + z * z);
         }
 
         public double LengthSquared()
@@ -100,9 +117,31 @@ namespace SDL2Engine
             return x * x + y * y;
         }
 
+        public double LengthSquared3D()
+        {
+            return x * x + y * y + z * z;
+        }
+
         public static double Distance(Vec2D a, Vec2D b)
         {
             return (a - b).Length();
+        }
+
+        public static double Distance3D(Vec2D a, Vec2D b)
+        {
+            Vec2D diff = new(a.x - b.x, a.y - b.y, a.z - b.z);
+            return diff.Length3D();
+        }
+
+        public static double DistanceSquared(Vec2D a, Vec2D b)
+        {
+            return (a - b).LengthSquared();
+        }
+
+        public static double DistanceSquared3D(Vec2D a, Vec2D b)
+        {
+            Vec2D diff = new(a.x - b.x, a.y - b.y, a.z - b.z);
+            return diff.LengthSquared3D();
         }
 
         public Vec2D Normalize()
@@ -200,7 +239,7 @@ namespace SDL2Engine
             return a.x == b.x && a.y == b.y && a.z == b.z;
         }
 
-        public override readonly bool Equals(object? obj)
+        public override bool Equals(object? obj)
         {
             return obj is Vec3D v && this == v;
         }
@@ -290,12 +329,12 @@ namespace SDL2Engine
      */
     public class Component
     {
-        protected GameObject gameObject;
+        protected GameObject gameObject = GameObject.Default;
         private bool active = false;
 
-        protected Component()
+        protected  Component()
         {
-            gameObject = new GameObject();
+            
         }
 
         public void Init(GameObject gameObject)
@@ -506,23 +545,94 @@ namespace SDL2Engine
      * and can be overridden to provide custom
      * functionality
      */
+
+    public class Transform : Component
+    {
+        private Vec2D _position = new Vec2D();
+        private Vec2D _localPosition = new Vec2D();
+
+        public void UpdateChildren()
+        {
+            var children = gameObject.GetChildren();
+            foreach (GameObject child in children)
+            {
+                child.SetParentPosition(position);
+            }
+        }
+
+        // sets the position to a specific world position
+        // adjust _localPosition to keep parent position the same
+        public Vec2D position
+        {
+            get
+            {
+                return _position;
+            }
+            set
+            {
+                var diff = value - _position;
+                localPosition += diff;
+            }
+        }
+
+        // sets the position to a specific local position
+        // this is the position relative to the parent
+        public Vec2D localPosition
+        {
+            get
+            {
+                return _localPosition;
+            }
+            set
+            {
+                // remove local position from parent position
+                var rootPosition = _position - _localPosition;
+                _position = value + rootPosition;
+                _localPosition = value;
+
+                UpdateChildren();
+            }
+        }
+
+        // sets the parent position directly
+        public void SetParentPosition(Vec2D parentPosition)
+        {
+            _position = _localPosition + parentPosition;
+            UpdateChildren();
+        }
+
+        public Vec2D GetPosition()
+        {
+            return position;
+        }
+
+        public Vec2D GetLocalPosition()
+        {
+            return localPosition;
+        }
+
+        private Vec2D _scale = new Vec2D(1, 1);
+        private Vec2D _localScale = new Vec2D(1, 1);
+        private Vec2D _rotation = new Vec2D();
+        private Vec2D _localRotation = new Vec2D();
+        
+        
+    }
     public class GameObject
     {
         public uint layer = 0;
         private bool active = true;
         public string name = "GameObject";
         // Position of the GameObject
-        protected Vec2D Position { get; set; }
-        protected Vec2D ParentPosition { get; set; }
+        protected Transform _transform = new();
         protected GameObject? Parent { get; set; }
         protected Scene? scene;
         private readonly List<GameObject> children = [];
         private readonly List<Component> components = [];
+        private static readonly GameObject defaultObject = new("default");
 
         public GameObject(string name = "GameObject", Scene? scene = null)
         {
-            this.Position = new Vec2D();
-            this.ParentPosition = new Vec2D();
             this.Parent = null;
             this.scene = null;
             this.name = name;
@@ -530,18 +640,33 @@ namespace SDL2Engine
 
         public GameObject(Scene scene)
         {
-            this.Position = new Vec2D();
-            this.ParentPosition = new Vec2D();
             this.Parent = null;
             this.scene = scene;
         }
 
+        public static GameObject Default
+        {
+            get
+            {
+                return defaultObject;
+            }
+        }
+
         public void UpdateChildPositions()
         {
-            var myPosition = this.GetPosition();
-            foreach (GameObject child in children)
+            this._transform.UpdateChildren();
+        }
+
+        public Transform transform
+        {
+            get
             {
-                child.SetParentPosition(myPosition);
+                return _transform;
+            }
+
+            set
+            {
+                _transform = value;
             }
         }
 
@@ -597,23 +722,24 @@ namespace SDL2Engine
 
         public Vec2D GetPosition()
         {
-            return this.ParentPosition + this.Position;
+            return this._transform.GetPosition();
         }
 
         public void SetPosition(Vec2D position)
         {
-            this.Position = position;
-            this.UpdateChildPositions();
+            this._transform.position = position;
 
+        }
+
+        public void SetLocalPosition(Vec2D position)
+        {
+            this._transform.localPosition = position;
         }
 
         public void SetParentPosition(Vec2D position)
         {
-            this.ParentPosition = position;
-            this.UpdateChildPositions();
+            this._transform.SetParentPosition(position);
         }
-
-
 
         public void AddChild(GameObject child)
         {

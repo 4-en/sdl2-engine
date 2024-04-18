@@ -80,6 +80,9 @@ namespace SDL2Engine
                     break;
                 }
             }
+
+            // set key in downKeys
+            SetKeyDown(key);
         }
 
         public static void SetKeyReleased(UInt32 key)
@@ -92,14 +95,27 @@ namespace SDL2Engine
                     break;
                 }
             }
+
+            // remove key from downKeys
+            for (int i = 0; i < downKeys.Length; i++)
+            {
+                if (downKeys[i] == key)
+                {
+                    downKeys[i] = 0;
+                    break;
+                }
+            }
         }
 
         public static void ClearInputs()
         {
+            /*
+             * downKeys are reset when the key is released
             for (int i = 0; i < downKeys.Length; i++)
             {
                 downKeys[i] = 0;
             }
+            */
 
             for (int i = 0; i < pressedKeys.Length; i++)
             {
@@ -111,10 +127,12 @@ namespace SDL2Engine
                 releasedKeys[i] = 0;
             }
 
+            /* downKeys are reset when the key is released
             for (int i = 0; i < mouseButtonsDown.Length; i++)
             {
                 mouseButtonsDown[i] = false;
             }
+            */
 
             for (int i = 0; i < mouseButtonsPressed.Length; i++)
             {
@@ -180,6 +198,8 @@ namespace SDL2Engine
                 return;
             }
             mouseButtonsPressed[button] = true;
+            // set button as down
+            SetMouseButtonDown(button);
         }
 
         public static void SetMouseButtonReleased(int button)
@@ -189,6 +209,7 @@ namespace SDL2Engine
                 return;
             }
             mouseButtonsReleased[button] = true;
+            mouseButtonsDown[button] = false;
         }
 
         public static void SetMousePosition(Vec2D position)

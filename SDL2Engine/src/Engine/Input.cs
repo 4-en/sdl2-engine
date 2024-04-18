@@ -21,9 +21,9 @@ namespace SDL2Engine
 
         public static bool GetKeyPressed(UInt32 key)
         {
-            for (int i = 0; i < downKeys.Length; i++)
+            for (int i = 0; i < pressedKeys.Length; i++)
             {
-                if (downKeys[i] == key)
+                if (pressedKeys[i] == key)
                 {
                     return true;
                 }
@@ -34,9 +34,9 @@ namespace SDL2Engine
 
         public static bool GetKeyDown(UInt32 key)
         {
-            for (int i = 0; i < pressedKeys.Length; i++)
+            for (int i = 0; i < downKeys.Length; i++)
             {
-                if (pressedKeys[i] == key)
+                if (downKeys[i] == key)
                 {
                     return true;
                 }
@@ -60,6 +60,7 @@ namespace SDL2Engine
 
         public static void SetKeyDown(UInt32 key)
         {
+            Console.WriteLine("Key down: " + key);
             for (int i = 0; i < downKeys.Length; i++)
             {
                 if (downKeys[i] == 0)
@@ -68,10 +69,13 @@ namespace SDL2Engine
                     break;
                 }
             }
+
+            SetKeyPressed(key);
         }
 
         public static void SetKeyPressed(UInt32 key)
         {
+            Console.WriteLine("Key pressed: " + key);
             for (int i = 0; i < pressedKeys.Length; i++)
             {
                 if (pressedKeys[i] == 0)
@@ -81,12 +85,11 @@ namespace SDL2Engine
                 }
             }
 
-            // set key in downKeys
-            SetKeyDown(key);
         }
 
         public static void SetKeyReleased(UInt32 key)
         {
+            Console.WriteLine("Key released: " + key);
             for (int i = 0; i < releasedKeys.Length; i++)
             {
                 if (releasedKeys[i] == 0)
@@ -96,12 +99,13 @@ namespace SDL2Engine
                 }
             }
 
-            // remove key from downKeys
-            for (int i = 0; i < downKeys.Length; i++)
+            // remove key from pressedKeys
+            for (int i = 0; i < pressedKeys.Length; i++)
             {
-                if (downKeys[i] == key)
+                if (pressedKeys[i] == key)
                 {
-                    downKeys[i] = 0;
+                    Console.WriteLine("Removing key from pressedKeys: " + key);
+                    pressedKeys[i] = 0;
                     break;
                 }
             }
@@ -109,35 +113,38 @@ namespace SDL2Engine
 
         public static void ClearInputs()
         {
-            /*
-             * downKeys are reset when the key is released
+            
             for (int i = 0; i < downKeys.Length; i++)
             {
                 downKeys[i] = 0;
             }
-            */
 
+            /*
+             * pressedKeys are reset when the key is released
             for (int i = 0; i < pressedKeys.Length; i++)
             {
                 pressedKeys[i] = 0;
             }
+            */
 
             for (int i = 0; i < releasedKeys.Length; i++)
             {
                 releasedKeys[i] = 0;
             }
 
-            /* downKeys are reset when the key is released
+            
             for (int i = 0; i < mouseButtonsDown.Length; i++)
             {
                 mouseButtonsDown[i] = false;
             }
-            */
 
+            /*
+             * pressedKeys are reset when the key is released
             for (int i = 0; i < mouseButtonsPressed.Length; i++)
             {
                 mouseButtonsPressed[i] = false;
             }
+            */
 
             for (int i = 0; i < mouseButtonsReleased.Length; i++)
             {
@@ -189,6 +196,7 @@ namespace SDL2Engine
                 return;
             }
             mouseButtonsDown[button] = true;
+            SetMouseButtonPressed(button);
         }
 
         public static void SetMouseButtonPressed(int button)
@@ -198,8 +206,6 @@ namespace SDL2Engine
                 return;
             }
             mouseButtonsPressed[button] = true;
-            // set button as down
-            SetMouseButtonDown(button);
         }
 
         public static void SetMouseButtonReleased(int button)
@@ -209,7 +215,7 @@ namespace SDL2Engine
                 return;
             }
             mouseButtonsReleased[button] = true;
-            mouseButtonsDown[button] = false;
+            mouseButtonsPressed[button] = false;
         }
 
         public static void SetMousePosition(Vec2D position)

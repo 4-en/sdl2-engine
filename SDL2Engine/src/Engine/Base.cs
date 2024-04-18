@@ -351,6 +351,23 @@ namespace SDL2Engine
             this.SetActive(false);
         }
 
+        // copy all members of the component
+        public static T Instantiate<T>(T source, GameObject? gameObject = null) where T : Component, new()
+        {
+            T newComponent = new T();
+            newComponent.Init(gameObject ?? source.gameObject);
+
+            // use reflection to copy all members of the component
+            FieldInfo[] fields = source.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            foreach (FieldInfo field in fields)
+            {
+                field.SetValue(newComponent, field.GetValue(source));
+            }
+
+            return newComponent;
+            
+        }
+
         public void SetActive(bool active)
         {
             if (active == this.active)

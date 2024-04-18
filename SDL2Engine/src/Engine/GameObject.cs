@@ -1,4 +1,6 @@
-﻿namespace SDL2Engine
+﻿using System.Reflection;
+
+namespace SDL2Engine
 {
     public class GameObject
     {
@@ -19,6 +21,52 @@
             this.scene = null;
             this.name = name;
             this.transform.Init(this);
+        }
+
+        // creates a deep copy of the GameObject
+        public static GameObject Instantiate(GameObject source)
+        {
+
+            // setups the new object
+            GameObject newObject = new GameObject(source.name);
+            newObject.layer = source.layer;
+            newObject.active = source.active;
+            newObject.transform = source.transform;
+            newObject.Parent = source.Parent;
+            newObject.scene = source.scene;
+
+            // copy all components
+            foreach (Component script in source.components)
+            {
+                Type type = script.GetType();
+                // create a new instance of the script
+                object? o = Activator.CreateInstance(type);
+                if (o == null || !(o is Component))
+                {
+                    Console.WriteLine("Failed to create component of type " + type.Name);
+                    continue;
+                }
+                Component newComponent = (Component)o;
+
+                // use reflection to copy all members of the component
+                FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                foreach (FieldInfo field in fields)
+                {
+                    field.SetValue(newComponent, field.GetValue(script));
+                }
+            }
+
+            // copy all children
+            foreach (GameObject child in source.children)
+            {
+                GameObject newChild = GameObject.Instantiate(child);
+                // fix references to new object
+                newChild.Parent = newObject;
+                newObject.children.Add(newChild);
+            }
+
+            return newObject;
+            
         }
 
 

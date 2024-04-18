@@ -19,7 +19,18 @@ namespace SDL2Engine
         private static bool[] mouseButtonsPressed = new bool[3];
         private static bool[] mouseButtonsReleased = new bool[3];
 
+        public static bool GetKeyPressed(UInt32 key)
+        {
+            for (int i = 0; i < downKeys.Length; i++)
+            {
+                if (downKeys[i] == key)
+                {
+                    return true;
+                }
+            }
 
+            return false;
+        }
 
         public static bool GetKeyDown(UInt32 key)
         {

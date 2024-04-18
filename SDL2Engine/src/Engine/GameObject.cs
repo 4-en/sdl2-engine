@@ -23,6 +23,14 @@ namespace SDL2Engine
             this.transform.Init(this);
         }
 
+        // Creates a new GameObject as a child of this GameObject
+        public GameObject CreateChild(string name = "GameObject")
+        {
+            GameObject newGameObject = new GameObject(name, this.scene);
+            this.AddChild(newGameObject);
+            return newGameObject;
+        }
+
         // creates a deep copy of the GameObject
         public static GameObject Instantiate(GameObject source)
         {

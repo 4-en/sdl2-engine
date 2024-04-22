@@ -350,17 +350,6 @@ namespace SDL2Engine
             {
                 children[i].Update();
             }
-
-            // Update Physics
-            List<GameObject> objects_with_collider = new List<GameObject>();
-            foreach (GameObject child in children)
-            {
-                if (child.GetComponent<Collider>() != null)
-                {
-                    objects_with_collider.Add(child);
-                }
-            }
-            Physics.UpdatePhysics(objects_with_collider);
         }
 
         // Override this method to draw custom graphics

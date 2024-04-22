@@ -757,10 +757,10 @@ namespace SDL2Engine
         private void HandleKeyboardEvent(SDL.SDL_KeyboardEvent keyEvent)
         {
 
-            // add key to pressed keys
+            // add key to down keys
             if (keyEvent.repeat == 0)
             {
-                Input.SetKeyPressed(((uint)keyEvent.keysym.sym));
+                Input.SetKeyDown((uint)keyEvent.keysym.sym);
             }
 
             switch (keyEvent.keysym.sym)
@@ -809,7 +809,7 @@ namespace SDL2Engine
                     // mouse button events
                     case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
                         Input.SetMouseButtonDown(sdlEvent.button.button - 1);
-                        Input.SetMouseButtonPressed(sdlEvent.button.button - 1);
+                        //Input.SetMouseButtonPressed(sdlEvent.button.button - 1);
                         break;
 
                     case SDL.SDL_EventType.SDL_MOUSEBUTTONUP:
@@ -820,6 +820,11 @@ namespace SDL2Engine
                     // Handle keyboard events
                     case SDL.SDL_EventType.SDL_KEYDOWN:
                         this.HandleKeyboardEvent(sdlEvent.key);
+                        break;
+
+                    // release key
+                    case SDL.SDL_EventType.SDL_KEYUP:
+                        Input.SetKeyReleased((uint)sdlEvent.key.keysym.sym);
                         break;
 
                     // window resize event

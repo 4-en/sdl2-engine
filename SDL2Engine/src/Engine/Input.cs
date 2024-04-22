@@ -19,13 +19,24 @@ namespace SDL2Engine
         private static bool[] mouseButtonsPressed = new bool[3];
         private static bool[] mouseButtonsReleased = new bool[3];
 
-
-
-        public static bool GetKeyDown(UInt32 key)
+        public static bool GetKeyPressed(UInt32 key)
         {
             for (int i = 0; i < pressedKeys.Length; i++)
             {
                 if (pressedKeys[i] == key)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool GetKeyDown(UInt32 key)
+        {
+            for (int i = 0; i < downKeys.Length; i++)
+            {
+                if (downKeys[i] == key)
                 {
                     return true;
                 }
@@ -49,6 +60,7 @@ namespace SDL2Engine
 
         public static void SetKeyDown(UInt32 key)
         {
+            Console.WriteLine("Key down: " + key);
             for (int i = 0; i < downKeys.Length; i++)
             {
                 if (downKeys[i] == 0)
@@ -57,10 +69,13 @@ namespace SDL2Engine
                     break;
                 }
             }
+
+            SetKeyPressed(key);
         }
 
         public static void SetKeyPressed(UInt32 key)
         {
+            Console.WriteLine("Key pressed: " + key);
             for (int i = 0; i < pressedKeys.Length; i++)
             {
                 if (pressedKeys[i] == 0)
@@ -69,10 +84,12 @@ namespace SDL2Engine
                     break;
                 }
             }
+
         }
 
         public static void SetKeyReleased(UInt32 key)
         {
+            Console.WriteLine("Key released: " + key);
             for (int i = 0; i < releasedKeys.Length; i++)
             {
                 if (releasedKeys[i] == 0)
@@ -81,34 +98,53 @@ namespace SDL2Engine
                     break;
                 }
             }
+
+            // remove key from pressedKeys
+            for (int i = 0; i < pressedKeys.Length; i++)
+            {
+                if (pressedKeys[i] == key)
+                {
+                    Console.WriteLine("Removing key from pressedKeys: " + key);
+                    pressedKeys[i] = 0;
+                    break;
+                }
+            }
         }
 
         public static void ClearInputs()
         {
+            
             for (int i = 0; i < downKeys.Length; i++)
             {
                 downKeys[i] = 0;
             }
 
+            /*
+             * pressedKeys are reset when the key is released
             for (int i = 0; i < pressedKeys.Length; i++)
             {
                 pressedKeys[i] = 0;
             }
+            */
 
             for (int i = 0; i < releasedKeys.Length; i++)
             {
                 releasedKeys[i] = 0;
             }
 
+            
             for (int i = 0; i < mouseButtonsDown.Length; i++)
             {
                 mouseButtonsDown[i] = false;
             }
 
+            /*
+             * pressedKeys are reset when the key is released
             for (int i = 0; i < mouseButtonsPressed.Length; i++)
             {
                 mouseButtonsPressed[i] = false;
             }
+            */
 
             for (int i = 0; i < mouseButtonsReleased.Length; i++)
             {
@@ -160,6 +196,7 @@ namespace SDL2Engine
                 return;
             }
             mouseButtonsDown[button] = true;
+            SetMouseButtonPressed(button);
         }
 
         public static void SetMouseButtonPressed(int button)
@@ -178,6 +215,7 @@ namespace SDL2Engine
                 return;
             }
             mouseButtonsReleased[button] = true;
+            mouseButtonsPressed[button] = false;
         }
 
         public static void SetMousePosition(Vec2D position)

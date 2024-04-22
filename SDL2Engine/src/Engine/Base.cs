@@ -348,6 +348,26 @@ namespace SDL2Engine
             return x < other.x + other.w && x + w > other.x && y < other.y + other.h && y + h > other.y;
         }
 
+        public static Rect operator +(Rect a, Vec2D b)
+        {
+            return new Rect(a.x + b.x, a.y + b.y, a.w, a.h);
+        }
+
+        public static Rect operator -(Rect a, Vec2D b)
+        {
+            return new Rect(a.x - b.x, a.y - b.y, a.w, a.h);
+        }
+
+        public static Rect operator *(Rect a, double b)
+        {
+            return new Rect(a.x * b, a.y * b, a.w * b, a.h * b);
+        }
+
+        public static Rect operator /(Rect a, double b)
+        {
+            return new Rect(a.x / b, a.y / b, a.w / b, a.h / b);
+        }
+
     }
 
     /* Base class for all scripts

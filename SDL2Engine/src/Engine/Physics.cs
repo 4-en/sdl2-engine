@@ -15,6 +15,7 @@ namespace SDL2Engine
         private bool isMovable = false;
         private Vec2D velocity = new Vec2D();
         private double mass = 1.0;
+        private double bounciness = 1.0;
         private double friction = 0.0;
         private double drag = 0.0;
 

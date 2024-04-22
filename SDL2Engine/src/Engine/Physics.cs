@@ -49,6 +49,7 @@ namespace SDL2Engine
         }
     }
 
+    // defines a pair of colliders that are colliding so they can be resolved later
     public class CollisionPair
     {
         public Collider colliderA;
@@ -61,14 +62,26 @@ namespace SDL2Engine
         }
     }
 
+    // defines a box collider
+    // a box collider is a rectangle that can be used to detect collisions
     public class BoxCollider : Collider
-    { }
-
+    {
+        private Rect box = new Rect(0, 0, 1, 1);
+    }
+    // defines a circle collider
+    // a circle collider is a circle that can be used to detect collisions
     public class CircleCollider : Collider
-    { }
+    {
+        private double radius = 1.0;
+    }
 
+    // defines an edge collider
+    // an edge collider is a line segment that can be used to detect collisions
     public class  EdgeCollider : Collider
-    { }
+    {
+        private Vec2D start = new Vec2D();
+        private Vec2D end = new Vec2D();
+    }
 
     public class RaycastHit
     {

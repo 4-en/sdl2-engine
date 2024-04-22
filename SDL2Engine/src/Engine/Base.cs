@@ -323,6 +323,33 @@ namespace SDL2Engine
 
     }
 
+    class Rect
+    {
+        public double x;
+        public double y;
+        public double w;
+        public double h;
+
+        public Rect(double x = 0, double y = 0, double w = 0, double h = 0)
+        {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+        }
+
+        public bool Contains(Vec2D point)
+        {
+            return point.x >= x && point.x <= x + w && point.y >= y && point.y <= y + h;
+        }
+
+        public bool Intersects(Rect other)
+        {
+            return x < other.x + other.w && x + w > other.x && y < other.y + other.h && y + h > other.y;
+        }
+
+    }
+
     /* Base class for all scripts
      * 
      * This class is meant to be inherited from

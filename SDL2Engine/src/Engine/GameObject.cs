@@ -9,6 +9,9 @@ namespace SDL2Engine
         public string name = "GameObject";
         // Position of the GameObject
         protected Transform _transform = new Transform();
+        protected Collider? _collider;
+        protected PhysicsBody? _physicsBody;
+        protected Drawable? _drawable;
         protected GameObject? Parent { get; set; }
         protected Scene? scene;
         private readonly List<GameObject> children = [];
@@ -103,6 +106,45 @@ namespace SDL2Engine
                 // instead of switching the transform, update the position
                 _transform.position = value.position;
             }
+        }
+
+        public Collider? collider
+        {
+            get
+            {
+                return _collider;
+            }
+        }
+
+        public bool HasCollider()
+        {
+            return _collider != null;
+        }
+
+        public PhysicsBody? physicsBody
+        {
+            get
+            {
+                return _physicsBody;
+            }
+        }
+
+        public bool HasPhysicsBody()
+        {
+            return _physicsBody != null;
+        }
+
+        public Drawable? drawable
+        {
+            get
+            {
+                return _drawable;
+            }
+        }
+
+        public bool IsDrawable()
+        {
+            return _drawable != null;
         }
 
         public void SetActive(bool active)
@@ -232,15 +274,39 @@ namespace SDL2Engine
             
             if (newComponent != null)
             {
-                // prevent transform from being added as a component
-                if (newComponent is Transform)
-                {
-                    return null;
-                }
+
 
                 newComponent.Init(this);
+
+                // add specific built-in components to fields instead of adding them to the components list
+                // GameObject should only have one of each of these components
+                // if multiple colliders or physics bodies are needed, use a child object or CompositeCollider
+                if (newComponent is Collider collider)
+                {
+                    this._collider = collider;
+                    return newComponent;
+                }
+
+                if (newComponent is PhysicsBody physicsBody)
+                {
+                    this._physicsBody = physicsBody;
+                    return newComponent;
+                }
+
+                if (newComponent is Transform transform)
+                {
+                    _transform = transform;
+                    return newComponent;
+                }
+
+                if (newComponent is Drawable drawable)
+                {
+                    _drawable = drawable;
+                    return newComponent;
+                }
+
+
                 components.Add(newComponent);
-                //newComponent.Start();
             } else
             {
                 Console.WriteLine("Failed to create component of type " + typeof(T).Name);
@@ -356,13 +422,9 @@ namespace SDL2Engine
         // By default, this method does nothing
         public void Draw(Camera camera)
         {
-            // draw drawables
-            foreach (Component script in components)
+            if (_drawable != null)
             {
-                if (script is Drawable)
-                {
-                    ((Drawable)script).Draw(camera);
-                }
+                _drawable.Draw(camera);
             }
 
             // Draw all children

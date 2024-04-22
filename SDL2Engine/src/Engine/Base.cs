@@ -891,7 +891,20 @@ namespace SDL2Engine
 
         private void Update()
         {
+            // Calls Script.Update() for all active scripts
             scene.Update();
+
+            // Update Physics
+            List<GameObject> objects_with_collider = new List<GameObject>();
+            // TODO: handle children with colliders and make sure children don't collide with parents
+            foreach (GameObject child in scene.GetChildren())
+            {
+                if (child.GetComponent<Collider>() != null)
+                {
+                    objects_with_collider.Add(child);
+                }
+            }
+            Physics.UpdatePhysics(objects_with_collider);
         }
 
         private void DrawDebug()

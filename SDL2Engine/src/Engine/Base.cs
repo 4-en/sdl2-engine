@@ -323,7 +323,7 @@ namespace SDL2Engine
 
     }
 
-    class Rect
+    public class Rect
     {
         public double x;
         public double y;
@@ -366,6 +366,12 @@ namespace SDL2Engine
         public static Rect operator /(Rect a, double b)
         {
             return new Rect(a.x / b, a.y / b, a.w / b, a.h / b);
+        }
+
+        // get size
+        public Vec2D GetSize()
+        {
+            return new Vec2D(w, h);
         }
 
     }

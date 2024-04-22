@@ -19,6 +19,22 @@ namespace SDL2Engine
         BottomRight
     }
 
+    struct Color
+    {
+        public byte r;
+        public byte g;
+        public byte b;
+        public byte a;
+
+        public Color(byte r, byte g, byte b, byte a = 255)
+        {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        }
+    }
+
     // DepthBuffer class to store depth values for each pixel of the screen
     // Can be used for occlusion culling
     public class DepthBuffer
@@ -126,6 +142,36 @@ namespace SDL2Engine
             return goRoot;
 
         }
+    }
+
+    public class DrawableRect : Drawable
+    {
+        protected Rect rect = new Rect(0, 0, 100, 100);
+
+        public override void Draw(Camera camera)
+        {
+            var renderer = Engine.renderer;
+
+            Vec2D root = GetDrawRoot();
+            Vec2D size = rect.GetSize();
+
+            Vec2D topLeft = new Vec2D(root.x - size.x / 2, root.y - size.y / 2);
+            Vec2D topRight = new Vec2D(root.x + size.x / 2, root.y - size.y / 2);
+            Vec2D bottomLeft = new Vec2D(root.x - size.x / 2, root.y + size.y / 2);
+            Vec2D bottomRight = new Vec2D(root.x + size.x / 2, root.y + size.y / 2);
+
+            topLeft = camera.WorldToScreen(topLeft);
+            topRight = camera.WorldToScreen(topRight);
+            bottomLeft = camera.WorldToScreen(bottomLeft);
+            bottomRight = camera.WorldToScreen(bottomRight);
+
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_RenderDrawLine(renderer, (int)topLeft.x, (int)topLeft.y, (int)topRight.x, (int)topRight.y);
+            SDL_RenderDrawLine(renderer, (int)topRight.x, (int)topRight.y, (int)bottomRight.x, (int)bottomRight.y);
+            SDL_RenderDrawLine(renderer, (int)bottomRight.x, (int)bottomRight.y, (int)bottomLeft.x, (int)bottomLeft.y);
+            SDL_RenderDrawLine(renderer, (int)bottomLeft.x, (int)bottomLeft.y, (int)topLeft.x, (int)topLeft.y);
+        }
+
     }
 
 

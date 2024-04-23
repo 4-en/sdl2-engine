@@ -336,10 +336,37 @@ namespace SDL2Engine
         // Gets first component of type T
         public T? GetComponent<T>() where T : Component
         {
-            // if component is transform, return transform
+            // if component is transform, physics body, collider, or drawable, return the field directly
             if (typeof(T) == typeof(Transform))
             {
                 return (T)(Component)_transform;
+            }
+
+            if (typeof(T) == typeof(Collider))
+            {
+                if (_collider == null)
+                {
+                    return null;
+                }
+                return (T)(Component)_collider;
+            }
+
+            if (typeof(T) == typeof(PhysicsBody))
+            {
+                if (_physicsBody == null)
+                {
+                    return null;
+                }
+                return (T)(Component)_physicsBody;
+            }
+
+            if (typeof(T) == typeof(Drawable))
+            {
+                if (_drawable == null)
+                {
+                    return null;
+                }
+                return (T)(Component)_drawable;
             }
 
             foreach (Component script in components)

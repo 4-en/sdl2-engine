@@ -53,13 +53,13 @@ namespace SDL2Engine
     // defines a pair of colliders that are colliding so they can be resolved later
     public class CollisionPair
     {
-        public Collider colliderA;
-        public Collider colliderB;
+        public GameObject obj1;
+        public GameObject obj2;
 
-        public CollisionPair(Collider colliderA, Collider colliderB)
+        public CollisionPair(GameObject obj1, GameObject obj2)
         {
-            this.colliderA = colliderA;
-            this.colliderB = colliderB;
+            this.obj1 = obj1;
+            this.obj2 = obj2;
         }
     }
 
@@ -118,14 +118,33 @@ namespace SDL2Engine
         // Resolves collisions between objects
         // Moves objects apart so they are no longer colliding
         // Applies forces to objects after collision
-        // For example, if two objects collide, they should bounce off each other based on their mass, velocity, etc.
+        // For example, if two objects collide, they should bounce off each other based on their mass, velocity, bounciness, etc.
         public static void ResolveCollisions(List<CollisionPair> collisions)
         { }
 
         // after all collisions are resolved, notify objects that a collision has occured
+        // TODO: Implement event listeners for OnCollisionEnter, OnCollisionStay, OnCollisionExit, etc.
         public static void NotifyCollisions(List<CollisionPair> collisions)
         { }
 
+
+        /*
+         * UpdatePhysics
+         * Called every frame to update physics in several steps:
+         * 1. Apply physics (velocity, gravity, forces, etc.)
+         * 2. Check for collisions (filter out non-colliding objects, etc.)
+         * 3. Resolve collisions (move objects apart, apply forces, etc.)
+         * 4. Notify objects of collisions (call OnCollisionEnter, OnCollisionStay, OnCollisionExit, etc.) (EventListeners not implemented yet)
+         * 
+         * Some notes:
+         * Not all objects need to have a physics body or collider
+         * Objects without a physics body will not be affected by physics
+         * Objects without a collider will not be checked for collisions
+         * Objects with a PhysicsBody that has isMovable set to false will not be moved by physics
+         * Object with a collider but without a physics body will not be moved by physics, but other moving objects can collide with them
+         * to check if the object has a collider or physics body, use HasCollider() and HasPhysicsBody() methods
+         * to get the collider or physics body of an object, use propterties collider and physicsBody or use generic GetComponent<T>() method
+         */
         public static void UpdatePhysics(List<GameObject> gameObjects)
         { 
             // Apply physics

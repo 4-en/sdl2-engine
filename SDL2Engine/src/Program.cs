@@ -82,10 +82,10 @@ namespace SDL2Engine
             var gameObject = new GameObject("Mouse Square", world);
 
             // add a drawable component to the game object
-            _ = gameObject.AddComponent<RotatingSquare>();
+            gameObject.AddComponent<RotatingSquare>();
 
             // add a mouse tracker component to the game object
-            _ = gameObject.AddComponent<MouseTracker>();
+            gameObject.AddComponent<MouseTracker>();
 
             // add the game object to the world
             world.AddChild(gameObject);

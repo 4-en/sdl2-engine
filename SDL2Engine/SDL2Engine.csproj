@@ -30,4 +30,9 @@
     </None>
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="src\test\" />
+  </ItemGroup>
+
 </Project>

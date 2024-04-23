@@ -50,7 +50,7 @@ namespace SDL2Engine
         }
     }
 
-    // defines a pair of colliders that are colliding so they can be resolved later
+    // defines a pair of objects that are colliding so they can be resolved later
     public class CollisionPair
     {
         public GameObject obj1;
@@ -68,6 +68,13 @@ namespace SDL2Engine
     public class BoxCollider : Collider
     {
         private Rect box = new Rect(0, 0, 1, 1);
+
+        // Collision between two box colliders
+        public override bool CollidesWith(BoxCollider other)
+        {
+            return false;
+        }
+        
     }
     // defines a circle collider
     // a circle collider is a circle that can be used to detect collisions

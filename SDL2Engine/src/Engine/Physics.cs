@@ -31,21 +31,72 @@ namespace SDL2Engine
         // for example, BoxCollider and BoxCollider, BoxCollider and CircleCollider, etc.
         public virtual bool CollidesWith(Collider other)
         {
+            if (other is CircleCollider)
+            {
+                return CollidesWith((CircleCollider)other);
+            }
+            if (other is EdgeCollider)
+            {
+                return CollidesWith((EdgeCollider)other);
+            }   
+            if (other is BoxCollider)
+            {
+                return CollidesWith((BoxCollider)other);
+            }   
             return false;
         }
 
         public virtual bool CollidesWith(BoxCollider other)
         {
+            //circlecollider and boxcollider
+            if (other is CircleCollider)
+            {
+                return false;
+            }
+            //edgecollider and boxcollider
+            if (other is EdgeCollider)
+            {
+                return false;
+            }   
+            //boxcollider and boxcollider
+            if (other is BoxCollider)
+            {
+                return false;
+            }   
             return false;
         }
 
         public virtual bool CollidesWith(CircleCollider other)
         {
+            if (other is CircleCollider)
+            {
+                return false;
+            }
+            if (other is EdgeCollider)
+            {
+                return false;
+            }
+            if (other is BoxCollider)
+            {
+                return false;
+            }
             return false;
         }
 
         public virtual bool CollidesWith(EdgeCollider other)
         {
+            if (other is CircleCollider)
+            {
+                return false;
+            }  
+            if (other is EdgeCollider)
+            {
+                return false;
+            }
+            if (other is BoxCollider)
+            {
+                return false;
+            }
             return false;
         }
     }
@@ -67,11 +118,30 @@ namespace SDL2Engine
     // a box collider is a rectangle that can be used to detect collisions
     public class BoxCollider : Collider
     {
-        private Rect box = new Rect(0, 0, 1, 1);
+        private Rect box = new Rect(0,0,1,1);
 
+       //constructor
+       //public BoxCollider(int a, int b)
+       // {
+         //   box = new Rect(a, b, 1, 1);
+       // }
+
+         
+     
         // Collision between two box colliders
         public override bool CollidesWith(BoxCollider other)
         {
+            //boxcollider and boxcollider
+            if (other is BoxCollider)
+            {
+                //check if the two boxes are colliding
+                if (box.Intersects(other.box))
+                {
+                    Console.WriteLine("COLLISION!");
+                    return true;
+                }
+                return false;
+            }
             return false;
         }
         
@@ -119,7 +189,29 @@ namespace SDL2Engine
         // Checks for collisions between objects
         public static List<CollisionPair> CheckCollisions(List<GameObject> gameObjects)
         { 
-            return new List<CollisionPair>();
+            //check collisions
+            var collisionPairList = new List<CollisionPair>();
+            foreach (var gameObject1 in gameObjects)
+            {
+                if (gameObject1.GetComponent<Collider>() != null) 
+                {                     
+                    foreach (var gameObject2 in gameObjects)
+                    {
+                        if (gameObject2.GetComponent<Collider>() != null)
+                        {
+                            if (gameObject1 != gameObject2)
+                            {
+                                if (gameObject1.GetComponent<Collider>().CollidesWith(gameObject2.GetComponent<Collider>()))
+                                {
+                                    collisionPairList.Add(new CollisionPair(gameObject1, gameObject2));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return collisionPairList;
         }
 
         // Resolves collisions between objects
@@ -153,7 +245,7 @@ namespace SDL2Engine
          * to get the collider or physics body of an object, use propterties collider and physicsBody or use generic GetComponent<T>() method
          */
         public static void UpdatePhysics(List<GameObject> gameObjects)
-        { 
+        {
             // Apply physics
             ApplePhysics(gameObjects);
 

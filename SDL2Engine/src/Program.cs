@@ -79,20 +79,58 @@ namespace SDL2Engine
             var world = new Scene("World");
 
             // create a new game object
-            var gameObject = new GameObject("Mouse Square", world);
+            var gameObject1 = new GameObject("Cube1", world);
 
             // add a drawable component to the game object
-            gameObject.AddComponent<RotatingSquare>();
+            gameObject1.AddComponent<Cube>();
 
             // add a mouse tracker component to the game object
-            gameObject.AddComponent<MouseTracker>();
+            gameObject1.AddComponent<WASDController>();
+
+            //add a collider component to the game object
+            gameObject1.AddComponent<BoxCollider>();
 
             // add the game object to the world
-            world.AddChild(gameObject);
+            world.AddChild(gameObject1);
 
-            gameObject.SetPosition(new Vec2D(500, 500));
+            gameObject1.SetPosition(new Vec2D(500, 500));
+
+
+
+            // create a new game object
+            var gameObject2 = new GameObject("Cube2", world);
+
+            // add a drawable component to the game object
+            gameObject2.AddComponent<Cube>();
+
+            //add a collider component to the game object
+            gameObject2.AddComponent<BoxCollider>();
+
+            // add the game object to the world
+            world.AddChild(gameObject2);
+
+            gameObject2.SetPosition(new Vec2D(800, 700));
 
             return world;
+
+
+            //var world = new Scene("World");
+
+            // create a new game object
+            //var gameObject = new GameObject("Mouse Square", world);
+
+            // add a drawable component to the game object
+            //gameObject.AddComponent<RotatingSquare>();
+
+            // add a mouse tracker component to the game object
+            //gameObject.AddComponent<MouseTracker>();
+
+            // add the game object to the world
+            //world.AddChild(gameObject);
+
+            // gameObject.SetPosition(new Vec2D(500, 500));
+
+            //return world;
         }
 #if ENGINE_TEST
         static void Main(string[] args)
@@ -111,4 +149,81 @@ namespace SDL2Engine
         }
 #endif
     }
+
+    class Cube : Drawable
+    {
+
+        public override void Draw(Camera camera)
+        {
+            var CubeWidth = 50;
+            var CubeHeight = 50;
+            var MovementSpeed = 10;
+
+            var renderer = Engine.renderer;
+
+            var root = this.gameObject;
+
+
+
+
+            // set the color to dark blue
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+
+
+
+
+            // define the square
+            List<Vec2D> points = new List<Vec2D>();
+            points.Add(new Vec2D(-CubeWidth / 2, -CubeHeight / 2));
+            points.Add(new Vec2D(CubeWidth / 2, -CubeHeight / 2));
+            points.Add(new Vec2D(CubeWidth / 2, CubeHeight / 2));
+            points.Add(new Vec2D(-CubeWidth / 2, CubeHeight / 2));
+
+            // convert to camera space
+            for (int i = 0; i < points.Count; i++)
+            {
+                // rotate around center
+                Vec2D p = points[i];
+                p = camera.WorldToScreen(p, root.GetPosition());
+                points[i] = p;
+            }
+
+            // draw the filled white square
+            var rect = new SDL_Rect();
+            rect.x = (int)points[0].x;
+            rect.y = (int)points[0].y;
+            rect.w = (int)(points[1].x - points[0].x);
+            rect.h = (int)(points[2].y - points[1].y);
+            SDL_RenderFillRect(renderer, ref rect);
+        }
+    }
+
+    class WASDController : Script
+    {
+        public override void Update()
+        {
+            // a better way to do this would be to use a rigidbody with velocity
+            var gameObject = this.gameObject;
+            var speed = 5;
+            if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_w)))
+            {
+                gameObject.transform.position += new Vec2D(0, -speed);
+            }
+            if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_s)))
+            {
+                gameObject.transform.position += new Vec2D(0, speed);
+            }
+            if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_a)))
+            {
+                gameObject.transform.position += new Vec2D(-speed, 0);
+            }
+            if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_d)))
+            {
+                gameObject.transform.position += new Vec2D(speed, 0);
+            }
+
+        }
+    }
+
 }

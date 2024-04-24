@@ -176,14 +176,87 @@ namespace SDL2Engine
     public class CircleCollider : Collider
     {
         private double radius = 1.0;
+        public Vec2D center { get; set; }
+
+        public CircleCollider(Vec2D center, double radius)
+        {
+            this.center = center;
+            this.radius = radius;
+        }
+        public CircleCollider()
+        {
+            this.center = new Vec2D(0, 0);
+            this.radius = 1.0;
+        }
+
+        // Collision between two circle colliders
+        public override bool CollidesWith(CircleCollider other)
+        {
+            //circlecollider and circlecollider
+            if (other is CircleCollider)
+            {
+                //check if the two circles are colliding
+                if (DistanceTo(center, other.center) < radius + other.radius)
+                {
+                    //Console.WriteLine("COLLISION!");
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        //collision between circle and box
+        public override bool CollidesWith(BoxCollider other)
+        {
+            //circlecollider and boxcollider
+            if (other is BoxCollider)
+            {
+                // Calculate closest point to the circle's center within the box
+                double closestX = Math.Max(other.box.x, Math.Min(center.x, other.box.x + other.box.w));
+                double closestY = Math.Max(other.box.y, Math.Min(center.y, other.box.y + other.box.h));
+
+                // Calculate distance between the circle's center and this closest point
+                double distanceX = center.x - closestX;
+                double distanceY = center.y - closestY;
+
+                // If the distance is less than the circle's radius, they are colliding
+                if ((distanceX * distanceX) + (distanceY * distanceY) < (radius * radius))
+                {
+                    Console.WriteLine("Circle + Box COLLISION!");
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+
+        //create DistanceTo function
+        public double DistanceTo(Vec2D center, Vec2D other)
+        {
+            return Math.Sqrt(Math.Pow(center.x - other.x, 2) + Math.Pow(center.y - other.y, 2));
+        }
+        //update the position of the circle collider
+        internal void UpdateColliderPosition(Vec2D vec2D)
+        {
+           this.center = vec2D;
+        }
+        //update the size of the circle collider
+        internal void UpdateColliderSize(double radius)
+        {
+            this.radius = radius;
+        }
+        
     }
 
     // defines an edge collider
     // an edge collider is a line segment that can be used to detect collisions
     public class  EdgeCollider : Collider
     {
-        private Vec2D start = new Vec2D();
-        private Vec2D end = new Vec2D();
+        private Vec2D start = new Vec2D(0,0);
+        private Vec2D end = new Vec2D(1,1);
+        
     }
 
     public class RaycastHit
@@ -229,13 +302,13 @@ namespace SDL2Engine
                                 if (gameObject1.GetComponent<Collider>().CollidesWith(gameObject2.GetComponent<Collider>()))
                                 {
                                     collisionPairList.Add(new CollisionPair(gameObject1, gameObject2));
+                             
                                 }
                             }
                         }
                     }
                 }
             }
-
             return collisionPairList;
         }
 

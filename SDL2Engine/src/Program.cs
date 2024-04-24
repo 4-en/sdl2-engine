@@ -118,6 +118,39 @@ namespace SDL2Engine
                 c.UpdateColliderPosition(gameObject2.GetPosition());
             }
 
+
+
+
+
+
+
+            // create a new game object
+            var gameObject3 = new GameObject("Circle", world);
+
+            // add a drawable component to the game object
+            var cube3 = gameObject3.AddComponent<Cube>();
+
+            //add a collider component to the game object
+            var circleCollider = gameObject3.AddComponent<CircleCollider>();
+            //boxCollider2.box = new Rect(0, -30, cube2.CubeWidth, cube2.CubeHeight);
+
+            gameObject3.SetPosition(new Vec2D(100, 500));
+            if (gameObject3.collider != null && gameObject3.collider is CircleCollider)
+            {
+                var c = (CircleCollider)gameObject3.collider;
+                c.UpdateColliderPosition(new Vec2D(gameObject3.GetPosition().x+25,gameObject3.GetPosition().y+25));
+                c.UpdateColliderSize(20);
+            }
+
+            // add the game object to the world
+            world.AddChild(gameObject3);
+
+
+
+
+
+
+
             return world;
 
 

@@ -380,12 +380,12 @@ namespace SDL2Engine
     {
         protected static Random random = new Random(DateTime.Now.Millisecond);
 
-        protected String name = "unnamed";
+        protected string name = "unnamed";
         protected bool active = true;
         protected Scene? scene = null;
         protected uint uid = GetRandomUID();
 
-        public EngineObject(String name = "unnamed")
+        public EngineObject(string name = "unnamed")
         {
             this.name = name;
         }

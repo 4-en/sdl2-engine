@@ -2,13 +2,16 @@
 
 namespace SDL2Engine
 {
-    public class Scene : GameObject
+    public class Scene
     {
         private Camera mainCamera;
+
+        private List<GameObject> gameObjects = new();
 
         private List<Drawable> drawableList = new();
         private List<Collider> colliderList = new();
         private List<Script> scripts = new();
+        
         public Scene()
         {
             this.Parent = null;

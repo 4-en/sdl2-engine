@@ -10,12 +10,12 @@ namespace SDL2Engine
 
     public class Assets
     {
-        String name;
-        String path;
+        string name;
+        string path;
         IntPtr asset;
         uint refCount = 0;
 
-        public Assets(String name, String path)
+        public Assets(string name, string path)
         {
             this.name = name;
             this.path = path;
@@ -75,7 +75,7 @@ namespace SDL2Engine
     {
         private static HashSet<Assets> assets = new HashSet<Assets>();
 
-        public static AssetHandle LoadAsset(String name, String path)
+        public static AssetHandle LoadAsset(string name, string path)
         {
             Assets asset = new Assets(name, path);
             assets.Add(asset);

@@ -86,7 +86,6 @@ namespace SDL2Engine
 
             //add a collider component to the game object
             var boxCollider1 = gameObject1.AddComponent<BoxCollider>();
-            //boxCollider1.box = new Rect(0, 50, cube1.CubeWidth, cube1.CubeHeight);
 
             // add a mouse tracker component to the game object
             gameObject1.AddComponent<WASDController>();
@@ -106,21 +105,18 @@ namespace SDL2Engine
 
             //add a collider component to the game object
             var boxCollider2 = gameObject2.AddComponent<BoxCollider>();
-            //boxCollider2.box = new Rect(0, -30, cube2.CubeWidth, cube2.CubeHeight);
 
             // add the game object to the world
             world.AddChild(gameObject2);
 
             gameObject2.SetPosition(new Vec2D(800, 700));
+
+            //adjust collider to cube position
             if (gameObject2.collider != null && gameObject2.collider is BoxCollider)
             {
                 var c = (BoxCollider)gameObject2.collider;
                 c.UpdateColliderPosition(gameObject2.GetPosition());
             }
-
-
-
-
 
 
 
@@ -132,9 +128,10 @@ namespace SDL2Engine
 
             //add a collider component to the game object
             var circleCollider = gameObject3.AddComponent<CircleCollider>();
-            //boxCollider2.box = new Rect(0, -30, cube2.CubeWidth, cube2.CubeHeight);
 
             gameObject3.SetPosition(new Vec2D(100, 500));
+
+            //adjust collider to cube size and position
             if (gameObject3.collider != null && gameObject3.collider is CircleCollider)
             {
                 var c = (CircleCollider)gameObject3.collider;
@@ -147,7 +144,22 @@ namespace SDL2Engine
 
 
 
+            // create a new game object
+            var gameObject4 = new GameObject("Line", world);
 
+            // add a drawable component to the game object
+            var line = gameObject4.AddComponent<Line>();
+
+            //add a collider component to the game object
+            var edgeCollider = gameObject4.AddComponent<EdgeCollider>();
+            edgeCollider.UpdateColliderPosition(new Vec2D(300, 800), new Vec2D(500, 1100));
+
+        
+
+            
+
+            // add the game object to the world
+            world.AddChild(gameObject4);
 
 
 
@@ -285,6 +297,39 @@ namespace SDL2Engine
                 var c = (BoxCollider )gameObject.collider;
                 c.UpdateColliderPosition(gameObject.GetPosition());
             }
+
+        }
+    }
+
+    class Line : Drawable
+    {
+        public int startx { get; set; } = 300;
+        public int starty { get; set; } = 800;
+        public int endx { get; set; } = 500;
+        public int endy { get; set; } = 1100;
+
+        public override void Draw(Camera camera)
+        {
+            var renderer = Engine.renderer;
+
+            var root = this.gameObject;
+
+            List<Vec2D> points = new List<Vec2D>();
+            points.Add(new Vec2D(300, 800));
+            points.Add(new Vec2D(500, 1100));
+
+            // convert to camera space
+            for (int i = 0; i < points.Count; i++)
+            {
+                // rotate around center
+                Vec2D p = points[i];
+                p = camera.WorldToScreen(p, root.GetPosition());
+                points[i] = p;
+            }
+
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            
+            SDL_RenderDrawLine(renderer, (int)points[0].x, (int)points[0].y, (int)points[1].x, (int)points[1].y);
 
         }
     }

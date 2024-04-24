@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -255,8 +256,83 @@ namespace SDL2Engine
     public class  EdgeCollider : Collider
     {
         private Vec2D start = new Vec2D(0,0);
-        private Vec2D end = new Vec2D(1,1);
+        private Vec2D end = new Vec2D(1, 1);
+
         
+        public EdgeCollider()
+        {
+            this.start = new Vec2D(0, 0);
+            this.end = new Vec2D(1, 1);
+        }
+        //update the position of the edge collider
+        internal void UpdateColliderPosition(Vec2D start, Vec2D end)
+        {
+            this.start = start;
+            this.end = end;
+        }
+
+        
+        //collision between edgecollider and boxcollider
+        public override bool CollidesWith(BoxCollider other)
+        {
+            //edgecollider and boxcollider
+            if (other is BoxCollider)
+            {
+                //check if the box and edge are colliding
+                if (Intersects(start, end, other.box))
+                {
+                    Console.WriteLine("Edge + Box COLLISION!");
+                    return true;
+                }
+
+
+                return false;
+            }
+            return false;
+        }
+
+        private bool Intersects(Vec2D lineStart, Vec2D lineEnd, Rect box)
+        {
+            // Convert the box into four line segments
+            Vec2D[] boxLines = new Vec2D[]
+            {
+                new Vec2D(box.x, box.y),
+                new Vec2D(box.x + box.w, box.y),
+                new Vec2D(box.x + box.w, box.y + box.h),
+                new Vec2D(box.x, box.y + box.h)
+            };
+
+            // Check for intersection between the line segment and each line segment of the box
+            for (int i = 0; i < 4; i++)
+            {
+                Vec2D current = boxLines[i];
+                Vec2D next = boxLines[(i + 1) % 4];
+
+                if (Intersects(lineStart, lineEnd, current, next))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Helper method to check intersection between a line segment and another line segment
+            private bool Intersects(Vec2D line1Start, Vec2D line1End, Vec2D line2Start, Vec2D line2End)
+        {
+            double q1 = CrossProduct(line2End - line2Start, line1Start - line2Start);
+            double q2 = CrossProduct(line2End - line2Start, line1End - line2Start);
+            double q3 = CrossProduct(line1End - line1Start, line2Start - line1Start);
+            double q4 = CrossProduct(line1End - line1Start, line2End - line1Start);
+
+            return q1 * q2 < 0 && q3 * q4 < 0;
+        }
+
+        // Helper method to compute the cross product of two vectors
+        private double CrossProduct(Vec2D v1, Vec2D v2)
+        {
+            return v1.x * v2.y - v1.y * v2.x;
+        }
     }
 
     public class RaycastHit

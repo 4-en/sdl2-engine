@@ -124,6 +124,10 @@ namespace SDL2Engine
     {
         private static Scene? activeScene;
 
+        private static List<Scene> scenes = new();
+
+        private static Scene persistentScene = new Scene("Persistent");
+
         public static Scene? GetActiveScene()
         {
             return activeScene;
@@ -133,5 +137,90 @@ namespace SDL2Engine
         {
             activeScene = scene;
         }
+
+        public static void DrawScenes()
+        {
+            for (int i = 0; i < scenes.Count; i++)
+            {
+                activeScene = scenes[i];
+                scenes[i].Draw();
+                activeScene = null;
+            }
+        }
+
+        public static void UpdateScenes()
+        {
+            for (int i = 0; i < scenes.Count; i++)
+            {
+                activeScene = scenes[i];
+                scenes[i].Update();
+                activeScene = null;
+            }
+        }
+
+        public static GameObject? Find(string name)
+        {
+
+            foreach (GameObject gameObject in persistentScene.GetGameObjects())
+            {
+                if (gameObject.GetName() == name)
+                {
+                    return gameObject;
+                }
+            }
+
+            foreach (Scene scene in scenes)
+            {
+                foreach (GameObject gameObject in scene.GetGameObjects())
+                {
+                    if (gameObject.GetName() == name)
+                    {
+                        return gameObject;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static void LoadScene(Scene scene)
+        {
+            scenes.Clear();
+            scenes.Add(scene);
+        }
+
+        public static void AddScene(Scene scene)
+        {
+            scenes.Add(scene);
+        }
+
+        public static void AddBefore(Scene scene, Scene before)
+        {
+            scenes.Insert(scenes.IndexOf(before), scene);
+        }
+
+        public static void AddAfter(Scene scene, Scene after)
+        {
+            scenes.Insert(scenes.IndexOf(after) + 1, scene);
+        }
+
+        public static void RemoveScene(Scene scene)
+        {
+            scenes.Remove(scene);
+        }
+
+        public static Scene GetPersistentScene()
+        {
+            return persistentScene;
+        }
+
+        public static void SetSceneOrder(Scene scene, int index)
+        {
+            scenes.Remove(scene);
+            scenes.Insert(index, scene);
+        }
+
+
+
+
     }
 }

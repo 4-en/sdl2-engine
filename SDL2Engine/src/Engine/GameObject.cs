@@ -89,6 +89,11 @@ namespace SDL2Engine
             }
         }
 
+        public string GetName()
+        {
+            return name;
+        }
+
         public void UpdateChildPositions()
         {
             this._transform.UpdateChildren();

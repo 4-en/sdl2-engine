@@ -13,6 +13,9 @@ namespace SDL2Engine
         private List<Drawable> drawableList = new();
         private List<Collider> colliderList = new();
         private List<Script> scripts = new();
+
+        private List<GameObject> toRemove = new();
+        private List<GameObject> toAdd = new();
         
         public Scene()
         {
@@ -37,14 +40,13 @@ namespace SDL2Engine
 
         public void AddGameObject(GameObject gameObject)
         {
-            gameObjects.Add(gameObject);
+            this.toAdd.Add(gameObject);
             gameObject.SetScene(this);
         }
 
         public void RemoveGameObject(GameObject gameObject)
         {
-            gameObjects.Remove(gameObject);
-            gameObject.SetScene(null);
+            this.toRemove.Add(gameObject);
         }
 
         public List<GameObject> GetGameObjects()
@@ -88,18 +90,32 @@ namespace SDL2Engine
 
         public void Draw()
         {
-            foreach (Drawable drawable in drawableList)
+            // TODO: draw only drawables
+            foreach (GameObject gameObject in gameObjects)
             {
-                drawable.Draw(mainCamera);
+                gameObject.Draw(mainCamera);
             }
         }
 
         public void Update()
         {
-            foreach (Script script in scripts)
+            foreach (GameObject gameObject in toAdd)
             {
-                script.Update();
+                this.gameObjects.Add(gameObject);
             }
+            toAdd.Clear();
+
+            // TODO: update only scripts
+            foreach (GameObject gameObject in gameObjects)
+            {
+                gameObject.Update();
+            }
+
+            foreach (GameObject gameObject in toRemove)
+            {
+                this.gameObjects.Remove(gameObject);
+            }
+            toRemove.Clear();
         }
 
     }

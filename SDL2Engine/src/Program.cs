@@ -14,12 +14,15 @@ namespace SDL2Engine
             {
                 parent = this.gameObject.GetParent();
             }
-            if (parent == null)
-            {
-                return null;
-            }
 
-            parent.AddChild(square);
+            if (parent != null)
+            {
+                parent.AddChild(square);
+            }
+            else
+            {
+                this.gameObject.GetScene()?.AddGameObject(square); 
+            }
             _ = square.AddComponent<RotatingSquare>();
             square.SetPosition(this.gameObject.GetPosition());
 

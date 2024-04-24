@@ -376,6 +376,53 @@ namespace SDL2Engine
 
     }
 
+    public class EngineObject
+    {
+        protected static Random random = new Random(DateTime.Now.Millisecond);
+
+        protected String name = "unnamed";
+        protected bool active = true;
+        protected Scene? scene = null;
+        protected uint uid = GetRandomUID();
+
+        public EngineObject(String name = "unnamed")
+        {
+            this.name = name;
+        }
+
+        public static uint GetRandomUID()
+        {
+            return (uint)random.Next();
+        }
+
+        public static bool Destroy(EngineObject obj, double time = 0)
+        {
+            /*
+             * TODO: Implement Destroy method
+             * This method should destroy the object after a certain amount of time
+             * and completely remove it from the scene at the end of the frame
+             *
+             * If the Object is a GameObject, it should also remove all its children and components
+             *             
+             */
+
+            return false;
+        }
+
+        public static bool DestroyImmediate(EngineObject obj)
+        {
+            /*
+             * TODO: Implement DestroyImmediate method
+             * This method should destroy the object immediately, without waiting for the end of the frame
+             */
+
+            return false;
+        }
+
+
+
+    }
+
     /* Base class for all scripts
      * 
      * This class is meant to be inherited from

@@ -82,13 +82,14 @@ namespace SDL2Engine
             var gameObject1 = new GameObject("Cube1", world);
 
             // add a drawable component to the game object
-            gameObject1.AddComponent<Cube>();
+            var cube1 = gameObject1.AddComponent<Cube>();
+
+            //add a collider component to the game object
+            var boxCollider1 = gameObject1.AddComponent<BoxCollider>();
+            //boxCollider1.box = new Rect(0, 50, cube1.CubeWidth, cube1.CubeHeight);
 
             // add a mouse tracker component to the game object
             gameObject1.AddComponent<WASDController>();
-
-            //add a collider component to the game object
-            gameObject1.AddComponent<BoxCollider>();
 
             // add the game object to the world
             world.AddChild(gameObject1);
@@ -101,15 +102,21 @@ namespace SDL2Engine
             var gameObject2 = new GameObject("Cube2", world);
 
             // add a drawable component to the game object
-            gameObject2.AddComponent<Cube>();
+            var cube2 = gameObject2.AddComponent<Cube>();
 
             //add a collider component to the game object
-            gameObject2.AddComponent<BoxCollider>();
+            var boxCollider2 = gameObject2.AddComponent<BoxCollider>();
+            //boxCollider2.box = new Rect(0, -30, cube2.CubeWidth, cube2.CubeHeight);
 
             // add the game object to the world
             world.AddChild(gameObject2);
 
             gameObject2.SetPosition(new Vec2D(800, 700));
+            if (gameObject2.collider != null && gameObject2.collider is BoxCollider)
+            {
+                var c = (BoxCollider)gameObject2.collider;
+                c.UpdateColliderPosition(gameObject2.GetPosition());
+            }
 
             return world;
 
@@ -152,12 +159,13 @@ namespace SDL2Engine
 
     class Cube : Drawable
     {
+        public int CubeWidth { get; set; } = 50;
+        public int CubeHeight { get; set; } = 50;
 
         public override void Draw(Camera camera)
         {
-            var CubeWidth = 50;
-            var CubeHeight = 50;
-            var MovementSpeed = 10;
+            
+
 
             var renderer = Engine.renderer;
 
@@ -196,11 +204,26 @@ namespace SDL2Engine
             rect.w = (int)(points[1].x - points[0].x);
             rect.h = (int)(points[2].y - points[1].y);
             SDL_RenderFillRect(renderer, ref rect);
+
+            //adjust collider to cube size
+            var boxCollider = this.gameObject.GetComponent<BoxCollider>();
+            if (boxCollider != null)
+            {
+                boxCollider.UpdateColliderSize(CubeWidth, CubeHeight);
+            }
         }
     }
 
     class WASDController : Script
     {
+
+        private BoxCollider? boxCollider;
+
+        public override void Start()
+        {
+            //boxCollider = gameObject.GetComponent<BoxCollider>();
+        }
+
         public override void Update()
         {
             // a better way to do this would be to use a rigidbody with velocity
@@ -221,6 +244,13 @@ namespace SDL2Engine
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_d)))
             {
                 gameObject.transform.position += new Vec2D(speed, 0);
+            }
+
+            // Update BoxCollider position
+            if (gameObject.collider != null && gameObject.collider is BoxCollider)
+            {
+                var c = (BoxCollider )gameObject.collider;
+                c.UpdateColliderPosition(gameObject.GetPosition());
             }
 
         }

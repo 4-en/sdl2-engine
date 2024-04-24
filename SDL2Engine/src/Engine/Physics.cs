@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -118,16 +119,39 @@ namespace SDL2Engine
     // a box collider is a rectangle that can be used to detect collisions
     public class BoxCollider : Collider
     {
-        private Rect box = new Rect(0,0,1,1);
 
-       //constructor
-       //public BoxCollider(int a, int b)
-       // {
-         //   box = new Rect(a, b, 1, 1);
-       // }
+        //create a box collider at the position of the game object
+        public Rect box { get; set; }
 
-         
-     
+        public BoxCollider(Rect box)
+        {
+            this.box = box;
+        }
+        public BoxCollider(int width, int height)
+        {
+            this.box = new Rect(0, 0, width, height);
+        }
+        public BoxCollider()
+        {
+            this.box = new Rect(50, 50, 50, 50);
+        }
+
+
+        public void UpdateColliderPosition(Vec2D newPosition)
+        {
+            this.box.x = newPosition.x;
+            this.box.y = newPosition.y;
+        }
+
+        public void UpdateColliderSize(int width, int height)
+        {
+            this.box.w = width;
+            this.box.h = height;
+        }
+
+
+
+
         // Collision between two box colliders
         public override bool CollidesWith(BoxCollider other)
         {
@@ -138,6 +162,7 @@ namespace SDL2Engine
                 if (box.Intersects(other.box))
                 {
                     Console.WriteLine("COLLISION!");
+                   // Console.WriteLine("Box1: " + box.x + box.y);
                     return true;
                 }
                 return false;

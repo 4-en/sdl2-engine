@@ -4,6 +4,8 @@ namespace SDL2Engine
 {
     public class Scene
     {
+        private string name = "Scene";
+
         private Camera mainCamera;
 
         private List<GameObject> gameObjects = new();
@@ -14,21 +16,15 @@ namespace SDL2Engine
         
         public Scene()
         {
-            this.Parent = null;
-            this.scene = this;
             this.mainCamera = new Camera2D(new Vec2D());
         }
         public Scene(Camera camera)
         {
-            this.Parent = null;
-            this.scene = this;
             this.mainCamera = camera;
         }
 
         public Scene(string name)
         {
-            this.Parent = null;
-            this.scene = this;
             this.mainCamera = new Camera2D(new Vec2D());
             this.name = name;
         }
@@ -37,6 +33,23 @@ namespace SDL2Engine
         public Camera GetCamera()
         {
             return mainCamera;
+        }
+
+        public void AddGameObject(GameObject gameObject)
+        {
+            gameObjects.Add(gameObject);
+            gameObject.SetScene(this);
+        }
+
+        public void RemoveGameObject(GameObject gameObject)
+        {
+            gameObjects.Remove(gameObject);
+            gameObject.SetScene(null);
+        }
+
+        public List<GameObject> GetGameObjects()
+        {
+            return gameObjects;
         }
 
         public void ActivateComponent<T>(T component) where T : Component
@@ -70,6 +83,22 @@ namespace SDL2Engine
                 case Script script:
                     scripts.Remove(script);
                     break;
+            }
+        }
+
+        public void Draw()
+        {
+            foreach (Drawable drawable in drawableList)
+            {
+                drawable.Draw(mainCamera);
+            }
+        }
+
+        public void Update()
+        {
+            foreach (Script script in scripts)
+            {
+                script.Update();
             }
         }
 

@@ -950,7 +950,7 @@ namespace SDL2Engine
             // Update Physics
             List<GameObject> objects_with_collider = new List<GameObject>();
             // TODO: handle children with colliders and make sure children don't collide with parents
-            foreach (GameObject child in scene.GetChildren())
+            foreach (GameObject child in scene.GetGameObjects())
             {
                 if (child.GetComponent<Collider>() != null)
                 {
@@ -1017,7 +1017,7 @@ namespace SDL2Engine
             SDL.SDL_SetRenderDrawColor(renderer, 0x1F, 0x1F, 0x1F, 0xFF); // Dark gray
             SDL.SDL_RenderClear(renderer);
 
-            scene.Draw(scene.GetCamera());
+            scene.Draw();
 
             if (showDebug)
             {

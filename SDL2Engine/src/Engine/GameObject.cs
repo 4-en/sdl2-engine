@@ -192,7 +192,7 @@ namespace SDL2Engine
             return scene;
         }
 
-        protected void SetScene(Scene? scene)
+        public void SetScene(Scene? scene)
         {
             this.scene = scene;
         }

@@ -2,18 +2,15 @@
 
 namespace SDL2Engine
 {
-    public class GameObject
+    public class GameObject : EngineObject
     {
         public uint layer = 0;
-        private bool active = true;
-        public string name = "GameObject";
         // Position of the GameObject
         protected Transform _transform = new Transform();
         protected Collider? _collider;
         protected PhysicsBody? _physicsBody;
         protected Drawable? _drawable;
         protected GameObject? Parent { get; set; }
-        protected Scene? scene;
         private readonly List<GameObject> children = [];
         private readonly List<Component> components = [];
         private static readonly GameObject defaultObject = new("default");
@@ -41,7 +38,7 @@ namespace SDL2Engine
             // setups the new object
             GameObject newObject = new GameObject(source.name);
             newObject.layer = source.layer;
-            newObject.active = source.active;
+            newObject.enabled = source.enabled;
             newObject.transform = source.transform;
             newObject.Parent = source.Parent;
             newObject.scene = source.scene;
@@ -152,19 +149,34 @@ namespace SDL2Engine
             return _drawable != null;
         }
 
-        public void SetActive(bool active)
+        public void SetEnabled(bool active)
         {
-            this.active = active;
+            this.enabled = active;
 
             for (int i = 0; i < components.Count; i++)
             {
-                components[i].SetActive(active);
+                components[i].SetEnabled(active);
+            }
+
+            for (int i = 0; i < children.Count; i++)
+            {
+                children[i].SetEnabled(active);
             }
         }
 
-        public bool IsActive()
+        public void Enable()
         {
-            return active;
+            this.SetEnabled(true);
+        }
+
+        public void Disable()
+        {
+            this.SetEnabled(false);
+        }
+
+        public bool IsEnabled()
+        {
+            return enabled;
         }
 
         public void SetParent(GameObject? parent)

@@ -381,7 +381,7 @@ namespace SDL2Engine
         protected static Random random = new Random(DateTime.Now.Millisecond);
 
         protected string name = "unnamed";
-        protected bool active = true;
+        protected bool enabled = true;
         protected Scene? scene = null;
         protected uint uid = GetRandomUID();
 

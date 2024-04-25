@@ -7,16 +7,20 @@ using System.Threading.Tasks;
 
 namespace SDL2Engine
 {
-    /* Base class for all scripts
+    /* Base class for all components
      * 
-     * This class is meant to be inherited from
-     * and can be overridden to provide custom
-     * functionality to GameObjects.
+     * Components can be added to GameObjects
+     * to provide complex functionality
+     * 
+     * To create custom components, inherit from Script instead
      */
-    public class Component
+    public class Component : EngineObject
     {
         protected GameObject gameObject = GameObject.Default;
-        private bool active = false;
+
+        // this tracks if the component was enabled on the last frame
+        // this is used to call OnEnable and OnDisable
+        private bool wasEnabled = false;
 
         protected Component()
         {
@@ -26,13 +30,14 @@ namespace SDL2Engine
         public void Init(GameObject gameObject)
         {
             this.gameObject = gameObject;
-            this.SetActive(gameObject.IsActive());
+            this.name = gameObject.GetName() + "." + this.GetType().Name;
+            this.SetEnabled(gameObject.IsEnabled());
         }
 
         // Destructor in case the component is removed
         ~Component()
         {
-            this.SetActive(false);
+            this.Disable();
         }
 
         // copy all members of the component
@@ -52,13 +57,13 @@ namespace SDL2Engine
 
         }
 
-        public void SetActive(bool active)
+        public void SetEnabled(bool active)
         {
-            if (active == this.active)
+            if (active == this.enabled)
             {
                 return;
             }
-            this.active = active;
+            this.enabled = active;
 
             if (active)
             {
@@ -70,9 +75,19 @@ namespace SDL2Engine
             }
         }
 
-        public bool IsActive()
+        public bool IsEnabled()
         {
-            return active;
+            return enabled;
+        }
+
+        public void Enable()
+        {
+            SetEnabled(true);
+        }
+
+        public void Disable()
+        {
+            SetEnabled(false);
         }
 
         public Scene? GetScene()

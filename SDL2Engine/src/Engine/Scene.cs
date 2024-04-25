@@ -81,6 +81,9 @@ namespace SDL2Engine
 
         public void RemoveGameObjectComponents(GameObject gameObject)
         {
+            // TODO: optimize this later?
+            // this could be slow if there are many components
+            // maybe consider using a better data structure for components
             List<Component> list = gameObject.GetComponents<Component>();
             for (int i = 0; i < list.Count; i++)
             {

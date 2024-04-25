@@ -647,6 +647,9 @@ namespace SDL2Engine
 
     public class Script : Component
     {
+
+        public bool wasEnabled = false;
+
         // Base class for all scripts
         // These scripts have a few virtual methods that can be overridden for custom functionality
 
@@ -698,6 +701,13 @@ namespace SDL2Engine
         // 6.
         // This method is called every frame after all Update() methods are called
         public virtual void LateUpdate()
+        {
+            // Do nothing
+        }
+
+        // 7.
+        // This method is called when the script is destroyed
+        public virtual void OnDestroy()
         {
             // Do nothing
         }

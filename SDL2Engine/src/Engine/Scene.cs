@@ -190,7 +190,7 @@ namespace SDL2Engine
 
         private static List<Scene> scenes = new();
 
-        private static Scene persistentScene = new Scene("Persistent");
+        private static List<GameObject> persistentGameObjects = new();
 
         public static Scene? GetActiveScene()
         {
@@ -225,7 +225,7 @@ namespace SDL2Engine
         public static GameObject? Find(string name)
         {
 
-            foreach (GameObject gameObject in persistentScene.GetGameObjects())
+            foreach (GameObject gameObject in persistentGameObjects)
             {
                 if (gameObject.GetName() == name)
                 {
@@ -272,9 +272,9 @@ namespace SDL2Engine
             scenes.Remove(scene);
         }
 
-        public static Scene GetPersistentScene()
+        public static List<GameObject> GetPersistentGameObjects()
         {
-            return persistentScene;
+            return persistentGameObjects;
         }
 
         public static void SetSceneOrder(Scene scene, int index)

@@ -91,7 +91,7 @@ namespace SDL2Engine
             gameObject.AddComponent<MouseTracker>();
 
             // add the game object to the world
-            world.AddGameObject(gameObject);
+            // world.AddGameObject(gameObject);
 
             gameObject.SetPosition(new Vec2D(500, 500));
 

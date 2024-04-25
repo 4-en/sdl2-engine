@@ -18,7 +18,13 @@ namespace SDL2Engine
         public GameObject(string name = "GameObject", Scene? scene = null)
         {
             this.Parent = null;
-            this.scene = null;
+            this.scene = scene;
+
+            if (scene != null)
+            {
+                scene.AddGameObject(this);
+            }
+
             this.name = name;
             this.transform.Init(this);
         }
@@ -294,6 +300,8 @@ namespace SDL2Engine
 
 
                 newComponent.Init(this);
+
+                this.scene?.AddGameObjectComponent(this, newComponent);
 
                 // add specific built-in components to fields instead of adding them to the components list
                 // GameObject should only have one of each of these components

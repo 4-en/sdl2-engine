@@ -1,11 +1,21 @@
 ﻿
 namespace SDL2Engine
 {
+
+    public enum SceneType
+    {
+        GAME = 0,
+        UI = 1,
+        MENU = 2,
+        LOADING = 3
+    }
+
     public class Scene
     {
         private string name = "Scene";
 
         private Camera mainCamera;
+        private SceneType sceneType = SceneType.GAME;
 
         private List<GameObject> gameObjects = new();
 
@@ -33,6 +43,16 @@ namespace SDL2Engine
             this.name = name;
         }
 
+        public SceneType GetSceneType()
+        {
+            return sceneType;
+        }
+
+        public void SetSceneType(SceneType sceneType)
+        {
+            this.sceneType = sceneType;
+        }
+
 
         public Camera GetCamera()
         {
@@ -43,6 +63,24 @@ namespace SDL2Engine
         {
             this.toAdd.Add(gameObject);
             gameObject.SetScene(this);
+        }
+
+        public void AddGameObjectComponent(GameObject gameObject, Component component)
+        {
+
+            switch (component)
+            {
+                case Drawable drawable:
+                    drawableList.Add(drawable);
+                    break;
+                case Collider collider:
+                    colliderList.Add(collider);
+                    break;
+                case Script script:
+                    scripts.Add(script);
+                    toStart.Add(script);
+                    break;
+            }
         }
 
         private void AddGameObjectComponents(GameObject gameObject)
@@ -152,10 +190,9 @@ namespace SDL2Engine
 
         public void Draw()
         {
-            // TODO: draw only drawables
-            foreach (GameObject gameObject in gameObjects)
+            foreach (Drawable drawable in drawableList)
             {
-                gameObject.Draw(mainCamera);
+                drawable.Draw(mainCamera);
             }
         }
 
@@ -163,7 +200,11 @@ namespace SDL2Engine
         {
             foreach (GameObject gameObject in toAdd)
             {
-                this.gameObjects.Add(gameObject);
+                // only add the game object if its a root
+                if (gameObject.GetParent() == null)
+                { 
+                    this.gameObjects.Add(gameObject);
+                }
                 AddGameObjectComponents(gameObject);
             }
             toAdd.Clear();
@@ -270,6 +311,11 @@ namespace SDL2Engine
         public static void RemoveScene(Scene scene)
         {
             scenes.Remove(scene);
+        }
+
+        public static void SortScenesBySceneType()
+        {
+            scenes.Sort((a, b) => a.GetSceneType().CompareTo(b.GetSceneType()));
         }
 
         public static List<GameObject> GetPersistentGameObjects()

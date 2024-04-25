@@ -675,20 +675,27 @@ namespace SDL2Engine
         }
 
         // 4.
+        // This method is called in fixed intervals to be more consistent with physics
+        public virtual void FixedUpdate()
+        {
+            // Do nothing
+        }
+
+        // 5.
         // This method is called every time the script is enabled. Probaly during Update()
         public virtual void OnEnable()
         {
             // Do nothing
         }
 
-        // 4.
+        // 5.
         // This method is called every time the script is disabled. Probaly during Update()
         public virtual void OnDisable()
         {
             // Do nothing
         }
 
-        // 5.
+        // 6.
         // This method is called every frame after all Update() methods are called
         public virtual void LateUpdate()
         {

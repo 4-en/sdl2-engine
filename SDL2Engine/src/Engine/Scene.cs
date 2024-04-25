@@ -1,5 +1,4 @@
 ﻿
-
 namespace SDL2Engine
 {
     public class Scene
@@ -13,6 +12,8 @@ namespace SDL2Engine
         private List<Drawable> drawableList = new();
         private List<Collider> colliderList = new();
         private List<Script> scripts = new();
+
+        private List<Script> toStart = new();
 
         private List<GameObject> toRemove = new();
         private List<GameObject> toAdd = new();
@@ -44,9 +45,67 @@ namespace SDL2Engine
             gameObject.SetScene(this);
         }
 
+        private void AddGameObjectComponents(GameObject gameObject)
+        {
+            List<Component> list = gameObject.GetComponents<Component>();
+            for (int i = 0; i < list.Count; i++) {
+                Component component = list[i];
+
+                switch (component)
+                {
+                    case Drawable drawable:
+                        drawableList.Add(drawable);
+                        break;
+                    case Collider collider:
+                        colliderList.Add(collider);
+                        break;
+                    case Script script:
+                        scripts.Add(script);
+                        toStart.Add(script);
+                        break;
+                }
+            }
+
+            // add children components
+            List<GameObject> children = gameObject.GetChildren();
+            for (int i = 0; i < children.Count; i++)
+            {
+                AddGameObjectComponents(children[i]);
+            }
+        }
+
         public void RemoveGameObject(GameObject gameObject)
         {
             this.toRemove.Add(gameObject);
+        }
+
+        public void RemoveGameObjectComponents(GameObject gameObject)
+        {
+            List<Component> list = gameObject.GetComponents<Component>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                Component component = list[i];
+
+                switch (component)
+                {
+                    case Drawable drawable:
+                        drawableList.Remove(drawable);
+                        break;
+                    case Collider collider:
+                        colliderList.Remove(collider);
+                        break;
+                    case Script script:
+                        scripts.Remove(script);
+                        break;
+                }
+            }
+
+            // remove children components
+            List<GameObject> children = gameObject.GetChildren();
+            for (int i = 0; i < children.Count; i++)
+            {
+                RemoveGameObjectComponents(children[i]);
+            }
         }
 
         public List<GameObject> GetGameObjects()
@@ -102,6 +161,7 @@ namespace SDL2Engine
             foreach (GameObject gameObject in toAdd)
             {
                 this.gameObjects.Add(gameObject);
+                AddGameObjectComponents(gameObject);
             }
             toAdd.Clear();
 
@@ -114,6 +174,7 @@ namespace SDL2Engine
             foreach (GameObject gameObject in toRemove)
             {
                 this.gameObjects.Remove(gameObject);
+                RemoveGameObjectComponents(gameObject);
             }
             toRemove.Clear();
         }

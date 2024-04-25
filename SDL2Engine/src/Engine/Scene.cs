@@ -209,10 +209,16 @@ namespace SDL2Engine
             }
             toAdd.Clear();
 
-            // TODO: update only scripts
-            foreach (GameObject gameObject in gameObjects)
+            foreach (Script script in toStart)
             {
-                gameObject.Update();
+                script.Start();
+            }
+            toStart.Clear();
+
+            // TODO: update only scripts
+            foreach (Script script in scripts)
+            {
+                script.Update();
             }
 
             foreach (GameObject gameObject in toRemove)

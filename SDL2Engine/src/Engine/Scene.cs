@@ -231,6 +231,7 @@ namespace SDL2Engine
             toStart.Clear();
 
             // call update on all scripts
+            // also check if the script was enabled or disabled
             foreach (Script script in scripts)
             {
                 if (script.IsEnabled()) {
@@ -242,6 +243,15 @@ namespace SDL2Engine
                     if (script.wasEnabled)
                         script.OnDisable();
                         script.wasEnabled = false;
+                }
+            }
+
+            // late update
+            foreach (Script script in scripts)
+            {
+                if (script.IsEnabled())
+                {
+                    script.LateUpdate();
                 }
             }
 

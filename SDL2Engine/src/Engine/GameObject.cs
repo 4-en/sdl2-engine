@@ -330,6 +330,13 @@ namespace SDL2Engine
                     return newComponent;
                 }
 
+                if (newComponent is Script script)
+                {
+                    components.Add(newComponent);
+                    script.Awake();
+                    return newComponent;
+                }
+
 
                 components.Add(newComponent);
             } else

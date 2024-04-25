@@ -198,6 +198,8 @@ namespace SDL2Engine
 
         public void Update()
         {
+
+            // add game objects that are scheduled to be added
             foreach (GameObject gameObject in toAdd)
             {
                 // only add the game object if its a root
@@ -209,18 +211,41 @@ namespace SDL2Engine
             }
             toAdd.Clear();
 
+            // Physics
+            // get all game objects with colliders
+            List<GameObject> goWithPhysics = new();
+            foreach (Collider collider in colliderList)
+            {
+                // TODO: this might cause problems if we add a parent game object and a child game object
+                // maybe fix this later
+                goWithPhysics.Add(collider.GetGameObject());
+            }
+            Physics.UpdatePhysics(goWithPhysics);
+
+
+            // start scripts that are scheduled to be started
             foreach (Script script in toStart)
             {
                 script.Start();
             }
             toStart.Clear();
 
-            // TODO: update only scripts
+            // call update on all scripts
             foreach (Script script in scripts)
             {
-                script.Update();
+                if (script.IsEnabled()) {
+                    if (!script.wasEnabled)
+                        script.OnEnable();
+                        script.wasEnabled = true;
+                    script.Update();
+                } else {
+                    if (script.wasEnabled)
+                        script.OnDisable();
+                        script.wasEnabled = false;
+                }
             }
 
+            // remove game objects that are scheduled to be removed
             foreach (GameObject gameObject in toRemove)
             {
                 this.gameObjects.Remove(gameObject);

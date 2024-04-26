@@ -423,9 +423,14 @@ namespace SDL2Engine
 
     }
 
-  
+    public interface IEngine
+    {
+        void Run();
 
-    public class Engine
+        void SetScene(Scene scene);
+    }
+
+    public class Engine : IEngine
     {
 
         private Scene scene;
@@ -715,6 +720,11 @@ namespace SDL2Engine
             // Quit SDL subsystems
             SDL.SDL_Quit();
 
+        }
+
+        public void SetScene(Scene scene)
+        {
+            this.scene = scene;
         }
     }
 }

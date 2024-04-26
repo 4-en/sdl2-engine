@@ -70,6 +70,12 @@ namespace SDL2Engine
         public void AddGameObjectComponent(GameObject gameObject, Component component)
         {
 
+            // if the game objectis in toAdd, dont add the component to the lists since it will be added later
+            if (toAdd.Contains(gameObject))
+            {
+                return;
+            }
+
             switch (component)
             {
                 case Drawable drawable:
@@ -87,7 +93,7 @@ namespace SDL2Engine
 
         private void AddGameObjectComponents(GameObject gameObject)
         {
-            List<Component> list = gameObject.GetComponents<Component>();
+            List<Component> list = gameObject.GetAllComponents();
             for (int i = 0; i < list.Count; i++) {
                 Component component = list[i];
 
@@ -134,7 +140,8 @@ namespace SDL2Engine
             switch (component)
             {
                 case Drawable drawable:
-                    drawableList.Remove(drawable);
+                    var succ = drawableList.Remove(drawable);
+                    Console.WriteLine("Drawable removed: " + succ);
                     break;
                 case Collider collider:
                     colliderList.Remove(collider);
@@ -145,6 +152,7 @@ namespace SDL2Engine
                     {
                         // maybe the script was already destroyed
                         // dont call OnDestroy again
+                        Console.WriteLine("Script was already destroyed");
                         return;
                     }
                     // call OnDisable and OnDestroy
@@ -174,7 +182,7 @@ namespace SDL2Engine
             // TODO: optimize this later?
             // this could be slow if there are many components
             // maybe consider using a better data structure for components
-            List<Component> list = gameObject.GetComponents<Component>();
+            List<Component> list = gameObject.GetAllComponents();
             for (int i = 0; i < list.Count; i++)
             {
                 Component component = list[i];
@@ -197,7 +205,7 @@ namespace SDL2Engine
             }
 
             // remove this game object from the scene
-            this.gameObjects.Remove(gameObject);
+            var succ = this.gameObjects.Remove(gameObject);
         }
 
         public List<GameObject> GetGameObjects()

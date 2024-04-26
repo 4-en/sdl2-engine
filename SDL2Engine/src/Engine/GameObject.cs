@@ -415,27 +415,42 @@ namespace SDL2Engine
         // Gets all components of type T
         public List<T> GetComponents<T>() where T : Component
         {
-            if (typeof(T) == typeof(Transform))
+            List<T> foundComponents = new List<T>();
+            if (transform is T t_component)
             {
-                List<T> transformList = [(T)(Component)_transform];
-                return transformList;
+                foundComponents.Add(t_component);
             }
 
-            List<T> foundComponents = new List<T>();
-            foreach (Component script in components)
+            if(_drawable != null && drawable is T d_component)
             {
-                if (script is T)
+                foundComponents.Add(d_component);
+            }
+
+            if (_collider != null && collider is T c_component)
+            {
+                foundComponents.Add(c_component);
+            }
+
+            if (_physicsBody != null && physicsBody is T p_component)
+            {
+                foundComponents.Add(p_component);
+            }
+
+            
+            foreach (Component component in components)
+            {
+                if (component is T)
                 {
-                    foundComponents.Add((T)script);
+                    foundComponents.Add((T)component);
                 }
             }
 
             return foundComponents;
         }
 
-        public List<Component> GetScripts()
+        public List<Component> GetAllComponents()
         {
-            return components;
+            return GetComponents<Component>();
         }
 
         public void Start()

@@ -411,8 +411,8 @@ namespace SDL2Engine
             {
                 return false;
             }
-
             scene.Destroy(obj, time);
+            
             return true;
         }
 

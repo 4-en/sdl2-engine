@@ -2,8 +2,23 @@
 using SDL2;
 using static SDL2.SDL;
 
-namespace SDL2Engine
+using SDL2Engine;
+
+namespace SDL2Engine.Testing
 {
+
+    class DestroyNotifier : Script
+    {
+        public override void Start()
+        {
+            Console.WriteLine("DestroyNotifier Start");
+        }
+
+        public override void OnDestroy()
+        {
+            Console.WriteLine("DestroyNotifier Destroy");
+        }
+    }
 
     class MouseTracker : Script
     {
@@ -23,7 +38,8 @@ namespace SDL2Engine
             {
                 this.gameObject.GetScene()?.AddGameObject(square); 
             }
-            _ = square.AddComponent<RotatingSquare>();
+            square.AddComponent<RotatingSquare>();
+            square.AddComponent<DestroyNotifier>();
             square.SetPosition(this.gameObject.GetPosition());
 
 
@@ -47,6 +63,23 @@ namespace SDL2Engine
             }
 
             gameObject.SetPosition(mousePosition);
+
+            if (Input.GetKeyDown((uint)SDL.SDL_Keycode.SDLK_x))
+            {
+                // remove a random root game object
+                var scene = gameObject.GetScene();
+                if (scene != null)
+                {
+                    var rootGameObjects = scene.GetGameObjects();
+                    if (rootGameObjects.Count > 0)
+                    {
+                        var rand = new Random();
+                        var index = rand.Next(0, rootGameObjects.Count);
+                        var rootGameObject = rootGameObjects[index];
+                        Destroy(rootGameObject);
+                    }
+                }
+            }
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -75,7 +108,7 @@ namespace SDL2Engine
         }
     }
     
-    internal class EngineTest
+    internal class EngineTest1
     {
         public static Scene CreateScene()
         {

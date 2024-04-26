@@ -369,36 +369,24 @@ namespace SDL2Engine
         public T? GetComponent<T>() where T : Component
         {
             // if component is transform, physics body, collider, or drawable, return the field directly
-            if (typeof(T) == typeof(Transform))
+            if(transform is T t_component)
             {
-                return (T)(Component)_transform;
+                return t_component;
             }
 
-            if (typeof(T) == typeof(Collider))
+            if (drawable is T d_component)
             {
-                if (_collider == null)
-                {
-                    return null;
-                }
-                return (T)(Component)_collider;
+                return d_component;
             }
 
-            if (typeof(T) == typeof(PhysicsBody))
+            if (collider is T c_component)
             {
-                if (_physicsBody == null)
-                {
-                    return null;
-                }
-                return (T)(Component)_physicsBody;
+                return c_component;
             }
 
-            if (typeof(T) == typeof(Drawable))
+            if (physicsBody is T p_component)
             {
-                if (_drawable == null)
-                {
-                    return null;
-                }
-                return (T)(Component)_drawable;
+                return p_component;
             }
 
             foreach (Component script in components)
@@ -421,17 +409,17 @@ namespace SDL2Engine
                 foundComponents.Add(t_component);
             }
 
-            if(_drawable != null && drawable is T d_component)
+            if(drawable is T d_component)
             {
                 foundComponents.Add(d_component);
             }
 
-            if (_collider != null && collider is T c_component)
+            if (collider is T c_component)
             {
                 foundComponents.Add(c_component);
             }
 
-            if (_physicsBody != null && physicsBody is T p_component)
+            if (physicsBody is T p_component)
             {
                 foundComponents.Add(p_component);
             }

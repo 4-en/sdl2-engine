@@ -12,6 +12,8 @@ namespace SDL2Engine
 
     public class Scene
     {
+
+
         private string name = "Scene";
 
         private Camera mainCamera;
@@ -25,7 +27,7 @@ namespace SDL2Engine
 
         private List<Script> toStart = new();
 
-        private List<GameObject> toRemove = new();
+        private SortedList<double, EngineObject> toDestroy = new();
         private List<GameObject> toAdd = new();
         
         public Scene()
@@ -112,12 +114,54 @@ namespace SDL2Engine
             }
         }
 
-        public void RemoveGameObject(GameObject gameObject)
+        public void Destroy(EngineObject engineObject, double delay = 0)
         {
-            this.toRemove.Add(gameObject);
+            this.toDestroy.Add(Time.time + delay, engineObject);
         }
 
-        public void RemoveGameObjectComponents(GameObject gameObject)
+        private void DestroyComponent(Component component)
+        {
+
+            // remove from GameObject
+            component.GetGameObject().RemoveComponent(component);
+
+            switch (component)
+            {
+                case Drawable drawable:
+                    drawableList.Remove(drawable);
+                    break;
+                case Collider collider:
+                    colliderList.Remove(collider);
+                    break;
+                case Script script:
+                    var success = scripts.Remove(script);
+                    if (!success)
+                    {
+                        // maybe the script was already destroyed
+                        // dont call OnDestroy again
+                        return;
+                    }
+                    // call OnDisable and OnDestroy
+                    script.OnDisable();
+                    script.OnDestroy();
+                    break;
+            }
+        }
+
+        private void HandleDestroy(EngineObject engineObject)
+        {
+            if (engineObject is GameObject gameObject)
+            {
+                this.DeepDestroyGameObject(gameObject);
+            }
+            else if (engineObject is Component component)
+            {
+                DestroyComponent(component);
+            }
+        }
+
+
+        public void DeepDestroyGameObject(GameObject gameObject)
         {
             // TODO: optimize this later?
             // this could be slow if there are many components
@@ -127,26 +171,25 @@ namespace SDL2Engine
             {
                 Component component = list[i];
 
-                switch (component)
-                {
-                    case Drawable drawable:
-                        drawableList.Remove(drawable);
-                        break;
-                    case Collider collider:
-                        colliderList.Remove(collider);
-                        break;
-                    case Script script:
-                        scripts.Remove(script);
-                        break;
-                }
+                DestroyComponent(component);
             }
 
             // remove children components
             List<GameObject> children = gameObject.GetChildren();
             for (int i = 0; i < children.Count; i++)
             {
-                RemoveGameObjectComponents(children[i]);
+                DeepDestroyGameObject(children[i]);
             }
+
+            // remove this game object from its parent if it has one
+            GameObject? parent = gameObject.GetParent();
+            if (parent != null)
+            {
+                parent.RemoveChild(gameObject);
+            }
+
+            // remove this game object from the scene
+            this.gameObjects.Remove(gameObject);
         }
 
         public List<GameObject> GetGameObjects()
@@ -256,12 +299,21 @@ namespace SDL2Engine
             }
 
             // remove game objects that are scheduled to be removed
-            foreach (GameObject gameObject in toRemove)
+            if (toDestroy.Count > 0)
             {
-                this.gameObjects.Remove(gameObject);
-                RemoveGameObjectComponents(gameObject);
+                double firstKey = toDestroy.Keys[0];
+                while (firstKey <= Time.time)
+                {
+                    HandleDestroy(toDestroy[firstKey]);
+                    toDestroy.RemoveAt(0);
+                    if (toDestroy.Count == 0)
+                    {
+                        break;
+                    }
+                    firstKey = toDestroy.Keys[0];
+                }
             }
-            toRemove.Clear();
+
         }
 
     }

@@ -67,11 +67,11 @@ namespace SDL2Engine
 
             if (active)
             {
-                GetScene()?.ActivateComponent(this);
+                GetScene()?.EnableComponent(this);
             }
             else
             {
-                GetScene()?.DeactivateComponent(this);
+                GetScene()?.DisableComponent(this);
             }
         }
 

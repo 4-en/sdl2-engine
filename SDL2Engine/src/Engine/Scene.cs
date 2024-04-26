@@ -114,6 +114,12 @@ namespace SDL2Engine
             }
         }
 
+        /*
+         * Destroy an EngineObject after a delay
+         * Either GameObject or Component
+         * 
+         * Destruction happens at the end of the frame
+         */
         public void Destroy(EngineObject engineObject, double delay = 0)
         {
             this.toDestroy.Add(Time.time + delay, engineObject);
@@ -160,7 +166,9 @@ namespace SDL2Engine
             }
         }
 
-
+        /*
+         * Destroy a GameObject, its children, and all of their components
+         */
         public void DeepDestroyGameObject(GameObject gameObject)
         {
             // TODO: optimize this later?
@@ -197,7 +205,7 @@ namespace SDL2Engine
             return gameObjects;
         }
 
-        public void ActivateComponent<T>(T component) where T : Component
+        public void EnableComponent<T>(T component) where T : Component
         {
             // Store some component types in lists for quick access
             switch (component)
@@ -214,7 +222,7 @@ namespace SDL2Engine
             }
         }
 
-        public void DeactivateComponent<T>(T component) where T : Component
+        public void DisableComponent<T>(T component) where T : Component
         {
             // Remove some component types from lists
             switch (component)
@@ -231,6 +239,7 @@ namespace SDL2Engine
             }
         }
 
+        // Iterate through all Drawable components and call their Draw method using the main camera defined in the scene
         public void Draw()
         {
             foreach (Drawable drawable in drawableList)
@@ -318,6 +327,15 @@ namespace SDL2Engine
 
     }
 
+    /*
+     * SceneManager
+     * This class is responsible for managing scenes
+     * Handles loading, unloading, and switching between scenes
+     * When a scene is updated or rendered, it is set as the active scene so that new GameObjects can be added to it automatically
+     * 
+     * Also has a list of persistent game objects that are not destroyed when a scene is unloaded
+     * These GameObjects can be accessed from a following scene, for example, a player GameObject
+     */
     public static class SceneManager
     {
         private static Scene? activeScene;

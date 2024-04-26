@@ -1,6 +1,7 @@
 ﻿using SDL2;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using static System.Diagnostics.Stopwatch;
 
 namespace SDL2Engine
@@ -395,32 +396,44 @@ namespace SDL2Engine
             return (uint)random.Next();
         }
 
-        public static bool Destroy(EngineObject obj, double time = 0)
+        public bool Destroy(EngineObject obj, double time = 0)
         {
-            /*
-             * TODO: Implement Destroy method
-             * This method should destroy the object after a certain amount of time
-             * and completely remove it from the scene at the end of the frame
-             *
-             * If the Object is a GameObject, it should also remove all its children and components
-             *             
-             */
+            // Destroy the object
+            Scene? scene = obj.GetScene();
 
-            return false;
+            if (scene == null)
+            {
+                // try to use the scene of this object
+                scene = this.GetScene();
+            }
+
+            if (scene == null)
+            {
+                return false;
+            }
+
+            scene.Destroy(obj, time);
+            return true;
         }
 
-        public static bool DestroyImmediate(EngineObject obj)
+        public bool Destroy(double time = 0)
         {
-            /*
-             * TODO: Implement DestroyImmediate method
-             * This method should destroy the object immediately, without waiting for the end of the frame
-             */
+            // Destroy the object
+            Scene? scene = this.GetScene();
 
-            return false;
+            if (scene == null)
+            {
+                return false;
+            }
+
+            scene.Destroy(this, time);
+            return true;
         }
 
-
-
+        private Scene? GetScene()
+        {
+            return scene;
+        }
     }
 
     public interface IEngine

@@ -172,6 +172,11 @@ namespace SDL2Engine
     {
         protected Rect rect = new Rect(0, 0, 100, 100);
 
+        public SDL.SDL_Rect GetDestRect()
+        {
+            return this.scene?.GetCamera().RectToScreen(rect, this.gameObject.GetPosition()).ToSDLRect() ?? rect.ToSDLRect();
+        }
+
         public override void Draw(Camera camera)
         {
             var renderer = Engine.renderer;
@@ -203,6 +208,17 @@ namespace SDL2Engine
         private IntPtr texture = IntPtr.Zero;
         private string? path = null;
         public static readonly string rootTexturePath = "Assets/Textures/";
+
+        ~Texture()
+        {
+            // TODO: check if this actually works
+            // seems like the finalizer is not called
+            Console.WriteLine("Texture destroyed");
+            if (texture != IntPtr.Zero)
+            {
+                SDL_DestroyTexture(texture);
+            }
+        }
 
         public bool LoadTexture(string t_path)
         {

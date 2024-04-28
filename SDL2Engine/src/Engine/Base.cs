@@ -516,12 +516,29 @@ namespace SDL2Engine
             {
                 Console.WriteLine("SDL could not initialize! SDL Error: " + SDL.SDL_GetError());
                 return;
+            } else
+            {
+                Console.WriteLine("SDL initialized");
             }
 
+            // Initialize SDL_image
+            if (SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) == 0)
+            {
+                Console.WriteLine("SDL_image could not initialize! SDL_image Error: " + SDL.SDL_GetError());
+                return;
+            } else
+            {
+                Console.WriteLine("SDL_image initialized");
+            }
+
+            // Initialize SDL_ttf
             if (SDL_ttf.TTF_Init() < 0)
             {
                 Console.WriteLine("SDL_ttf could not initialize! SDL_ttf Error: " + SDL.SDL_GetError());
                 return;
+            } else
+            {
+                Console.WriteLine("SDL_ttf initialized");
             }
 
             // Create window

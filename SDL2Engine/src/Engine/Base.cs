@@ -474,9 +474,11 @@ namespace SDL2Engine
         private bool running = false;
         private bool showDebug = false;
         private bool fullscreen = false;
+        private static bool forceAspectRatio = true;
+        private static double aspectRatio = 16.0 / 9.0;
         public static UInt32 targetFPS = 60;
         public static int windowWidth = 800;
-        public static int windowHeight = 600;
+        public static int windowHeight = (int)(windowWidth / aspectRatio);
 
 
         // SDL variables
@@ -605,6 +607,25 @@ namespace SDL2Engine
                     case SDL.SDL_EventType.SDL_WINDOWEVENT:
                         if (sdlEvent.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED)
                         {
+                            if (forceAspectRatio)
+                            {
+                                double newWidth = sdlEvent.window.data1;
+                                double newHeight = sdlEvent.window.data2;
+
+                                if (newWidth / newHeight > aspectRatio)
+                                {
+                                    windowWidth = (int)(newHeight * aspectRatio);
+                                    windowHeight = (int)newHeight;
+                                }
+                                else
+                                {
+                                    windowWidth = (int)newWidth;
+                                    windowHeight = (int)(newWidth / aspectRatio);
+                                }
+
+                                SDL.SDL_SetWindowSize(window, windowWidth, windowHeight);
+                            }
+
                             windowWidth = sdlEvent.window.data1;
                             windowHeight = sdlEvent.window.data2;
                         }

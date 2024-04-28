@@ -9,6 +9,9 @@ namespace SDL2Engine
 
     public struct Vec2D
     {
+        public static readonly Vec2D Zero = new(0, 0);
+        public static readonly Vec2D One = new(1, 1);
+
         public double x = 0;
         public double y = 0;
         public double z = 0; // Vec2D has a z component for layering

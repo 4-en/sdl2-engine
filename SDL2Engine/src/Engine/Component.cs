@@ -65,14 +65,6 @@ namespace SDL2Engine
             }
             this.enabled = active;
 
-            if (active)
-            {
-                GetScene()?.EnableComponent(this);
-            }
-            else
-            {
-                GetScene()?.DisableComponent(this);
-            }
         }
 
         public bool IsEnabled()

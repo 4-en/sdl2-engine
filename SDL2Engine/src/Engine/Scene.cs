@@ -28,7 +28,7 @@ namespace SDL2Engine
         private List<Script> toStart = new();
 
         private SortedList<double, EngineObject> toDestroy = new();
-        private List<GameObject> toAdd = new();
+        private List<EngineObject> toAdd = new();
         
         public Scene()
         {
@@ -63,6 +63,13 @@ namespace SDL2Engine
 
         public void AddGameObject(GameObject gameObject)
         {
+            if(gameObject.GetScene() != null)
+            {
+
+                Console.WriteLine("WARNING: GameObject already has a scene. This could result in duplicate objects in the scene" +
+                    " and unexpected behavior. Make sure to remove the GameObject from the previous scene before adding it to a new scene.");
+                return;
+            }
             this.toAdd.Add(gameObject);
             gameObject.SetScene(this);
         }
@@ -76,19 +83,13 @@ namespace SDL2Engine
                 return;
             }
 
-            switch (component)
+            // if the component is already in toAdd, dont add it again
+            if (toAdd.Contains(component))
             {
-                case Drawable drawable:
-                    drawableList.Add(drawable);
-                    break;
-                case Collider collider:
-                    colliderList.Add(collider);
-                    break;
-                case Script script:
-                    scripts.Add(script);
-                    toStart.Add(script);
-                    break;
+                return;
             }
+
+            this.toAdd.Add(gameObject);
         }
 
         private void AddGameObjectComponents(GameObject gameObject)
@@ -214,7 +215,7 @@ namespace SDL2Engine
             return gameObjects;
         }
 
-        public void EnableComponent<T>(T component) where T : Component
+        private void HandleAddComponent<T>(T component) where T : Component
         {
             // Store some component types in lists for quick access
             switch (component)
@@ -227,23 +228,6 @@ namespace SDL2Engine
                     break;
                 case Script script:
                     scripts.Add(script);
-                    break;
-            }
-        }
-
-        public void DisableComponent<T>(T component) where T : Component
-        {
-            // Remove some component types from lists
-            switch (component)
-            {
-                case Drawable drawable:
-                    drawableList.Remove(drawable);
-                    break;
-                case Collider collider:
-                    colliderList.Remove(collider);
-                    break;
-                case Script script:
-                    scripts.Remove(script);
                     break;
             }
         }
@@ -261,19 +245,25 @@ namespace SDL2Engine
         {
 
             // add game objects that are scheduled to be added
-            foreach (GameObject gameObject in toAdd)
+            foreach (EngineObject engineObject in toAdd)
             {
-                // only add the game object if its a root
-                if (gameObject.GetParent() == null)
-                { 
-                    this.gameObjects.Add(gameObject);
-                }
-                else
+                if (engineObject is GameObject gameObject)
                 {
-                    // otherwise we assume that the parent(or its parent) is already in the list
-                    // TODO: add a check for this
+                    // only add the game object if its a root
+                    if (gameObject.GetParent() == null)
+                    {
+                        this.gameObjects.Add(gameObject);
+                    }
+                    else
+                    {
+                        // otherwise we assume that the parent(or its parent) is already in the list
+                        // TODO: add a check for this
+                    }
+                    AddGameObjectComponents(gameObject);
+                } else if (engineObject is Component component)
+                {
+                    HandleAddComponent(component);
                 }
-                AddGameObjectComponents(gameObject);
             }
             toAdd.Clear();
 

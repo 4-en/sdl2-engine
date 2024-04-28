@@ -24,8 +24,6 @@ namespace SDL2Engine
                 scene = SceneManager.GetActiveScene();
             }
 
-            this.scene = scene;
-
             if (scene != null)
             {
                 scene.AddGameObject(this);

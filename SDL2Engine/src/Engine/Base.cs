@@ -483,7 +483,7 @@ namespace SDL2Engine
         private bool running = false;
         private bool showDebug = false;
         private bool fullscreen = false;
-        private static bool forceAspectRatio = true;
+        private static bool forceAspectRatio = false;
         private static double aspectRatio = 16.0 / 9.0;
         public static UInt32 targetFPS = 60;
         public static int windowWidth = 800;

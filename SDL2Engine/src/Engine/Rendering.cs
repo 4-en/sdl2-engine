@@ -119,6 +119,20 @@ namespace SDL2Engine
             return new Vec2D((worldPosition.x + rootPosition.x) / Size.x * screenSize.x + Position.x, (worldPosition.y + rootPosition.y) / Size.y * screenSize.y + Position.y);
         }
 
+        public Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D())
+        {
+            Vec2D topLeft = WorldToScreen(rect.GetTopLeft(), rootPosition);
+            Vec2D bottomRight = WorldToScreen(rect.GetBottomRight(), rootPosition);
+            return new Rect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+        }
+
+        public Rect RectToWorld(Rect rect, Vec2D rootPosition = new Vec2D())
+        {
+            Vec2D topLeft = ScreenToWorld(rect.GetTopLeft());
+            Vec2D bottomRight = ScreenToWorld(rect.GetBottomRight());
+            return new Rect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+        }
+
     }
 
     // Base class for all drawable components

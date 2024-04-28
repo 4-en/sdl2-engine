@@ -7,6 +7,122 @@ using System.Threading.Tasks;
 namespace SDL2Engine
 {
 
+    public interface IBounded
+    {
+        // Rect has x, y, w, h properties
+        Rect GetBounds();
+        
+    }
+
+    // A QuadTree is a data structure that is used to store objects in a 2D space
+    // It is used to quickly find objects that are close to each other
+    // and therefore can be used to optimize collision detection by avoiding checking collisions between objects that are far away from each other
+    public class QuadTree<T> where T : IBounded
+    {
+        private const int MAX_CAPACITY = 4;
+        private List<T> items = new List<T>();
+        private Rect bounds;
+        private QuadTree<T>[]? children = null;
+        private bool isDivided = false;
+
+        public QuadTree(Rect bounds)
+        {
+            this.bounds = bounds;
+        }
+
+        public bool Insert(T item)
+        {
+            Rect itemBounds = item.GetBounds();
+            if (!bounds.Intersects(itemBounds))
+            {
+                return false;
+            }
+
+            if (items.Count < MAX_CAPACITY && !isDivided)
+            {
+                items.Add(item);
+                return true;
+            }
+
+            if (!isDivided)
+            {
+                Subdivide();
+            }
+
+            // Try to insert the item into each child.
+            if (children == null)
+            {
+                return false;
+            }
+            bool inserted = false;
+            foreach (var child in children)
+            {
+                if (child.Insert(item))
+                {
+                    inserted = true;
+                }
+            }
+            return inserted;
+        }
+
+        private void Subdivide()
+        {
+            double x = bounds.x;
+            double y = bounds.y;
+            double halfWidth = bounds.w / 2;
+            double halfHeight = bounds.h / 2;
+
+            children = new QuadTree<T>[4]
+            {
+            new QuadTree<T>(new Rect(x, y, halfWidth, halfHeight)),
+            new QuadTree<T>(new Rect(x + halfWidth, y, halfWidth, halfHeight)),
+            new QuadTree<T>(new Rect(x, y + halfHeight, halfWidth, halfHeight)),
+            new QuadTree<T>(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight))
+            };
+            isDivided = true;
+
+            List<T> tempItems = new List<T>(items);
+            items.Clear();
+            foreach (T item in tempItems)
+            {
+                Insert(item);
+            }
+        }
+
+        public List<T> Query(Rect range, List<T>? found = null)
+        {
+            if (found == null)
+            {
+                found = new List<T>();
+            }
+
+            if (!bounds.Intersects(range))
+            {
+                return found;
+            }
+
+            if (!isDivided)
+            {
+                foreach (T item in items)
+                {
+                    if (item.GetBounds().Intersects(range))
+                    {
+                        found.Add(item);
+                    }
+                }
+            }
+            else if (children != null)
+            {
+                foreach (var child in children)
+                {
+                    child.Query(range, found);
+                }
+            }
+
+            return found;
+        }
+    }
+
     // defines physical properties of an object
     // for example, mass, velocity, friction, etc.
     public class PhysicsBody : Component

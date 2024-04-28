@@ -2,18 +2,15 @@
 
 namespace SDL2Engine
 {
-    public class GameObject
+    public class GameObject : EngineObject
     {
         public uint layer = 0;
-        private bool active = true;
-        public string name = "GameObject";
         // Position of the GameObject
         protected Transform _transform = new Transform();
         protected Collider? _collider;
         protected PhysicsBody? _physicsBody;
         protected Drawable? _drawable;
         protected GameObject? Parent { get; set; }
-        protected Scene? scene;
         private readonly List<GameObject> children = [];
         private readonly List<Component> components = [];
         private static readonly GameObject defaultObject = new("default");
@@ -21,7 +18,39 @@ namespace SDL2Engine
         public GameObject(string name = "GameObject", Scene? scene = null)
         {
             this.Parent = null;
-            this.scene = null;
+
+            if (scene == null)
+            {
+                scene = SceneManager.GetActiveScene();
+            }
+
+            this.scene = scene;
+
+            if (scene != null)
+            {
+                scene.AddGameObject(this);
+            }
+
+            this.name = name;
+            this.transform.Init(this);
+        }
+
+        public GameObject(GameObject parent, string name = "GameObject")
+        {
+            this.Parent = parent;
+
+            if (parent != null)
+            {
+                this.scene = parent.GetScene();
+                parent.AddChild(this);
+            }
+            else
+            {
+                this.scene = SceneManager.GetActiveScene();
+            }
+
+            this.scene?.AddGameObject(this);
+
             this.name = name;
             this.transform.Init(this);
         }
@@ -29,7 +58,7 @@ namespace SDL2Engine
         // Creates a new GameObject as a child of this GameObject
         public GameObject CreateChild(string name = "GameObject")
         {
-            GameObject newGameObject = new GameObject(name, this.scene);
+            GameObject newGameObject = new GameObject(this, name);
             this.AddChild(newGameObject);
             return newGameObject;
         }
@@ -41,7 +70,7 @@ namespace SDL2Engine
             // setups the new object
             GameObject newObject = new GameObject(source.name);
             newObject.layer = source.layer;
-            newObject.active = source.active;
+            newObject.enabled = source.enabled;
             newObject.transform = source.transform;
             newObject.Parent = source.Parent;
             newObject.scene = source.scene;
@@ -87,6 +116,11 @@ namespace SDL2Engine
             {
                 return defaultObject;
             }
+        }
+
+        public string GetName()
+        {
+            return name;
         }
 
         public void UpdateChildPositions()
@@ -147,19 +181,34 @@ namespace SDL2Engine
             return _drawable != null;
         }
 
-        public void SetActive(bool active)
+        public void SetEnabled(bool active)
         {
-            this.active = active;
+            this.enabled = active;
 
             for (int i = 0; i < components.Count; i++)
             {
-                components[i].SetActive(active);
+                components[i].SetEnabled(active);
+            }
+
+            for (int i = 0; i < children.Count; i++)
+            {
+                children[i].SetEnabled(active);
             }
         }
 
-        public bool IsActive()
+        public void Enable()
         {
-            return active;
+            this.SetEnabled(true);
+        }
+
+        public void Disable()
+        {
+            this.SetEnabled(false);
+        }
+
+        public bool IsEnabled()
+        {
+            return enabled;
         }
 
         public void SetParent(GameObject? parent)
@@ -192,7 +241,7 @@ namespace SDL2Engine
             return scene;
         }
 
-        protected void SetScene(Scene? scene)
+        public void SetScene(Scene? scene)
         {
             this.scene = scene;
         }
@@ -221,11 +270,21 @@ namespace SDL2Engine
         public void AddChild(GameObject child)
         {
             child.SetParent(this);
+
+            Scene? childScene = child.GetScene();
+            if (childScene != null && childScene != this.scene)
+            {
+                childScene.Destroy(child);
+                this.GetScene()?.AddGameObject(child);
+            }
+
             child.SetScene(this.scene);
             children.Add(child);
+
             child.SetParentPosition(this.GetPosition());
 
-
+            // TODO: remove child from scene if necessary
+            // if the old scene is null or different from the new scene, add components to the new scene
 
         }
 
@@ -278,35 +337,43 @@ namespace SDL2Engine
 
                 newComponent.Init(this);
 
+                this.scene?.AddGameObjectComponent(this, newComponent);
+
                 // add specific built-in components to fields instead of adding them to the components list
                 // GameObject should only have one of each of these components
                 // if multiple colliders or physics bodies are needed, use a child object or CompositeCollider
                 if (newComponent is Collider collider)
                 {
                     this._collider = collider;
-                    return newComponent;
                 }
 
-                if (newComponent is PhysicsBody physicsBody)
+                else if (newComponent is PhysicsBody physicsBody)
                 {
                     this._physicsBody = physicsBody;
-                    return newComponent;
                 }
 
-                if (newComponent is Transform transform)
+                else if (newComponent is Transform transform)
                 {
                     _transform = transform;
-                    return newComponent;
                 }
 
-                if (newComponent is Drawable drawable)
+                else if (newComponent is Drawable drawable)
                 {
                     _drawable = drawable;
-                    return newComponent;
                 }
 
+                else if (newComponent is Script script)
+                {
+                    components.Add(newComponent);
+                    script.Awake();
+                }
 
-                components.Add(newComponent);
+                else
+                {
+                    components.Add(newComponent);
+                }
+                this.scene?.AddGameObjectComponent(this, newComponent);
+                return newComponent;
             } else
             {
                 Console.WriteLine("Failed to create component of type " + typeof(T).Name);
@@ -337,36 +404,24 @@ namespace SDL2Engine
         public T? GetComponent<T>() where T : Component
         {
             // if component is transform, physics body, collider, or drawable, return the field directly
-            if (typeof(T) == typeof(Transform))
+            if(transform is T t_component)
             {
-                return (T)(Component)_transform;
+                return t_component;
             }
 
-            if (typeof(T) == typeof(Collider))
+            if (drawable is T d_component)
             {
-                if (_collider == null)
-                {
-                    return null;
-                }
-                return (T)(Component)_collider;
+                return d_component;
             }
 
-            if (typeof(T) == typeof(PhysicsBody))
+            if (collider is T c_component)
             {
-                if (_physicsBody == null)
-                {
-                    return null;
-                }
-                return (T)(Component)_physicsBody;
+                return c_component;
             }
 
-            if (typeof(T) == typeof(Drawable))
+            if (physicsBody is T p_component)
             {
-                if (_drawable == null)
-                {
-                    return null;
-                }
-                return (T)(Component)_drawable;
+                return p_component;
             }
 
             foreach (Component script in components)
@@ -383,27 +438,42 @@ namespace SDL2Engine
         // Gets all components of type T
         public List<T> GetComponents<T>() where T : Component
         {
-            if (typeof(T) == typeof(Transform))
+            List<T> foundComponents = new List<T>();
+            if (transform is T t_component)
             {
-                List<T> transformList = [(T)(Component)_transform];
-                return transformList;
+                foundComponents.Add(t_component);
             }
 
-            List<T> foundComponents = new List<T>();
-            foreach (Component script in components)
+            if(drawable is T d_component)
             {
-                if (script is T)
+                foundComponents.Add(d_component);
+            }
+
+            if (collider is T c_component)
+            {
+                foundComponents.Add(c_component);
+            }
+
+            if (physicsBody is T p_component)
+            {
+                foundComponents.Add(p_component);
+            }
+
+            
+            foreach (Component component in components)
+            {
+                if (component is T)
                 {
-                    foundComponents.Add((T)script);
+                    foundComponents.Add((T)component);
                 }
             }
 
             return foundComponents;
         }
 
-        public List<Component> GetScripts()
+        public List<Component> GetAllComponents()
         {
-            return components;
+            return GetComponents<Component>();
         }
 
         public void Start()

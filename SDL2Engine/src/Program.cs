@@ -2,8 +2,23 @@
 using SDL2;
 using static SDL2.SDL;
 
-namespace SDL2Engine
+using SDL2Engine;
+
+namespace SDL2Engine.Testing
 {
+
+    class DestroyNotifier : Script
+    {
+        public override void Start()
+        {
+            Console.WriteLine("DestroyNotifier Start");
+        }
+
+        public override void OnDestroy()
+        {
+            Console.WriteLine("DestroyNotifier Destroy");
+        }
+    }
 
     class MouseTracker : Script
     {
@@ -14,13 +29,13 @@ namespace SDL2Engine
             {
                 parent = this.gameObject.GetParent();
             }
-            if (parent == null)
-            {
-                return null;
-            }
 
-            parent.AddChild(square);
-            _ = square.AddComponent<RotatingSquare>();
+            if (parent != null)
+            {
+                parent.AddChild(square);
+            }
+            square.AddComponent<RotatingSquare>();
+            square.AddComponent<DestroyNotifier>();
             square.SetPosition(this.gameObject.GetPosition());
 
 
@@ -44,6 +59,23 @@ namespace SDL2Engine
             }
 
             gameObject.SetPosition(mousePosition);
+
+            if (Input.GetKeyDown((uint)SDL.SDL_Keycode.SDLK_x))
+            {
+                // remove a random root game object
+                var scene = gameObject.GetScene();
+                if (scene != null)
+                {
+                    var rootGameObjects = scene.GetGameObjects();
+                    if (rootGameObjects.Count > 0)
+                    {
+                        var rand = new Random();
+                        var index = rand.Next(0, rootGameObjects.Count);
+                        var rootGameObject = rootGameObjects[index];
+                        Destroy(rootGameObject);
+                    }
+                }
+            }
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -72,7 +104,7 @@ namespace SDL2Engine
         }
     }
     
-    internal class EngineTest
+    internal class EngineTest1
     {
         public static Scene CreateScene()
         {
@@ -88,7 +120,7 @@ namespace SDL2Engine
             gameObject.AddComponent<MouseTracker>();
 
             // add the game object to the world
-            world.AddChild(gameObject);
+            // world.AddGameObject(gameObject);
 
             gameObject.SetPosition(new Vec2D(500, 500));
 

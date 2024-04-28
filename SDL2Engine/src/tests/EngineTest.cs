@@ -66,9 +66,5 @@ namespace SDL2Engine.Testing
             this.currentScene?.Update();
         }
 
-        public void SetScene(Scene scene)
-        {
-            this.currentScene = scene;
-        }
     }
 }

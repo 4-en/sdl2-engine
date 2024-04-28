@@ -464,13 +464,11 @@ namespace SDL2Engine
     {
         void Run();
 
-        void SetScene(Scene scene);
     }
 
     public class Engine : IEngine
     {
-
-        private Scene scene;
+        private static Engine? instance = null;
         private bool running = false;
         private bool showDebug = false;
         private bool fullscreen = false;
@@ -486,9 +484,21 @@ namespace SDL2Engine
         public static IntPtr renderer;
         private SDL.SDL_Event sdlEvent;
 
+        /*
+         * Starts the engine with an initial scene
+         * this scene will run in the SceneManager and can be used to bootstrap the game, including other scenes
+         */
         public Engine(Scene scene)
         {
-            this.scene = scene;
+            if (instance != null)
+            {
+                throw new Exception("Engine instance already exists");
+            }
+
+            instance = this;
+
+            // Set the scene in the SceneManger
+            SceneManager.AddScene(scene);
         }
 
         private void Init()
@@ -639,20 +649,16 @@ namespace SDL2Engine
 
         private void Update()
         {
-            // Calls Script.Update() for all active scripts
-            scene.Update();
+            // Updates all scenes in the following order:
+            /*
+             * for each scene in scenes
+             *  1. Add new game objects
+             *  2. Update Physics
+             *  3. Call Scripts: (Start, Update, LateUpdate)
+             *  4. Remove game objects
+             */
+            SceneManager.UpdateScenes();
 
-            // Update Physics
-            List<GameObject> objects_with_collider = new List<GameObject>();
-            // TODO: handle children with colliders and make sure children don't collide with parents
-            foreach (GameObject child in scene.GetGameObjects())
-            {
-                if (child.GetComponent<Collider>() != null)
-                {
-                    objects_with_collider.Add(child);
-                }
-            }
-            Physics.UpdatePhysics(objects_with_collider);
         }
 
         private void DrawDebug()
@@ -712,7 +718,7 @@ namespace SDL2Engine
             SDL.SDL_SetRenderDrawColor(renderer, 0x1F, 0x1F, 0x1F, 0xFF); // Dark gray
             SDL.SDL_RenderClear(renderer);
 
-            scene.Draw();
+            SceneManager.DrawScenes();
 
             if (showDebug)
             {
@@ -778,11 +784,6 @@ namespace SDL2Engine
             // Quit SDL subsystems
             SDL.SDL_Quit();
 
-        }
-
-        public void SetScene(Scene scene)
-        {
-            this.scene = scene;
         }
     }
 }

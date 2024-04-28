@@ -357,7 +357,7 @@ namespace SDL2Engine
             return activeScene;
         }
 
-        public static void SetActiveScene(Scene scene)
+        private static void SetActiveScene(Scene scene)
         {
             activeScene = scene;
         }
@@ -371,6 +371,7 @@ namespace SDL2Engine
                 activeScene = null;
             }
         }
+
 
         public static void UpdateScenes()
         {

@@ -339,6 +339,16 @@ namespace SDL2Engine
             this.h = h;
         }
 
+        public Vec2D GetTopLeft()
+        {
+            return new Vec2D(x, y);
+        }
+
+        public Vec2D GetBottomRight()
+        {
+            return new Vec2D(x + w, y + h);
+        }
+
         public bool Contains(Vec2D point)
         {
             return point.x >= x && point.x <= x + w && point.y >= y && point.y <= y + h;

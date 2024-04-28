@@ -15,6 +15,7 @@ namespace SDL2Engine
 
 
         private string name = "Scene";
+        private int gameObjectsCount = 0;
 
         private Camera mainCamera;
         private SceneType sceneType = SceneType.GAME;
@@ -55,6 +56,21 @@ namespace SDL2Engine
             this.sceneType = sceneType;
         }
 
+        public string GetName()
+        {
+            return name;
+        }
+
+        public int GetGameObjectsCount()
+        {
+            return gameObjectsCount;
+        }
+
+        public int GetRootGameObjectsCount()
+        {
+            return gameObjects.Count;
+        }
+
 
         public Camera GetCamera()
         {
@@ -70,6 +86,15 @@ namespace SDL2Engine
                     " and unexpected behavior. Make sure to remove the GameObject from the previous scene before adding it to a new scene.");
                 return;
             }
+
+            // if the game object has a parent which is not in this scene, dont add it
+            GameObject? parent = gameObject.GetParent();
+            if (parent != null && parent.GetScene() != this)
+            {
+                Console.WriteLine("WARNING: GameObject has a parent which is not in this scene. Make sure to add the parent to this scene first.");
+                return;
+            }
+
             this.toAdd.Add(gameObject);
             gameObject.SetScene(this);
         }
@@ -119,6 +144,8 @@ namespace SDL2Engine
             {
                 AddGameObjectComponents(children[i]);
             }
+            // increment game objects count
+            this.gameObjectsCount++;
         }
 
         /*
@@ -179,7 +206,7 @@ namespace SDL2Engine
         /*
          * Destroy a GameObject, its children, and all of their components
          */
-        public void DeepDestroyGameObject(GameObject gameObject, bool removeFromParent = true)
+        private void DeepDestroyGameObject(GameObject gameObject, bool removeFromParent = true)
         {
             // TODO: optimize this later?
             // this could be slow if there are many components
@@ -212,6 +239,8 @@ namespace SDL2Engine
             {
                 this.gameObjects.Remove(gameObject);
             }
+
+            this.gameObjectsCount--;
         }
 
         public List<GameObject> GetGameObjects()
@@ -355,6 +384,11 @@ namespace SDL2Engine
         public static Scene? GetActiveScene()
         {
             return activeScene;
+        }
+
+        public static List<Scene> GetScenes()
+        {
+            return scenes;
         }
 
         private static void SetActiveScene(Scene scene)

@@ -9,9 +9,12 @@ namespace SDL2Engine
 
     public struct Vec2D
     {
-        public double x=0;
-        public double y=0;
-        public double z=0; // Vec2D has a z component for layering
+        public static readonly Vec2D Zero = new(0, 0);
+        public static readonly Vec2D One = new(1, 1);
+
+        public double x = 0;
+        public double y = 0;
+        public double z = 0; // Vec2D has a z component for layering
 
         public Vec2D(double x = 0, double y = 0, double z = 0)
         {
@@ -440,11 +443,11 @@ namespace SDL2Engine
 
             }
 
-            
+
 
 
             scene?.Destroy(obj, time);
-            
+
             return true;
         }
 
@@ -517,11 +520,31 @@ namespace SDL2Engine
                 Console.WriteLine("SDL could not initialize! SDL Error: " + SDL.SDL_GetError());
                 return;
             }
+            else
+            {
+                Console.WriteLine("SDL initialized");
+            }
 
+            // Initialize SDL_image
+            if (SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) == 0)
+            {
+                Console.WriteLine("SDL_image could not initialize! SDL_image Error: " + SDL.SDL_GetError());
+                return;
+            }
+            else
+            {
+                Console.WriteLine("SDL_image initialized");
+            }
+
+            // Initialize SDL_ttf
             if (SDL_ttf.TTF_Init() < 0)
             {
                 Console.WriteLine("SDL_ttf could not initialize! SDL_ttf Error: " + SDL.SDL_GetError());
                 return;
+            }
+            else
+            {
+                Console.WriteLine("SDL_ttf initialized");
             }
 
             // Create window
@@ -671,14 +694,8 @@ namespace SDL2Engine
 
         private void DrawDebug()
         {
-           // Draw debug information
-
-            
-            SDL.SDL_Color color = new SDL.SDL_Color();
-            color.r = 255;
-            color.g = 255;
-            color.b = 255;
-            color.a = 255;
+            SDL.SDL_Color textColor = new SDL.SDL_Color { r = 255, g = 255, b = 255, a = 255 };
+            SDL.SDL_Color backgroundColor = new SDL.SDL_Color { r = 0x1A, g = 0x1A, b = 0x1A, a = 0xFF }; // Black color for background
             IntPtr font = SDL_ttf.TTF_OpenFont("Assets/Fonts/Roboto-Regular.ttf", 24);
 
             if (font == IntPtr.Zero)
@@ -687,30 +704,39 @@ namespace SDL2Engine
                 return;
             }
 
-            string[] debugStrings =
+            int totalObjects = 0;
+            foreach (Scene scene in SceneManager.GetScenes())
             {
-                "FPS: " + Time.GetFPS().ToString("0.00"),
-                "Update Duration: " + (1000*Time.updateDuration).ToString("0.00") + " ms",
-                "Draw Duration: " + (1000*Time.drawDuration).ToString("0.00") + " ms",
-                "Total Duration: " + (1000*Time.totalDuration).ToString("0.00") + " ms",
-                "Free Duration: " + (1000*Time.freeDuration).ToString("0.00") + " ms"
-            };
+                totalObjects += scene.GetGameObjectsCount();
+            }
+
+            string[] debugStrings =
+                {
+                    "FPS: " + Time.GetFPS().ToString("0.00"),
+                    "Update Duration: " + (1000*Time.updateDuration).ToString("0.00") + " ms",
+                    "Draw Duration: " + (1000*Time.drawDuration).ToString("0.00") + " ms",
+                    "Total Duration: " + (1000*Time.totalDuration).ToString("0.00") + " ms",
+                    "Free Duration: " + (1000*Time.freeDuration).ToString("0.00") + " ms",
+                    "Total Objects: " + totalObjects.ToString()
+                };
 
             for (int i = 0; i < debugStrings.Length; i++)
             {
-                IntPtr surface = SDL_ttf.TTF_RenderText_Solid(font, debugStrings[i], color);
+                int texW = 0, texH = 0;
+                if (SDL_ttf.TTF_SizeText(font, debugStrings[i], out texW, out texH) != 0)
+                {
+                    Console.WriteLine("Failed to size text! SDL_ttf Error: " + SDL.SDL_GetError());
+                }
+
+                // Background Rectangle
+                SDL.SDL_Rect backgroundRect = new SDL.SDL_Rect { x = 5, y = 5 + i * 30, w = texW + 10, h = texH + 5 }; // Slightly larger to create padding
+                SDL.SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+                SDL.SDL_RenderFillRect(renderer, ref backgroundRect);
+
+                // Render Text
+                IntPtr surface = SDL_ttf.TTF_RenderText_Solid(font, debugStrings[i], textColor);
                 IntPtr texture = SDL.SDL_CreateTextureFromSurface(renderer, surface);
-
-                int texW = 0;
-                int texH = 0;
-                SDL.SDL_QueryTexture(texture, out _, out _, out texW, out texH);
-
-                SDL.SDL_Rect dst = new SDL.SDL_Rect();
-                dst.x = 10;
-                dst.y = 10 + i * 30;
-                dst.w = texW;
-                dst.h = texH;
-
+                SDL.SDL_Rect dst = new SDL.SDL_Rect { x = 10, y = 10 + i * 30, w = texW, h = texH };
                 SDL.SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dst);
 
                 SDL.SDL_DestroyTexture(texture);

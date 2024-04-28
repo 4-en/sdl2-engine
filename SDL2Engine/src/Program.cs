@@ -34,7 +34,7 @@ namespace SDL2Engine.Testing
             {
                 parent.AddChild(square);
             }
-            square.AddComponent<RotatingSquare>();
+            square.AddComponent<Texture>()?.LoadTexture("forsenE.png");
             square.AddComponent<DestroyNotifier>();
             square.SetPosition(this.gameObject.GetPosition());
 

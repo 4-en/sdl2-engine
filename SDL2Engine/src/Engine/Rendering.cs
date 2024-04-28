@@ -65,6 +65,9 @@ namespace SDL2Engine
             }
             return null;
         }
+
+        public abstract Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D());
+        public abstract Rect RectToWorld(Rect rect, Vec2D rootPosition = new Vec2D());
     }
 
     public class Camera2D : Camera
@@ -119,14 +122,14 @@ namespace SDL2Engine
             return new Vec2D((worldPosition.x + rootPosition.x) / Size.x * screenSize.x + Position.x, (worldPosition.y + rootPosition.y) / Size.y * screenSize.y + Position.y);
         }
 
-        public Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D())
+        public override Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D())
         {
             Vec2D topLeft = WorldToScreen(rect.GetTopLeft(), rootPosition);
             Vec2D bottomRight = WorldToScreen(rect.GetBottomRight(), rootPosition);
             return new Rect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
         }
 
-        public Rect RectToWorld(Rect rect, Vec2D rootPosition = new Vec2D())
+        public override Rect RectToWorld(Rect rect, Vec2D rootPosition = new Vec2D())
         {
             Vec2D topLeft = ScreenToWorld(rect.GetTopLeft());
             Vec2D bottomRight = ScreenToWorld(rect.GetBottomRight());
@@ -169,6 +172,11 @@ namespace SDL2Engine
     {
         protected Rect rect = new Rect(0, 0, 100, 100);
 
+        public SDL.SDL_Rect GetDestRect()
+        {
+            return this.scene?.GetCamera().RectToScreen(rect, this.gameObject.GetPosition()).ToSDLRect() ?? rect.ToSDLRect();
+        }
+
         public override void Draw(Camera camera)
         {
             var renderer = Engine.renderer;
@@ -193,6 +201,70 @@ namespace SDL2Engine
             SDL_RenderDrawLine(renderer, (int)bottomLeft.x, (int)bottomLeft.y, (int)topLeft.x, (int)topLeft.y);
         }
 
+    }
+
+    public class Texture : DrawableRect
+    {
+        private IntPtr texture = IntPtr.Zero;
+        private string? path = null;
+        public static readonly string rootTexturePath = "Assets/Textures/";
+
+        ~Texture()
+        {
+            // TODO: check if this actually works
+            // seems like the finalizer is not called
+            Console.WriteLine("Texture destroyed");
+            if (texture != IntPtr.Zero)
+            {
+                SDL_DestroyTexture(texture);
+            }
+        }
+
+        public bool LoadTexture(string t_path)
+        {
+            this.path = Texture.rootTexturePath + t_path;
+            texture = SDL_image.IMG_LoadTexture(Engine.renderer, path);
+            if (texture == IntPtr.Zero)
+            {
+                Console.WriteLine("Failed to load texture: " + SDL_GetError());
+                Console.WriteLine("Texture path: " + this.path);
+                return false;
+            }
+
+            // get the size of the texture
+            int w, h;
+            SDL_QueryTexture(texture, out _, out _, out w, out h);
+            rect = new Rect(0, 0, w, h);
+
+
+            return true;
+        }
+
+        public override void Draw(Camera camera)
+        {
+            if (texture == IntPtr.Zero)
+            {
+                if (path != null)
+                {
+                    LoadTexture(path);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            var root = gameObject.GetPosition();
+            Vec2D size = rect.GetSize();
+            var srcRect = rect.ToSDLRect();
+            var dstRect = camera.RectToScreen(rect, root).ToSDLRect();
+
+            double time = Time.time;
+            double angle = time * 0.3 * 360;
+
+            SDL_RenderCopyEx(Engine.renderer, texture, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
+
+            SDL_RenderDrawRect(Engine.renderer, ref dstRect);
+        }
     }
 
 

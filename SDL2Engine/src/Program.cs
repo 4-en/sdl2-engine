@@ -34,10 +34,6 @@ namespace SDL2Engine.Testing
             {
                 parent.AddChild(square);
             }
-            else
-            {
-                this.gameObject.GetScene()?.AddGameObject(square); 
-            }
             square.AddComponent<RotatingSquare>();
             square.AddComponent<DestroyNotifier>();
             square.SetPosition(this.gameObject.GetPosition());

@@ -131,11 +131,12 @@ namespace SDL2Engine
             this.toDestroy.Add(Time.time + delay, engineObject);
         }
 
-        private void DestroyComponent(Component component)
+        private void DestroyComponent(Component component, bool removeFromGameObject = true)
         {
 
             // remove from GameObject
-            component.GetGameObject().RemoveComponent(component);
+            if (removeFromGameObject)
+                component.GetGameObject().RemoveComponent(component);
 
             switch (component)
             {
@@ -177,7 +178,7 @@ namespace SDL2Engine
         /*
          * Destroy a GameObject, its children, and all of their components
          */
-        public void DeepDestroyGameObject(GameObject gameObject)
+        public void DeepDestroyGameObject(GameObject gameObject, bool removeFromParent = true)
         {
             // TODO: optimize this later?
             // this could be slow if there are many components
@@ -187,25 +188,25 @@ namespace SDL2Engine
             {
                 Component component = list[i];
 
-                DestroyComponent(component);
+                DestroyComponent(component, removeFromGameObject: false);
             }
 
             // remove children components
             List<GameObject> children = gameObject.GetChildren();
             for (int i = 0; i < children.Count; i++)
             {
-                DeepDestroyGameObject(children[i]);
+                DeepDestroyGameObject(children[i], removeFromParent: false);
             }
 
             // remove this game object from its parent if it has one
             GameObject? parent = gameObject.GetParent();
-            if (parent != null)
+            if (parent != null && removeFromParent)
             {
                 parent.RemoveChild(gameObject);
             }
 
             // remove this game object from the scene
-            var succ = this.gameObjects.Remove(gameObject);
+            this.gameObjects.Remove(gameObject);
         }
 
         public List<GameObject> GetGameObjects()
@@ -266,6 +267,11 @@ namespace SDL2Engine
                 if (gameObject.GetParent() == null)
                 { 
                     this.gameObjects.Add(gameObject);
+                }
+                else
+                {
+                    // otherwise we assume that the parent(or its parent) is already in the list
+                    // TODO: add a check for this
                 }
                 AddGameObjectComponents(gameObject);
             }

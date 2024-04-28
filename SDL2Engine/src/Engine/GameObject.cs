@@ -18,6 +18,12 @@ namespace SDL2Engine
         public GameObject(string name = "GameObject", Scene? scene = null)
         {
             this.Parent = null;
+
+            if (scene == null)
+            {
+                scene = SceneManager.GetActiveScene();
+            }
+
             this.scene = scene;
 
             if (scene != null)
@@ -29,10 +35,30 @@ namespace SDL2Engine
             this.transform.Init(this);
         }
 
+        public GameObject(GameObject parent, string name = "GameObject")
+        {
+            this.Parent = parent;
+
+            if (parent != null)
+            {
+                this.scene = parent.GetScene();
+                parent.AddChild(this);
+            }
+            else
+            {
+                this.scene = SceneManager.GetActiveScene();
+            }
+
+            this.scene?.AddGameObject(this);
+
+            this.name = name;
+            this.transform.Init(this);
+        }
+
         // Creates a new GameObject as a child of this GameObject
         public GameObject CreateChild(string name = "GameObject")
         {
-            GameObject newGameObject = new GameObject(name, this.scene);
+            GameObject newGameObject = new GameObject(this, name);
             this.AddChild(newGameObject);
             return newGameObject;
         }
@@ -244,11 +270,21 @@ namespace SDL2Engine
         public void AddChild(GameObject child)
         {
             child.SetParent(this);
+
+            Scene? childScene = child.GetScene();
+            if (childScene != null && childScene != this.scene)
+            {
+                childScene.Destroy(child);
+                this.GetScene()?.AddGameObject(child);
+            }
+
             child.SetScene(this.scene);
             children.Add(child);
+
             child.SetParentPosition(this.GetPosition());
 
-
+            // TODO: remove child from scene if necessary
+            // if the old scene is null or different from the new scene, add components to the new scene
 
         }
 
@@ -309,36 +345,35 @@ namespace SDL2Engine
                 if (newComponent is Collider collider)
                 {
                     this._collider = collider;
-                    return newComponent;
                 }
 
-                if (newComponent is PhysicsBody physicsBody)
+                else if (newComponent is PhysicsBody physicsBody)
                 {
                     this._physicsBody = physicsBody;
-                    return newComponent;
                 }
 
-                if (newComponent is Transform transform)
+                else if (newComponent is Transform transform)
                 {
                     _transform = transform;
-                    return newComponent;
                 }
 
-                if (newComponent is Drawable drawable)
+                else if (newComponent is Drawable drawable)
                 {
                     _drawable = drawable;
-                    return newComponent;
                 }
 
-                if (newComponent is Script script)
+                else if (newComponent is Script script)
                 {
                     components.Add(newComponent);
                     script.Awake();
-                    return newComponent;
                 }
 
-
-                components.Add(newComponent);
+                else
+                {
+                    components.Add(newComponent);
+                }
+                this.scene?.AddGameObjectComponent(this, newComponent);
+                return newComponent;
             } else
             {
                 Console.WriteLine("Failed to create component of type " + typeof(T).Name);

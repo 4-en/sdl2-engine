@@ -324,7 +324,11 @@ namespace SDL2Engine
 
     }
 
-    public class Rect
+    /* Rect struct
+     * SDL.SDL_Rect uses int for x, y, w, h
+     * We use this struct to store double values
+     */
+    public struct Rect
     {
         public double x;
         public double y;
@@ -347,6 +351,16 @@ namespace SDL2Engine
         public Vec2D GetBottomRight()
         {
             return new Vec2D(x + w, y + h);
+        }
+
+        public SDL.SDL_Rect ToSDLRect()
+        {
+            SDL.SDL_Rect sdlRect = new SDL.SDL_Rect();
+            sdlRect.x = (int)x;
+            sdlRect.y = (int)y;
+            sdlRect.w = (int)w;
+            sdlRect.h = (int)h;
+            return sdlRect;
         }
 
         public bool Contains(Vec2D point)

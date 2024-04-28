@@ -704,13 +704,20 @@ namespace SDL2Engine
                 return;
             }
 
+            int totalObjects = 0;
+            foreach (Scene scene in SceneManager.GetScenes())
+            {
+                totalObjects += scene.GetGameObjectsCount();
+            }
+
             string[] debugStrings =
             {
                 "FPS: " + Time.GetFPS().ToString("0.00"),
                 "Update Duration: " + (1000*Time.updateDuration).ToString("0.00") + " ms",
                 "Draw Duration: " + (1000*Time.drawDuration).ToString("0.00") + " ms",
                 "Total Duration: " + (1000*Time.totalDuration).ToString("0.00") + " ms",
-                "Free Duration: " + (1000*Time.freeDuration).ToString("0.00") + " ms"
+                "Free Duration: " + (1000*Time.freeDuration).ToString("0.00") + " ms",
+                "Total Objects: " + totalObjects.ToString()
             };
 
             for (int i = 0; i < debugStrings.Length; i++)

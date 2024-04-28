@@ -386,6 +386,11 @@ namespace SDL2Engine
             return activeScene;
         }
 
+        public static List<Scene> GetScenes()
+        {
+            return scenes;
+        }
+
         private static void SetActiveScene(Scene scene)
         {
             activeScene = scene;

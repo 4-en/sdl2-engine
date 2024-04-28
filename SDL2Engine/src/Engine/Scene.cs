@@ -203,11 +203,15 @@ namespace SDL2Engine
             GameObject? parent = gameObject.GetParent();
             if (parent != null && removeFromParent)
             {
-                parent.RemoveChild(gameObject);
+                parent.GetChildren().Remove(gameObject);
+                gameObject.SetParent(null);
             }
 
-            // remove this game object from the scene
-            this.gameObjects.Remove(gameObject);
+            // remove this game object from the scene if it was a root game object
+            if(parent == null)
+            {
+                this.gameObjects.Remove(gameObject);
+            }
         }
 
         public List<GameObject> GetGameObjects()

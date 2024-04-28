@@ -420,6 +420,11 @@ namespace SDL2Engine
             return (uint)random.Next();
         }
 
+        /* This basically removes the object from the scene
+         * The object will be destroyed in the next frame
+         * 
+         * This only destroys the object if its not referenced anywhere else in user code
+         */
         public bool Destroy(EngineObject obj, double time = 0)
         {
             // Destroy the object
@@ -428,14 +433,17 @@ namespace SDL2Engine
             if (scene == null)
             {
                 // try to use the scene of this object
-                scene = this.GetScene();
+                //scene = this.GetScene();
+
+                // the scene shouldn't be null, so send an error message
+                Console.WriteLine("Scene is null when trying to destroy object: " + obj.name + " in GameObject.Destroy()");
+
             }
 
-            if (scene == null)
-            {
-                return false;
-            }
-            scene.Destroy(obj, time);
+            
+
+
+            scene?.Destroy(obj, time);
             
             return true;
         }

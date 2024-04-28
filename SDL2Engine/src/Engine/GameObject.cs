@@ -291,8 +291,7 @@ namespace SDL2Engine
             // check if child is in children
             if (children.Contains(child))
             {
-                children.Remove(child);
-                child.SetParentPosition(new Vec2D());
+                Destroy(child);
             }
         }
 

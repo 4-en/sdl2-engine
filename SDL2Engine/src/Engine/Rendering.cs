@@ -53,6 +53,8 @@ namespace SDL2Engine
         public abstract Vec2D GetScreenSize();
         public abstract Vec2D ScreenToWorld(Vec2D screenPosition);
 
+        public abstract Vec2D GetWorldSize();
+
         public static Camera? GetCamera(GameObject gameObject)
         {
             var root = gameObject.GetScene();
@@ -77,6 +79,11 @@ namespace SDL2Engine
         {
             this.Position = position;
             this.Size = new Vec2D(1920, 1080);
+        }
+
+        public override Vec2D GetWorldSize()
+        {
+            return Size;
         }
 
         public override Vec2D GetScreenSize()

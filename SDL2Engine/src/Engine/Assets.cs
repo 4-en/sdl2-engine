@@ -63,6 +63,34 @@ namespace SDL2Engine
      * - JSON
      */
 
+    /* This could be a way to handle different types of assets
+     * The Asset class would be a generic class that takes a type parameter
+     * and something like Texture would inherit from Asset<IntPtr>,
+     * so it returns an IntPtr when calling Get()
+     * A Scene could collect all Assets used in the scene and preload them by calling Load() on all of them
+     * Also keep track of time so that loading assets doesn't block the main thread for too long
+     * Loading the Scene should also have a callback function that returns the progress of the loading
+     * or it returns a callable function or an object that can be used to check the progress
+     * 
+     
+    public abstract class TestClass<T>
+    {
+        public bool Load();
+        public bool Unload();
+        public abstract T Get(); // this also loads the asset if it's not loaded yet
+    }
+
+    public class TestClass2 : TestClass<int>
+    {
+        public override int Get()
+        {
+            return 0;
+        }
+    }
+    */
+
+
+
     public class Texture : AssetType
     {
         private string? path = null;

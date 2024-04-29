@@ -144,14 +144,14 @@ namespace Pong.src
         {
             var scene = new Scene("Example Scene");
 
-            var mouseTracker = scene.CreateChild("Mouse Tracker");
+            var mouseTracker = new GameObject("Mouse Tracker"); ;
 
             _ = mouseTracker.AddComponent<MouseTracker>();
 
             // see Engine.Rendering.cs for RotatingSquare implementation
             _ = mouseTracker.AddComponent<RotatingSquare>();
 
-            var movingSquare = scene.CreateChild("Moving Square");
+            var movingSquare = new GameObject("Moving Square");
             _ = movingSquare.AddComponent<WASDController>();
             _ = movingSquare.AddComponent<FilledSquare>();
             movingSquare.transform.position = new Vec2D(500, 500);

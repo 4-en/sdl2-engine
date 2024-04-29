@@ -18,15 +18,19 @@ namespace Pong.src
 
             var scene = new Scene("PongGame Scene");
 
-            var leftPaddle = scene.CreateChild("Left Paddle");
+            // var leftPaddle = scene.CreateChild("Left Paddle");
+            var leftPaddle = new GameObject("Left Paddle");
             _ = leftPaddle.AddComponent<WSController>();
             _ = leftPaddle.AddComponent<Paddle>();
-            leftPaddle.transform.position = new Vec2D(50, 750);
+            leftPaddle.SetPosition(new Vec2D(50, 750));
+            scene.AddGameObject(leftPaddle);
 
-            var rightPaddle = scene.CreateChild("Right Paddle");
+
+            var rightPaddle = new GameObject("Right Paddle");
             _ = rightPaddle.AddComponent<ArrowKeysController>();
             _ = rightPaddle.AddComponent<Paddle>();
             rightPaddle.transform.position = new Vec2D(1870, 750);
+            scene.AddGameObject(rightPaddle);
 
             ////PongBall variante round
             //var pongBall = scene.CreateChild("Pongball");
@@ -35,10 +39,15 @@ namespace Pong.src
             //pongBall.transform.position = new Vec2D(950, 750);
 
             ////PongBall variante round
-            var pongSquare = scene.CreateChild("Pongball");
+            var pongSquare = new GameObject("PongSquare");
             //_ = pongBall.AddComponent<ArrowKeysController>();
             _ = pongSquare.AddComponent<PongSquare>();
-            pongSquare.transform.position = new Vec2D(960, 750);
+            //pongSquare.transform.position = new Vec2D(960, 750);
+            var bc = pongSquare.AddComponent<BoxCollider>();
+            var pb = pongSquare.AddComponent<PhysicsBody>();
+            pb.Velocity = new Vec2D(1, 1);
+            pongSquare.SetPosition(new Vec2D(960, 750));
+            scene.AddGameObject(pongSquare);
 
             ////Boarder variante 1 
             //var leftBoarder = scene.CreateChild("Boarder");
@@ -50,9 +59,10 @@ namespace Pong.src
             //rightBoarder.transform.position = new Vec2D(1915, 750);
 
             //Boarder variante 2
-            var testBoarder = scene.CreateChild("Boarder");
+            var testBoarder = new GameObject("Boarder");
             _ = testBoarder.AddComponent<Boarder2>();
             testBoarder.transform.position = new Vec2D(960, 750);
+            scene.AddGameObject(testBoarder);
 
             //testBoarder.transform.position = new Vec2D(scene.GetCamera().GetWorldSize().x / 2, scene.GetCamera().GetWorldSize().y / 2);
 

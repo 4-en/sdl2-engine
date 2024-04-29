@@ -110,6 +110,7 @@ namespace SDL2Engine.Testing
         {
             var world = new Scene("World");
 
+            
             // create a new game object
             var gameObject1 = new GameObject("Cube1", world);
 
@@ -127,7 +128,8 @@ namespace SDL2Engine.Testing
             //gameObject1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-1, 0);
 
             // add the game object to the world
-            world.AddChild(gameObject1);
+            //world.AddChild(gameObject1);
+            world.AddGameObject(gameObject1);
 
             gameObject1.SetPosition(new Vec2D(500, 500));
 
@@ -147,7 +149,8 @@ namespace SDL2Engine.Testing
             //physicsBody.Velocity = new Vec2D(1, 0);
 
             // add the game object to the world
-            world.AddChild(gameObject2);
+            //world.AddChild(gameObject2);
+            world.AddGameObject(gameObject2);
 
             gameObject2.SetPosition(new Vec2D(300, 500));
 
@@ -184,7 +187,8 @@ namespace SDL2Engine.Testing
             }
 
             // add the game object to the world
-            world.AddChild(gameObject3);
+            //world.AddChild(gameObject3);
+            world.AddGameObject(gameObject3);
 
 
 
@@ -206,7 +210,8 @@ namespace SDL2Engine.Testing
             
 
             // add the game object to the world
-            world.AddChild(gameObject4);
+            //world.AddChild(gameObject4);
+            world.AddGameObject(gameObject4);
 
 
 

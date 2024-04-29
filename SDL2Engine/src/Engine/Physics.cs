@@ -313,14 +313,14 @@ namespace SDL2Engine
 
         public void UpdateColliderPosition(Vec2D newPosition)
         {
-            this.box.x = newPosition.x;
-            this.box.y = newPosition.y;
+            var rect = new Rect(newPosition.x, newPosition.y, box.w, box.h);
+            this.box = rect;
         }
 
         public void UpdateColliderSize(int width, int height)
         {
-            this.box.w = width;
-            this.box.h = height;
+            var rect = new Rect(box.x, box.y, width, height);
+            this.box = rect;
         }
 
 

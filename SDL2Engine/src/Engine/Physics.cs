@@ -209,6 +209,30 @@ namespace SDL2Engine
         // TODO: Implement Collider class
         // Base class for all colliders
 
+        private bool isTrigger = false;
+
+        // this is used to keep track of the active collision list
+        // before every collision check, the active_index is swapped
+        // this is used to call the correct callback functions for collision events
+        private uint active_index = 0;
+        private List<Collider>[] prevCollisions = { new List<Collider>(), new List<Collider>() };
+
+        public void SwapCollisions()
+        {
+            active_index = (active_index + 1) % 2;
+            prevCollisions[active_index].Clear();
+        }
+
+        public List<Collider> GetCurrentCollisionList()
+        {
+            return prevCollisions[active_index];
+        }
+
+        public List<Collider> GetPreviousCollisionList()
+        {
+            return prevCollisions[(active_index + 1) % 2];
+        }
+
         // imlpement collision functions for all collider types
         // for example, BoxCollider and BoxCollider, BoxCollider and CircleCollider, etc.
         public virtual bool CollidesWith(Collider other)
@@ -622,17 +646,21 @@ namespace SDL2Engine
             for (uint i = 0; i < gameObjects.Count; i++)
             {
                 colliderI = gameObjects[(int)i].GetComponent<Collider>();
+                
                 if (colliderI == null) continue;
+                colliderI.SwapCollisions();
 
                 for (uint j = i + 1; j < gameObjects.Count; j++)
                 {
                     colliderJ = gameObjects[(int)j].GetComponent<Collider>();
                     if (colliderJ == null) continue;
-
+                    colliderJ.SwapCollisions();
 
                     if (colliderI.CollidesWith(colliderJ))
                     {
                         collisionPairList.Add(new CollisionPair(gameObjects[(int)i], gameObjects[(int)j]));
+                        colliderJ.GetCurrentCollisionList().Add(colliderI);
+                        colliderI.GetCurrentCollisionList().Add(colliderJ);
 
                     }
 
@@ -671,7 +699,48 @@ namespace SDL2Engine
         // after all collisions are resolved, notify objects that a collision has occured
         // TODO: Implement event listeners for OnCollisionEnter, OnCollisionStay, OnCollisionExit, etc.
         public static void NotifyCollisions(List<CollisionPair> collisions)
-        { }
+        {
+            foreach (var pair in collisions)
+            {
+                GameObject obj1 = pair.obj1;
+                GameObject obj2 = pair.obj2;
+
+                Collider? collider1 = obj1.GetComponent<Collider>();
+                Collider? collider2 = obj2.GetComponent<Collider>();
+
+                if (collider1 == null || collider2 == null) continue;
+                
+                bool wasPreviouslyColliding = collider1.GetPreviousCollisionList().Contains(collider2);
+
+                List<Script> obj1Scripts = obj1.GetComponents<Script>();
+                List<Script> obj2Scripts = obj2.GetComponents<Script>();
+
+                if (wasPreviouslyColliding)
+                {
+                    foreach (var script in obj1Scripts)
+                    {
+                        script.OnCollisionStay(pair);
+                    }
+                    foreach (var script in obj2Scripts)
+                    {
+                        script.OnCollisionStay(pair);
+                    }
+                }
+                else
+                {
+                    foreach (var script in obj1Scripts)
+                    {
+                        script.OnCollisionEnter(pair);
+                    }
+                    foreach (var script in obj2Scripts)
+                    {
+                        script.OnCollisionEnter(pair);
+                    }
+                }
+
+                
+            }
+        }
 
 
         /*

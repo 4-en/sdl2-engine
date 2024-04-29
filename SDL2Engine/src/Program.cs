@@ -7,16 +7,11 @@ using SDL2Engine;
 namespace SDL2Engine.Testing
 {
 
-    class DestroyNotifier : Script
+    class DestrpyOnCollision : Script
     {
-        public override void Start()
+        public override void OnCollisionEnter(CollisionPair collision)
         {
-            Console.WriteLine("DestroyNotifier Start");
-        }
-
-        public override void OnDestroy()
-        {
-            Console.WriteLine("DestroyNotifier Destroy");
+            Destroy(this.gameObject);
         }
     }
 
@@ -35,7 +30,8 @@ namespace SDL2Engine.Testing
                 parent.AddChild(square);
             }
             square.AddComponent<Texture>()?.LoadTexture("forsenE.png");
-            square.AddComponent<DestroyNotifier>();
+            BoxCollider.FromDrawableRect(square);
+            square.AddComponent<DestrpyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());
 
 

@@ -265,6 +265,27 @@ namespace SDL2Engine
         //create a box collider at the position of the game object
         public Rect box { get; set; }
 
+        // create a box collider from a drawable rectangle
+        // the hitbox will be the same as the drawable rectangle
+        public static BoxCollider? FromDrawableRect(GameObject gameObject)
+        {
+            Drawable? drawable = gameObject.GetComponent<Drawable>();
+            if (drawable == null) return null;
+            
+            if (drawable is DrawableRect drawableRect)
+            {
+                Rect r = drawableRect.GetRect();
+
+                var collider = gameObject.AddComponent<BoxCollider>();
+                if (collider == null) return null;
+                collider.box = r;
+                return collider;
+
+            }
+
+            return null;
+        }
+
         public BoxCollider(Rect box)
         {
             this.box = box;

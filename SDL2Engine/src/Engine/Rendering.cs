@@ -319,7 +319,6 @@ namespace SDL2Engine
             Vec2D size = rect.GetSize();
             var srcRect = rect.ToSDLRect();
             var dstRect = this.GetDestRect();
-            Console.WriteLine("Drawing texture at: " + dstRect.x + ", " + dstRect.y + ", " + dstRect.w + ", " + dstRect.h);
 
             double time = Time.time;
             double angle = time * 0.3 * 360;

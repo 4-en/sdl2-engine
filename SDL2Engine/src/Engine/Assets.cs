@@ -53,6 +53,16 @@ namespace SDL2Engine
         bool Unload();
     }
 
+    /*
+     * Possible AssetTypes:
+     * - Texture
+     * - Audio
+     * - Font
+     * - Binary
+     * - Text
+     * - JSON
+     */
+
     public class Texture : AssetType
     {
         private string? path = null;

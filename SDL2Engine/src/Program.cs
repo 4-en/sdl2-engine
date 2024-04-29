@@ -7,10 +7,11 @@ using SDL2Engine;
 namespace SDL2Engine.Testing
 {
 
-    class DestrpyOnCollision : Script
+    class DestroyOnCollision : Script
     {
         public override void OnCollisionEnter(CollisionPair collision)
         {
+            // destroy if colliding with a square
             Destroy(this.gameObject);
         }
     }
@@ -32,7 +33,7 @@ namespace SDL2Engine.Testing
             square.AddComponent<Texture>()?.LoadTexture("forsenE.png");
             var bc = BoxCollider.FromDrawableRect(square);
             Console.WriteLine(bc?.box);
-            square.AddComponent<DestrpyOnCollision>();
+            square.AddComponent<DestroyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());
 
 

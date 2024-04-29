@@ -423,10 +423,21 @@ namespace SDL2Engine
         protected bool enabled = true;
         protected Scene? scene = null;
         protected uint uid = GetRandomUID();
+        private bool _to_be_destroyed = false;
 
         public EngineObject(string name = "unnamed")
         {
             this.name = name;
+        }
+
+        public void MarkToBeDestroyed()
+        {
+            _to_be_destroyed = true;
+        }
+
+        public bool ToBeDestroyed()
+        {
+            return _to_be_destroyed;
         }
 
         public static uint GetRandomUID()

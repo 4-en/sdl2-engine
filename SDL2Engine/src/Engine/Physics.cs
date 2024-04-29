@@ -648,6 +648,12 @@ namespace SDL2Engine
                 colliderI = gameObjects[(int)i].GetComponent<Collider>();
                 
                 if (colliderI == null) continue;
+
+                // check if it has a physics body
+                // if it doesn't it can't move, so we don't need to check for collisions from it, only with it
+                PhysicsBody? physicsBody = gameObjects[(int)i].GetComponent<PhysicsBody>();
+                if (physicsBody == null || !physicsBody.IsMovable) continue;
+
                 colliderI.SwapCollisions();
 
                 for (uint j = i + 1; j < gameObjects.Count; j++)

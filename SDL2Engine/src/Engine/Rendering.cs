@@ -270,27 +270,43 @@ namespace SDL2Engine
         private IntPtr texture = IntPtr.Zero;
         private string? path = null;
         public static readonly string rootTexturePath = "Assets/Textures/";
+        private static IntPtr forsenTexture = IntPtr.Zero;
 
         ~Texture()
         {
             // TODO: check if this actually works
             // seems like the finalizer is not called
+            /*
+             * This seems to be called before the texture is destroyed and
+             * causes access violation errors
+             * fix this later with AssetManager
             Console.WriteLine("Texture destroyed");
             if (texture != IntPtr.Zero)
             {
                 SDL_DestroyTexture(texture);
             }
+            */
         }
 
         public bool LoadTexture(string t_path)
         {
-            this.path = Texture.rootTexturePath + t_path;
-            texture = SDL_image.IMG_LoadTexture(Engine.renderer, path);
-            if (texture == IntPtr.Zero)
+            // just to test performance without loading the same texture multiple times
+            // TODO: implement AssetManager to load and manage assets and remove this
+            if (forsenTexture == IntPtr.Zero)
             {
-                Console.WriteLine("Failed to load texture: " + SDL_GetError());
-                Console.WriteLine("Texture path: " + this.path);
-                return false;
+
+                this.path = Texture.rootTexturePath + t_path;
+                texture = SDL_image.IMG_LoadTexture(Engine.renderer, path);
+                if (texture == IntPtr.Zero)
+                {
+                    Console.WriteLine("Failed to load texture: " + SDL_GetError());
+                    Console.WriteLine("Texture path: " + this.path);
+                    return false;
+                }
+                forsenTexture = texture;
+            } else
+            {
+                texture = forsenTexture;
             }
 
             // get the size of the texture

@@ -10,6 +10,97 @@ namespace SDL2Engine
         LOADING = 3
     }
 
+    /*
+     * This fixes the issue with having duplicate keys in a SortedList
+     * Probably really slow, but it works for now
+     * TODO: optimize this later
+     */
+    class TimedQueue<T> where T : class
+    {
+        class NodeValue
+        {
+            public double key;
+            public T value;
+            public NodeValue(double key, T value)
+            {
+                this.key = key;
+                this.value = value;
+            }
+        }
+
+        private LinkedList<NodeValue> list = new();
+
+        public void Add(double key, T value)
+        {
+            // TODO: optimize this later
+            NodeValue nodeValue = new(key, value);
+            LinkedListNode<NodeValue>? node = list.First;
+            while (node != null)
+            {
+                if (key <= node.Value.key)
+                {
+                    list.AddBefore(node, nodeValue);
+                    return;
+                }
+                node = node.Next;
+            }
+            list.AddLast(nodeValue);
+        }
+
+        public void AddBackwards(double key, T value)
+        {
+            NodeValue nodeValue = new(key, value);
+            LinkedListNode<NodeValue>? node = list.Last;
+            while (node != null)
+            {
+                if (key > node.Value.key)
+                {
+                    list.AddAfter(node, nodeValue);
+                    return;
+                }
+                node = node.Previous;
+            }
+            list.AddFirst(nodeValue);
+        }
+
+        public T? PopBefore(double key)
+        {
+            LinkedListNode<NodeValue>? node = list.First;
+            if (node == null)
+            {
+                return default;
+            }
+            if (node.Value.key < key)
+            {
+                T value = node.Value.value;
+                list.RemoveFirst();
+                return value;
+            }
+            return null;
+        }
+
+        public void Clear()
+        {
+            list.Clear();
+        }
+
+        public int Count()
+        {
+            return list.Count;
+        }
+
+        public T? Peek()
+        {
+            if (list.Count == 0)
+            {
+                return null;
+            }
+            return list.First?.Value.value ?? null;
+        }
+
+    }
+
+
     public class Scene
     {
 
@@ -28,9 +119,9 @@ namespace SDL2Engine
 
         private List<Script> toStart = new();
 
-        private SortedList<double, EngineObject> toDestroy = new();
+        private TimedQueue<EngineObject> toDestroy = new();
         private List<EngineObject> toAdd = new();
-        
+
         public Scene()
         {
             this.mainCamera = new Camera2D(new Vec2D());
@@ -79,7 +170,7 @@ namespace SDL2Engine
 
         public void AddGameObject(GameObject gameObject)
         {
-            if(gameObject.GetScene() != null)
+            if (gameObject.GetScene() != null)
             {
 
                 Console.WriteLine("WARNING: GameObject already has a scene. This could result in duplicate objects in the scene" +
@@ -120,7 +211,8 @@ namespace SDL2Engine
         private void AddGameObjectComponents(GameObject gameObject)
         {
             List<Component> list = gameObject.GetAllComponents();
-            for (int i = 0; i < list.Count; i++) {
+            for (int i = 0; i < list.Count; i++)
+            {
                 Component component = list[i];
 
                 switch (component)
@@ -156,7 +248,20 @@ namespace SDL2Engine
          */
         public void Destroy(EngineObject engineObject, double delay = 0)
         {
-            this.toDestroy.Add(Time.time + delay, engineObject);
+            if (engineObject.ToBeDestroyed()) return;
+            engineObject.MarkToBeDestroyed();
+
+            if (delay == 0)
+            {
+                // if delay is 0, we can assume that the object will be one of the first in the queue
+                this.toDestroy.Add(Time.time + delay, engineObject);
+            }
+            else
+            {
+                // if delay is not 0, we need to find the correct position in the queue
+                // since most objects will be destroyed with a delay of 0, we can optimize this by adding the object to the end of the queue
+                this.toDestroy.AddBackwards(Time.time + delay, engineObject);
+            }
         }
 
         private void DestroyComponent(Component component, bool removeFromGameObject = true)
@@ -235,7 +340,7 @@ namespace SDL2Engine
             }
 
             // remove this game object from the scene if it was a root game object
-            if(parent == null)
+            if (parent == null)
             {
                 this.gameObjects.Remove(gameObject);
             }
@@ -293,7 +398,8 @@ namespace SDL2Engine
                         // TODO: add a check for this
                     }
                     AddGameObjectComponents(gameObject);
-                } else if (engineObject is Component component)
+                }
+                else if (engineObject is Component component)
                 {
                     HandleAddComponent(component);
                 }
@@ -323,15 +429,18 @@ namespace SDL2Engine
             // also check if the script was enabled or disabled
             foreach (Script script in scripts)
             {
-                if (script.IsEnabled()) {
+                if (script.IsEnabled())
+                {
                     if (!script.wasEnabled)
                         script.OnEnable();
-                        script.wasEnabled = true;
+                    script.wasEnabled = true;
                     script.Update();
-                } else {
+                }
+                else
+                {
                     if (script.wasEnabled)
                         script.OnDisable();
-                        script.wasEnabled = false;
+                    script.wasEnabled = false;
                 }
             }
 
@@ -345,23 +454,20 @@ namespace SDL2Engine
             }
 
             // remove game objects that are scheduled to be removed
-            if (toDestroy.Count > 0)
+            if (toDestroy.Count() > 0)
             {
-                double firstKey = toDestroy.Keys[0];
-                while (firstKey <= Time.time)
+                double time = Time.time;
+                EngineObject? engineObject = toDestroy.PopBefore(time);
+
+                while (engineObject != null)
                 {
-                    HandleDestroy(toDestroy[firstKey]);
-                    toDestroy.RemoveAt(0);
-                    if (toDestroy.Count == 0)
-                    {
-                        break;
-                    }
-                    firstKey = toDestroy.Keys[0];
+                    HandleDestroy(engineObject);
+                    engineObject = toDestroy.PopBefore(time);
                 }
             }
 
         }
-        
+
 
     }
 

@@ -133,6 +133,7 @@ namespace SDL2Engine
         // if true, objects with this component can be moved when colliding with other objects
         private bool isMovable = true;
         private Vec2D velocity = new Vec2D();
+        private double angularVelocity = 0.0;
         private double mass = 1.0;
         private double bounciness = 1.0;
         private double friction = 0.0;
@@ -168,6 +169,12 @@ namespace SDL2Engine
         {
             get { return velocity; }
             set { velocity = value; }
+        }
+
+        public double AngularVelocity
+        {
+            get { return angularVelocity; }
+            set { angularVelocity = value; }
         }
 
         public double Mass

@@ -265,14 +265,14 @@ namespace SDL2Engine
 
     }
 
-    public class Texture : DrawableRect
+    public class TextureRenderer : DrawableRect
     {
         private IntPtr texture = IntPtr.Zero;
         private string? path = null;
         public static readonly string rootTexturePath = "Assets/Textures/";
         private static IntPtr forsenTexture = IntPtr.Zero;
 
-        ~Texture()
+        ~TextureRenderer()
         {
             // TODO: check if this actually works
             // seems like the finalizer is not called
@@ -295,7 +295,7 @@ namespace SDL2Engine
             if (forsenTexture == IntPtr.Zero)
             {
 
-                this.path = Texture.rootTexturePath + t_path;
+                this.path = TextureRenderer.rootTexturePath + t_path;
                 texture = SDL_image.IMG_LoadTexture(Engine.renderer, path);
                 if (texture == IntPtr.Zero)
                 {

@@ -1,15 +1,15 @@
-﻿using SDL2Engine;
+﻿using Pong.src;
+using SDL2Engine;
 
 namespace Pong
 {
-    internal class Program
+    internal class Pong
     {
         static void Main(string[] args)
         {
-            var scene = new Scene("Pong");
-            var engine = new Engine(scene);
-
-            engine.Run();
+            // example of how to use the engine
+            PongGame.Run();
+            //Example.Run();
         }
     }
 }

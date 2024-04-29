@@ -374,7 +374,6 @@ namespace SDL2Engine
             double distanceX = circleCenter.x - closestX;
             double distanceY = circleCenter.y - closestY;
 
-            Console.WriteLine("Radius: " + radius);
 
             // If the distance is less than the circle's radius, they are colliding
             if ((distanceX * distanceX) + (distanceY * distanceY) < (radius * radius))
@@ -537,7 +536,6 @@ namespace SDL2Engine
                 if (physicsBody == null) continue;
                 if (!physicsBody.IsMovable) continue;
 
-                Console.WriteLine(physicsBody.Velocity.x + " " + physicsBody.Velocity.y);
 
                 //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);
 
@@ -612,7 +610,6 @@ namespace SDL2Engine
             dragForce.Normalize();
             dragForce *= Math.Min(physicsBody.Drag * physicsBody.Mass, physicsBody.Velocity.LengthSquared());
             physicsBody.Velocity += dragForce;
-            Console.WriteLine(physicsBody.Velocity.x + " " + physicsBody.Velocity.y);
         }
 
         // after all collisions are resolved, notify objects that a collision has occured

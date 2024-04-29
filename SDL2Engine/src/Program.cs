@@ -30,7 +30,8 @@ namespace SDL2Engine.Testing
                 parent.AddChild(square);
             }
             square.AddComponent<Texture>()?.LoadTexture("forsenE.png");
-            BoxCollider.FromDrawableRect(square);
+            var bc = BoxCollider.FromDrawableRect(square);
+            Console.WriteLine(bc?.box);
             square.AddComponent<DestrpyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());
 
@@ -116,6 +117,8 @@ namespace SDL2Engine.Testing
 
             //add a collider component to the game object
             var boxCollider1 = gameObject1.AddComponent<BoxCollider>();
+            if (boxCollider1 != null)
+                boxCollider1.box = new Rect(0, 0, 50, 50);
 
             // add a mouse tracker component to the game object
             gameObject1.AddComponent<WASDController>();

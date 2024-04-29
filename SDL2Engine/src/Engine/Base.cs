@@ -362,6 +362,11 @@ namespace SDL2Engine
             return new Vec2D(x + w, y + h);
         }
 
+        public override string ToString()
+        {
+            return "Rect: x=" + x + ", y=" + y + ", w=" + w + ", h=" + h;
+        }
+
         public SDL.SDL_Rect ToSDLRect()
         {
             SDL.SDL_Rect sdlRect = new SDL.SDL_Rect();

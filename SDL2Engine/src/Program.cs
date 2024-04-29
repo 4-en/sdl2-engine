@@ -90,6 +90,10 @@ namespace SDL2Engine
             // add a mouse tracker component to the game object
             gameObject1.AddComponent<WASDController>();
 
+            //add a physics component to the game object
+            gameObject1.AddComponent<PhysicsBody>();
+            //gameObject1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-1, 0);
+
             // add the game object to the world
             world.AddChild(gameObject1);
 
@@ -106,10 +110,14 @@ namespace SDL2Engine
             //add a collider component to the game object
             var boxCollider2 = gameObject2.AddComponent<BoxCollider>();
 
+            //add physics component to the game object
+            var physicsBody = gameObject2.AddComponent<PhysicsBody>();
+            //physicsBody.Velocity = new Vec2D(1, 0);
+
             // add the game object to the world
             world.AddChild(gameObject2);
 
-            gameObject2.SetPosition(new Vec2D(800, 700));
+            gameObject2.SetPosition(new Vec2D(300, 500));
 
             //adjust collider to cube position
             if (gameObject2.collider != null && gameObject2.collider is BoxCollider)
@@ -129,13 +137,17 @@ namespace SDL2Engine
             //add a collider component to the game object
             var circleCollider = gameObject3.AddComponent<CircleCollider>();
 
+            //add physics component to the game object
+            var physicsBody3 = gameObject3.AddComponent<PhysicsBody>();
+
             gameObject3.SetPosition(new Vec2D(100, 500));
 
             //adjust collider to cube size and position
             if (gameObject3.collider != null && gameObject3.collider is CircleCollider)
             {
+                
                 var c = (CircleCollider)gameObject3.collider;
-                c.UpdateColliderPosition(new Vec2D(gameObject3.GetPosition().x+25,gameObject3.GetPosition().y+25));
+                c.UpdateColliderPosition(new Vec2D(gameObject3.GetPosition().x+10,gameObject3.GetPosition().y+10));
                 c.UpdateColliderSize(20);
             }
 
@@ -154,7 +166,10 @@ namespace SDL2Engine
             var edgeCollider = gameObject4.AddComponent<EdgeCollider>();
             edgeCollider.UpdateColliderPosition(new Vec2D(300, 800), new Vec2D(500, 1100));
 
-        
+            //add physics component to the game object
+            var physicsBody2 = gameObject4.AddComponent<PhysicsBody>();
+            physicsBody2.Velocity = new Vec2D(0, 0);
+            physicsBody2.IsMovable = false;
 
             
 

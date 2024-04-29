@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SDL2Engine
 {
@@ -14,12 +15,68 @@ namespace SDL2Engine
     public class PhysicsBody : Component
     {
         // if true, objects with this component can be moved when colliding with other objects
-        private bool isMovable = false;
+        private bool isMovable = true;
         private Vec2D velocity = new Vec2D();
         private double mass = 1.0;
         private double bounciness = 1.0;
         private double friction = 0.0;
         private double drag = 0.0;
+
+        public PhysicsBody()
+        {
+            this.isMovable = true;
+            this.velocity = new Vec2D(0,0);
+            this.mass = 1;
+            this.bounciness = 1.0 ;
+            this.friction = 0.0;
+            this.drag = 0.0;
+        }
+
+        public PhysicsBody(bool isMovable, Vec2D velocity, double mass, double bounciness, double friction, double drag)
+        {
+            this.isMovable = isMovable;
+            this.velocity = velocity;
+            this.mass = mass;
+            this.bounciness = bounciness;
+            this.friction = friction;
+            this.drag = drag;
+        }
+
+       public bool IsMovable
+        {
+            get { return isMovable; }
+            set { isMovable = value; }
+        }
+
+        public Vec2D Velocity
+        {
+            get { return velocity; }
+            set { velocity = value; }
+        }
+
+        public double Mass
+        {
+            get { return mass; }
+            set { mass = value; }
+        }
+
+        public double Bounciness
+        {
+            get { return bounciness; }
+            set { bounciness = value; }
+        }
+
+        public double Friction
+        {
+            get { return friction; }
+            set { friction = value; }
+        }
+
+        public double Drag
+        {
+            get { return drag; }
+            set { drag = value; }
+        }
 
     }
 
@@ -352,13 +409,56 @@ namespace SDL2Engine
             // Check for collision between ray and collider
             // Return true if collision is found
             // Return false if no collision is found
+
+           
+
+
+            
             hit = new RaycastHit();
+
             return false;
         }
 
         // Adds gravity and other forces, moves objects
-        public static void ApplePhysics(List<GameObject> gameObjects)
-        { }
+        public static void ApplyPhysics(List<GameObject> gameObjects)
+        {
+            // Apply gravity, forces, etc.
+            foreach (var gameObject in gameObjects)
+            {
+               //apply gravity
+               if (gameObject.GetComponent<PhysicsBody>() != null)
+                {
+                    if (gameObject.GetComponent<PhysicsBody>().IsMovable)
+                    {
+                       //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);
+                    }
+                }
+                //move objects
+                if (gameObject.GetComponent<PhysicsBody>() != null)
+                {
+                    if (gameObject.GetComponent<PhysicsBody>().IsMovable)
+                    {
+                        gameObject.SetPosition(new Vec2D(gameObject.GetPosition().x + gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetPosition().y + gameObject.GetComponent<PhysicsBody>().Velocity.y));
+                        //move the collider with the object
+                        if (gameObject.GetComponent<Collider>() != null)
+                        {
+                            if (gameObject.GetComponent<Collider>() is BoxCollider)
+                            {
+                                ((BoxCollider)gameObject.GetComponent<Collider>()).UpdateColliderPosition(gameObject.GetPosition());
+                            }
+                            if (gameObject.GetComponent<Collider>() is CircleCollider)
+                            {
+                                ((CircleCollider)gameObject.GetComponent<Collider>()).UpdateColliderPosition(gameObject.GetPosition());
+                            }
+                            if (gameObject.GetComponent<Collider>() is EdgeCollider)
+                            {
+                                ((EdgeCollider)gameObject.GetComponent<Collider>()).UpdateColliderPosition(gameObject.GetPosition(), new Vec2D(gameObject.GetPosition().x + 50, gameObject.GetPosition().y + 50));
+                            }
+                        }   
+                    }
+                }
+            }
+        }
 
         // Checks for collisions between objects
         public static List<CollisionPair> CheckCollisions(List<GameObject> gameObjects)
@@ -393,7 +493,26 @@ namespace SDL2Engine
         // Applies forces to objects after collision
         // For example, if two objects collide, they should bounce off each other based on their mass, velocity, bounciness, etc.
         public static void ResolveCollisions(List<CollisionPair> collisions)
-        { }
+        {
+            
+            
+        }
+
+        private static void ApplyFrictionAndDrag(PhysicsBody? physicsBody)
+        {
+            // Apply friction
+            Vec2D frictionForce = - physicsBody.Velocity;
+            frictionForce.Normalize();
+            frictionForce *= Math.Min(physicsBody.Friction * physicsBody.Mass, physicsBody.Velocity.Length());
+            physicsBody.Velocity += frictionForce;
+
+            // Apply drag
+            Vec2D dragForce = -physicsBody.Velocity;
+            dragForce.Normalize();
+            dragForce *= Math.Min(physicsBody.Drag * physicsBody.Mass, physicsBody.Velocity.LengthSquared());
+            physicsBody.Velocity += dragForce;
+            Console.WriteLine(physicsBody.Velocity.x + " " + physicsBody.Velocity.y);
+        }
 
         // after all collisions are resolved, notify objects that a collision has occured
         // TODO: Implement event listeners for OnCollisionEnter, OnCollisionStay, OnCollisionExit, etc.
@@ -421,13 +540,13 @@ namespace SDL2Engine
         public static void UpdatePhysics(List<GameObject> gameObjects)
         {
             // Apply physics
-            ApplePhysics(gameObjects);
+            ApplyPhysics(gameObjects);
 
             // Check for collisions
             List<CollisionPair> collisions = CheckCollisions(gameObjects);
 
             // Resolve collisions
-            ResolveCollisions(collisions);
+            //ResolveCollisions(collisions);
 
             // Notify objects of collisions
             NotifyCollisions(collisions);

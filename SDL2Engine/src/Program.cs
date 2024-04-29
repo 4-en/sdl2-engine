@@ -129,6 +129,9 @@ namespace SDL2Engine.Testing
             if (body != null)
             {
                 body.Velocity = new Vec2D(100, 0);
+
+                // testing drag
+                body.Drag = 0.3d;
             }
 
 
@@ -314,22 +317,42 @@ namespace SDL2Engine.Testing
         {
             // a better way to do this would be to use a rigidbody with velocity
             var gameObject = this.gameObject;
-            var speed = 5;
+            var speed = 100;
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_w)))
             {
-                gameObject.transform.position += new Vec2D(0, -speed);
+                //gameObject.transform.position += new Vec2D(0, -speed);
+                var body = gameObject.GetComponent<PhysicsBody>();
+                if (body != null)
+                {
+                    body.Velocity += new Vec2D(0, -speed);
+                }
             }
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_s)))
             {
-                gameObject.transform.position += new Vec2D(0, speed);
+                //gameObject.transform.position += new Vec2D(0, speed);
+                var body = gameObject.GetComponent<PhysicsBody>();
+                if (body != null)
+                {
+                    body.Velocity += new Vec2D(0, speed);
+                }
             }
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_a)))
             {
-                gameObject.transform.position += new Vec2D(-speed, 0);
+                //gameObject.transform.position += new Vec2D(-speed, 0);
+                var body = gameObject.GetComponent<PhysicsBody>();
+                if (body != null)
+                {
+                    body.Velocity += new Vec2D(-speed, 0);
+                }
             }
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_d)))
             {
-                gameObject.transform.position += new Vec2D(speed, 0);
+                //gameObject.transform.position += new Vec2D(speed, 0);
+                var body = gameObject.GetComponent<PhysicsBody>();
+                if (body != null)
+                {
+                    body.Velocity += new Vec2D(speed, 0);
+                }
             }
 
 

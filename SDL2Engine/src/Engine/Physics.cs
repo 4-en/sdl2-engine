@@ -549,8 +549,43 @@ namespace SDL2Engine
 
                 // rotate objects
                 t.rotation += physicsBody.AngularVelocity * deltaTime;
+                var vel_magnitude_squared = physicsBody.Velocity.LengthSquared();
+                // if velocity is below a certain threshold, set it to 0
+                if (vel_magnitude_squared > 0 && vel_magnitude_squared < 1.0)
+                {
+                    physicsBody.Velocity = new Vec2D(0, 0);
+                    vel_magnitude_squared = 0;
+                }
 
-                //gameObject.SetPosition(new Vec2D(gameObject.GetPosition().x + physicsBody.Velocity.x, gameObject.GetPosition().y + physicsBody.Velocity.y));
+                // Apply friction and drag
+
+                // drag: a force that opposes the motion of an object
+                
+                // new_kinetic_energy = old_kinetic_energy - drag_force
+                // old_kinetic_energy = 0.5 * mass * velocity^2
+                // drag_force = drag_coefficient * velocity^2
+                // 
+                // new_velocity       = old_velocity - 
+                // new_kinetic_energy = 0.5 * mass * velocity^2 - drag_coefficient * velocity^2 
+                // new_kinetic_energy = 0.5 * mass * velocity^2 * (1 - drag_coefficient)
+                //
+                //
+
+                // skip if drag is 0 or velocity is 0
+                if (physicsBody.Drag == 0 || vel_magnitude_squared == 0) continue;
+                // Calculate the magnitude of the velocity squared
+
+                // Normalize the velocity vector to get the direction of the force
+                // use precomputed magnitude to avoid recomputing it when using Vec2D.Normalize()
+                Vec2D velocity_normalized = physicsBody.Velocity / Math.Sqrt(vel_magnitude_squared);
+
+                // Compute drag force: F_drag = -0.5 * rho * v^2 * C_d * A * unit_vector(v)
+                // assume rho* C_d * A = physicsBody.Drag
+                Vec2D dragForce = velocity_normalized * (-0.5  * vel_magnitude_squared * physicsBody.Drag);
+
+                // Update velocity by adding acceleration due to drag (F = ma -> a = F/m)
+                physicsBody.Velocity += dragForce / physicsBody.Mass * deltaTime;
+
 
 
             }

@@ -73,7 +73,7 @@ namespace SDL2Engine
     public class Camera2D : Camera
     {
         private Vec2D Position { get; set; }
-        private Vec2D Size { get; set; }
+        private Vec2D WorldSize { get; set; }
 
         public bool keepAspectRatio = true;
 
@@ -81,7 +81,7 @@ namespace SDL2Engine
         public Camera2D(Vec2D position = new Vec2D())
         {
             this.Position = position;
-            this.Size = new Vec2D(1920, 1080);
+            this.WorldSize = new Vec2D(1920, 1080);
         }
 
         public void SetPosition(Vec2D position)
@@ -91,14 +91,14 @@ namespace SDL2Engine
 
         public override Vec2D GetWorldSize()
         {
-            return Size;
+            return WorldSize;
         }
 
         public override Vec2D GetScreenSize()
         {
             if (keepAspectRatio)
             {
-                double aspectRatio = Size.x / Size.y;
+                double aspectRatio = WorldSize.x / WorldSize.y;
                 double windowAspectRatio = Engine.windowWidth / Engine.windowHeight;
 
                 // constant scale for both axes
@@ -118,13 +118,13 @@ namespace SDL2Engine
         public override Vec2D ScreenToWorld(Vec2D screenPosition)
         {
             Vec2D screenSize = GetScreenSize();
-            return new Vec2D((screenPosition.x - Position.x) / screenSize.x * Size.x, (screenPosition.y - Position.y) / screenSize.y * Size.y);
+            return new Vec2D(screenPosition.x / screenSize.x * WorldSize.x + Position.x, screenPosition.y / screenSize.y * WorldSize.y + Position.y);
         }
 
         public override Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D())
         {
             Vec2D screenSize = GetScreenSize();
-            return new Vec2D((worldPosition.x + rootPosition.x) / Size.x * screenSize.x + Position.x, (worldPosition.y + rootPosition.y) / Size.y * screenSize.y + Position.y);
+            return new Vec2D((worldPosition.x + rootPosition.x-Position.x) / WorldSize.x * screenSize.x, (worldPosition.y + rootPosition.y-Position.y) / WorldSize.y * screenSize.y);
         }
 
         public override Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D())

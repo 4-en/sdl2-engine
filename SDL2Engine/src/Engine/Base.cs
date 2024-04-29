@@ -23,6 +23,12 @@ namespace SDL2Engine
             this.z = z;
         }
 
+        // to string
+        public override string ToString()
+        {
+            return "(" + x + ", " + y + ")";
+        }
+
         public static Vec2D operator +(Vec2D a, Vec2D b)
         {
             return new Vec2D(a.x + b.x, a.y + b.y, a.z);

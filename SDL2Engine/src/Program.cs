@@ -317,6 +317,16 @@ namespace SDL2Engine.Testing
         {
             // a better way to do this would be to use a rigidbody with velocity
             var gameObject = this.gameObject;
+
+            var camera = Camera.GetCamera(gameObject);
+            if(camera is Camera2D cam2d)
+            {
+                // follow the square
+                var worldPos = gameObject.GetPosition() - (cam2d.GetWorldSize() / 2);
+                Console.WriteLine(worldPos);
+                cam2d.SetPosition(worldPos);
+            }
+
             var speed = 100;
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_w)))
             {

@@ -142,7 +142,7 @@ namespace SDL2Engine
         public PhysicsBody()
         {
             this.isMovable = true;
-            this.velocity = new Vec2D(1, 0);
+            this.velocity = new Vec2D(0, 0);
             this.mass = 1;
             this.bounciness = 1.0;
             this.friction = 0.0;
@@ -528,6 +528,7 @@ namespace SDL2Engine
         // Adds gravity and other forces, moves objects
         public static void ApplyPhysics(List<GameObject> gameObjects)
         {
+            double deltaTime = Time.deltaTime;
             // Apply gravity, forces, etc.
             foreach (var gameObject in gameObjects)
             {
@@ -536,15 +537,22 @@ namespace SDL2Engine
                 if (physicsBody == null) continue;
                 if (!physicsBody.IsMovable) continue;
 
+                Console.WriteLine(physicsBody.Velocity.x + " " + physicsBody.Velocity.y);
+
                 //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);
 
 
                 //move objects
+                Transform t = gameObject.transform;
+                t.Move(
+                    physicsBody.Velocity.x * deltaTime,
+                    physicsBody.Velocity.y * deltaTime
+                    );
 
-                gameObject.SetPosition(new Vec2D(gameObject.GetPosition().x + physicsBody.Velocity.x, gameObject.GetPosition().y + physicsBody.Velocity.y));
-                //move the collider with the object
-                Collider? collider = gameObject.GetComponent<Collider>();
-                if (collider == null) continue;
+                // rotate objects
+                t.rotation += physicsBody.AngularVelocity * deltaTime;
+
+                //gameObject.SetPosition(new Vec2D(gameObject.GetPosition().x + physicsBody.Velocity.x, gameObject.GetPosition().y + physicsBody.Velocity.y));
 
 
             }

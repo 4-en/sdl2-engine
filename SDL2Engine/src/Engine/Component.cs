@@ -342,6 +342,18 @@ namespace SDL2Engine
             }
         }
 
+        public double rotation
+        {
+            get
+            {
+                return _rotation;
+            }
+            set
+            {
+                _rotation = value;
+            }
+        }
+
         // sets the position to a specific world position
         // adjust _localPosition to keep parent position the same
         public Vec2D position
@@ -376,6 +388,21 @@ namespace SDL2Engine
             }
         }
 
+        public void Move(Vec2D move)
+        {
+            this.Move(move.x, move.y);
+        }
+
+        public void Move(double x, double y)
+        {
+            _localPosition.x += x;
+            _localPosition.y += y;
+            _position.x += x;
+            _position.y += y;
+
+            UpdateChildren();
+        }
+
         // sets the parent position directly
         public void SetParentPosition(Vec2D parentPosition)
         {
@@ -395,8 +422,8 @@ namespace SDL2Engine
 
         private Vec2D _scale = new Vec2D(1, 1);
         private Vec2D _localScale = new Vec2D(1, 1);
-        private Vec2D _rotation = new Vec2D();
-        private Vec2D _localRotation = new Vec2D();
+        private double _rotation = 0.0;
+        private double _localRotation = 0.0;
 
 
     }

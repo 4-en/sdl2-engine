@@ -58,6 +58,7 @@ namespace SDL2Engine.Testing
                 mousePosition = camera.ScreenToWorld(mousePosition);
             }
 
+
             gameObject.SetPosition(mousePosition);
 
             if (Input.GetKeyDown((uint)SDL.SDL_Keycode.SDLK_x))
@@ -124,8 +125,12 @@ namespace SDL2Engine.Testing
             gameObject1.AddComponent<WASDController>();
 
             //add a physics component to the game object
-            gameObject1.AddComponent<PhysicsBody>();
-            //gameObject1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-1, 0);
+            var body = gameObject1.AddComponent<PhysicsBody>();
+            if (body != null)
+            {
+                body.Velocity = new Vec2D(100, 0);
+            }
+
 
 
 
@@ -143,8 +148,12 @@ namespace SDL2Engine.Testing
             var boxCollider2 = gameObject2.AddComponent<BoxCollider>();
 
             //add physics component to the game object
-            var physicsBody = gameObject2.AddComponent<PhysicsBody>();
-            //physicsBody.Velocity = new Vec2D(1, 0);
+            body = gameObject2.AddComponent<PhysicsBody>();
+            if (body != null)
+            {
+                body.Velocity = new Vec2D(0, 100);
+            }
+            
 
 
             gameObject2.SetPosition(new Vec2D(300, 500));
@@ -163,7 +172,11 @@ namespace SDL2Engine.Testing
             var circleCollider = gameObject3.AddComponent<CircleCollider>();
 
             //add physics component to the game object
-            var physicsBody3 = gameObject3.AddComponent<PhysicsBody>();
+            body = gameObject3.AddComponent<PhysicsBody>();
+            if (body != null)
+            {
+                body.Velocity = new Vec2D(100, 100);
+            }
 
             gameObject3.SetPosition(new Vec2D(100, 500));
 

@@ -84,6 +84,11 @@ namespace SDL2Engine
             this.Size = new Vec2D(1920, 1080);
         }
 
+        public void SetPosition(Vec2D position)
+        {
+            this.Position = position;
+        }
+
         public override Vec2D GetWorldSize()
         {
             return Size;

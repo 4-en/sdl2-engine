@@ -32,7 +32,6 @@ namespace SDL2Engine.Testing
             }
             square.AddComponent<Texture>()?.LoadTexture("forsenE.png");
             var bc = BoxCollider.FromDrawableRect(square);
-            Console.WriteLine(bc?.box);
             square.AddComponent<DestroyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());
 

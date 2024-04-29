@@ -177,9 +177,66 @@ namespace SDL2Engine
     {
         protected Rect rect = new Rect(0, 0, 100, 100);
 
+        public override Vec2D GetDrawRoot()
+        {
+            Vec2D localCenter = GetRect().GetTopLeft();
+            return scene?.GetCamera().WorldToScreen(localCenter, gameObject.GetPosition()) ?? localCenter + gameObject.GetPosition();
+        }
+
+        // get the rect based on the anchor point in local coordinates
+        // for example, if the anchor point is Center, the rect will be centered around the anchor point (move the rect to the left and up by half its size)
+        public Rect GetRect()
+        {
+            // return rect relative to anchor point
+            Vec2D size = rect.GetSize();
+            Vec2D position = rect.GetTopLeft();
+
+            switch(this.anchorPoint)
+            {
+                case AnchorPoint.Center:
+                    position = new Vec2D(-size.x / 2, -size.y / 2);
+                    break;
+                case AnchorPoint.TopCenter:
+                    position = new Vec2D(-size.x / 2, 0);
+                    break;
+                case AnchorPoint.TopRight:
+                    position = new Vec2D(-size.x, 0);
+                    break;
+                case AnchorPoint.CenterLeft:
+                    position = new Vec2D(0, -size.y / 2);
+                    break;
+                case AnchorPoint.CenterRight:
+                    position = new Vec2D(-size.x, -size.y / 2);
+                    break;
+                case AnchorPoint.BottomLeft:
+                    position = new Vec2D(0, -size.y);
+                    break;
+                case AnchorPoint.BottomCenter:
+                    position = new Vec2D(-size.x / 2, -size.y);
+                    break;
+                case AnchorPoint.BottomRight:
+                    position = new Vec2D(-size.x, -size.y);
+                    break;
+            }
+            return new Rect(position.x, position.y, size.x, size.y);
+        }
         public SDL.SDL_Rect GetDestRect()
         {
-            return this.scene?.GetCamera().RectToScreen(rect, this.gameObject.GetPosition()).ToSDLRect() ?? rect.ToSDLRect();
+            var scene = gameObject.GetScene();
+            Camera? camera = scene?.GetCamera();
+            if (camera != null)
+            {
+                return camera.RectToScreen(this.GetRect(), gameObject.GetPosition()).ToSDLRect();
+            } else
+            {
+                return rect.ToSDLRect();
+            }
+        }
+
+        // get the rect in world coordinates
+        public Rect GetWorldRect()
+        {
+            return GetRect() + gameObject.GetPosition();
         }
 
         public override void Draw(Camera camera)
@@ -261,7 +318,8 @@ namespace SDL2Engine
             var root = gameObject.GetPosition();
             Vec2D size = rect.GetSize();
             var srcRect = rect.ToSDLRect();
-            var dstRect = camera.RectToScreen(rect, root).ToSDLRect();
+            var dstRect = this.GetDestRect();
+            Console.WriteLine("Drawing texture at: " + dstRect.x + ", " + dstRect.y + ", " + dstRect.w + ", " + dstRect.h);
 
             double time = Time.time;
             double angle = time * 0.3 * 360;

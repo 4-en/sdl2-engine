@@ -323,7 +323,7 @@ namespace SDL2Engine.Testing
             {
                 // follow the square
                 var worldPos = gameObject.GetPosition() - (cam2d.GetWorldSize() / 2);
-                Console.WriteLine(worldPos);
+                //Console.WriteLine(worldPos);
                 cam2d.SetPosition(worldPos);
             }
 

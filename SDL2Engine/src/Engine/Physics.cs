@@ -299,7 +299,7 @@ namespace SDL2Engine
             //check if the two boxes are colliding
             if (cbox.Intersects(other.GetCollisionBox()))
             {
-                Console.WriteLine("COLLISION!");
+                //Console.WriteLine("COLLISION!");
                 // Console.WriteLine("Box1: " + box.x + box.y);
                 return true;
             }
@@ -378,7 +378,7 @@ namespace SDL2Engine
             // If the distance is less than the circle's radius, they are colliding
             if ((distanceX * distanceX) + (distanceY * distanceY) < (radius * radius))
             {
-                Console.WriteLine("Circle + Box COLLISION!");
+                //Console.WriteLine("Circle + Box COLLISION!");
                 return true;
             }
             return false;
@@ -444,7 +444,7 @@ namespace SDL2Engine
             //check if the box and edge are colliding
             if (Intersects(corners[0], corners[1], box))
             {
-                Console.WriteLine("Edge + Box COLLISION!");
+                //Console.WriteLine("Edge + Box COLLISION!");
                 return true;
             }
 

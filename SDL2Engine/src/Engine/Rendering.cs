@@ -315,8 +315,7 @@ namespace SDL2Engine
                     return;
                 }
             }
-            var root = gameObject.GetPosition();
-            Vec2D size = rect.GetSize();
+            
             var srcRect = rect.ToSDLRect();
             var dstRect = this.GetDestRect();
 

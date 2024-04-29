@@ -303,6 +303,21 @@ namespace SDL2Engine
             // Do nothing
         }
 
+        public virtual void OnCollisionEnter(CollisionPair collision)
+        {
+            // Do nothing
+        }
+
+        public virtual void OnCollisionStay(CollisionPair collision)
+        {
+            // Do nothing
+        }
+
+        public virtual void OnCollisionExit(CollisionPair collision)
+        {
+            // Do nothing
+        }
+
 
         public Transform transform
         {

@@ -20,6 +20,8 @@ namespace Pong.src
 
             var root = this.gameObject;
 
+            
+
             // Set the color to white
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 

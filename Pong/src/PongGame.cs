@@ -45,7 +45,7 @@ namespace Pong.src
             //pongSquare.transform.position = new Vec2D(960, 750);
             var bc = pongSquare.AddComponent<BoxCollider>();
             var pb = pongSquare.AddComponent<PhysicsBody>();
-            pb.Velocity = new Vec2D(1, 1);
+            pb.Velocity = new Vec2D(0, 2);
             pongSquare.SetPosition(new Vec2D(960, 750));
             scene.AddGameObject(pongSquare);
 
@@ -61,6 +61,11 @@ namespace Pong.src
             //Boarder variante 2
             var testBoarder = new GameObject("Boarder");
             _ = testBoarder.AddComponent<Boarder2>();
+            var bordercollider = testBoarder.AddComponent<BoxCollider>();
+            bordercollider.UpdateColliderPosition(new Vec2D(0, 750 + 550));
+            bordercollider.UpdateColliderSize(1980,5);
+            var borderphysics = testBoarder.AddComponent<PhysicsBody>();
+            borderphysics.IsMovable = false;
             testBoarder.transform.position = new Vec2D(960, 750);
             scene.AddGameObject(testBoarder);
 

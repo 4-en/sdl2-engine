@@ -133,7 +133,7 @@ namespace SDL2Engine
         // if true, objects with this component can be moved when colliding with other objects
         private bool isMovable = true;
         private Vec2D velocity = new Vec2D();
-        private double mass = 1.0;
+        private double mass = 10000.0;
         private double bounciness = 1.0;
         private double friction = 0.0;
         private double drag = 0.0;
@@ -141,8 +141,8 @@ namespace SDL2Engine
         public PhysicsBody()
         {
             this.isMovable = true;
-            this.velocity = new Vec2D(1,0);
-            this.mass = 1;
+            this.velocity = new Vec2D(0,0);
+            this.mass = 10000;
             this.bounciness = 1.0 ;
             this.friction = 0.0;
             this.drag = 0.0;
@@ -221,6 +221,12 @@ namespace SDL2Engine
             return false;
         }
 
+        //get center of the collider
+        public virtual Vec2D GetCenter()
+        {
+            return new Vec2D(0, 0);
+        }
+
         public virtual bool CollidesWith(BoxCollider other)
         {
             //circlecollider and boxcollider
@@ -296,6 +302,13 @@ namespace SDL2Engine
 
         //create a box collider at the position of the game object
         public Rect box { get; set; }
+
+        //function to get the center position of the box collider
+        public override Vec2D GetCenter()
+        {
+            return new Vec2D(box.x + box.w / 2, box.y + box.h / 2);
+        }
+        
 
         public BoxCollider(Rect box)
         {
@@ -593,7 +606,20 @@ namespace SDL2Engine
                             {
                                 if (gameObject1.GetComponent<Collider>().CollidesWith(gameObject2.GetComponent<Collider>()))
                                 {
-                                    collisionPairList.Add(new CollisionPair(gameObject1, gameObject2));
+                                    //check if collision pair already exists
+                                    bool exists = false;
+                                    foreach (var collisionPair in collisionPairList)
+                                    {
+                                        if (collisionPair.obj1 == gameObject2 && collisionPair.obj2 == gameObject1)
+                                        {
+                                            exists = true;
+                                        }
+                                    }
+                                    if (!exists)
+                                    {
+                                        collisionPairList.Add(new CollisionPair(gameObject1, gameObject2));
+                                    }
+                                    
                              
                                 }
                             }
@@ -610,25 +636,74 @@ namespace SDL2Engine
         // For example, if two objects collide, they should bounce off each other based on their mass, velocity, bounciness, etc.
         public static void ResolveCollisions(List<CollisionPair> collisions)
         {
-            
-            
+         
+            //resolve the collisions of colliding objects
+            foreach (var collision in collisions)
+            {
+                
+                Console.WriteLine("Collision between " + collision.obj1.GetName() + " and " + collision.obj2.GetName());
+                // Calculate relative velocity
+                Vec2D relativeVelocity = collision.obj1.GetComponent<PhysicsBody>().Velocity - collision.obj2.GetComponent<PhysicsBody>().Velocity;
+
+                //objects current velocities
+                var u1 = collision.obj1.GetComponent<PhysicsBody>().Velocity;
+                var u2 = collision.obj2.GetComponent<PhysicsBody>().Velocity;
+                //collision normal
+                Vec2D normal = collision.obj2.GetPosition() - collision.obj1.GetPosition();
+                normal = normal.Normalize();
+                //part of velocity along the contact normal
+                //Vec2D u1n = normal * Vec2D.Dot(normal,u1);
+                //Vec2D u2n = normal * Vec2D.Dot(normal, u2);
+                //only this part is getting involved
+                //Vec2D v1n = (u1n * (collision.obj1.GetComponent<PhysicsBody>().Mass - collision.obj2.GetComponent<PhysicsBody>().Mass) + 2 * collision.obj2.GetComponent<PhysicsBody>().Mass * u2n) / (collision.obj1.GetComponent<PhysicsBody>().Mass + collision.obj2.GetComponent<PhysicsBody>().Mass);
+                //Vec2D v2n = (u2n * (collision.obj2.GetComponent<PhysicsBody>().Mass - collision.obj1.GetComponent<PhysicsBody>().Mass) + 2 * collision.obj1.GetComponent<PhysicsBody>().Mass * u1n) / (collision.obj1.GetComponent<PhysicsBody>().Mass + collision.obj2.GetComponent<PhysicsBody>().Mass);
+                //objects velocities after collision
+                //Vec2D v1 = (u1 - u1n) + v1n;
+                //Vec2D v2 = (u2 - u2n) + v2n;
+                //set velocities
+
+
+                Vec2D v1 = Reflect(collision.obj1.GetComponent<PhysicsBody>().Velocity, normal);
+                Vec2D v2 = Reflect(collision.obj2.GetComponent<PhysicsBody>().Velocity, normal);
+                collision.obj1.GetComponent<PhysicsBody>().Velocity = v1;
+                collision.obj2.GetComponent<PhysicsBody>().Velocity = v2;
+
+
+                Console.WriteLine("v1: " + v1.x + " " + v1.y);
+                Console.WriteLine("v2: " + v2.x + " " + v2.y);
+                collision.obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(v1.x, v1.y);
+                collision.obj2.GetComponent<PhysicsBody>().Velocity =  new Vec2D(v2.x,v2.y);
+                Console.WriteLine(collision.obj2.GetComponent<PhysicsBody>().Velocity.x + " "+ collision.obj2.GetComponent<PhysicsBody>().Velocity.y);
+               
+
+            }
+
         }
 
-        private static void ApplyFrictionAndDrag(PhysicsBody? physicsBody)
+        // Helper method to reflect a vector along a normal vector
+        public static Vec2D Reflect(Vec2D velocity, Vec2D normal)
         {
-            // Apply friction
-            Vec2D frictionForce = - physicsBody.Velocity;
-            frictionForce.Normalize();
-            frictionForce *= Math.Min(physicsBody.Friction * physicsBody.Mass, physicsBody.Velocity.Length());
-            physicsBody.Velocity += frictionForce;
-
-            // Apply drag
-            Vec2D dragForce = -physicsBody.Velocity;
-            dragForce.Normalize();
-            dragForce *= Math.Min(physicsBody.Drag * physicsBody.Mass, physicsBody.Velocity.LengthSquared());
-            physicsBody.Velocity += dragForce;
-            Console.WriteLine(physicsBody.Velocity.x + " " + physicsBody.Velocity.y);
+            // Calculate the reflection using the formula: reflected_vector = velocity - 2 * (velocity dot normal) * normal
+            double dotProduct = Vec2D.Dot(velocity, normal);
+            Vec2D reflectedVector = velocity - (normal * (2 * dotProduct));
+            return reflectedVector;
         }
+
+        public static double CalculateDotProduct(Vec2D vec1, Vec2D vec2)
+        {
+            if (vec1.Length != vec2.Length)
+            {
+                throw new ArgumentException("Vectors must have the same length.");
+            }
+
+            double result = 0;
+
+            
+
+            return result;
+        }
+
+        
 
         // after all collisions are resolved, notify objects that a collision has occured
         // TODO: Implement event listeners for OnCollisionEnter, OnCollisionStay, OnCollisionExit, etc.
@@ -662,7 +737,7 @@ namespace SDL2Engine
             List<CollisionPair> collisions = CheckCollisions(gameObjects);
 
             // Resolve collisions
-            //ResolveCollisions(collisions);
+            ResolveCollisions(collisions);
 
             // Notify objects of collisions
             NotifyCollisions(collisions);

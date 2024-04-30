@@ -726,10 +726,18 @@ namespace SDL2Engine
                 return;
             }
 
+            int totalScenes = SceneManager.GetScenes().Count;
             int totalObjects = 0;
+            int totalDrawables = 0;
+            int totalScripts = 0;
+            int totalColliders = 0;
+            
             foreach (Scene scene in SceneManager.GetScenes())
             {
                 totalObjects += scene.GetGameObjectsCount();
+                totalDrawables += scene.GetDrawableCount();
+                totalScripts += scene.GetScriptCount();
+                totalColliders += scene.GetColliderCount();
             }
 
             string[] debugStrings =
@@ -739,7 +747,11 @@ namespace SDL2Engine
                     "Draw Duration: " + (1000*Time.drawDuration).ToString("0.00") + " ms",
                     "Total Duration: " + (1000*Time.totalDuration).ToString("0.00") + " ms",
                     "Free Duration: " + (1000*Time.freeDuration).ToString("0.00") + " ms",
-                    "Total Objects: " + totalObjects.ToString()
+                    "Total Objects: " + totalObjects.ToString(),
+                    "Total Drawables: " + totalDrawables.ToString(),
+                    "Total Scripts: " + totalScripts.ToString(),
+                    "Total Colliders: " + totalColliders.ToString(),
+                    "Total Scenes: " + totalScenes.ToString()
                 };
 
             for (int i = 0; i < debugStrings.Length; i++)

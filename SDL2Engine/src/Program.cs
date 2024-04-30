@@ -11,7 +11,7 @@ namespace SDL2Engine.Testing
     {
         public override void OnCollisionEnter(CollisionPair collision)
         {
-            // destroy if colliding with a square
+            // destroy if colliding with anything (thats movable, since two static objects can't collide)
             Destroy(this.gameObject);
         }
     }

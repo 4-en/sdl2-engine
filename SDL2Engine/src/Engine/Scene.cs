@@ -162,6 +162,20 @@ namespace SDL2Engine
             return gameObjects.Count;
         }
 
+        public int GetDrawableCount()
+        {
+            return drawableList.Count;
+        }
+
+        public int GetScriptCount()
+        {
+            return scripts.Count;
+        }
+
+        public int GetColliderCount()
+        {
+            return colliderList.Count;
+        }
 
         public Camera GetCamera()
         {

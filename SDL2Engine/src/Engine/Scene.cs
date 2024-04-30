@@ -104,6 +104,8 @@ namespace SDL2Engine
     public class Scene
     {
 
+        // TODO: use something like this to limit the number of new objects per frame
+        public static readonly uint MAX_ADDS_PER_FRAME = 1;
 
         private string name = "Scene";
         private int gameObjectsCount = 0;

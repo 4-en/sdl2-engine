@@ -570,6 +570,10 @@ namespace SDL2Engine
 
             instance = this;
 
+#if ENGINE_TEST
+            showDebug = true;
+#endif
+
             // Set the scene in the SceneManger
             SceneManager.AddScene(scene);
         }
@@ -782,6 +786,7 @@ namespace SDL2Engine
 
             string[] debugStrings =
                 {
+                    "Press F3 to toggle debug info",
                     "FPS: " + Time.GetFPS().ToString("0.00"),
                     "Update Duration: " + (1000*Time.updateDuration).ToString("0.00") + " ms",
                     "Draw Duration: " + (1000*Time.drawDuration).ToString("0.00") + " ms",

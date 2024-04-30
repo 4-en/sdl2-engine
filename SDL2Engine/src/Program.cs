@@ -40,6 +40,8 @@ namespace SDL2Engine.Testing
             
         }
 
+        private Sound sound = AssetManager.LoadAsset<Sound>("Assets/Audio/test_sound.mp3");
+
         public override void Start()
         {
             Console.WriteLine("MouseTracker Start");
@@ -78,10 +80,22 @@ namespace SDL2Engine.Testing
             if (Input.GetMouseButtonDown(0))
             {
                 // play a sound
-                var sound = AssetManager.LoadAsset<Sound>("Assets/Audio/test_sound.mp3");
+                var sound = this.sound;
                 if (sound != null)
                 {
-                    sound.Play();
+                    
+                    if (sound.IsPlaying())
+                    {
+                        Console.WriteLine("Stopping sound");
+                        sound.Stop();
+                    } else
+                    {
+                        Console.WriteLine("Playing sound");
+                        sound.Play();
+                    }
+                } else
+                {
+                    Console.WriteLine("Sound is null");
                 }
 
                 AddSquare();

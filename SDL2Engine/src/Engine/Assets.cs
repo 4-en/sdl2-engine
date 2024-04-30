@@ -226,23 +226,136 @@ namespace SDL2Engine
         }
     }
 
-    public class Sound : Asset<IntPtr>
+    public abstract class Audio<T> : Asset<T>
     {
+        public Audio(AssetHandler<T> handler) : base(handler)
+        {
+        }
+
+        public abstract bool Play(int loops=0);
+        public abstract bool Stop();
+        public abstract bool SetVolume(double volume);
+        public abstract bool IsPlaying();
+
+        // TODO: implement fade in/out, stereo panning, distance, set position, etc.
+    }
+
+    public class Sound : Audio<IntPtr>
+    {
+        private int channel = -1;
+        private SDL2.SDL_mixer.ChannelFinishedDelegate ChannelFinishedCallback;
         public Sound(AssetHandler<IntPtr> handler) : base(handler)
         {
+            ChannelFinishedCallback = (int channel) =>
+            {
+                if(channel == this.channel)
+                {
+                    this.channel = -1;
+                }
+            };
+
         }
 
-        public void Play()
+        public override bool Play(int loops=0)
         {
             // Play sound
-            SDL2.SDL_mixer.Mix_PlayChannel(-1, Get(), 0);
+            IntPtr sound_ref = Get();
+            if (sound_ref == IntPtr.Zero)
+            {
+                Console.WriteLine("Sound: Failed to get sound");
+                return false;
+            }
+            Console.WriteLine(this.channel);
+            if (this.channel != -1)
+            {
+                return false;
+            }
+            int sound_channel = SDL2.SDL_mixer.Mix_PlayChannel(-1, sound_ref, loops);
+            if (sound_channel == -1)
+            {
+                Console.WriteLine("Sound: Failed to play sound");
+                return false;
+            }
+            this.channel = sound_channel;
+
+            SDL2.SDL_mixer.Mix_ChannelFinished(ChannelFinishedCallback);
+
+            return true;
         }
 
+        public override bool Stop()
+        {
+            if (channel == -1)
+            {
+                return false;
+            }
+            SDL2.SDL_mixer.Mix_HaltChannel(channel);
+            channel = -1;
+            return true;
+        }
+
+        public override bool SetVolume(double volume)
+        {
+            if (channel == -1)
+            {
+                return false;
+            }
+            int result = SDL2.SDL_mixer.Mix_Volume(channel, (int)(volume * 128));
+            return result != -1;
+        }
+
+        public override bool IsPlaying()
+        {
+            return channel != -1 && SDL2.SDL_mixer.Mix_Playing(channel) == 1;
+        }
 
         public override IntPtr GetDefault()
         {
             return IntPtr.Zero;
         }
+    }
+
+    public class Music : Audio<IntPtr>
+    {
+        public Music(AssetHandler<IntPtr> handler) : base(handler)
+        {
+        }
+
+        public override bool Play(int loops=0)
+        {
+            // Play music
+            IntPtr music_ref = Get();
+            if (music_ref == IntPtr.Zero)
+            {
+                Console.WriteLine("Music: Failed to get music");
+                return false;
+            }
+            int result = SDL2.SDL_mixer.Mix_PlayMusic(music_ref, loops);
+            return result != -1;
+        }
+
+        public override bool Stop()
+        {
+            SDL2.SDL_mixer.Mix_HaltMusic();
+            return true;
+        }
+
+        public override bool SetVolume(double volume)
+        {
+            int result = SDL2.SDL_mixer.Mix_VolumeMusic((int)(volume * 128));
+            return result != -1;
+        }
+
+        public override bool IsPlaying()
+        {
+            return SDL2.SDL_mixer.Mix_PlayingMusic() == 1;
+        }
+
+        public override IntPtr GetDefault()
+        {
+            return IntPtr.Zero;
+        }
+        
     }
 
     
@@ -259,7 +372,6 @@ namespace SDL2Engine
         {
             this.path = path;
 
-            LoadAsset();
         }
 
         // This should return true if the asset was loaded successfully or was already loaded
@@ -422,6 +534,54 @@ namespace SDL2Engine
             return false;
         }
 
+    }
+
+    class MusicHandler : AssetHandler<IntPtr>
+    {
+        public MusicHandler(string path) : base(path)
+        {
+        }
+
+        public override bool LoadAsset()
+        {
+            // Load music
+            if (loaded)
+            {
+                return true;
+            }
+            if (loadFailed)
+            {
+                return false;
+            }
+            asset = SDL2.SDL_mixer.Mix_LoadMUS(path);
+            if (asset == IntPtr.Zero)
+            {
+                Console.WriteLine("MusicHandler: Failed to load music: " + path);
+                loadFailed = true;
+                return false;
+            }
+            loaded = true;
+
+            return false;
+        }
+
+        public override bool UnloadAsset()
+        {
+            // Unload music
+            if (!loaded)
+            {
+                return false;
+            }
+
+            if (asset != IntPtr.Zero)
+            {
+                SDL2.SDL_mixer.Mix_FreeMusic(asset);
+                asset = IntPtr.Zero;
+                loaded = false;
+                return true;
+            }
+            return false;
+        }
     }
 
     // Asset manager class

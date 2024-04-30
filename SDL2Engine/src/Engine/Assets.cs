@@ -6,11 +6,10 @@ using static SDL2.SDL;
 
 namespace SDL2Engine
 {
-    // TODO: rework asset system
-    // right now it's a bit of a mess
 
     /*
-     * Idea
+     *    Asset management system
+     * 
      * 1. Create asset reference (for example in GameObject or Component)
      *    Texture myTexture = LoadAsset<Texture>("path/to/texture.png");
      *    (This does not yet load the asset, only creates the object that will reference the asset later)
@@ -147,7 +146,7 @@ namespace SDL2Engine
     /*
      * Possible AssetTypes:
      * - Texture
-     * - Audio
+     * - Audio (Sound, Music)
      * - Font
      * - Binary
      * - Text

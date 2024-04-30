@@ -77,6 +77,13 @@ namespace SDL2Engine.Testing
 
             if (Input.GetMouseButtonDown(0))
             {
+                // play a sound
+                var sound = AssetManager.LoadAsset<Sound>("Assets/Audio/test_sound.mp3");
+                if (sound != null)
+                {
+                    sound.Play();
+                }
+
                 AddSquare();
             } else if (Input.GetMouseButtonDown(2))
             {

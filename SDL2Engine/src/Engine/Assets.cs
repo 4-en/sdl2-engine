@@ -235,22 +235,9 @@ namespace SDL2Engine
         public void Play()
         {
             // Play sound
+            SDL2.SDL_mixer.Mix_PlayChannel(-1, Get(), 0);
         }
 
-        public void Pause()
-        {
-            // Pause sound
-        }
-
-        public void Stop()
-        {
-            // Stop sound
-        }
-
-        public void Loop()
-        {
-            // Loop sound
-        }
 
         public override IntPtr GetDefault()
         {
@@ -401,6 +388,18 @@ namespace SDL2Engine
             {
                 return true;
             }
+            if (loadFailed)
+            {
+                return false;
+            }
+            asset = SDL2.SDL_mixer.Mix_LoadWAV(path);
+            if (asset == IntPtr.Zero)
+            {
+                Console.WriteLine("SoundHandler: Failed to load sound: " + path);
+                loadFailed = true;
+                return false;
+            }
+            loaded = true;
 
             return false;
         }
@@ -413,6 +412,13 @@ namespace SDL2Engine
                 return false;
             }
 
+            if (asset != IntPtr.Zero)
+            {
+                SDL2.SDL_mixer.Mix_FreeChunk(asset);
+                asset = IntPtr.Zero;
+                loaded = false;
+                return true;
+            }
             return false;
         }
 

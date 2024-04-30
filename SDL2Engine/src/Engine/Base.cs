@@ -609,6 +609,17 @@ namespace SDL2Engine
                 Console.WriteLine("SDL_ttf initialized");
             }
 
+            // Initualize SDL_mixer
+            if (SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+            {
+                Console.WriteLine("SDL_mixer could not initialize! SDL_mixer Error: " + SDL.SDL_GetError());
+                return;
+            }
+            else
+            {
+                Console.WriteLine("SDL_mixer initialized");
+            }
+
             // Create window
             window = SDL.SDL_CreateWindow("SDL2 Engine Test",
                 SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED,
@@ -635,6 +646,25 @@ namespace SDL2Engine
             Console.WriteLine("Press F3 to toggle debug info");
 
 
+        }
+
+        private void Cleanup()
+        {
+            // Destroy renderer
+            SDL.SDL_DestroyRenderer(renderer);
+            renderer = IntPtr.Zero;
+
+            // Destroy window
+            SDL.SDL_DestroyWindow(window);
+            window = IntPtr.Zero;
+
+            // Quit SDL subsystems
+            SDL_mixer.Mix_Quit();
+            SDL_ttf.TTF_Quit();
+            SDL_image.IMG_Quit();
+            SDL.SDL_Quit();
+
+            Console.WriteLine("Engine cleaned up");
         }
 
         private void HandleKeyboardEvent(SDL.SDL_KeyboardEvent keyEvent)
@@ -890,12 +920,8 @@ namespace SDL2Engine
 
             }
 
-            // Destroy window
-            SDL.SDL_DestroyRenderer(renderer);
-            SDL.SDL_DestroyWindow(window);
-
-            // Quit SDL subsystems
-            SDL.SDL_Quit();
+            // Cleanup SDL2
+            Cleanup();
 
         }
     }

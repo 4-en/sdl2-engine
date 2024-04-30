@@ -37,8 +37,9 @@ namespace SDL2Engine
      *    
      * 2. Specific asset classes (Texture, Sound, etc.)
      *    These will inherit from Asset and have a function to access the underlying asset (an IntPtr for example)
+     *    Should only be instantiated by the AssetManager using LoadAsset<T> where T is the type of asset (e.g. Texture)
      *    
-     * 3. ManagedAsset
+     * 3. AssetHandler
      *    This class will hold a reference to the asset and the number of references to itself
      *    It is also responsible for loading and unloading the asset
      *    Internally, it has to check what kind of asset it tries to load and use the correct method.
@@ -429,7 +430,7 @@ namespace SDL2Engine
         private static Dictionary<string, TextureHandler> texture_assets = new();
         private static Dictionary<string, SoundHandler> sound_assets = new();
 
-        private static Texture LoadTexture(string path)
+        public static Texture LoadTexture(string path)
         {
             TextureHandler? handler = null;
             if (texture_assets.ContainsKey(path))
@@ -445,7 +446,7 @@ namespace SDL2Engine
             return new Texture(handler);
         }
 
-        private static Sound LoadSound(string path)
+        public static Sound LoadSound(string path)
         {
             SoundHandler? handler = null;
             if (sound_assets.ContainsKey(path))
@@ -462,7 +463,15 @@ namespace SDL2Engine
             return new Sound(handler);
         }
 
-
+        /*
+         * Can be used to load assets of different types that inherit from Asset<T>
+         * If multiple assets with the same path are loaded, the same asset will be returned to avoid loading the same asset multiple times
+         * By default, the asset is not loaded when the object is created, but when the Load() or Get() method is called
+         * If loading fails for some reason, the Get() method should return a default asset (e.g. a white texture, a silent sound, etc.)
+         * 
+         * When an asset is no longer needed, the Dispose() method should be called to remove the reference to the asset.
+         * The finalizer can also call Dispose() when the object is garbage collected, but it's better to call Dispose() manually.
+         */
         public static T LoadAsset<T>(string path) where T : IAsset
         {
             if (typeof(T) == typeof(Texture))
@@ -475,6 +484,7 @@ namespace SDL2Engine
             }
         }
 
+        // TODO: implement something that checks for unused assets and unloads them periodically
         public static void CleanUnusedAssets()
         {
             

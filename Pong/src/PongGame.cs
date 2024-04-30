@@ -45,7 +45,12 @@ namespace Pong.src
             //pongSquare.transform.position = new Vec2D(960, 750);
             var bc = pongSquare.AddComponent<BoxCollider>();
             var pb = pongSquare.AddComponent<PhysicsBody>();
-            pb.Velocity = new Vec2D(1, 1);
+            if (pb != null)
+            {
+                var rand = new Random();
+                pb.Velocity = new Vec2D(rand.Next(-500, 500), rand.Next(-500, 500));
+                pb.Drag = 0d;
+            }
             pongSquare.SetPosition(new Vec2D(960, 750));
             scene.AddGameObject(pongSquare);
 

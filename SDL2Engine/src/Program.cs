@@ -41,10 +41,16 @@ namespace SDL2Engine.Testing
         }
 
         private Sound sound = AssetManager.LoadAsset<Sound>("Assets/Audio/test_sound.mp3");
+        private Music music = AssetManager.LoadAsset<Music>("Assets/Audio/tetris.mp3");
 
         public override void Start()
         {
             Console.WriteLine("MouseTracker Start");
+            // play music
+            if (music != null)
+            {
+                music.Play(-1);
+            }
         }
         public override void Update()
         {
@@ -86,11 +92,9 @@ namespace SDL2Engine.Testing
                     
                     if (sound.IsPlaying())
                     {
-                        Console.WriteLine("Stopping sound");
                         sound.Stop();
                     } else
                     {
-                        Console.WriteLine("Playing sound");
                         sound.Play();
                     }
                 } else

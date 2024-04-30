@@ -240,6 +240,11 @@ namespace SDL2Engine
         // TODO: implement fade in/out, stereo panning, distance, set position, etc.
     }
 
+    // Sound class
+    // Usually short audio clips that are played once or looped
+    // Difference to Music: SDL_mixer only allows one music to be played at a time, but multiple sounds
+    // Music is usually longer audio clips that are played in the background
+    // Sound should be used for sound effects, music for background music
     public class Sound : Audio<IntPtr>
     {
         private int channel = -1;
@@ -255,7 +260,11 @@ namespace SDL2Engine
             };
 
         }
-
+        // Play the sound
+        // int loops: number of times to loop the sound, -1 for infinite looping
+        // Can only play one sound at a time
+        // To play multiple sounds at the same time (even the same sound/same sound file), create multiple Sound objects
+        // If called while the sound is already playing, returns false
         public override bool Play(int loops=0)
         {
             // Play sound
@@ -265,7 +274,6 @@ namespace SDL2Engine
                 Console.WriteLine("Sound: Failed to get sound");
                 return false;
             }
-            Console.WriteLine(this.channel);
             if (this.channel != -1)
             {
                 return false;
@@ -283,6 +291,7 @@ namespace SDL2Engine
             return true;
         }
 
+        // Stop the sound if it is playing
         public override bool Stop()
         {
             if (channel == -1)
@@ -294,6 +303,7 @@ namespace SDL2Engine
             return true;
         }
 
+        // Set the volume of the sounds channel
         public override bool SetVolume(double volume)
         {
             if (channel == -1)
@@ -315,12 +325,21 @@ namespace SDL2Engine
         }
     }
 
+    // Music
+    // Usually longer audio clips that are played in the background
+    // Difference to Sound: SDL_mixer only allows one music to be played at a time, but multiple sounds
+    // Music is usually longer audio clips that are played in the background
+    // Sound should be used for sound effects, music for background music
     public class Music : Audio<IntPtr>
     {
         public Music(AssetHandler<IntPtr> handler) : base(handler)
         {
         }
 
+        // Play the music
+        // int loops: number of times to loop the music, -1 for infinite looping
+        // Can only play one music at a time (no matter how many Music objects are created)
+        // Playing a new music will stop the currently playing music
         public override bool Play(int loops=0)
         {
             // Play music
@@ -334,12 +353,14 @@ namespace SDL2Engine
             return result != -1;
         }
 
+        // Stop the music if it is playing
         public override bool Stop()
         {
             SDL2.SDL_mixer.Mix_HaltMusic();
             return true;
         }
 
+        // Set the volume of the music
         public override bool SetVolume(double volume)
         {
             int result = SDL2.SDL_mixer.Mix_VolumeMusic((int)(volume * 128));
@@ -595,6 +616,7 @@ namespace SDL2Engine
 
         private static Dictionary<string, TextureHandler> texture_assets = new();
         private static Dictionary<string, SoundHandler> sound_assets = new();
+        private static Dictionary<string, MusicHandler> music_assets = new();
 
         public static Texture LoadTexture(string path)
         {
@@ -629,6 +651,23 @@ namespace SDL2Engine
             return new Sound(handler);
         }
 
+        public static Music LoadMusic(string path)
+        {
+            MusicHandler? handler = null;
+            if (music_assets.ContainsKey(path))
+            {
+                handler = music_assets[path];
+            }
+            else
+            {
+                handler = new MusicHandler(path);
+                music_assets[path] = handler;
+                // handler.LoadAsset();
+            }
+
+            return new Music(handler);
+        }
+
         /*
          * Can be used to load assets of different types that inherit from Asset<T>
          * If multiple assets with the same path are loaded, the same asset will be returned to avoid loading the same asset multiple times
@@ -644,9 +683,17 @@ namespace SDL2Engine
             {
                 return LoadTexture(path) as T ?? throw new Exception("Failed to load texture");
             }
-            else
+            else if (typeof(T) == typeof(Sound))
             {
                 return LoadSound(path) as T ?? throw new Exception("Failed to load sound");
+            }
+            else if (typeof(T) == typeof(Music))
+            {
+                return LoadMusic(path) as T ?? throw new Exception("Failed to load music");
+            }
+            else
+            {
+                throw new Exception("Unsupported asset type");
             }
         }
 

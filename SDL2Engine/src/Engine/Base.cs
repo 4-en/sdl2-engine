@@ -570,10 +570,6 @@ namespace SDL2Engine
 
             instance = this;
 
-#if ENGINE_TEST
-            showDebug = true;
-#endif
-
             // Set the scene in the SceneManger
             SceneManager.AddScene(scene);
         }
@@ -633,6 +629,10 @@ namespace SDL2Engine
 
             // Initialize renderer color
             SDL.SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+            Console.WriteLine("Engine initialized");
+
+            Console.WriteLine("Press F3 to toggle debug info");
 
 
         }

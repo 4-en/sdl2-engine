@@ -265,6 +265,7 @@ namespace SDL2Engine
         protected T? asset;
         protected uint refCount = 0;
         protected bool loaded = false;
+        protected bool loadFailed = false;
 
         public AssetHandler(string path)
         {
@@ -273,20 +274,33 @@ namespace SDL2Engine
             LoadAsset();
         }
 
-        public abstract void LoadAsset();
+        // This should return true if the asset was loaded successfully or was already loaded
+        public abstract bool LoadAsset();
 
         public bool IsLoaded()
         {
             return loaded;
         }
 
-        public abstract void UnloadAsset();
+        // This should return true if the asset was unloaded successfully, otherwise false
+        public abstract bool UnloadAsset();
 
         public T? Get()
         {
+            if(loadFailed)
+            {
+                return default;
+            }
+
             if (!loaded)
             {
-                LoadAsset();
+                var result = LoadAsset();
+                if (!result)
+                {
+                    loadFailed = true;
+                    return default;
+                }
+                loaded = true;
             }
             return asset;
         }
@@ -332,36 +346,43 @@ namespace SDL2Engine
         {
         }
 
-        public override void LoadAsset()
+        public override bool LoadAsset()
         {
             if(loaded)
             {
-                return;
+                return true;
+            }
+            if(loadFailed)
+            {
+                return false;
             }
             asset = SDL_image.IMG_LoadTexture(Engine.renderer, path);
             if (asset == IntPtr.Zero)
             {
                 Console.WriteLine("TextureHandler: Failed to load texture: " + path);
-                loaded = false;
+                loadFailed = true;
+                return false;
+                
             }
-            else
-            {
-                loaded = true;
-            }
+            loaded = true;
+            return true;
         }
 
-        public override void UnloadAsset()
+        public override bool UnloadAsset()
         {
             if (!loaded)
             {
-                return;
+                return false;
             }
 
             if (asset != IntPtr.Zero)
             {
                 SDL.SDL_DestroyTexture(asset);
                 asset = IntPtr.Zero;
+                loaded = false;
+                return true;
             }
+            return false;
         }
 
     }
@@ -372,22 +393,26 @@ namespace SDL2Engine
         {
         }
 
-        public override void LoadAsset()
+        public override bool LoadAsset()
         {
             // Load sound
             if (loaded)
             {
-                return;
+                return true;
             }
+
+            return false;
         }
 
-        public override void UnloadAsset()
+        public override bool UnloadAsset()
         {
             // Unload sound
             if (!loaded)
             {
-                return;
+                return false;
             }
+
+            return false;
         }
 
     }

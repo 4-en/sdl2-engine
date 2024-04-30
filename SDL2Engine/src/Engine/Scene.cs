@@ -282,8 +282,14 @@ namespace SDL2Engine
         {
 
             // remove from GameObject
-            if (removeFromGameObject)
+            if (removeFromGameObject) { 
                 component.GetGameObject().RemoveComponent(component);
+                // since a component without a game object has no further use, we should dispose of its resources
+                component.Dispose();
+            }
+
+            component._clear_scene_on_destroy();
+
 
             switch (component)
             {
@@ -357,6 +363,25 @@ namespace SDL2Engine
             if (parent == null)
             {
                 this.gameObjects.Remove(gameObject);
+            }
+
+            gameObject._clear_scene_on_destroy();
+
+            // if the object is marked as persistent, add it to the persistent list in the scene manager
+            if (gameObject.IsPersistent())
+            {
+                // TODO: there might be a bug here where a non persisten parent of a persistent object is destroyed
+                // the parent could call Dispose on the persistent object
+                // maybe fix this later :)
+                // maybe non root objects should not be able to be persistent
+                SceneManager.GetPersistentGameObjects().Add(gameObject);
+            } else if (removeFromParent)
+            {
+                // if it is not persistent, we can dispose of it if this was the original
+                // object Destroy was called on
+                // otherwise, the parent will handle the disposal
+                // by calling Dispose recursively on its children and components
+                gameObject.Dispose();
             }
 
             this.gameObjectsCount--;

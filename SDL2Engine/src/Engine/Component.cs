@@ -57,14 +57,9 @@ namespace SDL2Engine
 
         }
 
-        public void SetEnabled(bool active)
+        public void SetEnabled(bool status)
         {
-            if (active == this.enabled)
-            {
-                return;
-            }
-            this.enabled = active;
-
+            this.enabled = status;
         }
 
         public bool IsEnabled()
@@ -82,10 +77,6 @@ namespace SDL2Engine
             SetEnabled(false);
         }
 
-        public Scene? GetScene()
-        {
-            return gameObject.GetScene();
-        }
 
         // Usefull methods to interact with other components
         public T? GetComponent<T>() where T : Component

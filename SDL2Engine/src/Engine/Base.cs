@@ -415,7 +415,7 @@ namespace SDL2Engine
 
     }
 
-    public class EngineObject
+    public class EngineObject : IDisposable
     {
         protected static Random random = new Random(DateTime.Now.Millisecond);
 
@@ -423,12 +423,32 @@ namespace SDL2Engine
         protected bool enabled = true;
         protected Scene? scene = null;
         protected uint uid = GetRandomUID();
-        private bool _to_be_destroyed = false;
+        protected bool _to_be_destroyed = false;
+        protected bool _disposed = false;
 
         public EngineObject(string name = "unnamed")
         {
             this.name = name;
         }
+
+        ~EngineObject()
+        {
+            if (!_disposed)
+            {
+                Dispose();
+            }
+        }
+
+        /* Override this method to dispose resources
+         *         * This method is called when the object is destroyed
+         */
+        public virtual void Dispose()
+        {
+            _disposed = true;
+            GC.SuppressFinalize(this);
+            //Console.WriteLine("Disposing object: " + name);
+        }
+
 
         public void MarkToBeDestroyed()
         {
@@ -487,9 +507,29 @@ namespace SDL2Engine
             return true;
         }
 
-        private Scene? GetScene()
+        public Scene? GetScene()
         {
             return scene;
+        }
+
+        public bool SetScene(Scene? scene)
+        {
+            if (this.scene != null && scene != this.scene)
+            {
+                // If this causes issues, implement something to properly remove/switch scenes
+                throw new Exception("Scene already set for object: " + name);
+            }
+
+            this.scene = scene;
+            return true;
+        }
+
+        // this should be called by the scene
+        // if not, we could get situations where the object is not properly removed from the scene
+        // and then added to another scene
+        internal void _clear_scene_on_destroy()
+        {
+            scene = null;
         }
     }
 

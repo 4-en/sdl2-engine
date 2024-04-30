@@ -15,6 +15,10 @@ namespace SDL2Engine
         private readonly List<Component> components = [];
         private static readonly GameObject defaultObject = new("default");
 
+        // if true, the object will not be destroyed when the scene is changed and instead will be moved
+        // to a buffer of persistent objects where it can be accessed by any scene
+        private bool persistent = false; 
+
         public GameObject(string name = "GameObject", Scene? scene = null)
         {
             this.Parent = null;
@@ -51,6 +55,27 @@ namespace SDL2Engine
 
             this.name = name;
             this.transform.Init(this);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            // Dispose all components and children
+            foreach (Component component in components)
+            {
+                component.Dispose();
+            }
+
+            transform.Dispose();
+            physicsBody?.Dispose();
+            collider?.Dispose();
+            drawable?.Dispose();
+
+            foreach (GameObject child in children)
+            {
+                child.Dispose();
+            }
         }
 
         // Creates a new GameObject as a child of this GameObject
@@ -105,6 +130,16 @@ namespace SDL2Engine
 
             return newObject;
             
+        }
+
+        public void SetPersistent(bool persistent)
+        {
+            this.persistent = persistent;
+        }
+
+        public bool IsPersistent()
+        {
+            return this.persistent;
         }
 
 
@@ -234,15 +269,6 @@ namespace SDL2Engine
             this.SetParentPosition(new Vec2D());
         }
 
-        public Scene? GetScene()
-        {
-            return scene;
-        }
-
-        public void SetScene(Scene? scene)
-        {
-            this.scene = scene;
-        }
 
         public Vec2D GetPosition()
         {

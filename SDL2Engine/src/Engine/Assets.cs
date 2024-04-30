@@ -61,14 +61,12 @@ namespace SDL2Engine
 
     public abstract class Asset<T> : IAsset
     {
-        private AssetHandler<T> handler;
+        protected AssetHandler<T> handler;
         private bool loaded = false;
         private bool hasRef = false;
-        private string path;
         public Asset(AssetHandler<T> handler)
         {
             this.handler = handler;
-            this.path = handler.GetPath();
             handler.AddRef();
             hasRef = true;
         }
@@ -136,6 +134,11 @@ namespace SDL2Engine
                 return GetDefault();
             }
             return res;
+        }
+
+        public string GetPath()
+        {
+            return handler.GetPath();
         }
 
 
@@ -332,6 +335,8 @@ namespace SDL2Engine
     // Sound should be used for sound effects, music for background music
     public class Music : Audio<IntPtr>
     {
+
+        private static string? current_music_path = null;
         public Music(AssetHandler<IntPtr> handler) : base(handler)
         {
         }
@@ -350,7 +355,14 @@ namespace SDL2Engine
                 return false;
             }
             int result = SDL2.SDL_mixer.Mix_PlayMusic(music_ref, loops);
-            return result != -1;
+            
+            if (result == -1)
+            {
+                Console.WriteLine("Music: Failed to play music");
+                return false;
+            }
+            current_music_path = handler.GetPath();
+            return true;
         }
 
         // Stop the music if it is playing
@@ -367,9 +379,25 @@ namespace SDL2Engine
             return result != -1;
         }
 
+        // this returns if ANY music is playing, not just this music object
         public override bool IsPlaying()
         {
             return SDL2.SDL_mixer.Mix_PlayingMusic() == 1;
+        }
+
+        // This is a bit of a hack to keep track of the currently playing music
+        public bool IsThisPlaying()
+        {
+            var is_playing = IsPlaying();
+            if (is_playing && current_music_path == handler.GetPath())
+            {
+                return true;
+            }
+            if (!is_playing)
+            {
+                current_music_path = null;
+            }
+            return false;
         }
 
         public override IntPtr GetDefault()

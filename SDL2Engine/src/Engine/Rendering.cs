@@ -267,10 +267,9 @@ namespace SDL2Engine
 
     public class TextureRenderer : DrawableRect
     {
-        private IntPtr texture = IntPtr.Zero;
+        private IntPtr texture_ptr = IntPtr.Zero;
+        private Texture? texture;
         private string? path = null;
-        public static readonly string rootTexturePath = "Assets/Textures/";
-        private static IntPtr forsenTexture = IntPtr.Zero;
 
         ~TextureRenderer()
         {
@@ -292,6 +291,7 @@ namespace SDL2Engine
         {
             // just to test performance without loading the same texture multiple times
             // TODO: implement AssetManager to load and manage assets and remove this
+            /*
             if (forsenTexture == IntPtr.Zero)
             {
 
@@ -308,10 +308,12 @@ namespace SDL2Engine
             {
                 texture = forsenTexture;
             }
-
+            */
+            texture = AssetManager.LoadAsset<Texture>(t_path);
+            texture_ptr = texture.Get();
             // get the size of the texture
             int w, h;
-            SDL_QueryTexture(texture, out _, out _, out w, out h);
+            SDL_QueryTexture(texture_ptr, out _, out _, out w, out h);
             rect = new Rect(0, 0, w, h);
 
 
@@ -320,7 +322,7 @@ namespace SDL2Engine
 
         public override void Draw(Camera camera)
         {
-            if (texture == IntPtr.Zero)
+            if (texture_ptr == IntPtr.Zero)
             {
                 if (path != null)
                 {
@@ -338,7 +340,7 @@ namespace SDL2Engine
             double time = Time.time;
             double angle = time * 0.3 * 360;
 
-            SDL_RenderCopyEx(Engine.renderer, texture, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
+            SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
 
             SDL_RenderDrawRect(Engine.renderer, ref dstRect);
         }

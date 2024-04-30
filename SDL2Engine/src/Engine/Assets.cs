@@ -1,5 +1,7 @@
 ﻿using SDL2;
 using System.Collections;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using static SDL2.SDL;
 
 namespace SDL2Engine
@@ -47,10 +49,95 @@ namespace SDL2Engine
      *    It's a static class, so it can be accessed from anywhere
      *    
      */
-    public interface AssetType
+
+    public abstract class IAsset : IDisposable
     {
-        bool Load(string path);
-        bool Unload();
+        public abstract void Load();
+        public abstract bool IsLoaded();
+        public abstract void Unload();
+        public abstract void Dispose();
+    }
+
+    public abstract class Asset<T> : IAsset
+    {
+        private AssetHandler<T> handler;
+        private bool loaded = false;
+        private bool hasRef = false;
+        private string path;
+        public Asset(AssetHandler<T> handler)
+        {
+            this.handler = handler;
+            this.path = handler.GetPath();
+            handler.AddRef();
+            hasRef = true;
+        }
+
+        ~Asset()
+        {
+            Dispose();
+        }
+
+        public override void Load()
+        {
+            if (loaded)
+            {
+                return;
+            }
+
+            handler.LoadAsset();
+            loaded = true;
+
+        }
+
+        public override bool IsLoaded()
+        {
+            return loaded;
+        }
+
+        public override void Unload()
+        {
+            Dispose();
+        }
+
+        public override void Dispose()
+        {
+            if(!hasRef)
+            {
+                return;
+            }
+
+            handler.RemoveRef();
+            loaded = false;
+        }
+
+        public abstract T GetDefault();
+
+        public T Get()
+        {
+            if(!hasRef)
+            {
+                return GetDefault();
+            }
+
+            if (!loaded)
+            {
+                Load();
+            }
+
+            if(!handler.IsLoaded())
+            {
+                return GetDefault();
+            }
+
+            var res = handler.Get();
+            if (res == null)
+            {
+                return GetDefault();
+            }
+            return res;
+        }
+
+
     }
 
     /*
@@ -90,53 +177,94 @@ namespace SDL2Engine
     */
 
 
-
-    public class Texture : AssetType
+    public class Texture : Asset<IntPtr>
     {
-        private string? path = null;
-        private IntPtr texture = IntPtr.Zero;
-        public bool Load(string path)
+        private static Lazy<IntPtr> default_texture = new(() =>
         {
-            // Load texture from file using SDL2
-            if (texture != IntPtr.Zero || this.path == null)
+            int size = 128;
+            int numPixels = size * size;
+            int bytesPerPixel = 4; // Each pixel is 4 bytes (32 bits)
+            IntPtr pixelPtr = Marshal.AllocHGlobal(numPixels * bytesPerPixel);
+
+            // Unsafe code block to manipulate memory directly
+            unsafe
             {
-                return false;
+                UInt32* pixels = (UInt32*)pixelPtr.ToPointer();
+                for (int i = 0; i < numPixels; i++)
+                {
+                    pixels[i] = (i % size < size / 2) ^ (i / size < size / 2) ? 0x443355FFu : 0x221133FFu;
+                }
             }
 
-            this.path = path;
-            this.texture = SDL_image.IMG_LoadTexture(Engine.renderer, path);
-            if (texture == IntPtr.Zero)
-            {
-                Console.WriteLine("Failed to load texture: " + SDL_GetError());
-                Console.WriteLine("Texture path: " + this.path);
-                return false;
-            }
+            var surface = SDL.SDL_CreateRGBSurfaceFrom(pixelPtr, size, size, 32, size * 4, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+            var texture = SDL.SDL_CreateTextureFromSurface(Engine.renderer, surface);
+            SDL.SDL_FreeSurface(surface);
 
-            return true;
+            // Free the unmanaged memory once it is no longer needed
+            Marshal.FreeHGlobal(pixelPtr);
 
+            return texture;
+        });
+
+        public Texture(AssetHandler<IntPtr> handler) : base(handler)
+        {
         }
 
-        public bool Unload()
+        public override IntPtr GetDefault()
         {
-            // Unload texture from memory
-            if (texture == IntPtr.Zero || this.path == null)
-            {
-                return false;
-            }
-
-            SDL.SDL_DestroyTexture(texture);
-            texture = IntPtr.Zero;
-            path = null;
-            return true;
+            return default_texture.Value;
         }
 
+        // how to suggest inlining in c#: (usually done automatically by the jit compiler)
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Draw(IntPtr renderer, ref Rect source, ref Rect destination)
+        {
+            var sdl_source = source.ToSDLRect();
+            var sdl_destination = destination.ToSDLRect();
+            SDL.SDL_RenderCopy(renderer, Get(), ref sdl_source, ref sdl_destination);
+        }
     }
 
-    public class AssetHandler<T> where T : AssetType
+    public class Sound : Asset<IntPtr>
     {
-        string path;
-        T? asset;
-        uint refCount = 0;
+        public Sound(AssetHandler<IntPtr> handler) : base(handler)
+        {
+        }
+
+        public void Play()
+        {
+            // Play sound
+        }
+
+        public void Pause()
+        {
+            // Pause sound
+        }
+
+        public void Stop()
+        {
+            // Stop sound
+        }
+
+        public void Loop()
+        {
+            // Loop sound
+        }
+
+        public override IntPtr GetDefault()
+        {
+            return IntPtr.Zero;
+        }
+    }
+
+    
+
+    public abstract class AssetHandler<T>
+    {
+        protected string path;
+        protected T? asset;
+        protected uint refCount = 0;
+        protected bool loaded = false;
 
         public AssetHandler(string path)
         {
@@ -145,19 +273,27 @@ namespace SDL2Engine
             LoadAsset();
         }
 
-        private void LoadAsset()
+        public abstract void LoadAsset();
+
+        public bool IsLoaded()
         {
-            // Load asset from file
+            return loaded;
         }
 
-        public void UnloadAsset()
-        {
-            // Unload asset from memory
-        }
+        public abstract void UnloadAsset();
 
         public T? Get()
         {
+            if (!loaded)
+            {
+                LoadAsset();
+            }
             return asset;
+        }
+
+        public string GetPath()
+        {
+            return path;
         }
 
         public void AddRef()
@@ -175,74 +311,84 @@ namespace SDL2Engine
             return refCount;
         }
 
+        public bool UnloadIfUnused()
+        {
+            if (refCount == 0)
+            {
+                UnloadAsset();
+                return true;
+            }
+
+            return false;
+        }
+
     }
 
-    public class Asset<T> : IDisposable where T : AssetType
+    class TextureHandler : AssetHandler<IntPtr>
     {
-        private AssetHandler<T>? handler = null;
-        private T? asset = default(T);
-        private bool loaded = false;
-        private string path;
-        public Asset(string path)
+
+
+        public TextureHandler(string path) : base(path)
         {
-            this.path = path;
         }
 
-        ~Asset()
+        public override void LoadAsset()
         {
-            Dispose();
-        }
-
-        public void Load()
-        {
-            if (handler == null)
+            if(loaded)
             {
-                handler = AssetManager.LoadAsset<T>(path);
-                if (handler == null)
-                {
-                    return;
-                }
-
-                handler.AddRef();
-                asset = handler.Get();
-
-                if (asset != null)
-                {
-                    loaded = true;
-                }
+                return;
+            }
+            asset = SDL_image.IMG_LoadTexture(Engine.renderer, path);
+            if (asset == IntPtr.Zero)
+            {
+                Console.WriteLine("TextureHandler: Failed to load texture: " + path);
+                loaded = false;
+            }
+            else
+            {
+                loaded = true;
             }
         }
 
-        public bool IsLoaded()
+        public override void UnloadAsset()
         {
-            return loaded;
-        }
-
-        public void Unload()
-        {
-            Dispose();
-        }
-
-        public void Dispose()
-        {
-            if (handler != null)
+            if (!loaded)
             {
-                handler.RemoveRef();
-                handler = null;
-                asset = default(T);
+                return;
+            }
+
+            if (asset != IntPtr.Zero)
+            {
+                SDL.SDL_DestroyTexture(asset);
+                asset = IntPtr.Zero;
             }
         }
 
-        public T? GetAsset()
-        {
-            if (asset == null)
-            {
-                Load();
+    }
 
-            }
-            return asset;
+    class SoundHandler : AssetHandler<IntPtr>
+    {
+        public SoundHandler(string path) : base(path)
+        {
         }
 
+        public override void LoadAsset()
+        {
+            // Load sound
+            if (loaded)
+            {
+                return;
+            }
+        }
+
+        public override void UnloadAsset()
+        {
+            // Unload sound
+            if (!loaded)
+            {
+                return;
+            }
+        }
 
     }
 
@@ -255,40 +401,58 @@ namespace SDL2Engine
     {
 
 
-        private static Hashtable assets = new Hashtable();
-        // private static Dictionary<string, AssetHandler<Texture>> textures = new Dictionary<string, AssetHandler<Texture>>();
+        private static Dictionary<string, TextureHandler> texture_assets = new();
+        private static Dictionary<string, SoundHandler> sound_assets = new();
 
-        public static AssetHandler<T>? LoadAsset<T>(string path) where T : AssetType
+        private static Texture LoadTexture(string path)
         {
-            // check if asset is already loaded
-            if (assets.ContainsKey(path))
+            TextureHandler? handler = null;
+            if (texture_assets.ContainsKey(path))
             {
-                var thing = assets[path];
-                if (thing is AssetHandler<T> handler)
-                {
-                    return handler;
-                }
+                handler = texture_assets[path];
+            } else
+            {
+                handler = new TextureHandler(path);
+                texture_assets[path] = handler;
+                // handler.LoadAsset();
+            }
+            
+            return new Texture(handler);
+        }
 
-                return null;
+        private static Sound LoadSound(string path)
+        {
+            SoundHandler? handler = null;
+            if (sound_assets.ContainsKey(path))
+            {
+                handler = sound_assets[path];
+            }
+            else
+            {
+                handler = new SoundHandler(path);
+                sound_assets[path] = handler;
+                // handler.LoadAsset();
             }
 
+            return new Sound(handler);
+        }
 
 
-            AssetHandler<T> asset = new AssetHandler<T>(path);
-            assets.Add(path, asset);
-            return asset;
+        public static T LoadAsset<T>(string path) where T : IAsset
+        {
+            if (typeof(T) == typeof(Texture))
+            {
+                return LoadTexture(path) as T ?? throw new Exception("Failed to load texture");
+            }
+            else
+            {
+                return LoadSound(path) as T ?? throw new Exception("Failed to load sound");
+            }
         }
 
         public static void CleanUnusedAssets()
         {
-            foreach (AssetHandler<Texture> asset in assets)
-            {
-                if (asset.GetRefCount() == 0)
-                {
-                    asset.UnloadAsset();
-                    assets.Remove(asset);
-                }
-            }
+            
         }
 
     }

@@ -480,7 +480,22 @@ namespace SDL2Engine
         public bool playOnAwake = false;
 
 
-        // ILodable methods
+        public void SetSource(string source)
+        {
+            this.source = source;
+            if (sound != null)
+            {
+                if (sound.IsPlaying())
+                {
+                    sound.Stop();
+                }
+                sound.Dispose();
+                sound = null;
+            }
+
+        }
+
+        // ILoable methods
         public void Load()
         {
             if (sound != null)
@@ -558,6 +573,114 @@ namespace SDL2Engine
             if (sound != null)
             {
                 return sound.SetVolume(volume);
+            }
+
+            return false;
+        }
+
+    }
+
+    public class MusicPlayer : Component, ILoadable
+    {
+        public static double music_volume = 1.0;
+        public string source = "";
+        public double volume = MusicPlayer.music_volume;
+        private Music? music = null;
+        public bool playOnAwake = false;
+
+        public void SetSource(string source)
+        {
+            this.source = source;
+            if (music != null)
+            {
+                if (music.IsPlaying())
+                {
+                    music.Stop();
+                }
+                music.Dispose();
+                music = null;
+            }
+
+        }
+
+        // ILoable methods
+        public void Load()
+        {
+            if (music != null)
+            {
+                return;
+            }
+
+            if (source != "")
+            {
+                music = AssetManager.LoadMusic(source);
+                music.Load();
+            }
+        }
+
+        public override void Awake()
+        {
+            base.Awake();
+            if (playOnAwake)
+            {
+                Play();
+            }
+        }
+
+        public bool IsLoaded()
+        {
+            return music != null;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            if (music != null)
+            {
+                music.Dispose();
+            }
+        }
+
+        // Playing the music
+        public bool Play(int loop = 0)
+        {
+            if (music != null)
+            {
+                var result = music.Play(loop);
+                if (result)
+                {
+                    music.SetVolume(volume);
+                }
+                return result;
+            }
+            return false;
+        }
+
+        public bool Stop()
+        {
+            if (music != null)
+            {
+                return music.Stop();
+            }
+
+            return false;
+        }
+
+        public bool IsPlaying()
+        {
+            if (music != null)
+            {
+                return music.IsPlaying();
+            }
+
+            return false;
+        }
+
+        public bool SetVolume(double volume)
+        {
+            if (music != null)
+            {
+                return music.SetVolume(volume);
             }
 
             return false;

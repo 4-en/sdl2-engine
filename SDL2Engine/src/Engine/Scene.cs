@@ -398,6 +398,7 @@ namespace SDL2Engine
                     break;
                 case Script script:
                     scripts.Add(script);
+                    toStart.Add(script);
                     break;
             }
         }

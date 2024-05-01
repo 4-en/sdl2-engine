@@ -475,9 +475,9 @@ namespace SDL2Engine
     {
         public static double sound_volume = 1.0;
         public string source = "";
-        public bool loop = false;
         public double volume = SoundPlayer.sound_volume;
         private Sound? sound = null;
+        public bool playOnAwake = false;
 
 
         // ILodable methods
@@ -492,6 +492,15 @@ namespace SDL2Engine
             {
                 sound = AssetManager.LoadSound(source);
                 sound.Load();
+            }
+        }
+
+        public override void Awake()
+        {
+            base.Awake();
+            if (playOnAwake)
+            {
+                Play();
             }
         }
 

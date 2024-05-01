@@ -305,6 +305,32 @@ namespace SDL2Engine
             // Do nothing
         }
 
+        // 8.
+        // This method is part of every EngineObject (and therefore every Component)
+        // It is called when the object is disposed (it is removed from the scene and is not persistent)
+        // this should be used to clean up any resources, especially SDL resources that are not automatically GC'd
+        /*
+        public override void Dispose()
+        {
+            // Do nothing
+        }
+        */
+
+
+        /*
+         * Collision methods
+         * 
+         * These methods are called when a collision occurs
+         * 
+         * OnCollisionEnter is called when the collision starts
+         * OnCollisionStay is called every frame the collision is happening
+         * OnCollisionExit is called when the collision ends (the first frame the collision is not happening)
+         * 
+         * CollisionPair is a struct that contains the two colliding objects
+         * One of them is the object this script is attached to
+         * 
+         * These methods can be overridden to provide custom functionality
+         */
         public virtual void OnCollisionEnter(CollisionPair collision)
         {
             // Do nothing

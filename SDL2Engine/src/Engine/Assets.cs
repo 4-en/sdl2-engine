@@ -50,7 +50,7 @@ namespace SDL2Engine
      *    
      */
 
-    public abstract class IAsset : IDisposable
+    public abstract class IAsset : ILoadable
     {
         public abstract void Load();
         public abstract bool IsLoaded();

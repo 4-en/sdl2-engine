@@ -433,4 +433,89 @@ namespace SDL2Engine
 
 
     }
+
+    public class SoundPlayer : Component, ILoadable
+    {
+        public static double sound_volume = 1.0;
+        public string source = "";
+        public bool loop = false;
+        public double volume = SoundPlayer.sound_volume;
+        private Sound? sound = null;
+
+
+        // ILodable methods
+        public void Load()
+        {
+            if (sound != null)
+            {
+                return;
+            }
+
+            if (source != "")
+            {
+                sound = AssetManager.LoadSound(source);
+                sound.Load();
+            }
+        }
+
+        public bool IsLoaded()
+        {
+            return sound != null;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            if (sound != null)
+            {
+                sound.Dispose();
+            }
+        }
+
+        // Playing the sound
+        public bool Play(int loop = 0)
+        {
+            if (sound != null)
+            {
+                var result = sound.Play(loop);
+                if (result)
+                {
+                    sound.SetVolume(volume);
+                }
+                return result;
+            }
+            return false;
+        }
+
+        public bool Stop()
+        {
+            if (sound != null)
+            {
+                return sound.Stop();
+            }
+
+            return false;
+        }
+
+        public bool IsPlaying()
+        {
+            if (sound != null)
+            {
+                return sound.IsPlaying();
+            }
+
+            return false;
+        }
+
+        public bool SetVolume(double volume)
+        {
+            if (sound != null)
+            {
+                return sound.SetVolume(volume);
+            }
+
+            return false;
+        }
+
+    }
 }

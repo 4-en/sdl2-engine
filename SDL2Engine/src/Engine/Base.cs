@@ -6,7 +6,13 @@ using static System.Diagnostics.Stopwatch;
 
 namespace SDL2Engine
 {
-
+    // ILoadable interface
+    // This interface is used to load and unload resources
+    interface ILoadable : IDisposable
+    {
+        public void Load();
+        public bool IsLoaded();
+    }
     public struct Vec2D
     {
         public static readonly Vec2D Zero = new(0, 0);

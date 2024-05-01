@@ -77,6 +77,13 @@ namespace SDL2Engine
             SetEnabled(false);
         }
 
+        // This is called for every compenent when it gets added to a Scene
+        // This doesn't necessarily mean that the owning GameObject has been completely initialized
+        public virtual void Awake()
+        {
+            // Do nothing
+        }
+
 
         // Usefull methods to interact with other components
         public T? GetComponent<T>() where T : Component
@@ -240,10 +247,14 @@ namespace SDL2Engine
 
         // 1.
         // This method is called once when the Component is created
+        /*
+         * This is now part of Component
+         * 
         public virtual void Awake()
         {
             // Do nothing
         }
+        */
 
         // 2.
         // This method is called during the first frame the script is active

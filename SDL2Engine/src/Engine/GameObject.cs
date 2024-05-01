@@ -388,7 +388,9 @@ namespace SDL2Engine
                 else if (newComponent is Script script)
                 {
                     components.Add(newComponent);
-                    script.Awake();
+                    // Commented out because Awake is called by the scene during the first step of the update loop
+                    // when a new component is added to the scene
+                    // script.Awake();
                 }
 
                 else

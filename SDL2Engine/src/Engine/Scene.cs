@@ -231,19 +231,7 @@ namespace SDL2Engine
             {
                 Component component = list[i];
 
-                switch (component)
-                {
-                    case Drawable drawable:
-                        drawableList.Add(drawable);
-                        break;
-                    case Collider collider:
-                        colliderList.Add(collider);
-                        break;
-                    case Script script:
-                        scripts.Add(script);
-                        toStart.Add(script);
-                        break;
-                }
+                HandleAddComponent(component);
             }
 
             // add children components
@@ -396,6 +384,9 @@ namespace SDL2Engine
 
         private void HandleAddComponent<T>(T component) where T : Component
         {
+            // Call Awake on the component
+            component.Awake();
+
             // Store some component types in lists for quick access
             switch (component)
             {

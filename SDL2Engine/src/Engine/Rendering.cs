@@ -265,6 +265,23 @@ namespace SDL2Engine
 
     }
 
+    public class TextureRenderer2 : DrawableRect, ILoadable
+    {
+        private Texture? texture;
+        public string? texture_path = null;
+
+            
+        public void Load()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsLoaded()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class TextureRenderer : DrawableRect
     {
         private IntPtr texture_ptr = IntPtr.Zero;

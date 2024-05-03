@@ -226,6 +226,13 @@ namespace SDL2Engine
             var sdl_destination = destination.ToSDLRect();
             SDL.SDL_RenderCopy(renderer, Get(), ref sdl_source, ref sdl_destination);
         }
+
+        public Rect GetTextureRect()
+        {
+            int w, h;
+            SDL_QueryTexture(this.Get(), out _, out _, out w, out h);
+            return new Rect(w, h);
+        }
     }
 
     public abstract class Audio<T> : Asset<T>
@@ -488,7 +495,7 @@ namespace SDL2Engine
 
     class TextureHandler : AssetHandler<IntPtr>
     {
-
+        private Rect? rect;
 
         public TextureHandler(string path) : base(path)
         {
@@ -512,8 +519,16 @@ namespace SDL2Engine
                 return false;
                 
             }
+            int w, h;
+            SDL_QueryTexture(this.Get(), out _, out _, out w, out h);
+            this.rect = new Rect(w, h);
             loaded = true;
             return true;
+        }
+
+        public Rect? GetTextureRect()
+        {
+            return rect;
         }
 
         public override bool UnloadAsset()

@@ -73,7 +73,7 @@ namespace SDL2Engine
     public class Camera2D : Camera
     {
         private Vec2D Position { get; set; }
-        private Vec2D Size { get; set; }
+        private Vec2D WorldSize { get; set; }
 
         public bool keepAspectRatio = true;
 
@@ -81,19 +81,24 @@ namespace SDL2Engine
         public Camera2D(Vec2D position = new Vec2D())
         {
             this.Position = position;
-            this.Size = new Vec2D(1920, 1080);
+            this.WorldSize = new Vec2D(1920, 1080);
+        }
+
+        public void SetPosition(Vec2D position)
+        {
+            this.Position = position;
         }
 
         public override Vec2D GetWorldSize()
         {
-            return Size;
+            return WorldSize;
         }
 
         public override Vec2D GetScreenSize()
         {
             if (keepAspectRatio)
             {
-                double aspectRatio = Size.x / Size.y;
+                double aspectRatio = WorldSize.x / WorldSize.y;
                 double windowAspectRatio = Engine.windowWidth / Engine.windowHeight;
 
                 // constant scale for both axes
@@ -113,13 +118,13 @@ namespace SDL2Engine
         public override Vec2D ScreenToWorld(Vec2D screenPosition)
         {
             Vec2D screenSize = GetScreenSize();
-            return new Vec2D((screenPosition.x - Position.x) / screenSize.x * Size.x, (screenPosition.y - Position.y) / screenSize.y * Size.y);
+            return new Vec2D(screenPosition.x / screenSize.x * WorldSize.x + Position.x, screenPosition.y / screenSize.y * WorldSize.y + Position.y);
         }
 
         public override Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D())
         {
             Vec2D screenSize = GetScreenSize();
-            return new Vec2D((worldPosition.x + rootPosition.x) / Size.x * screenSize.x + Position.x, (worldPosition.y + rootPosition.y) / Size.y * screenSize.y + Position.y);
+            return new Vec2D((worldPosition.x + rootPosition.x-Position.x) / WorldSize.x * screenSize.x, (worldPosition.y + rootPosition.y-Position.y) / WorldSize.y * screenSize.y);
         }
 
         public override Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D())
@@ -172,9 +177,66 @@ namespace SDL2Engine
     {
         protected Rect rect = new Rect(0, 0, 100, 100);
 
+        public override Vec2D GetDrawRoot()
+        {
+            Vec2D localCenter = GetRect().GetTopLeft();
+            return scene?.GetCamera().WorldToScreen(localCenter, gameObject.GetPosition()) ?? localCenter + gameObject.GetPosition();
+        }
+
+        // get the rect based on the anchor point in local coordinates
+        // for example, if the anchor point is Center, the rect will be centered around the anchor point (move the rect to the left and up by half its size)
+        public Rect GetRect()
+        {
+            // return rect relative to anchor point
+            Vec2D size = rect.GetSize();
+            Vec2D position = rect.GetTopLeft();
+
+            switch(this.anchorPoint)
+            {
+                case AnchorPoint.Center:
+                    position = new Vec2D(-size.x / 2, -size.y / 2);
+                    break;
+                case AnchorPoint.TopCenter:
+                    position = new Vec2D(-size.x / 2, 0);
+                    break;
+                case AnchorPoint.TopRight:
+                    position = new Vec2D(-size.x, 0);
+                    break;
+                case AnchorPoint.CenterLeft:
+                    position = new Vec2D(0, -size.y / 2);
+                    break;
+                case AnchorPoint.CenterRight:
+                    position = new Vec2D(-size.x, -size.y / 2);
+                    break;
+                case AnchorPoint.BottomLeft:
+                    position = new Vec2D(0, -size.y);
+                    break;
+                case AnchorPoint.BottomCenter:
+                    position = new Vec2D(-size.x / 2, -size.y);
+                    break;
+                case AnchorPoint.BottomRight:
+                    position = new Vec2D(-size.x, -size.y);
+                    break;
+            }
+            return new Rect(position.x, position.y, size.x, size.y);
+        }
         public SDL.SDL_Rect GetDestRect()
         {
-            return this.scene?.GetCamera().RectToScreen(rect, this.gameObject.GetPosition()).ToSDLRect() ?? rect.ToSDLRect();
+            var scene = gameObject.GetScene();
+            Camera? camera = scene?.GetCamera();
+            if (camera != null)
+            {
+                return camera.RectToScreen(this.GetRect(), gameObject.GetPosition()).ToSDLRect();
+            } else
+            {
+                return rect.ToSDLRect();
+            }
+        }
+
+        // get the rect in world coordinates
+        public Rect GetWorldRect()
+        {
+            return GetRect() + gameObject.GetPosition();
         }
 
         public override void Draw(Camera camera)
@@ -208,27 +270,43 @@ namespace SDL2Engine
         private IntPtr texture = IntPtr.Zero;
         private string? path = null;
         public static readonly string rootTexturePath = "Assets/Textures/";
+        private static IntPtr forsenTexture = IntPtr.Zero;
 
         ~Texture()
         {
             // TODO: check if this actually works
             // seems like the finalizer is not called
+            /*
+             * This seems to be called before the texture is destroyed and
+             * causes access violation errors
+             * fix this later with AssetManager
             Console.WriteLine("Texture destroyed");
             if (texture != IntPtr.Zero)
             {
                 SDL_DestroyTexture(texture);
             }
+            */
         }
 
         public bool LoadTexture(string t_path)
         {
-            this.path = Texture.rootTexturePath + t_path;
-            texture = SDL_image.IMG_LoadTexture(Engine.renderer, path);
-            if (texture == IntPtr.Zero)
+            // just to test performance without loading the same texture multiple times
+            // TODO: implement AssetManager to load and manage assets and remove this
+            if (forsenTexture == IntPtr.Zero)
             {
-                Console.WriteLine("Failed to load texture: " + SDL_GetError());
-                Console.WriteLine("Texture path: " + this.path);
-                return false;
+
+                this.path = Texture.rootTexturePath + t_path;
+                texture = SDL_image.IMG_LoadTexture(Engine.renderer, path);
+                if (texture == IntPtr.Zero)
+                {
+                    Console.WriteLine("Failed to load texture: " + SDL_GetError());
+                    Console.WriteLine("Texture path: " + this.path);
+                    return false;
+                }
+                forsenTexture = texture;
+            } else
+            {
+                texture = forsenTexture;
             }
 
             // get the size of the texture
@@ -253,10 +331,9 @@ namespace SDL2Engine
                     return;
                 }
             }
-            var root = gameObject.GetPosition();
-            Vec2D size = rect.GetSize();
+            
             var srcRect = rect.ToSDLRect();
-            var dstRect = camera.RectToScreen(rect, root).ToSDLRect();
+            var dstRect = this.GetDestRect();
 
             double time = Time.time;
             double angle = time * 0.3 * 360;

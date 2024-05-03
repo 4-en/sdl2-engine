@@ -23,6 +23,12 @@ namespace SDL2Engine
             this.z = z;
         }
 
+        // to string
+        public override string ToString()
+        {
+            return "(" + x + ", " + y + ")";
+        }
+
         public static Vec2D operator +(Vec2D a, Vec2D b)
         {
             return new Vec2D(a.x + b.x, a.y + b.y, a.z);
@@ -356,6 +362,11 @@ namespace SDL2Engine
             return new Vec2D(x + w, y + h);
         }
 
+        public override string ToString()
+        {
+            return "Rect: x=" + x + ", y=" + y + ", w=" + w + ", h=" + h;
+        }
+
         public SDL.SDL_Rect ToSDLRect()
         {
             SDL.SDL_Rect sdlRect = new SDL.SDL_Rect();
@@ -412,10 +423,21 @@ namespace SDL2Engine
         protected bool enabled = true;
         protected Scene? scene = null;
         protected uint uid = GetRandomUID();
+        private bool _to_be_destroyed = false;
 
         public EngineObject(string name = "unnamed")
         {
             this.name = name;
+        }
+
+        public void MarkToBeDestroyed()
+        {
+            _to_be_destroyed = true;
+        }
+
+        public bool ToBeDestroyed()
+        {
+            return _to_be_destroyed;
         }
 
         public static uint GetRandomUID()

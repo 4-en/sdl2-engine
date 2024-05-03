@@ -1,6 +1,7 @@
 ﻿using SDL2;
 using static SDL2.SDL;
 using System;
+using System.IO;
 
 namespace SDL2Engine
 {
@@ -268,17 +269,54 @@ namespace SDL2Engine
     public class TextureRenderer2 : DrawableRect, ILoadable
     {
         private Texture? texture;
-        public string? texture_path = null;
+        public string source = "";
 
-            
-        public void Load()
+        public void SetSource(string source)
         {
-            throw new NotImplementedException();
+            this.source = source;
+            if (texture != null)
+            {
+                
+                texture.Dispose();
+                texture = null;
+            }
         }
 
         public bool IsLoaded()
         {
-            throw new NotImplementedException();
+            return texture != null;
+        }
+
+        public void Load()
+        {
+            if (texture != null)
+            {
+                return;
+            }
+
+            if (source != "")
+            {
+                texture = AssetManager.LoadTexture(source);
+                texture.Load();
+            }
+        }
+
+        public override void Draw(Camera camera)
+        {
+            if (texture == null) return;
+
+            var texture_ptr = texture.Get();
+            
+
+            var srcRect = rect.ToSDLRect();
+            var dstRect = this.GetDestRect();
+
+            double time = Time.time;
+            double angle = time * 0.3 * 360;
+
+            SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
+
+            SDL_RenderDrawRect(Engine.renderer, ref dstRect);
         }
     }
 

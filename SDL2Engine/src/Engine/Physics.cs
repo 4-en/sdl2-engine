@@ -757,7 +757,10 @@ namespace SDL2Engine
                 Vec2D vel = obj1.GetComponent<PhysicsBody>().Velocity;
                 if (name2 == "BoarderLeft")
                 {
-                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-vel.x, vel.y);
+                    //obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-vel.x, vel.y);
+                    obj1.SetPosition(new Vec2D(960, 750));
+                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(8, 5);
+
                 }
                 else if (name2 == "BoarderTop")
                 {
@@ -765,7 +768,9 @@ namespace SDL2Engine
                 }
                 else if (name2 == "BoarderRight")
                 {
-                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-vel.x, vel.y);
+                    //obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-vel.x, vel.y);
+                    obj1.SetPosition(new Vec2D(960, 750));
+                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-8, 5);
                 }
                 else if (name2 == "BoarderBottom")
                 {

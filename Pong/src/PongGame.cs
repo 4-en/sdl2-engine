@@ -22,7 +22,8 @@ namespace Pong.src
             var leftPaddle = new GameObject("LeftPaddle");
             _ = leftPaddle.AddComponent<WSController>();
             _ = leftPaddle.AddComponent<Paddle>();
-            leftPaddle.AddComponent<PhysicsBody>();
+            var lp = leftPaddle.AddComponent<PhysicsBody>();
+            lp.IsMovable = true;
             var leftPaddleBoxCollider = leftPaddle.AddComponent<BoxCollider>();
             leftPaddleBoxCollider.UpdateColliderPosition(new Vec2D(50, 750));
             leftPaddleBoxCollider.UpdateColliderSize(35, 160);
@@ -33,11 +34,13 @@ namespace Pong.src
             var rightPaddle = new GameObject("RightPaddle");
             _ = rightPaddle.AddComponent<ArrowKeysController>();
             _ = rightPaddle.AddComponent<Paddle>();
-            rightPaddle.AddComponent<PhysicsBody>();
+            var rp = rightPaddle.AddComponent<PhysicsBody>();
+            rp.IsMovable = true;
             var rightPaddleBoxCollider = rightPaddle.AddComponent<BoxCollider>();
             rightPaddleBoxCollider.UpdateColliderPosition(new Vec2D(1870, 750));
             rightPaddleBoxCollider.UpdateColliderSize(35, 160);
             rightPaddle.transform.position = new Vec2D(1870, 750);
+
             scene.AddGameObject(rightPaddle);
 
             ////PongBall variante round
@@ -54,8 +57,10 @@ namespace Pong.src
             var bc = pongSquare.AddComponent<BoxCollider>();
             var pb = pongSquare.AddComponent<PhysicsBody>();
             pb.Velocity = new Vec2D(8, 5);
+            pb.IsMovable = true;
+
             //pongSquare.SetPosition(new Vec2D(960, 750));
-            pongSquare.SetPosition(new Vec2D(960- 480-50, 750));
+            pongSquare.SetPosition(new Vec2D(960 - 480 - 50, 750));
             scene.AddGameObject(pongSquare);
 
             ////Boarder variante 1 
@@ -67,67 +72,34 @@ namespace Pong.src
             //_ = rightBoarder.AddComponent<Boarder>();
             //rightBoarder.transform.position = new Vec2D(1915, 750);
 
-            //Boarder variante 2
-            var testBoarder = new GameObject("BoarderBottom");
-            _ = testBoarder.AddComponent<Boarder2>();
-            var bordercollider = testBoarder.AddComponent<BoxCollider>();
-            bordercollider.UpdateColliderPosition(new Vec2D(0, 750 + 550));
-            bordercollider.UpdateColliderSize(1980,5);
-            var borderphysics = testBoarder.AddComponent<PhysicsBody>();
-            borderphysics.IsMovable = false;
-            borderphysics.Mass = 0.5;
-            testBoarder.transform.position = new Vec2D(960, 750);
-            scene.AddGameObject(testBoarder);
+            void CreateBoarder(string name, Vec2D position, Vec2D colliderPosition, Vec2D colliderSize)
+            {
+                var boarder = new GameObject(name);
+                _ = boarder.AddComponent<Boarder2>();
+
+                var collider = boarder.AddComponent<BoxCollider>();
+                collider.UpdateColliderPosition(colliderPosition);
+                collider.UpdateColliderSize((int)colliderSize.x, (int)colliderSize.y); // Hier die Umwandlung in int hinzugefügt
+
+                var physics = boarder.AddComponent<PhysicsBody>();
+
+                boarder.transform.position = position;
+
+                scene.AddGameObject(boarder);
+            }
 
 
-            //Boarder top for test
-            var testBoarder2 = new GameObject("BoarderTop");
-            _ = testBoarder2.AddComponent<Boarder2>();
-            var bordercollider2 = testBoarder2.AddComponent<BoxCollider>();
-            bordercollider2.UpdateColliderPosition(new Vec2D(0, 223));
-            bordercollider2.UpdateColliderSize(1980, 5);
-            var borderphysics2 = testBoarder2.AddComponent<PhysicsBody>();
-            borderphysics2.IsMovable = false;
-            borderphysics2.Mass = 0.5;
-            testBoarder2.transform.position = new Vec2D(960, 750);
-            scene.AddGameObject(testBoarder2);
+            // Erstelle Boarder-Objekte mit vereinfachter Methode
+            CreateBoarder("BoarderBottom", new Vec2D(960, 750), new Vec2D(0, 750 + 550), new Vec2D(1980, 5));
+            CreateBoarder("BoarderTop", new Vec2D(960, 750), new Vec2D(0, 223), new Vec2D(1980, 5));
+            CreateBoarder("BoarderLeft", new Vec2D(960, 750), new Vec2D(5, 228), new Vec2D(5, 1070));
+            CreateBoarder("BoarderRight", new Vec2D(960, 750), new Vec2D(1970, 228), new Vec2D(5, 1070));
 
 
-            //Boarder left for test
-            var testBoarder3 = new GameObject("BoarderLeft");
-            _ = testBoarder3.AddComponent<Boarder2>();
-            var bordercollider3 = testBoarder3.AddComponent<BoxCollider>();
-            bordercollider3.UpdateColliderPosition(new Vec2D(5, 228));
-            bordercollider3.UpdateColliderSize( 5, 1070);
-            var borderphysics3 = testBoarder3.AddComponent<PhysicsBody>();
-            borderphysics3.IsMovable = false;
-            borderphysics3.Mass = 0.5;
-            testBoarder3.transform.position = new Vec2D(960, 750);
-            scene.AddGameObject(testBoarder3);
-
-            //Boarder right for test
-            var testBoarder4 = new GameObject("BoarderRight");
-            _ = testBoarder4.AddComponent<Boarder2>();
-            var bordercollider4 = testBoarder4.AddComponent<BoxCollider>();
-            bordercollider4.UpdateColliderPosition(new Vec2D(1970, 228));
-            bordercollider4.UpdateColliderSize(5, 1070);
-            var borderphysics4 = testBoarder4.AddComponent<PhysicsBody>();
-            borderphysics4.IsMovable = false;
-            borderphysics4.Mass = 0.5;
-            testBoarder4.transform.position = new Vec2D(960, 750);
-            scene.AddGameObject(testBoarder4);
-
-
-            //testBoarder.transform.position = new Vec2D(scene.GetCamera().GetWorldSize().x / 2, scene.GetCamera().GetWorldSize().y / 2);
-
-            // Text erstellen und rendern
-            //var helloText = scene.CreateChild("Hello Text");
-            //_ = testBoarder.AddComponent<Text>();
-            //helloText.transform.position = new Vec2D(960, 300);
-            // RenderText("Hello!", helloText.transform.position, Engine.renderer, scene.GetCamera());
 
             return scene;
         }
+
         public static void Run()
         {
 
@@ -138,38 +110,6 @@ namespace Pong.src
             engine.Run();
         }
 
-        // Methode zum Rendern des Textes
-        //private static void RenderText(string text, Vec2D worldPosition, nint renderer, Camera camera)
-        //{
-
-        //    Console.WriteLine(camera);
-        //    nint sans = TTF_OpenFont("Sans.ttf", 24);
-
-        //    SDL_Color white = new();
-        //    white.r = white.g = white.b = white.a = 255;
-
-        //    nint surfaceMessage = TTF_RenderText_Solid(sans, text, white);
-
-        //    // now you can convert it into a texture
-        //    nint message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
-
-        //    SDL_Rect message_rect;
-        //    message_rect.w = message_rect.h = 0;
-
-        //    // Convert world position to screen position using camera
-        //    Vec2D screenPosition = camera.WorldToScreen(worldPosition);
-        //    message_rect.x = (int)screenPosition.x;
-        //    message_rect.y = (int)screenPosition.y;
-
-        //    // Get the size of the text
-        //    SDL_QueryTexture(message, out _, out _, out message_rect.w, out message_rect.h);
-
-        //    SDL_RenderCopy(renderer, message, (nint)null, ref message_rect);
-
-        //    SDL_FreeSurface(surfaceMessage);
-        //    SDL_DestroyTexture(message);
-        //    TTF_CloseFont(sans);
-        //}
 
     }
 }
@@ -210,7 +150,7 @@ class WSController : Script
         {
             gameObject.transform.position += new Vec2D(0, speed);
         }
-      
+
 
     }
 }

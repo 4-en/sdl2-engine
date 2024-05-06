@@ -14,7 +14,7 @@ namespace SDL2Engine
     {
         // Rect has x, y, w, h properties
         Rect GetBounds();
-        
+
     }
 
     // A QuadTree is a data structure that is used to store objects in a 2D space
@@ -140,10 +140,10 @@ namespace SDL2Engine
 
         public PhysicsBody()
         {
-            this.isMovable = true;
-            this.velocity = new Vec2D(0,0);
+            this.isMovable = false;
+            this.velocity = new Vec2D(0, 0);
             this.mass = 1.0;
-            this.bounciness = 1.0 ;
+            this.bounciness = 1.0;
             this.friction = 0.0;
             this.drag = 0.0;
         }
@@ -158,7 +158,7 @@ namespace SDL2Engine
             this.drag = drag;
         }
 
-       public bool IsMovable
+        public bool IsMovable
         {
             get { return isMovable; }
             set { isMovable = value; }
@@ -213,11 +213,11 @@ namespace SDL2Engine
             if (other is EdgeCollider)
             {
                 return CollidesWith((EdgeCollider)other);
-            }   
+            }
             if (other is BoxCollider)
             {
                 return CollidesWith((BoxCollider)other);
-            }   
+            }
             return false;
         }
 
@@ -238,12 +238,12 @@ namespace SDL2Engine
             if (other is EdgeCollider)
             {
                 return false;
-            }   
+            }
             //boxcollider and boxcollider
             if (other is BoxCollider)
             {
                 return false;
-            }   
+            }
             return false;
         }
 
@@ -269,7 +269,7 @@ namespace SDL2Engine
             if (other is CircleCollider)
             {
                 return false;
-            }  
+            }
             if (other is EdgeCollider)
             {
                 return false;
@@ -316,7 +316,7 @@ namespace SDL2Engine
         {
             return new Vec2D(boxCollider.box.x + boxCollider.box.w / 2, boxCollider.box.y + boxCollider.box.h / 2);
         }
-        
+
 
         public BoxCollider(Rect box)
         {
@@ -357,14 +357,14 @@ namespace SDL2Engine
                 if (box.Intersects(other.box))
                 {
                     Console.WriteLine("COLLISION!");
-                   // Console.WriteLine("Box1: " + box.x + box.y);
+                    // Console.WriteLine("Box1: " + box.x + box.y);
                     return true;
                 }
                 return false;
             }
             return false;
         }
-        
+
     }
     // defines a circle collider
     // a circle collider is a circle that can be used to detect collisions
@@ -435,24 +435,24 @@ namespace SDL2Engine
         //update the position of the circle collider
         internal void UpdateColliderPosition(Vec2D vec2D)
         {
-           this.center = vec2D;
+            this.center = vec2D;
         }
         //update the size of the circle collider
         internal void UpdateColliderSize(double radius)
         {
             this.radius = radius;
         }
-        
+
     }
 
     // defines an edge collider
     // an edge collider is a line segment that can be used to detect collisions
-    public class  EdgeCollider : Collider
+    public class EdgeCollider : Collider
     {
-        private Vec2D start = new Vec2D(0,0);
+        private Vec2D start = new Vec2D(0, 0);
         private Vec2D end = new Vec2D(1, 1);
 
-        
+
         public EdgeCollider()
         {
             this.start = new Vec2D(0, 0);
@@ -465,7 +465,7 @@ namespace SDL2Engine
             this.end = end;
         }
 
-        
+
         //collision between edgecollider and boxcollider
         public override bool CollidesWith(BoxCollider other)
         {
@@ -512,7 +512,7 @@ namespace SDL2Engine
         }
 
         // Helper method to check intersection between a line segment and another line segment
-            private bool Intersects(Vec2D line1Start, Vec2D line1End, Vec2D line2Start, Vec2D line2End)
+        private bool Intersects(Vec2D line1Start, Vec2D line1End, Vec2D line2Start, Vec2D line2End)
         {
             double q1 = CrossProduct(line2End - line2Start, line1Start - line2Start);
             double q2 = CrossProduct(line2End - line2Start, line1End - line2Start);
@@ -547,10 +547,10 @@ namespace SDL2Engine
             // Return true if collision is found
             // Return false if no collision is found
 
-           
 
 
-            
+
+
             hit = new RaycastHit();
 
             return false;
@@ -562,12 +562,12 @@ namespace SDL2Engine
             // Apply gravity, forces, etc.
             foreach (var gameObject in gameObjects)
             {
-               //apply gravity
-               if (gameObject.GetComponent<PhysicsBody>() != null)
+                //apply gravity
+                if (gameObject.GetComponent<PhysicsBody>() != null)
                 {
                     if (gameObject.GetComponent<PhysicsBody>().IsMovable)
                     {
-                       //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);
+                        //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);
                     }
                 }
                 //move objects
@@ -582,12 +582,12 @@ namespace SDL2Engine
                             if (gameObject.GetName().Equals("LeftPaddle") || gameObject.GetName().Equals("RightPaddle"))
                             {
                                 (gameObject.GetComponent<Collider>() as BoxCollider).UpdateColliderPosition(new Vec2D(gameObject.GetPosition().x, (gameObject.GetPosition().y - 60)));
-                                
+
                             }
                             else if (gameObject.GetComponent<Collider>() is BoxCollider)
                             {
                                 (gameObject.GetComponent<Collider>() as BoxCollider).UpdateColliderPosition(gameObject.GetPosition());
-                                
+
                             }
                             else if (gameObject.GetComponent<Collider>() is CircleCollider)
                             {
@@ -597,7 +597,7 @@ namespace SDL2Engine
                             {
                                 (gameObject.GetComponent<Collider>() as EdgeCollider).UpdateColliderPosition(gameObject.GetPosition(), new Vec2D(gameObject.GetPosition().x + 50, gameObject.GetPosition().y + 50));
                             }
-                        }   
+                        }
                     }
                 }
             }
@@ -605,13 +605,13 @@ namespace SDL2Engine
 
         // Checks for collisions between objects
         public static List<CollisionPair> CheckCollisions(List<GameObject> gameObjects)
-        { 
+        {
             //check collisions
             var collisionPairList = new List<CollisionPair>();
             foreach (var gameObject1 in gameObjects)
             {
-                if (gameObject1.GetComponent<Collider>() != null) 
-                {                     
+                if (gameObject1.GetComponent<Collider>() != null)
+                {
                     foreach (var gameObject2 in gameObjects)
                     {
                         if (gameObject2.GetComponent<Collider>() != null)
@@ -632,10 +632,10 @@ namespace SDL2Engine
                                     if (!exists)
                                     {
                                         var cp = CalculateCollisionPoint(gameObject1, gameObject2);
-                                        collisionPairList.Add(new CollisionPair(gameObject1, gameObject2,cp));
+                                        collisionPairList.Add(new CollisionPair(gameObject1, gameObject2, cp));
                                     }
-                                    
-                             
+
+
                                 }
                             }
                         }
@@ -676,8 +676,8 @@ namespace SDL2Engine
             if (gameObject1.GetComponent<Collider>() is BoxCollider && gameObject2.GetComponent<Collider>() is EdgeCollider)
             {
                 //calculate the collision point between a box collider and an edge collider
-                
-                return new Vec2D(0,0);
+
+                return new Vec2D(0, 0);
             }
             return new Vec2D(0, 0);
         }
@@ -732,7 +732,7 @@ namespace SDL2Engine
                         // Console.WriteLine("v2: " + obj2.GetComponent<PhysicsBody>().Velocity.x + obj2.GetComponent<PhysicsBody>().Velocity.y);
 
                         //resolve collision for pong game
-                        ResolveCollisionsForPong(obj1,obj2);
+                        ResolveCollisionsForPong(obj1, obj2);
                     }
                 }
 
@@ -741,7 +741,7 @@ namespace SDL2Engine
 
         private static void ResolveCollisionsForPong(GameObject obj1, GameObject obj2)
         {
-            
+
             if (obj1.GetComponent<PhysicsBody>().IsMovable)
             {
                 //get name of gameobject
@@ -794,12 +794,12 @@ namespace SDL2Engine
 
             double result = 0;
 
-            
+
 
             return result;
         }
 
-        
+
 
         // after all collisions are resolved, notify objects that a collision has occured
         // TODO: Implement event listeners for OnCollisionEnter, OnCollisionStay, OnCollisionExit, etc.

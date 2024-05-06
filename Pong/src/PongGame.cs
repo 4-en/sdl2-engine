@@ -19,16 +19,24 @@ namespace Pong.src
             var scene = new Scene("PongGame Scene");
 
             // var leftPaddle = scene.CreateChild("Left Paddle");
-            var leftPaddle = new GameObject("Left Paddle");
+            var leftPaddle = new GameObject("LeftPaddle");
             _ = leftPaddle.AddComponent<WSController>();
             _ = leftPaddle.AddComponent<Paddle>();
-            leftPaddle.SetPosition(new Vec2D(50, 750));
+            leftPaddle.AddComponent<PhysicsBody>();
+            var leftPaddleBoxCollider = leftPaddle.AddComponent<BoxCollider>();
+            leftPaddleBoxCollider.UpdateColliderPosition(new Vec2D(50, 750));
+            leftPaddleBoxCollider.UpdateColliderSize(35, 160);
+            leftPaddle.transform.position = new Vec2D(50, 750);
             scene.AddGameObject(leftPaddle);
 
 
-            var rightPaddle = new GameObject("Right Paddle");
+            var rightPaddle = new GameObject("RightPaddle");
             _ = rightPaddle.AddComponent<ArrowKeysController>();
             _ = rightPaddle.AddComponent<Paddle>();
+            rightPaddle.AddComponent<PhysicsBody>();
+            var rightPaddleBoxCollider = rightPaddle.AddComponent<BoxCollider>();
+            rightPaddleBoxCollider.UpdateColliderPosition(new Vec2D(1870, 750));
+            rightPaddleBoxCollider.UpdateColliderSize(35, 160);
             rightPaddle.transform.position = new Vec2D(1870, 750);
             scene.AddGameObject(rightPaddle);
 
@@ -45,8 +53,9 @@ namespace Pong.src
             //pongSquare.transform.position = new Vec2D(960, 750);
             var bc = pongSquare.AddComponent<BoxCollider>();
             var pb = pongSquare.AddComponent<PhysicsBody>();
-            pb.Velocity = new Vec2D(0, 2);
-            pongSquare.SetPosition(new Vec2D(960, 750));
+            pb.Velocity = new Vec2D(8, 5);
+            //pongSquare.SetPosition(new Vec2D(960, 750));
+            pongSquare.SetPosition(new Vec2D(960- 480-50, 750));
             scene.AddGameObject(pongSquare);
 
             ////Boarder variante 1 
@@ -59,15 +68,55 @@ namespace Pong.src
             //rightBoarder.transform.position = new Vec2D(1915, 750);
 
             //Boarder variante 2
-            var testBoarder = new GameObject("Boarder");
+            var testBoarder = new GameObject("BoarderBottom");
             _ = testBoarder.AddComponent<Boarder2>();
             var bordercollider = testBoarder.AddComponent<BoxCollider>();
             bordercollider.UpdateColliderPosition(new Vec2D(0, 750 + 550));
             bordercollider.UpdateColliderSize(1980,5);
             var borderphysics = testBoarder.AddComponent<PhysicsBody>();
             borderphysics.IsMovable = false;
+            borderphysics.Mass = 0.5;
             testBoarder.transform.position = new Vec2D(960, 750);
             scene.AddGameObject(testBoarder);
+
+
+            //Boarder top for test
+            var testBoarder2 = new GameObject("BoarderTop");
+            _ = testBoarder2.AddComponent<Boarder2>();
+            var bordercollider2 = testBoarder2.AddComponent<BoxCollider>();
+            bordercollider2.UpdateColliderPosition(new Vec2D(0, 223));
+            bordercollider2.UpdateColliderSize(1980, 5);
+            var borderphysics2 = testBoarder2.AddComponent<PhysicsBody>();
+            borderphysics2.IsMovable = false;
+            borderphysics2.Mass = 0.5;
+            testBoarder2.transform.position = new Vec2D(960, 750);
+            scene.AddGameObject(testBoarder2);
+
+
+            //Boarder left for test
+            var testBoarder3 = new GameObject("BoarderLeft");
+            _ = testBoarder3.AddComponent<Boarder2>();
+            var bordercollider3 = testBoarder3.AddComponent<BoxCollider>();
+            bordercollider3.UpdateColliderPosition(new Vec2D(5, 228));
+            bordercollider3.UpdateColliderSize( 5, 1070);
+            var borderphysics3 = testBoarder3.AddComponent<PhysicsBody>();
+            borderphysics3.IsMovable = false;
+            borderphysics3.Mass = 0.5;
+            testBoarder3.transform.position = new Vec2D(960, 750);
+            scene.AddGameObject(testBoarder3);
+
+            //Boarder right for test
+            var testBoarder4 = new GameObject("BoarderRight");
+            _ = testBoarder4.AddComponent<Boarder2>();
+            var bordercollider4 = testBoarder4.AddComponent<BoxCollider>();
+            bordercollider4.UpdateColliderPosition(new Vec2D(1970, 228));
+            bordercollider4.UpdateColliderSize(5, 1070);
+            var borderphysics4 = testBoarder4.AddComponent<PhysicsBody>();
+            borderphysics4.IsMovable = false;
+            borderphysics4.Mass = 0.5;
+            testBoarder4.transform.position = new Vec2D(960, 750);
+            scene.AddGameObject(testBoarder4);
+
 
             //testBoarder.transform.position = new Vec2D(scene.GetCamera().GetWorldSize().x / 2, scene.GetCamera().GetWorldSize().y / 2);
 
@@ -161,6 +210,7 @@ class WSController : Script
         {
             gameObject.transform.position += new Vec2D(0, speed);
         }
+      
 
     }
 }

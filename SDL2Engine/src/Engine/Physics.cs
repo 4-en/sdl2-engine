@@ -133,7 +133,7 @@ namespace SDL2Engine
         // if true, objects with this component can be moved when colliding with other objects
         private bool isMovable = true;
         private Vec2D velocity = new Vec2D();
-        private double mass = 10000.0;
+        private double mass = 1.0;
         private double bounciness = 1.0;
         private double friction = 0.0;
         private double drag = 0.0;
@@ -142,7 +142,7 @@ namespace SDL2Engine
         {
             this.isMovable = true;
             this.velocity = new Vec2D(0,0);
-            this.mass = 10000;
+            this.mass = 1.0;
             this.bounciness = 1.0 ;
             this.friction = 0.0;
             this.drag = 0.0;
@@ -287,11 +287,13 @@ namespace SDL2Engine
     {
         public GameObject obj1;
         public GameObject obj2;
+        public Vec2D collisionPoint;
 
-        public CollisionPair(GameObject obj1, GameObject obj2)
+        public CollisionPair(GameObject obj1, GameObject obj2, Vec2D collisionPoint)
         {
             this.obj1 = obj1;
             this.obj2 = obj2;
+            this.collisionPoint = collisionPoint;
         }
     }
 
@@ -307,6 +309,12 @@ namespace SDL2Engine
         public override Vec2D GetCenter()
         {
             return new Vec2D(box.x + box.w / 2, box.y + box.h / 2);
+        }
+
+        //get center
+        public Vec2D GetCenter(BoxCollider boxCollider)
+        {
+            return new Vec2D(boxCollider.box.x + boxCollider.box.w / 2, boxCollider.box.y + boxCollider.box.h / 2);
         }
         
 
@@ -571,17 +579,23 @@ namespace SDL2Engine
                         //move the collider with the object
                         if (gameObject.GetComponent<Collider>() != null)
                         {
-                            if (gameObject.GetComponent<Collider>() is BoxCollider)
+                            if (gameObject.GetName().Equals("LeftPaddle") || gameObject.GetName().Equals("RightPaddle"))
                             {
-                                ((BoxCollider)gameObject.GetComponent<Collider>()).UpdateColliderPosition(gameObject.GetPosition());
+                                (gameObject.GetComponent<Collider>() as BoxCollider).UpdateColliderPosition(new Vec2D(gameObject.GetPosition().x, (gameObject.GetPosition().y - 60)));
+                                
                             }
-                            if (gameObject.GetComponent<Collider>() is CircleCollider)
+                            else if (gameObject.GetComponent<Collider>() is BoxCollider)
                             {
-                                ((CircleCollider)gameObject.GetComponent<Collider>()).UpdateColliderPosition(gameObject.GetPosition());
+                                (gameObject.GetComponent<Collider>() as BoxCollider).UpdateColliderPosition(gameObject.GetPosition());
+                                
                             }
-                            if (gameObject.GetComponent<Collider>() is EdgeCollider)
+                            else if (gameObject.GetComponent<Collider>() is CircleCollider)
                             {
-                                ((EdgeCollider)gameObject.GetComponent<Collider>()).UpdateColliderPosition(gameObject.GetPosition(), new Vec2D(gameObject.GetPosition().x + 50, gameObject.GetPosition().y + 50));
+                                (gameObject.GetComponent<Collider>() as CircleCollider).UpdateColliderPosition(gameObject.GetPosition());
+                            }
+                            else if (gameObject.GetComponent<Collider>() is EdgeCollider)
+                            {
+                                (gameObject.GetComponent<Collider>() as EdgeCollider).UpdateColliderPosition(gameObject.GetPosition(), new Vec2D(gameObject.GetPosition().x + 50, gameObject.GetPosition().y + 50));
                             }
                         }   
                     }
@@ -617,7 +631,8 @@ namespace SDL2Engine
                                     }
                                     if (!exists)
                                     {
-                                        collisionPairList.Add(new CollisionPair(gameObject1, gameObject2));
+                                        var cp = CalculateCollisionPoint(gameObject1, gameObject2);
+                                        collisionPairList.Add(new CollisionPair(gameObject1, gameObject2,cp));
                                     }
                                     
                              
@@ -630,63 +645,144 @@ namespace SDL2Engine
             return collisionPairList;
         }
 
+        private static Vec2D CalculateCollisionPoint(GameObject gameObject1, GameObject gameObject2)
+        {
+            //calculate the Collisionpoint between two objects
+            //boxcollider and boxcollider
+            if (gameObject1.GetComponent<Collider>() is BoxCollider && gameObject2.GetComponent<Collider>() is BoxCollider)
+            {
+                //calculate the collision point between two box colliders
+                var box1 = gameObject1.GetComponent<Collider>() as BoxCollider;
+                var box2 = gameObject2.GetComponent<Collider>() as BoxCollider;
+                double x = Math.Max(box1.box.x, Math.Min(box2.box.x + box2.box.w, box1.box.x + box1.box.w));
+                double y = Math.Max(box1.box.y, Math.Min(box2.box.y + box2.box.h, box1.box.y + box1.box.h));
+                Vec2D collisionPoint = new Vec2D(x, y);
+                Console.WriteLine("Collision Point: " + collisionPoint.x + collisionPoint.y);
+                return collisionPoint;
+            }
+            //boxcollider and circlecollider
+            if (gameObject1.GetComponent<Collider>() is BoxCollider && gameObject2.GetComponent<Collider>() is CircleCollider)
+            {
+                //calculate the collision point between a box collider and a circle collider
+                var box = gameObject1.GetComponent<Collider>() as BoxCollider;
+                var circle = gameObject2.GetComponent<Collider>() as CircleCollider;
+                double closestX = Math.Max(box.box.x, Math.Min(circle.center.x, box.box.x + box.box.w));
+                double closestY = Math.Max(box.box.y, Math.Min(circle.center.y, box.box.y + box.box.h));
+                Vec2D collisionPoint = new Vec2D(closestX, closestY);
+                Console.WriteLine("Collision Point: " + collisionPoint.x + collisionPoint.y);
+                return collisionPoint;
+            }
+            //boxcollider and edgecollider
+            if (gameObject1.GetComponent<Collider>() is BoxCollider && gameObject2.GetComponent<Collider>() is EdgeCollider)
+            {
+                //calculate the collision point between a box collider and an edge collider
+                
+                return new Vec2D(0,0);
+            }
+            return new Vec2D(0, 0);
+        }
+
         // Resolves collisions between objects
         // Moves objects apart so they are no longer colliding
         // Applies forces to objects after collision
         // For example, if two objects collide, they should bounce off each other based on their mass, velocity, bounciness, etc.
         public static void ResolveCollisions(List<CollisionPair> collisions)
         {
-         
-            //resolve the collisions of colliding objects
             foreach (var collision in collisions)
             {
-                
-                Console.WriteLine("Collision between " + collision.obj1.GetName() + " and " + collision.obj2.GetName());
-                // Calculate relative velocity
-                Vec2D relativeVelocity = collision.obj1.GetComponent<PhysicsBody>().Velocity - collision.obj2.GetComponent<PhysicsBody>().Velocity;
-
-                //objects current velocities
-                var u1 = collision.obj1.GetComponent<PhysicsBody>().Velocity;
-                var u2 = collision.obj2.GetComponent<PhysicsBody>().Velocity;
-                //collision normal
-                Vec2D normal = collision.obj2.GetPosition() - collision.obj1.GetPosition();
-                normal = normal.Normalize();
-                //part of velocity along the contact normal
-                //Vec2D u1n = normal * Vec2D.Dot(normal,u1);
-                //Vec2D u2n = normal * Vec2D.Dot(normal, u2);
-                //only this part is getting involved
-                //Vec2D v1n = (u1n * (collision.obj1.GetComponent<PhysicsBody>().Mass - collision.obj2.GetComponent<PhysicsBody>().Mass) + 2 * collision.obj2.GetComponent<PhysicsBody>().Mass * u2n) / (collision.obj1.GetComponent<PhysicsBody>().Mass + collision.obj2.GetComponent<PhysicsBody>().Mass);
-                //Vec2D v2n = (u2n * (collision.obj2.GetComponent<PhysicsBody>().Mass - collision.obj1.GetComponent<PhysicsBody>().Mass) + 2 * collision.obj1.GetComponent<PhysicsBody>().Mass * u1n) / (collision.obj1.GetComponent<PhysicsBody>().Mass + collision.obj2.GetComponent<PhysicsBody>().Mass);
-                //objects velocities after collision
-                //Vec2D v1 = (u1 - u1n) + v1n;
-                //Vec2D v2 = (u2 - u2n) + v2n;
-                //set velocities
+                var obj1 = collision.obj1;
+                var obj2 = collision.obj2;
+                //check if the objects have a physics body
+                if (obj1.GetComponent<PhysicsBody>() != null && obj2.GetComponent<PhysicsBody>() != null)
+                {
+                    //box collider and box collider
+                    if (obj1.GetComponent<Collider>() is BoxCollider && obj2.GetComponent<Collider>() is BoxCollider)
+                    {
+                        //calculate the collision point between two box colliders
+                        // var box1 = obj1.GetComponent<Collider>() as BoxCollider;
+                        // var box2 = obj2.GetComponent<Collider>() as BoxCollider;
 
 
-                Vec2D v1 = Reflect(collision.obj1.GetComponent<PhysicsBody>().Velocity, normal);
-                Vec2D v2 = Reflect(collision.obj2.GetComponent<PhysicsBody>().Velocity, normal);
-                collision.obj1.GetComponent<PhysicsBody>().Velocity = v1;
-                collision.obj2.GetComponent<PhysicsBody>().Velocity = v2;
+                        //Vec2D u1 = obj1.GetComponent<PhysicsBody>().Velocity;
+                        //Vec2D u2 = obj2.GetComponent<PhysicsBody>().Velocity;
 
+                        //Vec2D r1 = box1.GetCenter(box1) - collsion.collisionPoint;
+                        //Vec2D r2 = box2.GetCenter(box2) - collsion.collisionPoint;
+                        //Vec2D normal = r2 - r1;
+                        // normal.Normalize();
 
-                Console.WriteLine("v1: " + v1.x + " " + v1.y);
-                Console.WriteLine("v2: " + v2.x + " " + v2.y);
-                collision.obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(v1.x, v1.y);
-                collision.obj2.GetComponent<PhysicsBody>().Velocity =  new Vec2D(v2.x,v2.y);
-                Console.WriteLine(collision.obj2.GetComponent<PhysicsBody>().Velocity.x + " "+ collision.obj2.GetComponent<PhysicsBody>().Velocity.y);
-               
+                        //Vec2D u1n = normal * Vec2D.Dot(u1, normal);
+                        //Vec2D u2n = normal * Vec2D.Dot(u2, normal);
+
+                        //Vec2D v2n = (u1n * (obj1.GetComponent<PhysicsBody>().Mass - obj2.GetComponent<PhysicsBody>().Mass) + 2 * obj2.GetComponent<PhysicsBody>().Mass * u2n) / (obj1.GetComponent<PhysicsBody>().Mass + obj2.GetComponent<PhysicsBody>().Mass);
+                        // Vec2D v1n = (u2n * (obj2.GetComponent<PhysicsBody>().Mass - obj1.GetComponent<PhysicsBody>().Mass) + 2 * obj1.GetComponent<PhysicsBody>().Mass * u1n) / (obj1.GetComponent<PhysicsBody>().Mass + obj2.GetComponent<PhysicsBody>().Mass);
+
+                        //Vec2D v1 = (u1 - u1n) + v1n;
+                        // Vec2D v2 = (u2 - u2n) + v2n;
+
+                        // if (obj1.GetComponent<PhysicsBody>().IsMovable)
+                        // {
+                        //    obj1.GetComponent<PhysicsBody>().Velocity = v1;
+                        //}
+                        // if (obj2.GetComponent<PhysicsBody>().IsMovable)
+                        //{
+                        //   obj2.GetComponent<PhysicsBody>().Velocity = v2;
+                        //}
+                        // Console.WriteLine("v2: " + obj1.GetComponent<PhysicsBody>().Velocity.x + obj1.GetComponent<PhysicsBody>().Velocity.y);
+                        // Console.WriteLine("v2: " + obj2.GetComponent<PhysicsBody>().Velocity.x + obj2.GetComponent<PhysicsBody>().Velocity.y);
+
+                        //resolve collision for pong game
+                        ResolveCollisionsForPong(obj1,obj2);
+                    }
+                }
 
             }
-
         }
 
-        // Helper method to reflect a vector along a normal vector
-        public static Vec2D Reflect(Vec2D velocity, Vec2D normal)
+        private static void ResolveCollisionsForPong(GameObject obj1, GameObject obj2)
         {
-            // Calculate the reflection using the formula: reflected_vector = velocity - 2 * (velocity dot normal) * normal
-            double dotProduct = Vec2D.Dot(velocity, normal);
-            Vec2D reflectedVector = velocity - (normal * (2 * dotProduct));
-            return reflectedVector;
+            
+            if (obj1.GetComponent<PhysicsBody>().IsMovable)
+            {
+                //get name of gameobject
+                string name1 = obj1.GetName();
+                string name2 = obj2.GetName();
+                if (!name1.Equals("PongSquare"))
+                {
+                    GameObject temp = obj1;
+                    obj1 = obj2;
+                    obj2 = temp;
+                    name2 = obj2.GetName();
+                }
+                Vec2D vel = obj1.GetComponent<PhysicsBody>().Velocity;
+                if (name2 == "BoarderLeft")
+                {
+                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-vel.x, vel.y);
+                }
+                else if (name2 == "BoarderTop")
+                {
+                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(vel.x, -vel.y);
+                }
+                else if (name2 == "BoarderRight")
+                {
+                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-vel.x, vel.y);
+                }
+                else if (name2 == "BoarderBottom")
+                {
+                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(vel.x, -vel.y);
+                }
+                else if (name2 == "LeftPaddle")
+                {
+                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-vel.x, vel.y);
+                }
+                else if (name2 == "RightPaddle")
+                {
+                    obj1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-vel.x, vel.y);
+                }
+
+
+            }
+            Console.WriteLine("Collision between" + obj1.GetName() + " and " + obj2.GetName());
         }
 
         public static double CalculateDotProduct(Vec2D vec1, Vec2D vec2)

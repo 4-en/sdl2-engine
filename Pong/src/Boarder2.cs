@@ -44,7 +44,6 @@ namespace Pong.src
             // Define the inner rectangle (empty area) with root as center
             Vec2D topLeft = new Vec2D(-BoarderWidth / 2, -BoarderHeight / 2) + root.transform.position;
             Vec2D bottomRight = new Vec2D(BoarderWidth / 2, BoarderHeight / 2) + root.transform.position;
-
             // transform to camera space
             topLeft = camera.WorldToScreen(topLeft);
             bottomRight = camera.WorldToScreen(bottomRight);

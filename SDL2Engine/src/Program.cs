@@ -125,15 +125,15 @@ namespace SDL2Engine.Testing
 
             //add a physics component to the game object
             gameObject1.AddComponent<PhysicsBody>();
-            //gameObject1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-1, -1);
-            gameObject1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-1, 0);
+            gameObject1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-1, -1);
+            //gameObject1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-1, 0);
 
             // add the game object to the world
             //world.AddChild(gameObject1);
             world.AddGameObject(gameObject1);
 
-            //gameObject1.SetPosition(new Vec2D(500, 500))
-            gameObject1.SetPosition(new Vec2D(500, 300));
+            gameObject1.SetPosition(new Vec2D(500, 500));
+            //gameObject1.SetPosition(new Vec2D(500, 300));
 
 
 
@@ -149,7 +149,8 @@ namespace SDL2Engine.Testing
             //add physics component to the game object
             var physicsBody = gameObject2.AddComponent<PhysicsBody>();
             physicsBody.Velocity = new Vec2D(0, 0);
-            physicsBody.Mass = 10000000;
+            physicsBody.IsMovable = false;
+            physicsBody.Mass = 2;
 
             // add the game object to the world
             //world.AddChild(gameObject2);

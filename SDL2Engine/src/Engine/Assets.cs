@@ -503,6 +503,8 @@ namespace SDL2Engine
 
         public override bool LoadAsset()
         {
+            
+
             if(loaded)
             {
                 return true;
@@ -520,8 +522,8 @@ namespace SDL2Engine
                 
             }
             int w, h;
-            SDL_QueryTexture(this.Get(), out _, out _, out w, out h);
-            this.rect = new Rect(w, h);
+            SDL_QueryTexture(asset, out _, out _, out w, out h);
+            this.rect = new Rect(100, 100);
             loaded = true;
             return true;
         }

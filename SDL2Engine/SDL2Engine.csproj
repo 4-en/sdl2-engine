@@ -19,7 +19,7 @@
 
 
   <ItemGroup>
-    <None Update="Assets\Audio\test_sound.mp3">
+    <None Update="Assets\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Audio\tetris.mp3">

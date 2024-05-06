@@ -508,7 +508,7 @@ namespace SDL2Engine
         private static bool forceAspectRatio = false;
         private static double aspectRatio = 16.0 / 9.0;
         public static UInt32 targetFPS = 60;
-        public static int windowWidth = 800;
+        public static int windowWidth = 1000;
         public static int windowHeight = (int)(windowWidth / aspectRatio);
 
 

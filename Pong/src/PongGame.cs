@@ -12,9 +12,11 @@ namespace Pong.src
 {
     internal class PongGame
     {
+
+        public static Vec2D boarderPosition = new Vec2D(960, 500);
+
         public static Scene CreateScene()
         {
-
 
             var scene = new Scene("PongGame Scene");
 
@@ -25,9 +27,9 @@ namespace Pong.src
             var lp = leftPaddle.AddComponent<PhysicsBody>();
             lp.IsMovable = true;
             var leftPaddleBoxCollider = leftPaddle.AddComponent<BoxCollider>();
-            leftPaddleBoxCollider.UpdateColliderPosition(new Vec2D(50, 750));
+            leftPaddleBoxCollider.UpdateColliderPosition(new Vec2D(50, boarderPosition.y));
             leftPaddleBoxCollider.UpdateColliderSize(35, 160);
-            leftPaddle.transform.position = new Vec2D(50, 750);
+            leftPaddle.transform.position = new Vec2D(50, boarderPosition.y);
             scene.AddGameObject(leftPaddle);
 
 
@@ -37,9 +39,9 @@ namespace Pong.src
             var rp = rightPaddle.AddComponent<PhysicsBody>();
             rp.IsMovable = true;
             var rightPaddleBoxCollider = rightPaddle.AddComponent<BoxCollider>();
-            rightPaddleBoxCollider.UpdateColliderPosition(new Vec2D(1870, 750));
+            rightPaddleBoxCollider.UpdateColliderPosition(new Vec2D(1870, boarderPosition.y));
             rightPaddleBoxCollider.UpdateColliderSize(35, 160);
-            rightPaddle.transform.position = new Vec2D(1870, 750);
+            rightPaddle.transform.position = new Vec2D(1870, boarderPosition.y);
 
             scene.AddGameObject(rightPaddle);
 
@@ -53,14 +55,13 @@ namespace Pong.src
             var pongSquare = new GameObject("PongSquare");
             //_ = pongBall.AddComponent<ArrowKeysController>();
             _ = pongSquare.AddComponent<PongSquare>();
-            //pongSquare.transform.position = new Vec2D(960, 750);
             var bc = pongSquare.AddComponent<BoxCollider>();
             var pb = pongSquare.AddComponent<PhysicsBody>();
             pb.Velocity = new Vec2D(8, 5);
             pb.IsMovable = true;
 
-            //pongSquare.SetPosition(new Vec2D(960, 750));
-            pongSquare.SetPosition(new Vec2D(960 - 480 - 50, 750));
+            pongSquare.SetPosition(new Vec2D(960, boarderPosition.y));
+            //pongSquare.SetPosition(new Vec2D(960 - 480 - 50, 750));
             scene.AddGameObject(pongSquare);
 
             ////Boarder variante 1 
@@ -75,8 +76,8 @@ namespace Pong.src
             void CreateBoarder(string name, Vec2D position, Vec2D colliderPosition, Vec2D colliderSize)
             {
                 var boarder = new GameObject(name);
-                _ = boarder.AddComponent<Boarder2>();
-
+                var boarder2 = boarder.AddComponent<Boarder2>();
+                
                 var collider = boarder.AddComponent<BoxCollider>();
                 collider.UpdateColliderPosition(colliderPosition);
                 collider.UpdateColliderSize((int)colliderSize.x, (int)colliderSize.y); // Hier die Umwandlung in int hinzugefügt
@@ -88,12 +89,16 @@ namespace Pong.src
                 scene.AddGameObject(boarder);
             }
 
+            //public static float BoarderWidth = 1905;
+        //public static float BoarderHeight = 850;
 
-            // Erstelle Boarder-Objekte mit vereinfachter Methode
-            CreateBoarder("BoarderBottom", new Vec2D(960, 750), new Vec2D(0, 750 + 550), new Vec2D(1980, 5));
-            CreateBoarder("BoarderTop", new Vec2D(960, 750), new Vec2D(0, 223), new Vec2D(1980, 5));
-            CreateBoarder("BoarderLeft", new Vec2D(960, 750), new Vec2D(5, 228), new Vec2D(5, 1070));
-            CreateBoarder("BoarderRight", new Vec2D(960, 750), new Vec2D(1970, 228), new Vec2D(5, 1070));
+        // Erstelle Boarder-Objekte mit vereinfachter Methode
+            CreateBoarder("BoarderBottom", boarderPosition, new Vec2D(5, boarderPosition.y+ Boarder2.BoarderHeight/2 + 20), new Vec2D(Boarder2.BoarderWidth, 5));
+            CreateBoarder("BoarderTop", boarderPosition, new Vec2D(5, boarderPosition.y - Boarder2.BoarderHeight / 2 + 20 ), new Vec2D(Boarder2.BoarderWidth-5, 5));
+            CreateBoarder("BoarderLeft", boarderPosition, new Vec2D(0, boarderPosition.y - Boarder2.BoarderHeight / 2), new Vec2D(5, Boarder2.BoarderHeight));
+            CreateBoarder("BoarderRight", boarderPosition, new Vec2D(Boarder2.BoarderWidth + 25, boarderPosition.y - Boarder2.BoarderHeight / 2), new Vec2D(5, Boarder2.BoarderHeight));
+
+            
 
 
 

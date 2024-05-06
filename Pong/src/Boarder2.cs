@@ -11,10 +11,13 @@ namespace Pong.src
         public float Top { get; private set; }
         public float Bottom { get; private set; }
 
+        
+        public static float BoarderWidth = 1905;
+        public static float BoarderHeight = 850;
+
+
         public override void Draw(Camera camera)
         {
-            var BoarderWidth = 1905;
-            var BoarderHeight = 1075;
             var BorderThickness = 5;
             var renderer = Engine.renderer;
 

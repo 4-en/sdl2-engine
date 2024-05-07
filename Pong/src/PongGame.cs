@@ -115,6 +115,10 @@ namespace Pong.src
             engine.Run();
         }
 
+        //    SDL_FreeSurface(surfaceMessage);
+        //    SDL_DestroyTexture(message);
+        //    TTF_CloseFont(sans);
+        //}
 
     }
 }

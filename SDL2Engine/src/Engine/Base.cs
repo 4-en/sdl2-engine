@@ -6,7 +6,13 @@ using static System.Diagnostics.Stopwatch;
 
 namespace SDL2Engine
 {
-
+    // ILoadable interface
+    // This interface is used to load and unload resources
+    interface ILoadable : IDisposable
+    {
+        public void Load();
+        public bool IsLoaded();
+    }
     public struct Vec2D
     {
         public static readonly Vec2D Zero = new(0, 0);
@@ -344,7 +350,15 @@ namespace SDL2Engine
         public double w;
         public double h;
 
-        public Rect(double x = 0, double y = 0, double w = 0, double h = 0)
+        public Rect(double h, double w)
+        {
+            this.x = 0;
+            this.y = 0;
+            this.h = h;
+            this.w = w;
+        }
+
+        public Rect(double x, double y, double w, double h)
         {
             this.x = x;
             this.y = y;
@@ -415,7 +429,7 @@ namespace SDL2Engine
 
     }
 
-    public class EngineObject
+    public class EngineObject : IDisposable
     {
         protected static Random random = new Random(DateTime.Now.Millisecond);
 
@@ -423,12 +437,32 @@ namespace SDL2Engine
         protected bool enabled = true;
         protected Scene? scene = null;
         protected uint uid = GetRandomUID();
-        private bool _to_be_destroyed = false;
+        protected bool _to_be_destroyed = false;
+        protected bool _disposed = false;
 
         public EngineObject(string name = "unnamed")
         {
             this.name = name;
         }
+
+        ~EngineObject()
+        {
+            if (!_disposed)
+            {
+                Dispose();
+            }
+        }
+
+        /* Override this method to dispose resources
+         *         * This method is called when the object is destroyed
+         */
+        public virtual void Dispose()
+        {
+            _disposed = true;
+            GC.SuppressFinalize(this);
+            //Console.WriteLine("Disposing object: " + name);
+        }
+
 
         public void MarkToBeDestroyed()
         {
@@ -487,9 +521,29 @@ namespace SDL2Engine
             return true;
         }
 
-        private Scene? GetScene()
+        public Scene? GetScene()
         {
             return scene;
+        }
+
+        public bool SetScene(Scene? scene)
+        {
+            if (this.scene != null && scene != this.scene)
+            {
+                // If this causes issues, implement something to properly remove/switch scenes
+                throw new Exception("Scene already set for object: " + name);
+            }
+
+            this.scene = scene;
+            return true;
+        }
+
+        // this should be called by the scene
+        // if not, we could get situations where the object is not properly removed from the scene
+        // and then added to another scene
+        internal void _clear_scene_on_destroy()
+        {
+            scene = null;
         }
     }
 
@@ -569,6 +623,17 @@ namespace SDL2Engine
                 Console.WriteLine("SDL_ttf initialized");
             }
 
+            // Initualize SDL_mixer
+            if (SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+            {
+                Console.WriteLine("SDL_mixer could not initialize! SDL_mixer Error: " + SDL.SDL_GetError());
+                return;
+            }
+            else
+            {
+                Console.WriteLine("SDL_mixer initialized");
+            }
+
             // Create window
             window = SDL.SDL_CreateWindow("SDL2 Engine Test",
                 SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED,
@@ -590,7 +655,30 @@ namespace SDL2Engine
             // Initialize renderer color
             SDL.SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
+            Console.WriteLine("Engine initialized");
 
+            Console.WriteLine("Press F3 to toggle debug info");
+
+
+        }
+
+        private void Cleanup()
+        {
+            // Destroy renderer
+            SDL.SDL_DestroyRenderer(renderer);
+            renderer = IntPtr.Zero;
+
+            // Destroy window
+            SDL.SDL_DestroyWindow(window);
+            window = IntPtr.Zero;
+
+            // Quit SDL subsystems
+            SDL_mixer.Mix_Quit();
+            SDL_ttf.TTF_Quit();
+            SDL_image.IMG_Quit();
+            SDL.SDL_Quit();
+
+            Console.WriteLine("Engine cleaned up");
         }
 
         private void HandleKeyboardEvent(SDL.SDL_KeyboardEvent keyEvent)
@@ -726,20 +814,33 @@ namespace SDL2Engine
                 return;
             }
 
+            int totalScenes = SceneManager.GetScenes().Count;
             int totalObjects = 0;
+            int totalDrawables = 0;
+            int totalScripts = 0;
+            int totalColliders = 0;
+            
             foreach (Scene scene in SceneManager.GetScenes())
             {
                 totalObjects += scene.GetGameObjectsCount();
+                totalDrawables += scene.GetDrawableCount();
+                totalScripts += scene.GetScriptCount();
+                totalColliders += scene.GetColliderCount();
             }
 
             string[] debugStrings =
                 {
+                    "Press F3 to toggle debug info",
                     "FPS: " + Time.GetFPS().ToString("0.00"),
                     "Update Duration: " + (1000*Time.updateDuration).ToString("0.00") + " ms",
                     "Draw Duration: " + (1000*Time.drawDuration).ToString("0.00") + " ms",
                     "Total Duration: " + (1000*Time.totalDuration).ToString("0.00") + " ms",
                     "Free Duration: " + (1000*Time.freeDuration).ToString("0.00") + " ms",
-                    "Total Objects: " + totalObjects.ToString()
+                    "Total Objects: " + totalObjects.ToString(),
+                    "Total Drawables: " + totalDrawables.ToString(),
+                    "Total Scripts: " + totalScripts.ToString(),
+                    "Total Colliders: " + totalColliders.ToString(),
+                    "Total Scenes: " + totalScenes.ToString()
                 };
 
             for (int i = 0; i < debugStrings.Length; i++)
@@ -833,12 +934,8 @@ namespace SDL2Engine
 
             }
 
-            // Destroy window
-            SDL.SDL_DestroyRenderer(renderer);
-            SDL.SDL_DestroyWindow(window);
-
-            // Quit SDL subsystems
-            SDL.SDL_Quit();
+            // Cleanup SDL2
+            Cleanup();
 
         }
     }

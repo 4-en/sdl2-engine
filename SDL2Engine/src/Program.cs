@@ -11,12 +11,15 @@ namespace SDL2Engine.Testing
     {
         public override void Start()
         {
-            Console.WriteLine("DestroyNotifier Start");
+            // destroy if colliding with anything (thats movable, since two static objects can't collide)
+            Destroy(this.gameObject);
         }
 
-        public override void OnDestroy()
+        public override void Update()
         {
-            Console.WriteLine("DestroyNotifier Destroy");
+            // rotate with time
+
+            transform.rotation = Time.time * 360 / 3 % 360;
         }
     }
 
@@ -34,8 +37,9 @@ namespace SDL2Engine.Testing
             {
                 parent.AddChild(square);
             }
-            square.AddComponent<Texture>()?.LoadTexture("forsenE.png");
-            square.AddComponent<DestroyNotifier>();
+            square.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/forsenE.png");
+            var bc = BoxCollider.FromDrawableRect(square);
+            square.AddComponent<DestroyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());
 
 
@@ -43,9 +47,17 @@ namespace SDL2Engine.Testing
             
         }
 
+        private Sound sound = AssetManager.LoadAsset<Sound>("Assets/Audio/test_sound.mp3");
+        private Music music = AssetManager.LoadAsset<Music>("Assets/Audio/tetris.mp3");
+
         public override void Start()
         {
             Console.WriteLine("MouseTracker Start");
+            // play music
+            if (music != null)
+            {
+                music.Play(-1);
+            }
         }
         public override void Update()
         {
@@ -79,6 +91,23 @@ namespace SDL2Engine.Testing
 
             if (Input.GetMouseButtonDown(0))
             {
+                // play a sound
+                var sound = this.sound;
+                if (sound != null)
+                {
+                    
+                    if (sound.IsPlaying())
+                    {
+                        sound.Stop();
+                    } else
+                    {
+                        sound.Play();
+                    }
+                } else
+                {
+                    Console.WriteLine("Sound is null");
+                }
+
                 AddSquare();
             } else if (Input.GetMouseButtonDown(2))
             {

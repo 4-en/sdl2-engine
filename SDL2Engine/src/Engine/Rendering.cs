@@ -1,6 +1,7 @@
 ﻿using SDL2;
 using static SDL2.SDL;
 using System;
+using System.IO;
 
 namespace SDL2Engine
 {
@@ -265,14 +266,76 @@ namespace SDL2Engine
 
     }
 
-    public class Texture : DrawableRect
+    public class TextureRenderer : DrawableRect, ILoadable
     {
-        private IntPtr texture = IntPtr.Zero;
-        private string? path = null;
-        public static readonly string rootTexturePath = "Assets/Textures/";
-        private static IntPtr forsenTexture = IntPtr.Zero;
+        private Texture? texture;
+        public string source = "";
 
-        ~Texture()
+        public void SetSource(string source)
+        {
+            this.source = source;
+            if (texture != null)
+            {
+                
+                texture.Dispose();
+                texture = null;
+            }
+        }
+
+        public bool IsLoaded()
+        {
+            return texture != null;
+        }
+
+        public void Load()
+        {
+            if (texture != null)
+            {
+                return;
+            }
+
+            if (source != "")
+            {
+                texture = AssetManager.LoadTexture(source);
+                texture.Load();
+                this.rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
+            }
+        }
+
+        public void LoadTexture(string path)
+        {
+            this.SetSource(path);
+            this.Load();
+        }
+
+        public override void Draw(Camera camera)
+        {
+            // not sure if this should be necessary
+            // maybe it should be assumed that the texture is loaded
+            if (texture == null) {
+                this.Load();
+            }
+
+            var texture_ptr = texture.Get();
+            
+
+            var srcRect = rect.ToSDLRect();
+            var dstRect = this.GetDestRect();
+
+            double angle = gameObject.transform.rotation;
+
+            SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
+
+        }
+    }
+
+    public class TextureRendererOld : DrawableRect
+    {
+        private IntPtr texture_ptr = IntPtr.Zero;
+        private Texture? texture;
+        private string? path = null;
+
+        ~TextureRendererOld()
         {
             // TODO: check if this actually works
             // seems like the finalizer is not called
@@ -292,10 +355,11 @@ namespace SDL2Engine
         {
             // just to test performance without loading the same texture multiple times
             // TODO: implement AssetManager to load and manage assets and remove this
+            /*
             if (forsenTexture == IntPtr.Zero)
             {
 
-                this.path = Texture.rootTexturePath + t_path;
+                this.path = TextureRenderer.rootTexturePath + t_path;
                 texture = SDL_image.IMG_LoadTexture(Engine.renderer, path);
                 if (texture == IntPtr.Zero)
                 {
@@ -308,10 +372,12 @@ namespace SDL2Engine
             {
                 texture = forsenTexture;
             }
-
+            */
+            texture = AssetManager.LoadAsset<Texture>(t_path);
+            texture_ptr = texture.Get();
             // get the size of the texture
             int w, h;
-            SDL_QueryTexture(texture, out _, out _, out w, out h);
+            SDL_QueryTexture(texture_ptr, out _, out _, out w, out h);
             rect = new Rect(0, 0, w, h);
 
 
@@ -320,7 +386,7 @@ namespace SDL2Engine
 
         public override void Draw(Camera camera)
         {
-            if (texture == IntPtr.Zero)
+            if (texture_ptr == IntPtr.Zero)
             {
                 if (path != null)
                 {
@@ -338,7 +404,7 @@ namespace SDL2Engine
             double time = Time.time;
             double angle = time * 0.3 * 360;
 
-            SDL_RenderCopyEx(Engine.renderer, texture, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
+            SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
 
             SDL_RenderDrawRect(Engine.renderer, ref dstRect);
         }

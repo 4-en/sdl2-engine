@@ -104,6 +104,8 @@ namespace SDL2Engine
     public class Scene
     {
 
+        // TODO: use something like this to limit the number of new objects per frame
+        public static readonly uint MAX_ADDS_PER_FRAME = 1;
 
         private string name = "Scene";
         private int gameObjectsCount = 0;
@@ -162,6 +164,20 @@ namespace SDL2Engine
             return gameObjects.Count;
         }
 
+        public int GetDrawableCount()
+        {
+            return drawableList.Count;
+        }
+
+        public int GetScriptCount()
+        {
+            return scripts.Count;
+        }
+
+        public int GetColliderCount()
+        {
+            return colliderList.Count;
+        }
 
         public Camera GetCamera()
         {
@@ -215,19 +231,7 @@ namespace SDL2Engine
             {
                 Component component = list[i];
 
-                switch (component)
-                {
-                    case Drawable drawable:
-                        drawableList.Add(drawable);
-                        break;
-                    case Collider collider:
-                        colliderList.Add(collider);
-                        break;
-                    case Script script:
-                        scripts.Add(script);
-                        toStart.Add(script);
-                        break;
-                }
+                HandleAddComponent(component);
             }
 
             // add children components
@@ -268,8 +272,14 @@ namespace SDL2Engine
         {
 
             // remove from GameObject
-            if (removeFromGameObject)
+            if (removeFromGameObject) { 
                 component.GetGameObject().RemoveComponent(component);
+                // since a component without a game object has no further use, we should dispose of its resources
+                component.Dispose();
+            }
+
+            component._clear_scene_on_destroy();
+
 
             switch (component)
             {
@@ -345,6 +355,25 @@ namespace SDL2Engine
                 this.gameObjects.Remove(gameObject);
             }
 
+            gameObject._clear_scene_on_destroy();
+
+            // if the object is marked as persistent, add it to the persistent list in the scene manager
+            if (gameObject.IsPersistent())
+            {
+                // TODO: there might be a bug here where a non persisten parent of a persistent object is destroyed
+                // the parent could call Dispose on the persistent object
+                // maybe fix this later :)
+                // maybe non root objects should not be able to be persistent
+                SceneManager.GetPersistentGameObjects().Add(gameObject);
+            } else if (removeFromParent)
+            {
+                // if it is not persistent, we can dispose of it if this was the original
+                // object Destroy was called on
+                // otherwise, the parent will handle the disposal
+                // by calling Dispose recursively on its children and components
+                gameObject.Dispose();
+            }
+
             this.gameObjectsCount--;
         }
 
@@ -355,6 +384,9 @@ namespace SDL2Engine
 
         private void HandleAddComponent<T>(T component) where T : Component
         {
+            // Call Awake on the component
+            component.Awake();
+
             // Store some component types in lists for quick access
             switch (component)
             {
@@ -366,6 +398,7 @@ namespace SDL2Engine
                     break;
                 case Script script:
                     scripts.Add(script);
+                    toStart.Add(script);
                     break;
             }
         }

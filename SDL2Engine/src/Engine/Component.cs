@@ -57,14 +57,9 @@ namespace SDL2Engine
 
         }
 
-        public void SetEnabled(bool active)
+        public void SetEnabled(bool status)
         {
-            if (active == this.enabled)
-            {
-                return;
-            }
-            this.enabled = active;
-
+            this.enabled = status;
         }
 
         public bool IsEnabled()
@@ -82,10 +77,13 @@ namespace SDL2Engine
             SetEnabled(false);
         }
 
-        public Scene? GetScene()
+        // This is called for every compenent when it gets added to a Scene
+        // This doesn't necessarily mean that the owning GameObject has been completely initialized
+        public virtual void Awake()
         {
-            return gameObject.GetScene();
+            // Do nothing
         }
+
 
         // Usefull methods to interact with other components
         public T? GetComponent<T>() where T : Component
@@ -249,10 +247,14 @@ namespace SDL2Engine
 
         // 1.
         // This method is called once when the Component is created
+        /*
+         * This is now part of Component
+         * 
         public virtual void Awake()
         {
             // Do nothing
         }
+        */
 
         // 2.
         // This method is called during the first frame the script is active
@@ -303,6 +305,32 @@ namespace SDL2Engine
             // Do nothing
         }
 
+        // 8.
+        // This method is part of every EngineObject (and therefore every Component)
+        // It is called when the object is disposed (it is removed from the scene and is not persistent)
+        // this should be used to clean up any resources, especially SDL resources that are not automatically GC'd
+        /*
+        public override void Dispose()
+        {
+            // Do nothing
+        }
+        */
+
+
+        /*
+         * Collision methods
+         * 
+         * These methods are called when a collision occurs
+         * 
+         * OnCollisionEnter is called when the collision starts
+         * OnCollisionStay is called every frame the collision is happening
+         * OnCollisionExit is called when the collision ends (the first frame the collision is not happening)
+         * 
+         * CollisionPair is a struct that contains the two colliding objects
+         * One of them is the object this script is attached to
+         * 
+         * These methods can be overridden to provide custom functionality
+         */
         public virtual void OnCollisionEnter(CollisionPair collision)
         {
             // Do nothing
@@ -440,6 +468,223 @@ namespace SDL2Engine
         private double _rotation = 0.0;
         private double _localRotation = 0.0;
 
+
+    }
+
+    public class SoundPlayer : Component, ILoadable
+    {
+        public static double sound_volume = 1.0;
+        public string source = "";
+        public double volume = SoundPlayer.sound_volume;
+        private Sound? sound = null;
+        public bool playOnAwake = false;
+
+
+        public void SetSource(string source)
+        {
+            this.source = source;
+            if (sound != null)
+            {
+                if (sound.IsPlaying())
+                {
+                    sound.Stop();
+                }
+                sound.Dispose();
+                sound = null;
+            }
+
+        }
+
+        // ILoable methods
+        public void Load()
+        {
+            if (sound != null)
+            {
+                return;
+            }
+
+            if (source != "")
+            {
+                sound = AssetManager.LoadSound(source);
+                sound.Load();
+            }
+        }
+
+        public override void Awake()
+        {
+            base.Awake();
+            if (playOnAwake)
+            {
+                Play();
+            }
+        }
+
+        public bool IsLoaded()
+        {
+            return sound != null;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            if (sound != null)
+            {
+                sound.Dispose();
+            }
+        }
+
+        // Playing the sound
+        public bool Play(int loop = 0)
+        {
+            if (sound != null)
+            {
+                var result = sound.Play(loop);
+                if (result)
+                {
+                    sound.SetVolume(volume);
+                }
+                return result;
+            }
+            return false;
+        }
+
+        public bool Stop()
+        {
+            if (sound != null)
+            {
+                return sound.Stop();
+            }
+
+            return false;
+        }
+
+        public bool IsPlaying()
+        {
+            if (sound != null)
+            {
+                return sound.IsPlaying();
+            }
+
+            return false;
+        }
+
+        public bool SetVolume(double volume)
+        {
+            if (sound != null)
+            {
+                return sound.SetVolume(volume);
+            }
+
+            return false;
+        }
+
+    }
+
+    public class MusicPlayer : Component, ILoadable
+    {
+        public static double music_volume = 1.0;
+        public string source = "";
+        public double volume = MusicPlayer.music_volume;
+        private Music? music = null;
+        public bool playOnAwake = false;
+
+        public void SetSource(string source)
+        {
+            this.source = source;
+            if (music != null)
+            {
+                if (music.IsPlaying())
+                {
+                    music.Stop();
+                }
+                music.Dispose();
+                music = null;
+            }
+
+        }
+
+        // ILoable methods
+        public void Load()
+        {
+            if (music != null)
+            {
+                return;
+            }
+
+            if (source != "")
+            {
+                music = AssetManager.LoadMusic(source);
+                music.Load();
+            }
+        }
+
+        public override void Awake()
+        {
+            base.Awake();
+            if (playOnAwake)
+            {
+                Play();
+            }
+        }
+
+        public bool IsLoaded()
+        {
+            return music != null;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            if (music != null)
+            {
+                music.Dispose();
+            }
+        }
+
+        // Playing the music
+        public bool Play(int loop = 0)
+        {
+            if (music != null)
+            {
+                var result = music.Play(loop);
+                if (result)
+                {
+                    music.SetVolume(volume);
+                }
+                return result;
+            }
+            return false;
+        }
+
+        public bool Stop()
+        {
+            if (music != null)
+            {
+                return music.Stop();
+            }
+
+            return false;
+        }
+
+        public bool IsPlaying()
+        {
+            if (music != null)
+            {
+                return music.IsPlaying();
+            }
+
+            return false;
+        }
+
+        public bool SetVolume(double volume)
+        {
+            if (music != null)
+            {
+                return music.SetVolume(volume);
+            }
+
+            return false;
+        }
 
     }
 }

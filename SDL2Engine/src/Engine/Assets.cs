@@ -119,7 +119,7 @@ namespace SDL2Engine
         {
             if(loaded)
             {
-                Console.WriteLine("Asset already loaded");
+                return handler.Get();
             }
 
             if(loadFailed)

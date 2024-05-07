@@ -30,7 +30,7 @@ namespace SDL2Engine.Testing
             {
                 parent.AddChild(square);
             }
-            square.AddComponent<TextureRenderer>()?.LoadTexture("Assets/Textures/forsenE.png");
+            square.AddComponent<TextureRenderer2>()?.SetSource("Assets/Textures/forsenE.png");
             var bc = BoxCollider.FromDrawableRect(square);
             square.AddComponent<DestroyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());

@@ -298,12 +298,23 @@ namespace SDL2Engine
             {
                 texture = AssetManager.LoadTexture(source);
                 texture.Load();
+                this.rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
             }
+        }
+
+        public void LoadTexture(string path)
+        {
+            this.SetSource(path);
+            this.Load();
         }
 
         public override void Draw(Camera camera)
         {
-            if (texture == null) return;
+            // not sure if this should be necessary
+            // maybe it should be assumed that the texture is loaded
+            if (texture == null) {
+                this.Load();
+            }
 
             var texture_ptr = texture.Get();
             

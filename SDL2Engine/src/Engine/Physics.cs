@@ -133,6 +133,7 @@ namespace SDL2Engine
         // if true, objects with this component can be moved when colliding with other objects
         private bool isMovable = true;
         private Vec2D velocity = new Vec2D();
+        private double angularVelocity = 0.0;
         private double mass = 1.0;
         private double bounciness = 1.0;
         private double friction = 0.0;
@@ -170,6 +171,12 @@ namespace SDL2Engine
             set { velocity = value; }
         }
 
+        public double AngularVelocity
+        {
+            get { return angularVelocity; }
+            set { angularVelocity = value; }
+        }
+
         public double Mass
         {
             get { return mass; }
@@ -199,11 +206,37 @@ namespace SDL2Engine
     // defines physical shape of an object and handles collision detection
     public class Collider : Component
     {
-        // TODO: Implement Collider class
-        // Base class for all colliders
 
-        // imlpement collision functions for all collider types
-        // for example, BoxCollider and BoxCollider, BoxCollider and CircleCollider, etc.
+        private bool isTrigger = false;
+
+        // this is used to keep track of the active collision list
+        // before every collision check, the active_index is swapped
+        // this is used to call the correct callback functions for collision events
+        private uint active_index = 0;
+        private List<Collider>[] prevCollisions = { new List<Collider>(), new List<Collider>() };
+
+        public void SwapCollisions()
+        {
+            active_index = (active_index + 1) % 2;
+            prevCollisions[active_index].Clear();
+        }
+
+        public List<Collider> GetCurrentCollisionList()
+        {
+            return prevCollisions[active_index];
+        }
+
+        public List<Collider> GetPreviousCollisionList()
+        {
+            return prevCollisions[(active_index + 1) % 2];
+        }
+
+        public bool IsTrigger
+        {
+            get { return isTrigger; }
+            set { isTrigger = value; }
+        }
+
         public virtual bool CollidesWith(Collider other)
         {
             if (other is CircleCollider)
@@ -229,55 +262,16 @@ namespace SDL2Engine
 
         public virtual bool CollidesWith(BoxCollider other)
         {
-            //circlecollider and boxcollider
-            if (other is CircleCollider)
-            {
-                return false;
-            }
-            //edgecollider and boxcollider
-            if (other is EdgeCollider)
-            {
-                return false;
-            }
-            //boxcollider and boxcollider
-            if (other is BoxCollider)
-            {
-                return false;
-            }
             return false;
         }
 
         public virtual bool CollidesWith(CircleCollider other)
         {
-            if (other is CircleCollider)
-            {
-                return false;
-            }
-            if (other is EdgeCollider)
-            {
-                return false;
-            }
-            if (other is BoxCollider)
-            {
-                return false;
-            }
             return false;
         }
 
         public virtual bool CollidesWith(EdgeCollider other)
         {
-            if (other is CircleCollider)
-            {
-                return false;
-            }
-            if (other is EdgeCollider)
-            {
-                return false;
-            }
-            if (other is BoxCollider)
-            {
-                return false;
-            }
             return false;
         }
     }
@@ -302,20 +296,36 @@ namespace SDL2Engine
     public class BoxCollider : Collider
     {
 
+        public static BoxCollider? FromDrawableRect(GameObject gameObject)
+        {
+            Drawable? drawable = gameObject.GetComponent<Drawable>();
+            if (drawable == null) return null;
+
+            if (drawable is DrawableRect drawableRect)
+            {
+                Rect r = drawableRect.GetRect();
+
+                var collider = gameObject.AddComponent<BoxCollider>();
+                if (collider == null) return null;
+                collider.box = r;
+                return collider;
+
+            }
+
+            return null;
+        }
+
         //create a box collider at the position of the game object
         public Rect box { get; set; }
 
         //function to get the center position of the box collider
         public override Vec2D GetCenter()
         {
+            var box = this.GetCollisionBox();
             return new Vec2D(box.x + box.w / 2, box.y + box.h / 2);
         }
 
-        //get center
-        public Vec2D GetCenter(BoxCollider boxCollider)
-        {
-            return new Vec2D(boxCollider.box.x + boxCollider.box.w / 2, boxCollider.box.y + boxCollider.box.h / 2);
-        }
+
 
 
         public BoxCollider(Rect box)
@@ -331,38 +341,42 @@ namespace SDL2Engine
             this.box = new Rect(50, 50, 50, 50);
         }
 
-
-        public void UpdateColliderPosition(Vec2D newPosition)
-        {
-            var rect = new Rect(newPosition.x, newPosition.y, box.w, box.h);
-            this.box = rect;
-        }
-
         public void UpdateColliderSize(int width, int height)
         {
             var rect = new Rect(box.x, box.y, width, height);
             this.box = rect;
         }
 
-
+        public Rect GetCollisionBox()
+        {
+            return box + gameObject.GetPosition();
+        }
 
 
         // Collision between two box colliders
         public override bool CollidesWith(BoxCollider other)
         {
-            //boxcollider and boxcollider
-            if (other is BoxCollider)
+            var cbox = this.GetCollisionBox();
+
+            //check if the two boxes are colliding
+            if (cbox.Intersects(other.GetCollisionBox()))
             {
-                //check if the two boxes are colliding
-                if (box.Intersects(other.box))
-                {
-                    Console.WriteLine("COLLISION!");
-                    // Console.WriteLine("Box1: " + box.x + box.y);
-                    return true;
-                }
-                return false;
+                //Console.WriteLine("COLLISION!");
+                // Console.WriteLine("Box1: " + box.x + box.y);
+                return true;
             }
             return false;
+
+        }
+
+        public override bool CollidesWith(CircleCollider other)
+        {
+            return other.CollidesWith(this);
+        }
+
+        public override bool CollidesWith(EdgeCollider other)
+        {
+            return other.CollidesWith(this);
         }
 
     }
@@ -384,46 +398,53 @@ namespace SDL2Engine
             this.radius = 1.0;
         }
 
+        public Vec2D GetCollisionCenter()
+        {
+            return center + gameObject.GetPosition();
+        }
+
+        public void SetCenter(Vec2D center)
+        {
+            this.center = center;
+        }
+
         // Collision between two circle colliders
         public override bool CollidesWith(CircleCollider other)
         {
-            //circlecollider and circlecollider
-            if (other is CircleCollider)
+
+            //check if the two circles are colliding
+            if (DistanceTo(this.GetCollisionCenter(), other.GetCollisionCenter()) < radius + other.radius)
             {
-                //check if the two circles are colliding
-                if (DistanceTo(center, other.center) < radius + other.radius)
-                {
-                    //Console.WriteLine("COLLISION!");
-                    return true;
-                }
-                return false;
+                //Console.WriteLine("COLLISION!");
+                return true;
             }
             return false;
+
         }
 
         //collision between circle and box
         public override bool CollidesWith(BoxCollider other)
         {
-            //circlecollider and boxcollider
-            if (other is BoxCollider)
+
+            // Calculate closest point to the circle's center within the box
+            Vec2D circleCenter = this.GetCollisionCenter();
+            Rect box = other.GetCollisionBox();
+            double closestX = Math.Max(box.x, Math.Min(circleCenter.x, box.x + box.w));
+            double closestY = Math.Max(box.y, Math.Min(circleCenter.y, box.y + box.h));
+
+            // Calculate distance between the circle's center and this closest point
+            double distanceX = circleCenter.x - closestX;
+            double distanceY = circleCenter.y - closestY;
+
+
+            // If the distance is less than the circle's radius, they are colliding
+            if ((distanceX * distanceX) + (distanceY * distanceY) < (radius * radius))
             {
-                // Calculate closest point to the circle's center within the box
-                double closestX = Math.Max(other.box.x, Math.Min(center.x, other.box.x + other.box.w));
-                double closestY = Math.Max(other.box.y, Math.Min(center.y, other.box.y + other.box.h));
-
-                // Calculate distance between the circle's center and this closest point
-                double distanceX = center.x - closestX;
-                double distanceY = center.y - closestY;
-
-                // If the distance is less than the circle's radius, they are colliding
-                if ((distanceX * distanceX) + (distanceY * distanceY) < (radius * radius))
-                {
-                    Console.WriteLine("Circle + Box COLLISION!");
-                    return true;
-                }
-                return false;
+                //Console.WriteLine("Circle + Box COLLISION!");
+                return true;
             }
             return false;
+
         }
 
 
@@ -432,13 +453,9 @@ namespace SDL2Engine
         {
             return Math.Sqrt(Math.Pow(center.x - other.x, 2) + Math.Pow(center.y - other.y, 2));
         }
-        //update the position of the circle collider
-        internal void UpdateColliderPosition(Vec2D vec2D)
-        {
-            this.center = vec2D;
-        }
+
         //update the size of the circle collider
-        internal void UpdateColliderSize(double radius)
+        public void UpdateColliderSize(double radius)
         {
             this.radius = radius;
         }
@@ -458,6 +475,28 @@ namespace SDL2Engine
             this.start = new Vec2D(0, 0);
             this.end = new Vec2D(1, 1);
         }
+
+        public Vec2D[] GetCornerPoints()
+        {
+            return [start + gameObject.GetPosition(), end + gameObject.GetPosition()];
+        }
+
+        public void SetStart(Vec2D start)
+        {
+            this.start = start;
+        }
+
+        public void SetEnd(Vec2D end)
+        {
+            this.end = end;
+        }
+
+        public void SetEdge(Vec2D start, Vec2D end)
+        {
+            this.start = start;
+            this.end = end;
+        }
+
         //update the position of the edge collider
         internal void UpdateColliderPosition(Vec2D start, Vec2D end)
         {
@@ -469,20 +508,18 @@ namespace SDL2Engine
         //collision between edgecollider and boxcollider
         public override bool CollidesWith(BoxCollider other)
         {
-            //edgecollider and boxcollider
-            if (other is BoxCollider)
+            Rect box = other.GetCollisionBox();
+            Vec2D[] corners = GetCornerPoints();
+            //check if the box and edge are colliding
+            if (Intersects(corners[0], corners[1], box))
             {
-                //check if the box and edge are colliding
-                if (Intersects(start, end, other.box))
-                {
-                    Console.WriteLine("Edge + Box COLLISION!");
-                    return true;
-                }
-
-
-                return false;
+                //Console.WriteLine("Edge + Box COLLISION!");
+                return true;
             }
+
+
             return false;
+
         }
 
         private bool Intersects(Vec2D lineStart, Vec2D lineEnd, Rect box)
@@ -559,47 +596,68 @@ namespace SDL2Engine
         // Adds gravity and other forces, moves objects
         public static void ApplyPhysics(List<GameObject> gameObjects)
         {
+            double deltaTime = Time.deltaTime;
             // Apply gravity, forces, etc.
             foreach (var gameObject in gameObjects)
             {
                 //apply gravity
-                if (gameObject.GetComponent<PhysicsBody>() != null)
-                {
-                    if (gameObject.GetComponent<PhysicsBody>().IsMovable)
-                    {
-                        //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);
-                    }
-                }
+                PhysicsBody? physicsBody = gameObject.GetComponent<PhysicsBody>();
+                if (physicsBody == null) continue;
+                if (!physicsBody.IsMovable) continue;
+
+
+                //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);
+
+
                 //move objects
-                if (gameObject.GetComponent<PhysicsBody>() != null)
+                Transform t = gameObject.transform;
+                t.Move(
+                    physicsBody.Velocity.x * deltaTime,
+                    physicsBody.Velocity.y * deltaTime
+                    );
+
+                // rotate objects
+                t.rotation += physicsBody.AngularVelocity * deltaTime;
+                var vel_magnitude_squared = physicsBody.Velocity.LengthSquared();
+
+                // if velocity is below a certain threshold, set it to 0
+                if (vel_magnitude_squared > 0 && vel_magnitude_squared < 1.0)
                 {
-                    if (gameObject.GetComponent<PhysicsBody>().IsMovable)
-                    {
-                        gameObject.SetPosition(new Vec2D(gameObject.GetPosition().x + gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetPosition().y + gameObject.GetComponent<PhysicsBody>().Velocity.y));
-                        //move the collider with the object
-                        if (gameObject.GetComponent<Collider>() != null)
-                        {
-                            if (gameObject.GetName().Equals("LeftPaddle") || gameObject.GetName().Equals("RightPaddle"))
-                            {
-                                (gameObject.GetComponent<Collider>() as BoxCollider).UpdateColliderPosition(new Vec2D(gameObject.GetPosition().x, (gameObject.GetPosition().y - 60)));
-
-                            }
-                            else if (gameObject.GetComponent<Collider>() is BoxCollider)
-                            {
-                                (gameObject.GetComponent<Collider>() as BoxCollider).UpdateColliderPosition(gameObject.GetPosition());
-
-                            }
-                            else if (gameObject.GetComponent<Collider>() is CircleCollider)
-                            {
-                                (gameObject.GetComponent<Collider>() as CircleCollider).UpdateColliderPosition(gameObject.GetPosition());
-                            }
-                            else if (gameObject.GetComponent<Collider>() is EdgeCollider)
-                            {
-                                (gameObject.GetComponent<Collider>() as EdgeCollider).UpdateColliderPosition(gameObject.GetPosition(), new Vec2D(gameObject.GetPosition().x + 50, gameObject.GetPosition().y + 50));
-                            }
-                        }
-                    }
+                    physicsBody.Velocity = new Vec2D(0, 0);
+                    vel_magnitude_squared = 0;
                 }
+
+                // Apply friction and drag
+
+                // drag: a force that opposes the motion of an object
+
+                // new_kinetic_energy = old_kinetic_energy - drag_force
+                // old_kinetic_energy = 0.5 * mass * velocity^2
+                // drag_force = drag_coefficient * velocity^2
+                // 
+                // new_velocity       = old_velocity - 
+                // new_kinetic_energy = 0.5 * mass * velocity^2 - drag_coefficient * velocity^2 
+                // new_kinetic_energy = 0.5 * mass * velocity^2 * (1 - drag_coefficient)
+                //
+                //
+
+                // skip if drag is 0 or velocity is 0
+                if (physicsBody.Drag == 0 || vel_magnitude_squared == 0) continue;
+                // Calculate the magnitude of the velocity squared
+
+                // Normalize the velocity vector to get the direction of the force
+                // use precomputed magnitude to avoid recomputing it when using Vec2D.Normalize()
+                Vec2D velocity_normalized = physicsBody.Velocity / Math.Sqrt(vel_magnitude_squared);
+
+                // Compute drag force: F_drag = -0.5 * rho * v^2 * C_d * A * unit_vector(v)
+                // assume rho* C_d * A = physicsBody.Drag
+                Vec2D dragForce = velocity_normalized * (-0.5 * vel_magnitude_squared * physicsBody.Drag);
+
+                // Update velocity by adding acceleration due to drag (F = ma -> a = F/m)
+                physicsBody.Velocity += dragForce / physicsBody.Mass * deltaTime;
+
+
+
             }
         }
 
@@ -607,44 +665,48 @@ namespace SDL2Engine
         public static List<CollisionPair> CheckCollisions(List<GameObject> gameObjects)
         {
             //check collisions
+            Collider? colliderI = null;
+            Collider? colliderJ = null;
             var collisionPairList = new List<CollisionPair>();
-            foreach (var gameObject1 in gameObjects)
+            for (uint i = 0; i < gameObjects.Count; i++)
             {
-                if (gameObject1.GetComponent<Collider>() != null)
+                colliderI = gameObjects[(int)i].GetComponent<Collider>();
+
+                if (colliderI == null) continue;
+
+                // check if it has a physics body
+                // if it doesn't it can't move, so we don't need to check for collisions from it, only with it
+                PhysicsBody? physicsBody = gameObjects[(int)i].GetComponent<PhysicsBody>();
+                if (physicsBody == null || !physicsBody.IsMovable) continue;
+
+                colliderI.SwapCollisions();
+
+                for (uint j = i + 1; j < gameObjects.Count; j++)
                 {
-                    foreach (var gameObject2 in gameObjects)
+                    colliderJ = gameObjects[(int)j].GetComponent<Collider>();
+                    if (colliderJ == null) continue;
+                    colliderJ.SwapCollisions();
+
+                    if (colliderI.CollidesWith(colliderJ))
                     {
-                        if (gameObject2.GetComponent<Collider>() != null)
-                        {
-                            if (gameObject1 != gameObject2)
-                            {
-                                if (gameObject1.GetComponent<Collider>().CollidesWith(gameObject2.GetComponent<Collider>()))
-                                {
-                                    //check if collision pair already exists
-                                    bool exists = false;
-                                    foreach (var collisionPair in collisionPairList)
-                                    {
-                                        if (collisionPair.obj1 == gameObject2 && collisionPair.obj2 == gameObject1)
-                                        {
-                                            exists = true;
-                                        }
-                                    }
-                                    if (!exists)
-                                    {
-                                        var cp = CalculateCollisionPoint(gameObject1, gameObject2);
-                                        collisionPairList.Add(new CollisionPair(gameObject1, gameObject2, cp));
-                                    }
+                        var cp = CalculateCollisionPoint(gameObjects[(int)i], gameObjects[(int)j]);
+                        collisionPairList.Add(new CollisionPair(gameObjects[(int)i], gameObjects[(int)j], cp));
+                        colliderJ.GetCurrentCollisionList().Add(colliderI);
+                        colliderI.GetCurrentCollisionList().Add(colliderJ);
 
-
-                                }
-                            }
-                        }
                     }
+
+
                 }
+
             }
             return collisionPairList;
         }
 
+        // TODO: fix this function
+        // this should probably be a method of the Collider class
+        // and does not have to be seperate from the CheckCollisions method
+        // otherwise we are doing the same calculations twice
         private static Vec2D CalculateCollisionPoint(GameObject gameObject1, GameObject gameObject2)
         {
             //calculate the Collisionpoint between two objects
@@ -692,53 +754,69 @@ namespace SDL2Engine
             {
                 var obj1 = collision.obj1;
                 var obj2 = collision.obj2;
-                //check if the objects have a physics body
-                if (obj1.GetComponent<PhysicsBody>() != null && obj2.GetComponent<PhysicsBody>() != null)
+                var collisionPoint = collision.collisionPoint;
+
+                var pb1 = obj1.GetComponent<PhysicsBody>();
+                var box1 = obj1.GetComponent<BoxCollider>();
+                var box2 = obj2.GetComponent<BoxCollider>();
+
+                // check for nulls
+                if (pb1 == null || box1 == null || box2 == null) continue;
+
+                // calculate the direction of the collision
+                // this is either horizontal or vertical, since we are only dealing with boxes
+                // for now, just check if box1 center is to the left or right of box2.
+                // If so, the collision is horizontal, otherwise it is vertical
+                Vec2D collisionNormal = new Vec2D(0, 0);
+                Vec2D box1Center = box1.GetCenter();
+                Rect box2Area = box2.GetCollisionBox();
+                if (box1Center.x < box2Area.x)
                 {
-                    //box collider and box collider
-                    if (obj1.GetComponent<Collider>() is BoxCollider && obj2.GetComponent<Collider>() is BoxCollider)
-                    {
-                        //calculate the collision point between two box colliders
-                        // var box1 = obj1.GetComponent<Collider>() as BoxCollider;
-                        // var box2 = obj2.GetComponent<Collider>() as BoxCollider;
-
-
-                        //Vec2D u1 = obj1.GetComponent<PhysicsBody>().Velocity;
-                        //Vec2D u2 = obj2.GetComponent<PhysicsBody>().Velocity;
-
-                        //Vec2D r1 = box1.GetCenter(box1) - collsion.collisionPoint;
-                        //Vec2D r2 = box2.GetCenter(box2) - collsion.collisionPoint;
-                        //Vec2D normal = r2 - r1;
-                        // normal.Normalize();
-
-                        //Vec2D u1n = normal * Vec2D.Dot(u1, normal);
-                        //Vec2D u2n = normal * Vec2D.Dot(u2, normal);
-
-                        //Vec2D v2n = (u1n * (obj1.GetComponent<PhysicsBody>().Mass - obj2.GetComponent<PhysicsBody>().Mass) + 2 * obj2.GetComponent<PhysicsBody>().Mass * u2n) / (obj1.GetComponent<PhysicsBody>().Mass + obj2.GetComponent<PhysicsBody>().Mass);
-                        // Vec2D v1n = (u2n * (obj2.GetComponent<PhysicsBody>().Mass - obj1.GetComponent<PhysicsBody>().Mass) + 2 * obj1.GetComponent<PhysicsBody>().Mass * u1n) / (obj1.GetComponent<PhysicsBody>().Mass + obj2.GetComponent<PhysicsBody>().Mass);
-
-                        //Vec2D v1 = (u1 - u1n) + v1n;
-                        // Vec2D v2 = (u2 - u2n) + v2n;
-
-                        // if (obj1.GetComponent<PhysicsBody>().IsMovable)
-                        // {
-                        //    obj1.GetComponent<PhysicsBody>().Velocity = v1;
-                        //}
-                        // if (obj2.GetComponent<PhysicsBody>().IsMovable)
-                        //{
-                        //   obj2.GetComponent<PhysicsBody>().Velocity = v2;
-                        //}
-                        // Console.WriteLine("v2: " + obj1.GetComponent<PhysicsBody>().Velocity.x + obj1.GetComponent<PhysicsBody>().Velocity.y);
-                        // Console.WriteLine("v2: " + obj2.GetComponent<PhysicsBody>().Velocity.x + obj2.GetComponent<PhysicsBody>().Velocity.y);
-
-                        //resolve collision for pong game
-                        ResolveCollisionsForPong(obj1, obj2);
-                    }
+                    collisionNormal = new Vec2D(-1, 0);
                 }
+                else if (box1Center.x > box2Area.x + box2Area.w)
+                {
+                    collisionNormal = new Vec2D(1, 0);
+                }
+                else if (box1Center.y < box2Area.y)
+                {
+                    collisionNormal = new Vec2D(0, -1);
+                }
+                else if (box1Center.y > box2Area.y + box2Area.h)
+                {
+                    collisionNormal = new Vec2D(0, 1);
+                }
+
+                Vec2D relativeVelocity = pb1.Velocity;
+                double velocityAlongNormal = Vec2D.Dot(relativeVelocity, collisionNormal);
+
+                // check if the objects are moving away from each other
+                if (velocityAlongNormal > 0)
+                {
+                    continue;
+                }
+
+                // calculate the impulse scalar
+                double e = Math.Min(pb1.Bounciness, 1);
+                double j = -(1 + e) * velocityAlongNormal;
+                j /= 1 / pb1.Mass;
+
+                // apply the impulse
+                Vec2D impulse = collisionNormal * j;
+                pb1.Velocity += impulse;
+
+                // just to make sure the objects are not stuck together, move obj1 away from obj2 by a small amount
+                double dt = Time.deltaTime / 2;
+                obj1.transform.Move(impulse.x * dt, impulse.y * dt);
 
             }
         }
 
+        // TODO: remove this
+        // engine should not know about specific game objects, only general physics for PhysicsBodies
+        // for custom behaviour, use Script components
+        // for example, use a Script with OnCollisionEnter method to handle collision between PongSquare and BoarderLeft,
+        // optimally, this should just work without having to modify the Physics class, since its just a bounce of the ball on a static object
         private static void ResolveCollisionsForPong(GameObject obj1, GameObject obj2)
         {
 
@@ -809,7 +887,48 @@ namespace SDL2Engine
         // after all collisions are resolved, notify objects that a collision has occured
         // TODO: Implement event listeners for OnCollisionEnter, OnCollisionStay, OnCollisionExit, etc.
         public static void NotifyCollisions(List<CollisionPair> collisions)
-        { }
+        {
+            foreach (var pair in collisions)
+            {
+                GameObject obj1 = pair.obj1;
+                GameObject obj2 = pair.obj2;
+
+                Collider? collider1 = obj1.GetComponent<Collider>();
+                Collider? collider2 = obj2.GetComponent<Collider>();
+
+                if (collider1 == null || collider2 == null) continue;
+
+                bool wasPreviouslyColliding = collider1.GetPreviousCollisionList().Contains(collider2);
+
+                List<Script> obj1Scripts = obj1.GetComponents<Script>();
+                List<Script> obj2Scripts = obj2.GetComponents<Script>();
+
+                if (wasPreviouslyColliding)
+                {
+                    foreach (var script in obj1Scripts)
+                    {
+                        script.OnCollisionStay(pair);
+                    }
+                    foreach (var script in obj2Scripts)
+                    {
+                        script.OnCollisionStay(pair);
+                    }
+                }
+                else
+                {
+                    foreach (var script in obj1Scripts)
+                    {
+                        script.OnCollisionEnter(pair);
+                    }
+                    foreach (var script in obj2Scripts)
+                    {
+                        script.OnCollisionEnter(pair);
+                    }
+                }
+
+
+            }
+        }
 
 
         /*

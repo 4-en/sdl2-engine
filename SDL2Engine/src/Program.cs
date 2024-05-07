@@ -7,9 +7,9 @@ using SDL2Engine;
 namespace SDL2Engine.Testing
 {
 
-    class DestroyNotifier : Script
+    class DestroyOnCollision : Script
     {
-        public override void Start()
+        public override void OnCollisionEnter(CollisionPair collision)
         {
             // destroy if colliding with anything (thats movable, since two static objects can't collide)
             Destroy(this.gameObject);
@@ -44,7 +44,7 @@ namespace SDL2Engine.Testing
 
 
             return square;
-            
+
         }
 
         private Sound sound = AssetManager.LoadAsset<Sound>("Assets/Audio/test_sound.mp3");
@@ -62,13 +62,14 @@ namespace SDL2Engine.Testing
         public override void Update()
         {
             var mousePosition = Input.GetMousePosition();
-            
+
             var gameObject = this.gameObject;
             var camera = Camera.GetCamera(gameObject);
             if (camera != null)
             {
                 mousePosition = camera.ScreenToWorld(mousePosition);
             }
+
 
             gameObject.SetPosition(mousePosition);
 
@@ -95,21 +96,24 @@ namespace SDL2Engine.Testing
                 var sound = this.sound;
                 if (sound != null)
                 {
-                    
+
                     if (sound.IsPlaying())
                     {
                         sound.Stop();
-                    } else
+                    }
+                    else
                     {
                         sound.Play();
                     }
-                } else
+                }
+                else
                 {
                     Console.WriteLine("Sound is null");
                 }
 
                 AddSquare();
-            } else if (Input.GetMouseButtonDown(2))
+            }
+            else if (Input.GetMouseButtonDown(2))
             {
                 var square = AddSquare(gameObject);
                 if (square != null)
@@ -117,7 +121,8 @@ namespace SDL2Engine.Testing
                     var rand = new Random();
                     square.SetLocalPosition(new Vec2D(rand.Next(-100, 100), rand.Next(-100, 100)));
                 }
-            } else if (Input.GetMouseButtonDown(1))
+            }
+            else if (Input.GetMouseButtonDown(1))
             {
                 // add 1000 squares
                 for (int i = 0; i < 1000; i++)
@@ -132,37 +137,42 @@ namespace SDL2Engine.Testing
             }
         }
     }
-    
+
     internal class EngineTest1
     {
         public static Scene CreateScene()
         {
             var world = new Scene("World");
 
-            
+
             // create a new game object
             var gameObject1 = new GameObject("Cube1", world);
 
             // add a drawable component to the game object
-            var cube1 = gameObject1.AddComponent<Cube>();
+            gameObject1.AddComponent<Cube>();
 
             //add a collider component to the game object
             var boxCollider1 = gameObject1.AddComponent<BoxCollider>();
+            if (boxCollider1 != null)
+                boxCollider1.box = new Rect(0, 0, 50, 50);
 
             // add a mouse tracker component to the game object
             gameObject1.AddComponent<WASDController>();
 
             //add a physics component to the game object
-            gameObject1.AddComponent<PhysicsBody>();
-            gameObject1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-1, -1);
-            //gameObject1.GetComponent<PhysicsBody>().Velocity = new Vec2D(-1, 0);
+            var body = gameObject1.AddComponent<PhysicsBody>();
+            if (body != null)
+            {
+                body.Velocity = new Vec2D(100, 0);
+                body.IsMovable = true;
+                // testing drag
+                body.Drag = 0.3d;
+            }
 
-            // add the game object to the world
-            //world.AddChild(gameObject1);
-            world.AddGameObject(gameObject1);
+
+
 
             gameObject1.SetPosition(new Vec2D(500, 500));
-            //gameObject1.SetPosition(new Vec2D(500, 300));
 
 
 
@@ -176,23 +186,18 @@ namespace SDL2Engine.Testing
             var boxCollider2 = gameObject2.AddComponent<BoxCollider>();
 
             //add physics component to the game object
-            var physicsBody = gameObject2.AddComponent<PhysicsBody>();
-            physicsBody.Velocity = new Vec2D(0, 0);
-            physicsBody.IsMovable = false;
-            physicsBody.Mass = 2;
-
-            // add the game object to the world
-            //world.AddChild(gameObject2);
-            world.AddGameObject(gameObject2);
-
-            gameObject2.SetPosition(new Vec2D(280, 300));
-
-            //adjust collider to cube position
-            if (gameObject2.collider != null && gameObject2.collider is BoxCollider)
+            body = gameObject2.AddComponent<PhysicsBody>();
+            if (body != null)
             {
-                var c = (BoxCollider)gameObject2.collider;
-                c.UpdateColliderPosition(gameObject2.GetPosition());
+                body.IsMovable = true;
+                body.Velocity = new Vec2D(0, 100);
             }
+
+
+
+            gameObject2.SetPosition(new Vec2D(300, 500));
+
+
 
 
 
@@ -206,22 +211,17 @@ namespace SDL2Engine.Testing
             var circleCollider = gameObject3.AddComponent<CircleCollider>();
 
             //add physics component to the game object
-            var physicsBody3 = gameObject3.AddComponent<PhysicsBody>();
+            body = gameObject3.AddComponent<PhysicsBody>();
+            if (body != null)
+            {
+                body.Velocity = new Vec2D(100, 100);
+            }
 
             gameObject3.SetPosition(new Vec2D(100, 500));
 
             //adjust collider to cube size and position
-            if (gameObject3.collider != null && gameObject3.collider is CircleCollider)
-            {
-                
-                var c = (CircleCollider)gameObject3.collider;
-                c.UpdateColliderPosition(new Vec2D(gameObject3.GetPosition().x+10,gameObject3.GetPosition().y+10));
-                c.UpdateColliderSize(20);
-            }
-
-            // add the game object to the world
-            //world.AddChild(gameObject3);
-            world.AddGameObject(gameObject3);
+            circleCollider?.UpdateColliderSize(25);
+            circleCollider?.SetCenter(new Vec2D(50, 50));
 
 
 
@@ -229,45 +229,40 @@ namespace SDL2Engine.Testing
             var gameObject4 = new GameObject("Line", world);
 
             // add a drawable component to the game object
-            var line = gameObject4.AddComponent<Line>();
+            gameObject4.AddComponent<Line>();
 
             //add a collider component to the game object
             var edgeCollider = gameObject4.AddComponent<EdgeCollider>();
-            edgeCollider.UpdateColliderPosition(new Vec2D(300, 800), new Vec2D(500, 1100));
+            edgeCollider?.SetEdge(new Vec2D(300, 800), new Vec2D(500, 1100));
 
             //add physics component to the game object
             var physicsBody2 = gameObject4.AddComponent<PhysicsBody>();
-            physicsBody2.Velocity = new Vec2D(0, 0);
-            physicsBody2.IsMovable = false;
-
-            
-
-            // add the game object to the world
-            //world.AddChild(gameObject4);
-            world.AddGameObject(gameObject4);
+            if (physicsBody2 != null)
+            {
+                physicsBody2.Velocity = new Vec2D(0, 0);
+                physicsBody2.IsMovable = false;
+            }
 
 
-
-            return world;
 
 
             //var world = new Scene("World");
 
             // create a new game object
-            //var gameObject = new GameObject("Mouse Square", world);
+            var gameObject = new GameObject("Mouse Square", world);
 
             // add a drawable component to the game object
-            //gameObject.AddComponent<RotatingSquare>();
+            gameObject.AddComponent<RotatingSquare>();
 
             // add a mouse tracker component to the game object
-            //gameObject.AddComponent<MouseTracker>();
+            gameObject.AddComponent<MouseTracker>();
 
             // add the game object to the world
             //world.AddChild(gameObject);
 
             // gameObject.SetPosition(new Vec2D(500, 500));
 
-            //return world;
+            return world;
         }
 #if ENGINE_TEST
         static void Main(string[] args)
@@ -294,7 +289,7 @@ namespace SDL2Engine.Testing
 
         public override void Draw(Camera camera)
         {
-            
+
 
 
             var renderer = Engine.renderer;
@@ -313,10 +308,10 @@ namespace SDL2Engine.Testing
 
             // define the square
             List<Vec2D> points = new List<Vec2D>();
-            points.Add(new Vec2D(-CubeWidth / 2, -CubeHeight / 2));
-            points.Add(new Vec2D(CubeWidth / 2, -CubeHeight / 2));
-            points.Add(new Vec2D(CubeWidth / 2, CubeHeight / 2));
-            points.Add(new Vec2D(-CubeWidth / 2, CubeHeight / 2));
+            points.Add(new Vec2D(0, 0));
+            points.Add(new Vec2D(CubeWidth, 0));
+            points.Add(new Vec2D(CubeWidth, CubeHeight));
+            points.Add(new Vec2D(0, CubeHeight));
 
             // convert to camera space
             for (int i = 0; i < points.Count; i++)
@@ -358,30 +353,54 @@ namespace SDL2Engine.Testing
         {
             // a better way to do this would be to use a rigidbody with velocity
             var gameObject = this.gameObject;
-            var speed = 5;
+
+            var camera = Camera.GetCamera(gameObject);
+            if (camera is Camera2D cam2d)
+            {
+                // follow the square
+                var worldPos = gameObject.GetPosition() - (cam2d.GetWorldSize() / 2);
+                //Console.WriteLine(worldPos);
+                cam2d.SetPosition(worldPos);
+            }
+
+            var speed = 100;
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_w)))
             {
-                gameObject.transform.position += new Vec2D(0, -speed);
+                //gameObject.transform.position += new Vec2D(0, -speed);
+                var body = gameObject.GetComponent<PhysicsBody>();
+                if (body != null)
+                {
+                    body.Velocity += new Vec2D(0, -speed);
+                }
             }
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_s)))
             {
-                gameObject.transform.position += new Vec2D(0, speed);
+                //gameObject.transform.position += new Vec2D(0, speed);
+                var body = gameObject.GetComponent<PhysicsBody>();
+                if (body != null)
+                {
+                    body.Velocity += new Vec2D(0, speed);
+                }
             }
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_a)))
             {
-                gameObject.transform.position += new Vec2D(-speed, 0);
+                //gameObject.transform.position += new Vec2D(-speed, 0);
+                var body = gameObject.GetComponent<PhysicsBody>();
+                if (body != null)
+                {
+                    body.Velocity += new Vec2D(-speed, 0);
+                }
             }
             if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_d)))
             {
-                gameObject.transform.position += new Vec2D(speed, 0);
+                //gameObject.transform.position += new Vec2D(speed, 0);
+                var body = gameObject.GetComponent<PhysicsBody>();
+                if (body != null)
+                {
+                    body.Velocity += new Vec2D(speed, 0);
+                }
             }
 
-            // Update BoxCollider position
-            if (gameObject.collider != null && gameObject.collider is BoxCollider)
-            {
-                var c = (BoxCollider )gameObject.collider;
-                c.UpdateColliderPosition(gameObject.GetPosition());
-            }
 
         }
     }
@@ -413,7 +432,7 @@ namespace SDL2Engine.Testing
             }
 
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            
+
             SDL_RenderDrawLine(renderer, (int)points[0].x, (int)points[0].y, (int)points[1].x, (int)points[1].y);
 
         }

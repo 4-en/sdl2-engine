@@ -62,6 +62,7 @@ namespace SDL2Engine
     {
         protected AssetHandler<T> handler;
         private bool loaded = false;
+        private bool loadFailed = false;
         private bool hasRef = false;
         public Asset(AssetHandler<T> handler)
         {
@@ -82,8 +83,12 @@ namespace SDL2Engine
                 return;
             }
 
-            handler.LoadAsset();
-            loaded = true;
+            bool result = handler.LoadAsset();
+            loaded = result;
+            if (!result)
+            {
+                loadFailed = true;
+            }
 
         }
 
@@ -112,27 +117,24 @@ namespace SDL2Engine
 
         public T Get()
         {
+            if(loaded)
+            {
+                Console.WriteLine("Asset already loaded");
+            }
+
+            if(loadFailed)
+            {
+                return GetDefault();
+            }
+
             if(!hasRef)
             {
                 return GetDefault();
             }
 
-            if (!loaded)
-            {
-                Load();
-            }
+            Load();
 
-            if(!handler.IsLoaded())
-            {
-                return GetDefault();
-            }
-
-            var res = handler.Get();
-            if (res == null)
-            {
-                return GetDefault();
-            }
-            return res;
+            return loaded && !loadFailed ? handler.Get() : GetDefault();
         }
 
         public string GetPath()
@@ -182,6 +184,7 @@ namespace SDL2Engine
 
     public class Texture : Asset<IntPtr>
     {
+        private Rect? rect = null;
         private static Lazy<IntPtr> default_texture = new(() =>
         {
             int size = 128;
@@ -227,11 +230,23 @@ namespace SDL2Engine
             SDL.SDL_RenderCopy(renderer, Get(), ref sdl_source, ref sdl_destination);
         }
 
-        public Rect GetTextureRect()
+        public Rect? GetTextureRect()
         {
+            if (this.rect != null)
+            {
+                return this.rect;
+            }
+
             int w, h;
             SDL_QueryTexture(this.Get(), out _, out _, out w, out h);
-            return new Rect(w, h);
+            var my_rect = new Rect(w, h);
+
+            // only set the rect if the texture is loaded
+            if (IsLoaded())
+            {
+                this.rect = my_rect;
+            }
+            return my_rect;
         }
     }
 
@@ -280,7 +295,7 @@ namespace SDL2Engine
             IntPtr sound_ref = Get();
             if (sound_ref == IntPtr.Zero)
             {
-                Console.WriteLine("Sound: Failed to get sound");
+                Console.WriteLine("Sound: Failed to get sound: " + handler.GetPath());
                 return false;
             }
             if (this.channel != -1)
@@ -290,7 +305,7 @@ namespace SDL2Engine
             int sound_channel = SDL2.SDL_mixer.Mix_PlayChannel(-1, sound_ref, loops);
             if (sound_channel == -1)
             {
-                Console.WriteLine("Sound: Failed to play sound");
+                Console.WriteLine("Sound: Failed to play sound: " + handler.GetPath());
                 return false;
             }
             this.channel = sound_channel;
@@ -357,14 +372,14 @@ namespace SDL2Engine
             IntPtr music_ref = Get();
             if (music_ref == IntPtr.Zero)
             {
-                Console.WriteLine("Music: Failed to get music");
+                Console.WriteLine("Music: Failed to get music: " + handler.GetPath());
                 return false;
             }
             int result = SDL2.SDL_mixer.Mix_PlayMusic(music_ref, loops);
             
             if (result == -1)
             {
-                Console.WriteLine("Music: Failed to play music");
+                Console.WriteLine("Music: Failed to play music: " + handler.GetPath());
                 return false;
             }
             current_music_path = handler.GetPath();
@@ -495,7 +510,7 @@ namespace SDL2Engine
 
     class TextureHandler : AssetHandler<IntPtr>
     {
-        private Rect? rect;
+        private Rect rect;
 
         public TextureHandler(string path) : base(path)
         {
@@ -528,7 +543,7 @@ namespace SDL2Engine
             return true;
         }
 
-        public Rect? GetTextureRect()
+        public Rect GetTextureRect()
         {
             return rect;
         }
@@ -578,7 +593,7 @@ namespace SDL2Engine
             }
             loaded = true;
 
-            return false;
+            return true;
         }
 
         public override bool UnloadAsset()
@@ -627,7 +642,7 @@ namespace SDL2Engine
             }
             loaded = true;
 
-            return false;
+            return true;
         }
 
         public override bool UnloadAsset()

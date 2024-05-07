@@ -266,7 +266,7 @@ namespace SDL2Engine
 
     }
 
-    public class TextureRenderer2 : DrawableRect, ILoadable
+    public class TextureRenderer : DrawableRect, ILoadable
     {
         private Texture? texture;
         public string source = "";
@@ -322,22 +322,20 @@ namespace SDL2Engine
             var srcRect = rect.ToSDLRect();
             var dstRect = this.GetDestRect();
 
-            double time = Time.time;
-            double angle = time * 0.3 * 360;
+            double angle = gameObject.transform.rotation;
 
             SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
 
-            SDL_RenderDrawRect(Engine.renderer, ref dstRect);
         }
     }
 
-    public class TextureRenderer : DrawableRect
+    public class TextureRendererOld : DrawableRect
     {
         private IntPtr texture_ptr = IntPtr.Zero;
         private Texture? texture;
         private string? path = null;
 
-        ~TextureRenderer()
+        ~TextureRendererOld()
         {
             // TODO: check if this actually works
             // seems like the finalizer is not called

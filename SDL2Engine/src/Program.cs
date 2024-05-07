@@ -14,6 +14,13 @@ namespace SDL2Engine.Testing
             // destroy if colliding with anything (thats movable, since two static objects can't collide)
             Destroy(this.gameObject);
         }
+
+        public override void Update()
+        {
+            // rotate with time
+
+            transform.rotation = Time.time * 360 / 3 % 360;
+        }
     }
 
     class MouseTracker : Script
@@ -30,7 +37,7 @@ namespace SDL2Engine.Testing
             {
                 parent.AddChild(square);
             }
-            square.AddComponent<TextureRenderer2>()?.SetSource("Assets/Textures/forsenE.png");
+            square.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/forsenE.png");
             var bc = BoxCollider.FromDrawableRect(square);
             square.AddComponent<DestroyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());

@@ -11,14 +11,19 @@ namespace Pong.src
         public float Top { get; private set; }
         public float Bottom { get; private set; }
 
+        
+        public static float BoarderWidth = 1905;
+        public static float BoarderHeight = 850;
+
+
         public override void Draw(Camera camera)
         {
-            var BoarderWidth = 1905;
-            var BoarderHeight = 1075;
             var BorderThickness = 5;
             var renderer = Engine.renderer;
 
             var root = this.gameObject;
+
+            
 
             // Set the color to white
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -42,7 +47,6 @@ namespace Pong.src
             // Define the inner rectangle (empty area) with root as center
             Vec2D topLeft = new Vec2D(-BoarderWidth / 2, -BoarderHeight / 2) + root.transform.position;
             Vec2D bottomRight = new Vec2D(BoarderWidth / 2, BoarderHeight / 2) + root.transform.position;
-
             // transform to camera space
             topLeft = camera.WorldToScreen(topLeft);
             bottomRight = camera.WorldToScreen(bottomRight);

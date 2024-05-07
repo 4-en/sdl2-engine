@@ -12,24 +12,37 @@ namespace Pong.src
 {
     internal class PongGame
     {
+
+        public static Vec2D boarderPosition = new Vec2D(960, 500);
+
         public static Scene CreateScene()
         {
-
 
             var scene = new Scene("PongGame Scene");
 
             // var leftPaddle = scene.CreateChild("Left Paddle");
-            var leftPaddle = new GameObject("Left Paddle");
+            var leftPaddle = new GameObject("LeftPaddle");
             _ = leftPaddle.AddComponent<WSController>();
             _ = leftPaddle.AddComponent<Paddle>();
-            leftPaddle.SetPosition(new Vec2D(50, 750));
+            var lp = leftPaddle.AddComponent<PhysicsBody>();
+            lp.IsMovable = true;
+            var leftPaddleBoxCollider = leftPaddle.AddComponent<BoxCollider>();
+            leftPaddleBoxCollider.UpdateColliderPosition(new Vec2D(50, boarderPosition.y));
+            leftPaddleBoxCollider.UpdateColliderSize(35, 160);
+            leftPaddle.transform.position = new Vec2D(50, boarderPosition.y);
             scene.AddGameObject(leftPaddle);
 
 
-            var rightPaddle = new GameObject("Right Paddle");
+            var rightPaddle = new GameObject("RightPaddle");
             _ = rightPaddle.AddComponent<ArrowKeysController>();
             _ = rightPaddle.AddComponent<Paddle>();
-            rightPaddle.transform.position = new Vec2D(1870, 750);
+            var rp = rightPaddle.AddComponent<PhysicsBody>();
+            rp.IsMovable = true;
+            var rightPaddleBoxCollider = rightPaddle.AddComponent<BoxCollider>();
+            rightPaddleBoxCollider.UpdateColliderPosition(new Vec2D(1870, boarderPosition.y));
+            rightPaddleBoxCollider.UpdateColliderSize(35, 160);
+            rightPaddle.transform.position = new Vec2D(1870, boarderPosition.y);
+
             scene.AddGameObject(rightPaddle);
 
             ////PongBall variante round
@@ -42,16 +55,13 @@ namespace Pong.src
             var pongSquare = new GameObject("PongSquare");
             //_ = pongBall.AddComponent<ArrowKeysController>();
             _ = pongSquare.AddComponent<PongSquare>();
-            //pongSquare.transform.position = new Vec2D(960, 750);
             var bc = pongSquare.AddComponent<BoxCollider>();
             var pb = pongSquare.AddComponent<PhysicsBody>();
-            if (pb != null)
-            {
-                var rand = new Random();
-                pb.Velocity = new Vec2D(rand.Next(-500, 500), rand.Next(-500, 500));
-                pb.Drag = 0d;
-            }
-            pongSquare.SetPosition(new Vec2D(960, 750));
+            pb.Velocity = new Vec2D(8, 5);
+            pb.IsMovable = true;
+
+            pongSquare.SetPosition(new Vec2D(960, boarderPosition.y));
+            //pongSquare.SetPosition(new Vec2D(960 - 480 - 50, 750));
             scene.AddGameObject(pongSquare);
 
             ////Boarder variante 1 
@@ -63,22 +73,38 @@ namespace Pong.src
             //_ = rightBoarder.AddComponent<Boarder>();
             //rightBoarder.transform.position = new Vec2D(1915, 750);
 
-            //Boarder variante 2
-            var testBoarder = new GameObject("Boarder");
-            _ = testBoarder.AddComponent<Boarder2>();
-            testBoarder.transform.position = new Vec2D(960, 750);
-            scene.AddGameObject(testBoarder);
+            void CreateBoarder(string name, Vec2D position, Vec2D colliderPosition, Vec2D colliderSize)
+            {
+                var boarder = new GameObject(name);
+                var boarder2 = boarder.AddComponent<Boarder2>();
+                
+                var collider = boarder.AddComponent<BoxCollider>();
+                collider.UpdateColliderPosition(colliderPosition);
+                collider.UpdateColliderSize((int)colliderSize.x, (int)colliderSize.y); // Hier die Umwandlung in int hinzugefügt
 
-            //testBoarder.transform.position = new Vec2D(scene.GetCamera().GetWorldSize().x / 2, scene.GetCamera().GetWorldSize().y / 2);
+                var physics = boarder.AddComponent<PhysicsBody>();
 
-            // Text erstellen und rendern
-            //var helloText = scene.CreateChild("Hello Text");
-            //_ = testBoarder.AddComponent<Text>();
-            //helloText.transform.position = new Vec2D(960, 300);
-            // RenderText("Hello!", helloText.transform.position, Engine.renderer, scene.GetCamera());
+                boarder.transform.position = position;
+
+                scene.AddGameObject(boarder);
+            }
+
+            //public static float BoarderWidth = 1905;
+        //public static float BoarderHeight = 850;
+
+        // Erstelle Boarder-Objekte mit vereinfachter Methode
+            CreateBoarder("BoarderBottom", boarderPosition, new Vec2D(5, boarderPosition.y+ Boarder2.BoarderHeight/2 + 20), new Vec2D(Boarder2.BoarderWidth, 5));
+            CreateBoarder("BoarderTop", boarderPosition, new Vec2D(5, boarderPosition.y - Boarder2.BoarderHeight / 2 + 20 ), new Vec2D(Boarder2.BoarderWidth-5, 5));
+            CreateBoarder("BoarderLeft", boarderPosition, new Vec2D(0, boarderPosition.y - Boarder2.BoarderHeight / 2), new Vec2D(5, Boarder2.BoarderHeight));
+            CreateBoarder("BoarderRight", boarderPosition, new Vec2D(Boarder2.BoarderWidth + 25, boarderPosition.y - Boarder2.BoarderHeight / 2), new Vec2D(5, Boarder2.BoarderHeight));
+
+            
+
+
 
             return scene;
         }
+
         public static void Run()
         {
 
@@ -89,38 +115,6 @@ namespace Pong.src
             engine.Run();
         }
 
-        // Methode zum Rendern des Textes
-        //private static void RenderText(string text, Vec2D worldPosition, nint renderer, Camera camera)
-        //{
-
-        //    Console.WriteLine(camera);
-        //    nint sans = TTF_OpenFont("Sans.ttf", 24);
-
-        //    SDL_Color white = new();
-        //    white.r = white.g = white.b = white.a = 255;
-
-        //    nint surfaceMessage = TTF_RenderText_Solid(sans, text, white);
-
-        //    // now you can convert it into a texture
-        //    nint message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
-
-        //    SDL_Rect message_rect;
-        //    message_rect.w = message_rect.h = 0;
-
-        //    // Convert world position to screen position using camera
-        //    Vec2D screenPosition = camera.WorldToScreen(worldPosition);
-        //    message_rect.x = (int)screenPosition.x;
-        //    message_rect.y = (int)screenPosition.y;
-
-        //    // Get the size of the text
-        //    SDL_QueryTexture(message, out _, out _, out message_rect.w, out message_rect.h);
-
-        //    SDL_RenderCopy(renderer, message, (nint)null, ref message_rect);
-
-        //    SDL_FreeSurface(surfaceMessage);
-        //    SDL_DestroyTexture(message);
-        //    TTF_CloseFont(sans);
-        //}
 
     }
 }
@@ -161,6 +155,7 @@ class WSController : Script
         {
             gameObject.transform.position += new Vec2D(0, speed);
         }
+
 
     }
 }

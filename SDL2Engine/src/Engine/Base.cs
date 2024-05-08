@@ -495,14 +495,15 @@ namespace SDL2Engine
                 //scene = this.GetScene();
 
                 // the scene shouldn't be null, so send an error message
-                Console.WriteLine("Scene is null when trying to destroy object: " + obj.name + " in GameObject.Destroy()");
+                // Console.WriteLine("Scene is null when trying to destroy object: " + obj.name + " in GameObject.Destroy()");
+                throw new Exception("Scene is null when trying to destroy object: " + obj.name + " in GameObject.Destroy()");
 
             }
 
 
 
 
-            scene?.Destroy(obj, time);
+            scene.Destroy(obj, time);
 
             return true;
         }

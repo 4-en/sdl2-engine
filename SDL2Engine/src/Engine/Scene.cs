@@ -188,18 +188,23 @@ namespace SDL2Engine
         {
             if (gameObject.GetScene() != null)
             {
-
+                /*
                 Console.WriteLine("WARNING: GameObject already has a scene. This could result in duplicate objects in the scene" +
                     " and unexpected behavior. Make sure to remove the GameObject from the previous scene before adding it to a new scene.");
                 return;
+                */
+                throw new Exception("GameObject already has a scene");
             }
 
             // if the game object has a parent which is not in this scene, dont add it
             GameObject? parent = gameObject.GetParent();
             if (parent != null && parent.GetScene() != this)
             {
+                /*
                 Console.WriteLine("WARNING: GameObject has a parent which is not in this scene. Make sure to add the parent to this scene first.");
                 return;
+                */
+                throw new Exception("GameObject has a parent which is not in this scene");
             }
 
             this.toAdd.Add(gameObject);
@@ -285,7 +290,6 @@ namespace SDL2Engine
             {
                 case Drawable drawable:
                     var succ = drawableList.Remove(drawable);
-                    Console.WriteLine("Drawable removed: " + succ);
                     break;
                 case Collider collider:
                     colliderList.Remove(collider);

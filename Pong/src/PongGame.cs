@@ -23,13 +23,13 @@ namespace Pong.src
             ////PongBall variante round
             var pongSquare = new GameObject("PongSquare");
             //_ = pongBall.AddComponent<ArrowKeysController>();
-            var ball_drawable = pongSquare.AddComponent<DrawableRect>();
+            var ball_drawable = pongSquare.AddComponent<FilledRect>();
             ball_drawable.color = new Color(255, 255, 255, 255);
             ball_drawable.SetRect(new Rect(50, 50));
             ball_drawable.anchorPoint = AnchorPoint.TopLeft;
             BoxCollider.FromDrawableRect(pongSquare);
             var pb = pongSquare.AddComponent<PhysicsBody>();
-            pb.Velocity = new Vec2D(800, 500);
+            pb.Velocity = new Vec2D(80, 50);
             pb.IsMovable = true;
 
             pongSquare.SetPosition(new Vec2D(960, borderPosition.y));

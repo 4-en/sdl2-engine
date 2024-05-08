@@ -250,18 +250,14 @@ namespace SDL2Engine
         {
             var renderer = Engine.renderer;
 
-            Vec2D root = GetDrawRoot();
-            Vec2D size = rect.GetSize();
+            var world_rect = this.GetWorldRect();
+            world_rect = camera.RectToScreen(world_rect);
 
-            Vec2D topLeft = new Vec2D(root.x - size.x / 2, root.y - size.y / 2);
-            Vec2D topRight = new Vec2D(root.x + size.x / 2, root.y - size.y / 2);
-            Vec2D bottomLeft = new Vec2D(root.x - size.x / 2, root.y + size.y / 2);
-            Vec2D bottomRight = new Vec2D(root.x + size.x / 2, root.y + size.y / 2);
+            Vec2D topLeft = new Vec2D(world_rect.x, world_rect.y);
+            Vec2D topRight = new Vec2D(world_rect.x + world_rect.w, world_rect.y);
+            Vec2D bottomRight = new Vec2D(world_rect.x + world_rect.w, world_rect.y + world_rect.h);
+            Vec2D bottomLeft = new Vec2D(world_rect.x, world_rect.y + world_rect.h);
 
-            topLeft = camera.WorldToScreen(topLeft);
-            topRight = camera.WorldToScreen(topRight);
-            bottomLeft = camera.WorldToScreen(bottomLeft);
-            bottomRight = camera.WorldToScreen(bottomRight);
 
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
             SDL_RenderDrawLine(renderer, (int)topLeft.x, (int)topLeft.y, (int)topRight.x, (int)topRight.y);
@@ -270,6 +266,19 @@ namespace SDL2Engine
             SDL_RenderDrawLine(renderer, (int)bottomLeft.x, (int)bottomLeft.y, (int)topLeft.x, (int)topLeft.y);
         }
 
+    }
+
+    public class FilledRect : DrawableRect
+    {
+        public override void Draw(Camera camera)
+        {
+            var renderer = Engine.renderer;
+
+            var sdl_rect = this.GetDestRect();
+
+            SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+            SDL_RenderFillRect(renderer, ref sdl_rect);
+        }
     }
 
     public class TextureRenderer : DrawableRect, ILoadable

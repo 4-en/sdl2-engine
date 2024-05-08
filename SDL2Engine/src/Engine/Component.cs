@@ -96,9 +96,9 @@ namespace SDL2Engine
             return gameObject.GetComponents<T>();
         }
 
-        public T AddComponent<T>() where T : Component, new()
+        public T AddComponent<T>(T? component = null) where T : Component, new()
         {
-            return gameObject.AddComponent<T>();
+            return gameObject.AddComponent<T>(component);
         }
 
         public bool RemoveComponent(Component script)

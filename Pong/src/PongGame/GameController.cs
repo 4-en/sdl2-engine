@@ -169,7 +169,15 @@ namespace Pong
                 int total_score = player_1_score + player_2_score;
                 double speed = 500 + total_score * 50; // increase speed as game progresses
                 var rand = new System.Random();
-                double direction = rand.NextDouble() * Math.PI / 2 + Math.PI / 4;
+                
+                // angle should be between -45 and 45 degrees
+                double direction = rand.NextDouble() * Math.PI / 3 - Math.PI / 6;
+
+                if (rand.NextDouble() > 0.5)
+                {
+                    direction += Math.PI;
+                }
+
                 body.Velocity = new Vec2D(Math.Cos(direction), Math.Sin(direction)) * speed;
             }
         }

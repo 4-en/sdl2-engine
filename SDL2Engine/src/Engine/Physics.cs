@@ -719,7 +719,7 @@ namespace SDL2Engine
                 double x = Math.Max(box1.box.x, Math.Min(box2.box.x + box2.box.w, box1.box.x + box1.box.w));
                 double y = Math.Max(box1.box.y, Math.Min(box2.box.y + box2.box.h, box1.box.y + box1.box.h));
                 Vec2D collisionPoint = new Vec2D(x, y);
-                Console.WriteLine("Collision Point: " + collisionPoint.x + collisionPoint.y);
+                // Console.WriteLine("Collision Point: " + collisionPoint.x + collisionPoint.y);
                 return collisionPoint;
             }
             //boxcollider and circlecollider
@@ -731,7 +731,7 @@ namespace SDL2Engine
                 double closestX = Math.Max(box.box.x, Math.Min(circle.center.x, box.box.x + box.box.w));
                 double closestY = Math.Max(box.box.y, Math.Min(circle.center.y, box.box.y + box.box.h));
                 Vec2D collisionPoint = new Vec2D(closestX, closestY);
-                Console.WriteLine("Collision Point: " + collisionPoint.x + collisionPoint.y);
+                // Console.WriteLine("Collision Point: " + collisionPoint.x + collisionPoint.y);
                 return collisionPoint;
             }
             //boxcollider and edgecollider
@@ -865,21 +865,7 @@ namespace SDL2Engine
 
 
             }
-            Console.WriteLine("Collision between" + obj1.GetName() + " and " + obj2.GetName());
-        }
-
-        public static double CalculateDotProduct(Vec2D vec1, Vec2D vec2)
-        {
-            if (vec1.Length != vec2.Length)
-            {
-                throw new ArgumentException("Vectors must have the same length.");
-            }
-
-            double result = 0;
-
-
-
-            return result;
+            // Console.WriteLine("Collision between" + obj1.GetName() + " and " + obj2.GetName());
         }
 
 

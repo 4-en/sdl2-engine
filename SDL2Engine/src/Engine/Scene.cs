@@ -226,7 +226,7 @@ namespace SDL2Engine
                 return;
             }
 
-            this.toAdd.Add(gameObject);
+            this.toAdd.Add(component);
         }
 
         private void AddGameObjectComponents(GameObject gameObject)

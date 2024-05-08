@@ -101,9 +101,9 @@ namespace SDL2Engine
             return gameObject.AddComponent<T>(component);
         }
 
-        public bool RemoveComponent(Component script)
+        public bool RemoveComponent(Component component)
         {
-            return gameObject.RemoveComponent(script);
+            return gameObject.RemoveComponent(component);
         }
 
         public bool RemoveComponent<T>() where T : Component

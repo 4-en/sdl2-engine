@@ -94,6 +94,10 @@ namespace SDL2Engine
             GameObject newObject = new GameObject(source.name, source.scene);
             newObject.layer = source.layer;
             newObject.enabled = source.enabled;
+
+            // TODO: check if this works
+            // maybe clone all fields of the object instead of copying the reference
+            // otherwise, the new object will be a reference to the old object, sharing the same transform, components, and children
             newObject.transform = source.transform;
             newObject.Parent = source.Parent;
 
@@ -116,6 +120,10 @@ namespace SDL2Engine
                 {
                     field.SetValue(newComponent, field.GetValue(script));
                 }
+
+                // TODO: check if this works
+                // this hasn't been tested yet
+                newObject.AddComponent(newComponent);
             }
 
             // copy all children
@@ -348,10 +356,20 @@ namespace SDL2Engine
             return null;
         }
 
-        public T AddComponent<T>() where T : Component , new()
+        /*
+         * Adds a component to the GameObject
+         * Usually used to add a new Component to the GameObject
+         * by only specifying the type of the Component
+         *
+         * Can also be used to add an existing Component to the GameObject
+         * this should only be done when the Component is not already attached to a GameObject
+         * and could lead to unexpected behavior if the Component is already attached to a GameObject
+         */
+        public T AddComponent<T>(T? instance = null) where T : Component , new()
         {
             
-            T newComponent = new T();
+            
+            T newComponent = instance ?? new T();
             
             if (newComponent != null)
             {

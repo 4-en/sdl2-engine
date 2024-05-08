@@ -44,7 +44,6 @@ namespace SDL2Engine
         public static T Instantiate<T>(T source, GameObject? gameObject = null) where T : Component, new()
         {
             T newComponent = new T();
-            newComponent.Init(gameObject ?? source.gameObject);
 
             // use reflection to copy all members of the component
             FieldInfo[] fields = source.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -53,8 +52,9 @@ namespace SDL2Engine
                 field.SetValue(newComponent, field.GetValue(source));
             }
 
-            return newComponent;
-
+            // TODO: check if this works
+            GameObject myParent = gameObject ?? source.gameObject;
+            return myParent.AddComponent<T>(newComponent);
         }
 
         public void SetEnabled(bool status)

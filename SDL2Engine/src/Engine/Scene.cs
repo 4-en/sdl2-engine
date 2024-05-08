@@ -123,6 +123,7 @@ namespace SDL2Engine
 
         private TimedQueue<EngineObject> toDestroy = new();
         private List<EngineObject> toAdd = new();
+        private List<GameObject> toRemove = new();
 
         public Scene()
         {
@@ -205,14 +206,32 @@ namespace SDL2Engine
                 return;
                 */
                 throw new Exception("GameObject has a parent which is not in this scene");
+            } else if (parent != null)
+            {
+                // check if parent is in the toAdd list
+                if (toAdd.Contains(parent) || toAdd.Contains(gameObject.GetDeepParent()))
+                {
+                    // if the parent is in the toAdd list, we can assume that it will be added later
+                    // in this case, we don't need to add this child to the list as well
+                    gameObject.SetScene(this);
+                    return;
+                }
+
             }
 
             this.toAdd.Add(gameObject);
             gameObject.SetScene(this);
         }
 
-        public void AddGameObjectComponent(GameObject gameObject, Component component)
+        public void AddComponent(Component component)
         {
+
+            var gameObject = component.GetGameObject();
+            if(gameObject == null || gameObject == GameObject.Default)
+            {
+                Console.WriteLine("WARNING: Component has no GameObject. Make sure to add the component to a GameObject before adding it to a scene.");
+                return;
+            }
 
             // if the game objectis in toAdd, dont add the component to the lists since it will be added later
             if (toAdd.Contains(gameObject))
@@ -229,7 +248,7 @@ namespace SDL2Engine
             this.toAdd.Add(component);
         }
 
-        private void AddGameObjectComponents(GameObject gameObject)
+        private void HandleAddGameObjectComponents(GameObject gameObject)
         {
             List<Component> list = gameObject.GetAllComponents();
             for (int i = 0; i < list.Count; i++)
@@ -243,7 +262,7 @@ namespace SDL2Engine
             List<GameObject> children = gameObject.GetChildren();
             for (int i = 0; i < children.Count; i++)
             {
-                AddGameObjectComponents(children[i]);
+                HandleAddGameObjectComponents(children[i]);
             }
             // increment game objects count
             this.gameObjectsCount++;
@@ -308,6 +327,23 @@ namespace SDL2Engine
                     script.OnDestroy();
                     break;
             }
+        }
+
+        public void RemoveGameObjectFromRoot(GameObject gameObject)
+        {
+            if (gameObject.GetScene() != this)
+            {
+                Console.WriteLine("WARNING: GameObject is not in this scene. Make sure to remove the GameObject from the correct scene.");
+                return;
+            }
+
+            if (gameObject.GetParent() == null)
+            {
+                Console.WriteLine("WARNING: GameObject has no parent and should not be removed from the root. To remove a GameObject from the scene, use Destroy.");
+                return;
+            }
+
+            this.toRemove.Add(gameObject);
         }
 
         private void HandleDestroy(EngineObject engineObject)
@@ -419,26 +455,80 @@ namespace SDL2Engine
         public void Update()
         {
 
+            // TODO: optimize this later
+            // (this seems horrible tbh)
             // add game objects that are scheduled to be added
+            var alreadyAdded = new HashSet<GameObject>();
+            //var get_parent_count = (GameObjects go) => go.GetParent() == null ? 0 : 1 + get_parent_count(go.GetParent());
+            // sort the game objects by their depth, lowest depth first
+
             foreach (EngineObject engineObject in toAdd)
             {
                 if (engineObject is GameObject gameObject)
                 {
+                    GameObject? parent = gameObject.GetParent();
                     // only add the game object if its a root
-                    if (gameObject.GetParent() == null)
+                    if (parent == null)
                     {
                         this.gameObjects.Add(gameObject);
+                        HandleAddGameObjectComponents(gameObject);
+                        alreadyAdded.Add(gameObject);
                     }
                     else
                     {
                         // otherwise we assume that the parent(or its parent) is already in the list
                         // TODO: add a check for this
+
+                        // since AddGameObjectComponents will recursively add all components,
+                        // even of children, we could double add components if we add a parent and a child
+                        // in the same frame
+                        // if the child is added at a later frame, this is fine, since it hasn't been part
+                        // of the parent when the parent was added, and therefore its components haven't been added
+                        // GENERALLY, the parent would be added first (even during the same frame), so we are only checking
+                        // if the parent has already been added
+                        // this could be an issue if we create the child, then the parent, then add the child to the parent
+
+                        // we also have to check every parents parent and so on...
+                        // this is a bit slow, but it should work for now
+                        bool parentAdded = false;
+                        while (parent != null)
+                        {
+                            if (alreadyAdded.Contains(parent))
+                            {
+                                parentAdded = true;
+                                break;
+                            }
+                            parent = parent.GetParent();
+                        }
+
+                        if (!parentAdded)
+                        {
+                            HandleAddGameObjectComponents(gameObject);
+                            alreadyAdded.Add(gameObject);
+                        }
                     }
-                    AddGameObjectComponents(gameObject);
+                    
                 }
                 else if (engineObject is Component component)
                 {
-                    HandleAddComponent(component);
+                    // same issue as above with child game objects
+                    // we have to make sure the owning game object is not added during the same frame
+                    GameObject? componentsGameObject = component.GetGameObject();
+                    bool parentAdded = false;
+                    while (componentsGameObject != null)
+                    {
+                        if (alreadyAdded.Contains(componentsGameObject))
+                        {
+                            parentAdded = true;
+                            break;
+                        }
+                        componentsGameObject = componentsGameObject.GetParent();
+                    }
+                    
+                    if (!parentAdded)
+                    {
+                        HandleAddComponent(component);
+                    }
                 }
             }
             toAdd.Clear();
@@ -501,6 +591,18 @@ namespace SDL2Engine
                     HandleDestroy(engineObject);
                     engineObject = toDestroy.PopBefore(time);
                 }
+            }
+
+            // remove game objects from the root list
+            // this assumes they are now a child of another game object,
+            // therefore they are still part of the scene
+            if (toRemove.Count > 0)
+            {
+                foreach (GameObject gameObject in toRemove)
+                {
+                    gameObjects.Remove(gameObject);
+                }
+                toRemove.Clear();
             }
 
         }

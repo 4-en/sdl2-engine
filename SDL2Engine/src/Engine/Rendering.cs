@@ -236,6 +236,7 @@ namespace SDL2Engine
                 return camera.RectToScreen(this.GetRect(), gameObject.GetPosition()).ToSDLRect();
             } else
             {
+                Console.WriteLine("Camera not found");
                 return rect.ToSDLRect();
             }
         }

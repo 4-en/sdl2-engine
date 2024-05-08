@@ -270,6 +270,17 @@ namespace SDL2Engine
             return Parent;
         }
 
+        public GameObject? GetDeepParent()
+        {
+            GameObject? parent = this.Parent;
+            while (parent != null && parent.Parent != null)
+            {
+                parent = parent.Parent;
+            }
+
+            return parent;
+        }
+
         public void RemoveParent()
         {
             this.Parent = null;
@@ -301,15 +312,13 @@ namespace SDL2Engine
         public GameObject AddChild()
         {
             GameObject newChild = new GameObject();
-            this.AddChild(newChild);
-            return newChild;
+            return this.AddChild(newChild);
         }
 
         public GameObject AddChild(string name)
         {
             GameObject newChild = new GameObject(name);
-            this.AddChild(newChild);
-            return newChild;
+            return this.AddChild(newChild);
         }
 
         public GameObject AddChild(GameObject child)
@@ -317,10 +326,21 @@ namespace SDL2Engine
             child.SetParent(this);
 
             Scene? childScene = child.GetScene();
-            if (childScene != null && childScene != this.scene)
+            if (childScene != null)
             {
-                childScene.Destroy(child);
-                this.GetScene()?.AddGameObject(child);
+                if (childScene != this.scene)
+                {
+                    /*
+                    * this could destroy resources that are still in use
+                    * its better to completely forbid adding a GameObject to a different scene
+                    childScene.Destroy(child);
+                    this.GetScene()?.AddGameObject(child);
+                    */
+                    throw new Exception("Cannot add GameObject to a different scene");
+                } else
+                {
+                    childScene.RemoveGameObjectFromRoot(child);
+                }
             }
 
             child.SetScene(this.scene);
@@ -393,7 +413,7 @@ namespace SDL2Engine
 
                 newComponent.Init(this);
 
-                this.scene?.AddGameObjectComponent(this, newComponent);
+                this.scene?.AddComponent(newComponent);
 
                 // add specific built-in components to fields instead of adding them to the components list
                 // GameObject should only have one of each of these components
@@ -430,7 +450,7 @@ namespace SDL2Engine
                 {
                     components.Add(newComponent);
                 }
-                this.scene?.AddGameObjectComponent(this, newComponent);
+
                 return newComponent;
             } else
             {

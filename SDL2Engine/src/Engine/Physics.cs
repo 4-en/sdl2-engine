@@ -763,6 +763,14 @@ namespace SDL2Engine
                 // check for nulls
                 if (pb1 == null || box1 == null || box2 == null) continue;
 
+                // check if any of the colliders is a trigger
+                // if so, do not resolve the collision
+                // triggers are used to detect collisions without resolving them
+                // they are still used to notify objects of collisions, so they can react to them
+                // useful for example for detecting when a player enters a trigger area
+                // or when implementing custom collision behaviour
+                if (box1.IsTrigger || box2.IsTrigger) continue;
+
                 // calculate the direction of the collision
                 // this is either horizontal or vertical, since we are only dealing with boxes
                 // for now, just check if box1 center is to the left or right of box2.

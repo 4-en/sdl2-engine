@@ -73,6 +73,21 @@ namespace Pong
         }
     }
 
+    class BallBounceScript : Script
+    {
+        Sound? sound = null;
+        public override void Start()
+        {
+            Console.WriteLine("BallBounceScript Start");
+            sound = AssetManager.LoadAsset<Sound>("Assets/Audio/bounce.mp3");
+        }
+
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            sound?.Play();
+        }
+    }
+
     public class GameController : Script
     {
         protected int player_1_score = 0;
@@ -107,6 +122,8 @@ namespace Pong
             ball_drawable.anchorPoint = AnchorPoint.TopLeft;
             BoxCollider.FromDrawableRect(ball);
             ball.AddComponent<PhysicsBody>();
+            ball.AddComponent<BallBounceScript>();
+            Console.WriteLine("Ball created");
 
             // create the paddles
             player1 = new GameObject("Player1");

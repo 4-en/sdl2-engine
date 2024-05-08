@@ -79,7 +79,7 @@ namespace Pong
         public override void Start()
         {
             Console.WriteLine("BallBounceScript Start");
-            sound = AssetManager.LoadAsset<Sound>("Assets/Audio/bounce.mp3");
+            sound = AssetManager.LoadAsset<Sound>("Assets/Audio/test_sound.mp3");
         }
 
         public override void OnCollisionEnter(CollisionPair collision)

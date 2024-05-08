@@ -300,7 +300,7 @@ namespace SDL2Engine
             }
             if (this.channel != -1)
             {
-                return false;
+                Stop();
             }
             int sound_channel = SDL2.SDL_mixer.Mix_PlayChannel(-1, sound_ref, loops);
             if (sound_channel == -1)

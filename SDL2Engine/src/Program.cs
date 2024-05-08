@@ -52,7 +52,6 @@ namespace SDL2Engine.Testing
 
         public override void Start()
         {
-            Console.WriteLine("MouseTracker Start");
             // play music
             if (music != null)
             {

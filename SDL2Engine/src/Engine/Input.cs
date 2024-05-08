@@ -60,7 +60,6 @@ namespace SDL2Engine
 
         public static void SetKeyDown(UInt32 key)
         {
-            Console.WriteLine("Key down: " + key);
             for (int i = 0; i < downKeys.Length; i++)
             {
                 if (downKeys[i] == 0)
@@ -75,7 +74,6 @@ namespace SDL2Engine
 
         public static void SetKeyPressed(UInt32 key)
         {
-            Console.WriteLine("Key pressed: " + key);
             for (int i = 0; i < pressedKeys.Length; i++)
             {
                 if (pressedKeys[i] == 0)
@@ -89,7 +87,6 @@ namespace SDL2Engine
 
         public static void SetKeyReleased(UInt32 key)
         {
-            Console.WriteLine("Key released: " + key);
             for (int i = 0; i < releasedKeys.Length; i++)
             {
                 if (releasedKeys[i] == 0)
@@ -104,7 +101,6 @@ namespace SDL2Engine
             {
                 if (pressedKeys[i] == key)
                 {
-                    Console.WriteLine("Removing key from pressedKeys: " + key);
                     pressedKeys[i] = 0;
                     break;
                 }

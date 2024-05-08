@@ -20,39 +20,14 @@ namespace Pong.src
 
             var scene = new Scene("PongGame Scene");
 
-            // var leftPaddle = scene.CreateChild("Left Paddle");
-            var leftPaddle = new GameObject("LeftPaddle");
-            leftPaddle.AddComponent<WSController>();
-            leftPaddle.AddComponent<Paddle>();
-
-            var leftPaddleBoxCollider = leftPaddle.AddComponent<BoxCollider>();
-            leftPaddleBoxCollider.UpdateColliderSize(35, 160);
-            leftPaddle.transform.position = new Vec2D(50, 0);
-            scene.AddGameObject(leftPaddle);
-
-
-            var rightPaddle = new GameObject("RightPaddle");
-            rightPaddle.AddComponent<ArrowKeysController>();
-            rightPaddle.AddComponent<Paddle>();
-
-            var rightPaddleBoxCollider = rightPaddle.AddComponent<BoxCollider>();
-            rightPaddleBoxCollider.UpdateColliderSize(35, 160);
-            rightPaddle.transform.position = new Vec2D(1870, borderPosition.y);
-
-            scene.AddGameObject(rightPaddle);
-
-            ////PongBall variante round
-            //var pongBall = scene.CreateChild("Pongball");
-            ////_ = pongBall.AddComponent<ArrowKeysController>();
-            //_ = pongBall.AddComponent<PongBall>();
-            //pongBall.transform.position = new Vec2D(950, 750);
-
             ////PongBall variante round
             var pongSquare = new GameObject("PongSquare");
             //_ = pongBall.AddComponent<ArrowKeysController>();
-            _ = pongSquare.AddComponent<PongSquare>();
-            var bc = pongSquare.AddComponent<BoxCollider>();
-            bc.box = new Rect(-25, -25, 50, 50);
+            var ball_drawable = pongSquare.AddComponent<DrawableRect>();
+            ball_drawable.color = new Color(255, 255, 255, 255);
+            ball_drawable.SetRect(new Rect(50, 50));
+            ball_drawable.anchorPoint = AnchorPoint.TopLeft;
+            BoxCollider.FromDrawableRect(pongSquare);
             var pb = pongSquare.AddComponent<PhysicsBody>();
             pb.Velocity = new Vec2D(800, 500);
             pb.IsMovable = true;
@@ -61,41 +36,31 @@ namespace Pong.src
             //pongSquare.SetPosition(new Vec2D(960 - 480 - 50, 750));
             scene.AddGameObject(pongSquare);
 
-            ////Boarder variante 1 
-            //var leftBoarder = scene.CreateChild("Boarder");
-            //_ = leftBoarder.AddComponent<Boarder>();
-            //leftBoarder.transform.position = new Vec2D(5, 750);
+            // var leftPaddle = scene.CreateChild("Left Paddle");
+            var leftPaddle = new GameObject("LeftPaddle", scene);
+            leftPaddle.AddComponent<WSController>();
+            var left_paddle_drawable = leftPaddle.AddComponent<DrawableRect>();
+            left_paddle_drawable.color = new Color(055, 055, 255, 255);
+            left_paddle_drawable.SetRect(new Rect(35, 160));
+            left_paddle_drawable.anchorPoint = AnchorPoint.TopLeft;
 
-            //var rightBoarder = scene.CreateChild("Boarder");
-            //_ = rightBoarder.AddComponent<Boarder>();
-            //rightBoarder.transform.position = new Vec2D(1915, 750);
 
-            /*
-            void CreateBorder(string name, Vec2D position, Vec2D colliderPosition, Vec2D colliderSize)
-            {
-                var boarder = new GameObject(name);
-                var boarder2 = boarder.AddComponent<Boarder2>();
+            BoxCollider.FromDrawableRect(leftPaddle);
+            //leftPaddleBoxCollider.box = new Rect(0, 0, 35, 160);
+            leftPaddle.transform.position = new Vec2D(50, 1080/2 - 80);
 
-                var collider = boarder.AddComponent<BoxCollider>();
-                collider.UpdateColliderPosition(colliderPosition);
-                collider.UpdateColliderSize((int)colliderSize.x, (int)colliderSize.y); // Hier die Umwandlung in int hinzugefügt
 
-                var physics = boarder.AddComponent<PhysicsBody>();
+            var rightPaddle = new GameObject("RightPaddle");
+            rightPaddle.AddComponent<ArrowKeysController>();
+            var right_paddle_drawable = rightPaddle.AddComponent<DrawableRect>();
+            right_paddle_drawable.color = new Color(255, 055, 055, 255);
+            right_paddle_drawable.SetRect(new Rect(35, 160));
+            right_paddle_drawable.anchorPoint = AnchorPoint.TopLeft;
 
-                boarder.transform.position = position;
+            BoxCollider.FromDrawableRect(rightPaddle);
+            rightPaddle.transform.position = new Vec2D(1870, borderPosition.y);
 
-                scene.AddGameObject(boarder);
-            }
-
-            //public static float BoarderWidth = 1905;
-            //public static float BoarderHeight = 850;
-
-            // Erstelle Boarder-Objekte mit vereinfachter Methode
-            CreateBorder("BoarderBottom", boarderPosition, new Vec2D(5, boarderPosition.y + Boarder2.BoarderHeight / 2 + 20), new Vec2D(Boarder2.BoarderWidth, 5));
-            CreateBorder("BoarderTop", boarderPosition, new Vec2D(5, boarderPosition.y - Boarder2.BoarderHeight / 2 + 20), new Vec2D(Boarder2.BoarderWidth - 5, 5));
-            CreateBorder("BoarderLeft", boarderPosition, new Vec2D(0, boarderPosition.y - Boarder2.BoarderHeight / 2), new Vec2D(5, Boarder2.BoarderHeight));
-            CreateBorder("BoarderRight", boarderPosition, new Vec2D(Boarder2.BoarderWidth + 25, boarderPosition.y - Boarder2.BoarderHeight / 2), new Vec2D(5, Boarder2.BoarderHeight));
-            */
+            scene.AddGameObject(rightPaddle);
 
             var create_barrier = (string name, Rect area) =>
             {
@@ -161,7 +126,6 @@ class WSController : Script
 {
     public override void Update()
     {
-        // a better way to do this would be to use a rigidbody with velocity
         var gameObject = this.gameObject;
         var speed = 10;
         if (Input.GetKeyPressed(((int)SDL_Keycode.SDLK_w)))

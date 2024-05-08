@@ -338,12 +338,12 @@ namespace SDL2Engine
         }
         public BoxCollider()
         {
-            this.box = new Rect(50, 50, 50, 50);
+            this.box = new Rect(0, 0, 50, 50);
         }
 
         public void UpdateColliderSize(int width, int height)
         {
-            var rect = new Rect(box.x, box.y, width, height);
+            var rect = new Rect(this.box.x, this.box.y, width, height);
             this.box = rect;
         }
 

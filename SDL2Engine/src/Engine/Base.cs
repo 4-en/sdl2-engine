@@ -350,7 +350,7 @@ namespace SDL2Engine
         public double w;
         public double h;
 
-        public Rect(double h, double w)
+        public Rect(double w, double h)
         {
             this.x = 0;
             this.y = 0;

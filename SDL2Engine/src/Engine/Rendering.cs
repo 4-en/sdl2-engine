@@ -20,7 +20,7 @@ namespace SDL2Engine
         BottomRight
     }
 
-    struct Color
+    public struct Color
     {
         public byte r;
         public byte g;
@@ -149,7 +149,7 @@ namespace SDL2Engine
     public class Drawable : Component
     {
 
-        protected AnchorPoint anchorPoint = AnchorPoint.Center;
+        public AnchorPoint anchorPoint = AnchorPoint.Center;
 
         public virtual void Draw(Camera camera)
         {
@@ -177,11 +177,17 @@ namespace SDL2Engine
     public class DrawableRect : Drawable
     {
         protected Rect rect = new Rect(0, 0, 64, 64);
+        public Color color = new Color(255, 255, 255, 255);
 
         public override Vec2D GetDrawRoot()
         {
             Vec2D localCenter = GetRect().GetTopLeft();
             return scene?.GetCamera().WorldToScreen(localCenter, gameObject.GetPosition()) ?? localCenter + gameObject.GetPosition();
+        }
+
+        public void SetRect(Rect rect)
+        {
+            this.rect = rect;
         }
 
         // get the rect based on the anchor point in local coordinates
@@ -195,28 +201,28 @@ namespace SDL2Engine
             switch(this.anchorPoint)
             {
                 case AnchorPoint.Center:
-                    position = new Vec2D(-size.x / 2, -size.y / 2);
+                    position = new Vec2D(-size.x / 2, -size.y / 2) + position;
                     break;
                 case AnchorPoint.TopCenter:
-                    position = new Vec2D(-size.x / 2, 0);
+                    position = new Vec2D(-size.x / 2, 0) + position;
                     break;
                 case AnchorPoint.TopRight:
-                    position = new Vec2D(-size.x, 0);
+                    position = new Vec2D(-size.x, 0) + position;
                     break;
                 case AnchorPoint.CenterLeft:
-                    position = new Vec2D(0, -size.y / 2);
+                    position = new Vec2D(0, -size.y / 2) + position;
                     break;
                 case AnchorPoint.CenterRight:
-                    position = new Vec2D(-size.x, -size.y / 2);
+                    position = new Vec2D(-size.x, -size.y / 2) + position;
                     break;
                 case AnchorPoint.BottomLeft:
-                    position = new Vec2D(0, -size.y);
+                    position = new Vec2D(0, -size.y) + position;
                     break;
                 case AnchorPoint.BottomCenter:
-                    position = new Vec2D(-size.x / 2, -size.y);
+                    position = new Vec2D(-size.x / 2, -size.y) + position;
                     break;
                 case AnchorPoint.BottomRight:
-                    position = new Vec2D(-size.x, -size.y);
+                    position = new Vec2D(-size.x, -size.y) + position;
                     break;
             }
             return new Rect(position.x, position.y, size.x, size.y);
@@ -257,7 +263,7 @@ namespace SDL2Engine
             bottomLeft = camera.WorldToScreen(bottomLeft);
             bottomRight = camera.WorldToScreen(bottomRight);
 
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
             SDL_RenderDrawLine(renderer, (int)topLeft.x, (int)topLeft.y, (int)topRight.x, (int)topRight.y);
             SDL_RenderDrawLine(renderer, (int)topRight.x, (int)topRight.y, (int)bottomRight.x, (int)bottomRight.y);
             SDL_RenderDrawLine(renderer, (int)bottomRight.x, (int)bottomRight.y, (int)bottomLeft.x, (int)bottomLeft.y);

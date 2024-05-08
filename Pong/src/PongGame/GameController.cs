@@ -114,6 +114,9 @@ namespace Pong
         protected GameObject? topWall = null;
         protected GameObject? bottomWall = null;
 
+        protected GameObject? scoreObject = null;
+        protected TextRenderer? scoreText = null;
+
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
 
         private double roundTimer = -3;
@@ -173,8 +176,22 @@ namespace Pong
             topWall = create_barrier("Top Barrier", new Rect(0, -100, 1920, 100));
             bottomWall = create_barrier("Bottom Barrier", new Rect(0, 1080, 1920, 100));
 
+            scoreObject = new GameObject("Score");
+            scoreObject.transform.position = new Vec2D(gameBounds.x / 2, 50);
+            scoreText = scoreObject.AddComponent<TextRenderer>();
+            scoreText.color = new Color(255, 255, 255, 205);
+            scoreText.SetFontSize(100);
+
             ResetGame();
 
+        }
+
+        public void UpdateScoreText()
+        {
+            if (scoreText == null) return;
+
+            string scoreString = $"{player_1_score} - {player_2_score}";
+            scoreText.SetText(scoreString);
         }
 
         public void SetGameMode(GameMode mode)
@@ -237,6 +254,7 @@ namespace Pong
         {
             player_1_score = 0;
             player_2_score = 0;
+            UpdateScoreText();
             ResetBall();
             roundTimer = -4;
 
@@ -248,7 +266,7 @@ namespace Pong
 
             if (player2 != null)
             {
-                player2.transform.position = new Vec2D(gameBounds.x - 50, gameBounds.y / 2);
+                player2.transform.position = new Vec2D(gameBounds.x - 50 - 40, gameBounds.y / 2);
             }
         }
 
@@ -327,6 +345,8 @@ namespace Pong
                 StartBall();
                 roundStarted = true;
             }
+
+            UpdateScoreText();
 
             switch (gameMode)
             {

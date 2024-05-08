@@ -279,8 +279,9 @@ namespace SDL2Engine
 
         public void SetText(string text)
         {
+            bool changed = this.text != text;
             this.text = text;
-            updateTexture = true;
+            updateTexture = changed || updateTexture;
         }
 
         public void SetFontSize(int fontSize)

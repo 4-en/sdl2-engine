@@ -562,9 +562,10 @@ namespace SDL2Engine
         private bool fullscreen = false;
         private static bool forceAspectRatio = false;
         private static double aspectRatio = 16.0 / 9.0;
-        public static UInt32 targetFPS = 60;
+        public static UInt32 targetFPS = 1000;
         public static int windowWidth = 1000;
         public static int windowHeight = (int)(windowWidth / aspectRatio);
+        private IntPtr font = IntPtr.Zero;
 
 
         // SDL variables
@@ -810,7 +811,8 @@ namespace SDL2Engine
         {
             SDL.SDL_Color textColor = new SDL.SDL_Color { r = 255, g = 255, b = 255, a = 255 };
             SDL.SDL_Color backgroundColor = new SDL.SDL_Color { r = 0x1A, g = 0x1A, b = 0x1A, a = 0xFF }; // Black color for background
-            IntPtr font = SDL_ttf.TTF_OpenFont("Assets/Fonts/Roboto-Regular.ttf", 24);
+            if (font == IntPtr.Zero)
+                font = SDL_ttf.TTF_OpenFont("Assets/Fonts/Roboto-Regular.ttf", 24);
 
             if (font == IntPtr.Zero)
             {
@@ -869,8 +871,6 @@ namespace SDL2Engine
                 SDL.SDL_DestroyTexture(texture);
                 SDL.SDL_FreeSurface(surface);
             }
-
-            SDL_ttf.TTF_CloseFont(font);
         }
 
         private void Draw()

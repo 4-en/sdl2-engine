@@ -4,9 +4,17 @@ using SDL2Engine;
 namespace Pong
 {
 
-
     public static partial class LevelManager
     {
+        public static void Start()
+        {
+            LoadLevel(0);
+
+            var engine = new Engine();
+            engine.Run();
+        }
+
+
         private static Scene? level;
         private static int levelIndex = 0;
 
@@ -66,6 +74,9 @@ namespace Pong
         public static Scene CreateBaseLevel()
         {
             var level = new Scene("BaseLevel");
+
+            var gameControllerObject = new GameObject("GameController", level);
+            gameControllerObject.AddComponent<GameController>();
 
             return level;
         }

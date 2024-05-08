@@ -141,7 +141,7 @@ namespace SDL2Engine
 
         public PhysicsBody()
         {
-            this.isMovable = false;
+            this.isMovable = true;
             this.velocity = new Vec2D(0, 0);
             this.mass = 1.0;
             this.bounciness = 1.0;

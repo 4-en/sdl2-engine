@@ -576,7 +576,7 @@ namespace SDL2Engine
          * Starts the engine with an initial scene
          * this scene will run in the SceneManager and can be used to bootstrap the game, including other scenes
          */
-        public Engine(Scene scene)
+        public Engine(Scene? scene = null)
         {
             if (instance != null)
             {
@@ -586,7 +586,10 @@ namespace SDL2Engine
             instance = this;
 
             // Set the scene in the SceneManger
-            SceneManager.AddScene(scene);
+            if (scene != null)
+            {
+                SceneManager.AddScene(scene);
+            }
         }
 
         private void Init()

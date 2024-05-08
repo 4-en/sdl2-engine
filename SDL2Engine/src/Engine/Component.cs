@@ -495,12 +495,22 @@ namespace SDL2Engine
 
         }
 
-        // ILoable methods
         public void Load()
+        {
+            this.Load(null);
+        }
+
+        // ILoable methods
+        public void Load(string? new_source = null)
         {
             if (sound != null)
             {
                 return;
+            }
+
+            if (new_source != null)
+            {
+                this.source = new_source;
             }
 
             if (source != "")
@@ -536,6 +546,16 @@ namespace SDL2Engine
         // Playing the sound
         public bool Play(int loop = 0)
         {
+
+            if(sound == null)
+            {
+                if (source != "")
+                {
+                    Load();
+                }
+            }
+
+
             if (sound != null)
             {
                 var result = sound.Play(loop);

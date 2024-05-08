@@ -83,11 +83,11 @@ namespace Pong
 
     class BallBounceScript : Script
     {
-        Sound? sound = null;
+        SoundPlayer? sound = null;
         public override void Start()
         {
-            Console.WriteLine("BallBounceScript Start");
-            sound = AssetManager.LoadAsset<Sound>("Assets/Audio/test_sound.mp3");
+            sound = AddComponent<SoundPlayer>();
+            sound?.Load("Assets/Audio/test_sound.mp3");
         }
 
         public override void OnCollisionEnter(CollisionPair collision)
@@ -139,7 +139,6 @@ namespace Pong
             BoxCollider.FromDrawableRect(ball);
             ball.AddComponent<PhysicsBody>();
             ball.AddComponent<BallBounceScript>();
-            Console.WriteLine("Ball created");
 
             // create the paddles
             player1 = new GameObject("Player1");

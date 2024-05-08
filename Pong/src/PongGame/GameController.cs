@@ -109,7 +109,6 @@ namespace Pong
             ball.AddComponent<PhysicsBody>();
 
             // create the paddles
-            double boundsPadding = 50;
             player1 = new GameObject("Player1");
             var player1_drawable = player1.AddComponent<FilledRect>();
             player1_drawable.color = new Color(055, 055, 255, 255);

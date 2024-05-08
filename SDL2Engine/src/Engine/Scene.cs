@@ -462,6 +462,13 @@ namespace SDL2Engine
             //var get_parent_count = (GameObjects go) => go.GetParent() == null ? 0 : 1 + get_parent_count(go.GetParent());
             // sort the game objects by their depth, lowest depth first
 
+            // another option to solve this would be to keep a seperate list of all engine objects that are already in the scene (HashSet)
+            // then we could just check if the object is already in the scene
+            // the disadvantage  of this would be that we would have to keep track of all objects in the scene
+            // this list would also change a lot, since we are adding and removing objects all the time
+            // when just doing something based on the toAdd list, we probably only have to check a few objects, if any
+            
+
             foreach (EngineObject engineObject in toAdd)
             {
                 if (engineObject is GameObject gameObject)

@@ -8,6 +8,7 @@ namespace Pong
     {
         public double speed = 1000;
         private BoxCollider? boxCollider = null;
+        public GameController? gameController = null;
 
         public override void Start()
         {
@@ -44,6 +45,13 @@ namespace Pong
         public void MoveDown()
         {
             Move(1);
+        }
+
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            if (gameController == null) return;
+
+            gameController.OnPaddleHit();
         }
     }
 
@@ -88,6 +96,12 @@ namespace Pong
         }
     }
 
+    public enum GameMode
+    {
+        DUEL = 0,
+        HIGHSCORE = 1
+    }
+
     public class GameController : Script
     {
         protected int player_1_score = 0;
@@ -104,6 +118,8 @@ namespace Pong
 
         private double roundTimer = -3;
         private bool roundStarted = false;
+
+        private GameMode gameMode = GameMode.DUEL;
 
         public int scoreToWin = 11;
         public override void Start()
@@ -132,7 +148,7 @@ namespace Pong
             player1_drawable.SetRect(new Rect(40, 200));
             player1_drawable.anchorPoint = AnchorPoint.TopLeft;
             BoxCollider.FromDrawableRect(player1);
-            player1.AddComponent<PaddleController>();
+            player1.AddComponent<PaddleController>().gameController = this;
             player1.AddComponent<KeyboardController>();
 
             player2 = new GameObject("Player2");
@@ -141,7 +157,7 @@ namespace Pong
             player2_drawable.SetRect(new Rect(40, 200));
             player2_drawable.anchorPoint = AnchorPoint.TopLeft;
             BoxCollider.FromDrawableRect(player2);
-            player2.AddComponent<PaddleController>();
+            player2.AddComponent<PaddleController>().gameController = this;
             var keyboard_controller = player2.AddComponent<KeyboardController>();
             keyboard_controller.keyUp = (uint)SDL_Keycode.SDLK_UP;
             keyboard_controller.keyDown = (uint)SDL_Keycode.SDLK_DOWN;
@@ -160,6 +176,25 @@ namespace Pong
 
             ResetGame();
 
+        }
+
+        public void SetGameMode(GameMode mode)
+        {
+            if (mode == gameMode) return;
+
+            gameMode = mode;
+            ResetGame();
+        }
+
+        public void OnPaddleHit()
+        {
+            // increase speed of ball
+            double increase = 50;
+            var body = ball?.GetComponent<PhysicsBody>();
+            if (body != null)
+            {
+                body.Velocity += body.Velocity.Normalize()* increase;
+            }
         }
 
         public void ResetBall()
@@ -186,7 +221,7 @@ namespace Pong
                 int total_score = player_1_score + player_2_score;
                 double speed = 500 + total_score * 50; // increase speed as game progresses
                 var rand = new System.Random();
-                
+
                 // angle should be between -45 and 45 degrees
                 double direction = rand.NextDouble() * Math.PI / 3 - Math.PI / 6;
 
@@ -218,6 +253,32 @@ namespace Pong
             }
         }
 
+        private void HandleDuel()
+        {
+            // track player 1 and player 2 scores
+            // end game if score reaches scoreToWin
+
+            if (player_1_score >= scoreToWin || player_2_score >= scoreToWin)
+            {
+                Console.WriteLine("Game Over");
+                string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
+                Console.WriteLine($"{winner_name} wins!");
+                ResetGame();
+            }
+        }
+
+        private void HandleHighscore()
+        {
+            // track player 1 score
+            // end game if player 2 scores a point
+            if (player_2_score > 0)
+            {
+                Console.WriteLine("Game Over");
+                Console.WriteLine($"Player 1 scored {player_1_score} points");
+                ResetGame();
+            }
+        }
+
         public override void Update()
         {
 
@@ -240,7 +301,7 @@ namespace Pong
             // check bounds
             var ball_collider = ball.GetComponent<BoxCollider>();
             double ball_radius = ball_collider?.box.w ?? 50 / 2;
-            double tolerance = 2*ball_radius;
+            double tolerance = 2 * ball_radius;
 
             if (ball.transform.position.x < -tolerance)
             {
@@ -262,20 +323,22 @@ namespace Pong
                 ResetBall();
             }
 
-            if(roundTimer > 0 && !roundStarted)
+            if (roundTimer > 0 && !roundStarted)
             {
                 StartBall();
                 roundStarted = true;
             }
 
-            if (player_1_score >= scoreToWin || player_2_score >= scoreToWin)
+            switch (gameMode)
             {
-                Console.WriteLine("Game Over");
-                string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
-                Console.WriteLine($"{winner_name} wins!");
-                ResetGame();
-            }
+                case GameMode.DUEL:
+                    HandleDuel();
+                    break;
+                case GameMode.HIGHSCORE:
+                    HandleHighscore();
+                    break;
 
+            }
         }
     }
 }

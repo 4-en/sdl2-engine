@@ -86,6 +86,8 @@ namespace Pong
             var level = CreateBaseLevel();
 
             // so some level specific stuff here...
+            // for example, add powerup GameObject to level, change speed of ball, idk
+            // you could also create a new GameController script that has different logic for this level
 
             return level;
         }

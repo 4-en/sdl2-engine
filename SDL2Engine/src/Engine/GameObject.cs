@@ -91,12 +91,11 @@ namespace SDL2Engine
         {
 
             // setups the new object
-            GameObject newObject = new GameObject(source.name);
+            GameObject newObject = new GameObject(source.name, source.scene);
             newObject.layer = source.layer;
             newObject.enabled = source.enabled;
             newObject.transform = source.transform;
             newObject.Parent = source.Parent;
-            newObject.scene = source.scene;
 
             // copy all components
             foreach (Component script in source.components)

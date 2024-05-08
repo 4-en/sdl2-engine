@@ -195,6 +195,14 @@ namespace Pong
 
         public override void Update()
         {
+
+            // reset game if r is pressed
+            if (Input.GetKeyPressed((uint)SDL_Keycode.SDLK_r))
+            {
+                ResetGame();
+                return;
+            }
+
             // basic game logic here
             // check for out of bounds
             // keep track of score

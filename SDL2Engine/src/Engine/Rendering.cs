@@ -268,6 +268,86 @@ namespace SDL2Engine
 
     }
 
+    public class TextRenderer : DrawableRect
+    {
+        private string text = "[TEXT]";
+        private int fontSize = 24;
+        private string fontPath = "Assets/Fonts/Roboto-Regular.ttf";
+        private bool updateTexture = true;
+        private IntPtr texture = IntPtr.Zero;
+
+        public void SetText(string text)
+        {
+            this.text = text;
+            updateTexture = true;
+        }
+
+        public void SetFontSize(int fontSize)
+        {
+            this.fontSize = fontSize;
+            updateTexture = true;
+        }
+
+        public void SetFontPath(string fontPath)
+        {
+            this.fontPath = fontPath;
+            updateTexture = true;
+        }
+
+        private void CreateTextTexture()
+        {
+            if (texture != IntPtr.Zero)
+            {
+                SDL_DestroyTexture(texture);
+                texture = IntPtr.Zero;
+            }
+
+            IntPtr font = SDL_ttf.TTF_OpenFont(fontPath, fontSize);
+            if (font == IntPtr.Zero)
+            {
+                Console.WriteLine("Failed to load font: " + SDL_GetError());
+                return;
+            }
+
+            IntPtr surface = SDL_ttf.TTF_RenderText_Solid(font, text, new SDL.SDL_Color() { r = color.r, g = color.g, b = color.b, a = color.a });
+            texture = SDL_CreateTextureFromSurface(Engine.renderer, surface);
+
+            // get the size of the texture
+            int w, h;
+            SDL_QueryTexture(texture, out _, out _, out w, out h);
+            rect = new Rect(0, 0, w, h);
+            SDL_ttf.TTF_CloseFont(font);
+            SDL_FreeSurface(surface);
+            this.updateTexture = false;
+        }
+
+        public override void Draw(Camera camera)
+        {
+            // Render Text
+            if (updateTexture)
+            {
+                CreateTextTexture();
+            }
+
+
+            var renderer = Engine.renderer;
+            
+            var dest_rect = this.GetDestRect();
+
+            // draw the texture
+            SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dest_rect);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            if (texture != IntPtr.Zero)
+            {
+                SDL_DestroyTexture(texture);
+            }
+        }
+    }
+
     public class FilledRect : DrawableRect
     {
         public override void Draw(Camera camera)

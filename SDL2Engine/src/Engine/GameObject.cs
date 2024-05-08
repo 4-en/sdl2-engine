@@ -298,7 +298,21 @@ namespace SDL2Engine
             this._transform.SetParentPosition(position);
         }
 
-        public void AddChild(GameObject child)
+        public GameObject AddChild()
+        {
+            GameObject newChild = new GameObject();
+            this.AddChild(newChild);
+            return newChild;
+        }
+
+        public GameObject AddChild(string name)
+        {
+            GameObject newChild = new GameObject(name);
+            this.AddChild(newChild);
+            return newChild;
+        }
+
+        public GameObject AddChild(GameObject child)
         {
             child.SetParent(this);
 
@@ -316,6 +330,8 @@ namespace SDL2Engine
 
             // TODO: remove child from scene if necessary
             // if the old scene is null or different from the new scene, add components to the new scene
+
+            return child;
 
         }
 

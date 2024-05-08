@@ -38,6 +38,7 @@ namespace SDL2Engine.Testing
                 parent.AddChild(square);
             }
             square.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/forsenE.png");
+            square.AddChild().AddComponent<TextRenderer>().SetText("forsenE");
             var bc = BoxCollider.FromDrawableRect(square);
             square.AddComponent<DestroyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());

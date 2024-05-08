@@ -176,7 +176,7 @@ namespace SDL2Engine
 
     public class DrawableRect : Drawable
     {
-        protected Rect rect = new Rect(0, 0, 100, 100);
+        protected Rect rect = new Rect(0, 0, 64, 64);
 
         public override Vec2D GetDrawRoot()
         {
@@ -269,6 +269,7 @@ namespace SDL2Engine
     public class TextureRenderer : DrawableRect, ILoadable
     {
         private Texture? texture;
+        private Rect source_rect = new Rect(0, 0, 1, 1);
         public string source = "";
 
         public void SetSource(string source)
@@ -298,7 +299,8 @@ namespace SDL2Engine
             {
                 texture = AssetManager.LoadTexture(source);
                 texture.Load();
-                this.rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
+                this.source_rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
+                this.rect = this.source_rect * 1;
             }
         }
 
@@ -319,7 +321,7 @@ namespace SDL2Engine
             var texture_ptr = texture.Get();
             
 
-            var srcRect = rect.ToSDLRect();
+            var srcRect = this.source_rect.ToSDLRect();
             var dstRect = this.GetDestRect();
 
             double angle = gameObject.transform.rotation;

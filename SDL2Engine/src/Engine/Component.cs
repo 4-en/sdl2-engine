@@ -22,7 +22,7 @@ namespace SDL2Engine
         // this is used to call OnEnable and OnDisable
         private bool wasEnabled = false;
 
-        protected Component()
+        public Component()
         {
 
         }
@@ -96,7 +96,7 @@ namespace SDL2Engine
             return gameObject.GetComponents<T>();
         }
 
-        public T? AddComponent<T>() where T : Component
+        public T AddComponent<T>() where T : Component, new()
         {
             return gameObject.AddComponent<T>();
         }

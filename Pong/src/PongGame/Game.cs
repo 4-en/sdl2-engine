@@ -5,7 +5,7 @@ namespace Pong
 {
 
 
-    public static class LevelManager
+    public static partial class LevelManager
     {
         private static Scene? level;
         private static int levelIndex = 0;

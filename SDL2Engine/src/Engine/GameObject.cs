@@ -349,10 +349,10 @@ namespace SDL2Engine
             return null;
         }
 
-        public T? AddComponent<T>() where T : Component
+        public T AddComponent<T>() where T : Component , new()
         {
             
-            T? newComponent = (T?)Activator.CreateInstance(typeof(T));
+            T newComponent = new T();
             
             if (newComponent != null)
             {

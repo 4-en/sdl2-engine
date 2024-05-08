@@ -13,7 +13,7 @@ namespace Pong.src
     internal class PongGame
     {
 
-        public static Vec2D boarderPosition = new Vec2D(960, 500);
+        public static Vec2D borderPosition = new Vec2D(960, 500);
 
         public static Scene CreateScene()
         {
@@ -27,7 +27,7 @@ namespace Pong.src
 
             var leftPaddleBoxCollider = leftPaddle.AddComponent<BoxCollider>();
             leftPaddleBoxCollider.UpdateColliderSize(35, 160);
-            leftPaddle.transform.position = new Vec2D(50, boarderPosition.y);
+            leftPaddle.transform.position = new Vec2D(50, 0);
             scene.AddGameObject(leftPaddle);
 
 
@@ -37,7 +37,7 @@ namespace Pong.src
 
             var rightPaddleBoxCollider = rightPaddle.AddComponent<BoxCollider>();
             rightPaddleBoxCollider.UpdateColliderSize(35, 160);
-            rightPaddle.transform.position = new Vec2D(1870, boarderPosition.y);
+            rightPaddle.transform.position = new Vec2D(1870, borderPosition.y);
 
             scene.AddGameObject(rightPaddle);
 
@@ -57,7 +57,7 @@ namespace Pong.src
             pb.Velocity = new Vec2D(800, 500);
             pb.IsMovable = true;
 
-            pongSquare.SetPosition(new Vec2D(960, boarderPosition.y));
+            pongSquare.SetPosition(new Vec2D(960, borderPosition.y));
             //pongSquare.SetPosition(new Vec2D(960 - 480 - 50, 750));
             scene.AddGameObject(pongSquare);
 

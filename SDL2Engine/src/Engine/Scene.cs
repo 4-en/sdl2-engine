@@ -122,7 +122,7 @@ namespace SDL2Engine
         private List<Script> toStart = new();
 
         private TimedQueue<EngineObject> toDestroy = new();
-        private List<EngineObject> toAdd = new();
+        private HashSet<EngineObject> toAdd = new();
         private List<GameObject> toRemove = new();
 
         public Scene()
@@ -458,7 +458,7 @@ namespace SDL2Engine
             // TODO: optimize this later
             // (this seems horrible tbh)
             // add game objects that are scheduled to be added
-            var alreadyAdded = new HashSet<GameObject>();
+            //var alreadyAdded = new HashSet<GameObject>();
             //var get_parent_count = (GameObjects go) => go.GetParent() == null ? 0 : 1 + get_parent_count(go.GetParent());
             // sort the game objects by their depth, lowest depth first
 
@@ -479,7 +479,7 @@ namespace SDL2Engine
                     {
                         this.gameObjects.Add(gameObject);
                         HandleAddGameObjectComponents(gameObject);
-                        alreadyAdded.Add(gameObject);
+                        //alreadyAdded.Add(gameObject);
                     }
                     else
                     {
@@ -500,7 +500,7 @@ namespace SDL2Engine
                         bool parentAdded = false;
                         while (parent != null)
                         {
-                            if (alreadyAdded.Contains(parent))
+                            if (toAdd.Contains(parent))
                             {
                                 parentAdded = true;
                                 break;
@@ -511,7 +511,7 @@ namespace SDL2Engine
                         if (!parentAdded)
                         {
                             HandleAddGameObjectComponents(gameObject);
-                            alreadyAdded.Add(gameObject);
+                            //alreadyAdded.Add(gameObject);
                         }
                     }
                     
@@ -524,7 +524,7 @@ namespace SDL2Engine
                     bool parentAdded = false;
                     while (componentsGameObject != null)
                     {
-                        if (alreadyAdded.Contains(componentsGameObject))
+                        if (toAdd.Contains(componentsGameObject))
                         {
                             parentAdded = true;
                             break;

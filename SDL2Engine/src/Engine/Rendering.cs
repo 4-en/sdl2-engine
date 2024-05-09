@@ -311,7 +311,7 @@ namespace SDL2Engine
                 return;
             }
 
-            IntPtr surface = SDL_ttf.TTF_RenderText_Solid(font, text, new SDL.SDL_Color() { r = color.r, g = color.g, b = color.b, a = color.a });
+            IntPtr surface = SDL_ttf.TTF_RenderUTF8_Blended(font, text, new SDL.SDL_Color() { r = color.r, g = color.g, b = color.b, a = color.a });
             texture = SDL_CreateTextureFromSurface(Engine.renderer, surface);
 
             // get the size of the texture

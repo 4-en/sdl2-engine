@@ -562,7 +562,7 @@ namespace SDL2Engine
         private bool fullscreen = false;
         private static bool forceAspectRatio = false;
         private static double aspectRatio = 16.0 / 9.0;
-        public static UInt32 targetFPS = 1000;
+        public static UInt32 targetFPS = 500;
         public static int windowWidth = 1000;
         public static int windowHeight = (int)(windowWidth / aspectRatio);
         private IntPtr font = IntPtr.Zero;
@@ -837,7 +837,7 @@ namespace SDL2Engine
             string[] debugStrings =
                 {
                     "Press F3 to toggle debug info",
-                    "FPS: " + Time.GetFPS().ToString("0.00"),
+                    "FPS: " + Time.GetFPS().ToString(),
                     "Update Duration: " + (1000*Time.updateDuration).ToString("0.00") + " ms",
                     "Draw Duration: " + (1000*Time.drawDuration).ToString("0.00") + " ms",
                     "Total Duration: " + (1000*Time.totalDuration).ToString("0.00") + " ms",
@@ -905,6 +905,7 @@ namespace SDL2Engine
             long tickStart = Stopwatch.GetTimestamp();
             long beforeUpdate = tickStart;
             double beforeUpdateSec = ticksToSec * beforeUpdate;
+            double temp_double = 0;
             Time.lastUpdateTime = ticksToSec * tickStart;
             Time.lastDrawTime = Time.lastUpdateTime;
 
@@ -915,14 +916,23 @@ namespace SDL2Engine
                 // Handle events on queue
                 HandleEvents();
 
+                // Time start of update
                 beforeUpdate = Stopwatch.GetTimestamp();
-                beforeUpdateSec = ticksToSec * beforeUpdate;
-                Time.deltaTime = (beforeUpdateSec - Time.lastUpdateTime);
+                temp_double = ticksToSec * beforeUpdate;
+                Time.deltaTime = temp_double - beforeUpdateSec;
+                beforeUpdateSec = temp_double;
+
+                Time.AddFrameTime(Time.deltaTime);
                 Time.time += Time.deltaTime;
                 Time.tick++;
+
+                // Update the game
+                // (Physics, Scripts, etc. )
                 this.Update();
                 Time.lastUpdateTime = ticksToSec * Stopwatch.GetTimestamp();
                 Time.updateDuration = Time.lastUpdateTime - beforeUpdateSec;
+
+                // Draw the game
                 this.Draw();
                 Time.lastDrawTime = ticksToSec * Stopwatch.GetTimestamp();
                 Time.drawDuration = Time.lastDrawTime - Time.lastUpdateTime;

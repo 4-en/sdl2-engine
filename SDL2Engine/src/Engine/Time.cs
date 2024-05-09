@@ -22,9 +22,25 @@ namespace SDL2Engine
         public static double totalDuration = 0;
         public static double freeDuration = 0;
 
-        public static double GetFPS()
+        public static int GetFPS()
         {
-            return 1.0 / deltaTime;
+            return lastFps;
+        }
+
+        private static int lastFps = 0;
+        private static int frameCounter = 0;
+        private static double timeCounter = 0;
+
+        public static void AddFrameTime(double dt)
+        {
+            timeCounter += dt;
+            frameCounter++;
+            if (timeCounter >= 1)
+            {
+                lastFps = frameCounter;
+                frameCounter = 0;
+                timeCounter = 0;
+            }
         }
     }
 

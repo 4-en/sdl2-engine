@@ -653,8 +653,19 @@ namespace SDL2Engine
                 // assume rho* C_d * A = physicsBody.Drag
                 Vec2D dragForce = velocity_normalized * (-0.5 * vel_magnitude_squared * physicsBody.Drag);
 
-                // Update velocity by adding acceleration due to drag (F = ma -> a = F/m)
-                physicsBody.Velocity += dragForce / physicsBody.Mass * deltaTime;
+                // check if the drag force is greater than the velocity
+                // if so, set the velocity to 0
+                var drag_velocity = dragForce / physicsBody.Mass * deltaTime;
+                if (drag_velocity.LengthSquared() > vel_magnitude_squared)
+                {
+                    physicsBody.Velocity = new Vec2D(0, 0);
+                }
+                else
+                {
+                    // Update velocity by adding acceleration due to drag (F = ma -> a = F/m)
+                    physicsBody.Velocity += dragForce / physicsBody.Mass * deltaTime;
+                }
+                
 
 
 

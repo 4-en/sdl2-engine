@@ -40,6 +40,7 @@ namespace SDL2Engine.Testing
             square.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/forsenE.png");
             square.AddChild().AddComponent<TextRenderer>().SetText("forsenE");
             var bc = BoxCollider.FromDrawableRect(square);
+            bc.IsTrigger = true;
             square.AddComponent<DestroyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());
 
@@ -166,7 +167,7 @@ namespace SDL2Engine.Testing
                 body.Velocity = new Vec2D(100, 0);
                 body.IsMovable = true;
                 // testing drag
-                body.Drag = 0.3d;
+                body.Drag = 0.03d;
             }
 
 
@@ -347,6 +348,12 @@ namespace SDL2Engine.Testing
         public override void Start()
         {
             //boxCollider = gameObject.GetComponent<BoxCollider>();
+        }
+
+        public override void OnDestroy()
+        {
+            // remove the box collider
+            Console.WriteLine("Destroying WASDController");
         }
 
         public override void Update()

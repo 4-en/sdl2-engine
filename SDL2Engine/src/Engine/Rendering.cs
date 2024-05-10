@@ -284,6 +284,11 @@ namespace SDL2Engine
             updateTexture = changed || updateTexture;
         }
 
+        public string GetText()
+        {
+            return this.text;
+        }
+
         public void SetFontSize(int fontSize)
         {
             this.fontSize = fontSize;

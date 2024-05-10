@@ -86,31 +86,50 @@ namespace SDL2Engine
 
 
         // Usefull methods to interact with other components
+
+        // Returns the component of type T attached to the same GameObject
         public T? GetComponent<T>() where T : Component
         {
             return gameObject.GetComponent<T>();
         }
 
+        // Returns all components of type T attached to the same GameObject
         public List<T> GetComponents<T>() where T : Component
         {
             return gameObject.GetComponents<T>();
         }
 
+        // Returns the component of type T attached to any GameObject in the scene
+        public T? FindComponent<T>() where T : Component
+        {
+            return gameObject.FindComponent<T>();
+        }
+
+        // Returns the GameObject with the given name in the scene
+        public GameObject? Find(string name)
+        {
+            return gameObject.Find(name);
+        }
+
+        // Adds a component of type T to the same GameObject
         public T AddComponent<T>(T? component = null) where T : Component, new()
         {
             return gameObject.AddComponent<T>(component);
         }
-
+        
+        // Removes a component from the same GameObject by reference
         public bool RemoveComponent(Component component)
         {
             return gameObject.RemoveComponent(component);
         }
 
+        // Removes a component of type T from the same GameObject
         public bool RemoveComponent<T>() where T : Component
         {
             return gameObject.RemoveComponent<T>();
         }
 
+        // Returns the main camera of the scene
         public Camera? GetCamera()
         {
             var scene = gameObject.GetScene();
@@ -120,7 +139,8 @@ namespace SDL2Engine
             }
             return null;
         }
-
+        
+        // Returns a Component of type T attached to the same GameObject or any of its parents
         public T? GetComponentInParent<T>() where T : Component
         {
             GameObject? parent = gameObject.GetParent();
@@ -137,6 +157,7 @@ namespace SDL2Engine
             return null;
         }
 
+        // Returns a Component of type T attached to the same GameObject or any of its children
         public T? GetComponentInChildren<T>() where T : Component
         {
             U? GetComponentInChildrenHelper<U>(GameObject parent) where U : Component
@@ -163,6 +184,7 @@ namespace SDL2Engine
             return GetComponentInChildrenHelper<T>(gameObject);
         }
 
+        // Returns all Components of type T attached to the same GameObject or any of its children
         public List<T> GetComponentsInChildren<T>() where T : Component
         {
             List<U> GetComponentsInChildrenHelper<U>(GameObject parent) where U : Component
@@ -184,6 +206,7 @@ namespace SDL2Engine
             return GetComponentsInChildrenHelper<T>(gameObject);
         }
 
+        // Returns all Components of type T attached to the same GameObject or any of its parents
         public List<T> GetComponentsInParent<T>() where T : Component
         {
             List<T> foundComponents = new();
@@ -204,6 +227,7 @@ namespace SDL2Engine
         }
 
         // SendMessage method to call methods on other components
+        // TODO: test if this actually works (looks a bit sketchy)
         public bool SendMessage(string methodName, object[]? args, out object? result)
         {
             result = null;

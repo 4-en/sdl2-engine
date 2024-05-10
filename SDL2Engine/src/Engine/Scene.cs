@@ -101,7 +101,7 @@ namespace SDL2Engine
     }
 
 
-    public class Scene
+    public class Scene : ILoadable
     {
 
         // TODO: use something like this to limit the number of new objects per frame
@@ -668,7 +668,47 @@ namespace SDL2Engine
 
         }
 
+        public void Load()
+        {
+            // TODO: implement this (load all resources)
+            // this should call Load on all ILoadable objects in the scene before updating and rendering
+            // to keep the game running smoothly, only update up to a certain amount of objects per frame
+            // this could be done in the background while another scene is running
+            // the scene manager should handle this and can use IsLoaded to check if the scene is ready to rendered
+            return;
+        }
 
+        // This loads the next GameObject in queue
+        public void LoadNext()
+        { }
+
+        // This loads n GameObjects in queue
+        public void Load(int n)
+        {
+            // load n objects
+            // this should be called in the background while another scene is running
+            // the scene manager should handle this and can use IsLoaded to check if the scene is ready to rendered
+            return;
+        }
+
+        public bool IsLoaded()
+        {
+            // TODO: implement this
+            // this should return true if all resources are loaded
+            // after this, the scene can be updated and rendered
+          
+            return true;
+        }
+
+        public void Dispose()
+        {
+            // this should only be called when the scene is removed from the scene manager
+            // (hopefully) remove all game objects and components and calls their Dispose methods
+            for(int i = gameObjects.Count - 1; i >= 0; i--)
+            {
+                DeepDestroyGameObject(gameObjects[i]);
+            }
+        }
     }
 
     /*
@@ -707,9 +747,8 @@ namespace SDL2Engine
         {
             for (int i = 0; i < scenes.Count; i++)
             {
-                activeScene = scenes[i];
+                SetActiveScene(scenes[i]);
                 scenes[i].Draw();
-                activeScene = null;
             }
         }
 
@@ -718,9 +757,8 @@ namespace SDL2Engine
         {
             for (int i = 0; i < scenes.Count; i++)
             {
-                activeScene = scenes[i];
+                SetActiveScene(scenes[i]);
                 scenes[i].Update();
-                activeScene = null;
             }
         }
 
@@ -748,30 +786,45 @@ namespace SDL2Engine
             return null;
         }
 
-        public static void LoadScene(Scene scene)
+        /*
+         * Replaces the current scene with a new scene
+         * Clears all other scenes
+         */
+        public static void SetScene(Scene scene)
         {
-            scenes.Clear();
-            scenes.Add(scene);
+            for (int i = scenes.Count - 1; i >= 0; i--)
+            {
+                RemoveScene(scenes[i]);
+            }
+
+            AddScene(scene);
         }
 
         public static void AddScene(Scene scene)
         {
+            scene.Load();
             scenes.Add(scene);
         }
 
         public static void AddBefore(Scene scene, Scene before)
         {
+            scene.Load();
             scenes.Insert(scenes.IndexOf(before), scene);
         }
 
         public static void AddAfter(Scene scene, Scene after)
         {
+            scene.Load();
             scenes.Insert(scenes.IndexOf(after) + 1, scene);
         }
 
         public static void RemoveScene(Scene scene)
         {
-            scenes.Remove(scene);
+            bool was_removed = scenes.Remove(scene);
+            if (was_removed)
+            {
+                scene.Dispose();
+            }
         }
 
         public static void SortScenesBySceneType()
@@ -789,9 +842,6 @@ namespace SDL2Engine
             scenes.Remove(scene);
             scenes.Insert(index, scene);
         }
-
-
-
 
     }
 }

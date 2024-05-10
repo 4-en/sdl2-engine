@@ -9,8 +9,8 @@ namespace Pong
     {
         public static void Start()
         {
-            LoadLevel(0);
-            //LoadHomeScreen();
+            
+            LoadHomeScreen();
 
             var engine = new Engine();
             engine.Run();
@@ -97,7 +97,7 @@ namespace Pong
             return level;
         }
 
-        private static Scene CreateLevel1()
+        public static Scene CreateLevel1()
         {
             var level = CreateBaseLevel();
 

@@ -6,48 +6,89 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static SDL2.SDL;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Pong.src
 {
     internal class HomeScreen
     {
+        
+
         public static Scene CreateScene()
         {
             var scene = new Scene("Home Screen");
+            Vec2D gameBounds = new Vec2D(1920, 1080);
 
-            var homeScreenScript = new GameObject("TestScript");
-            homeScreenScript.AddComponent<HomeScreenScript>();
-            scene.AddGameObject(homeScreenScript);
+            GameObject gameTitle = HomeScreenText("Pong", gameBounds.x / 2, 200, 200);
+            GameObject level1 = HomeScreenText("Level 1", gameBounds.x / 2, 500, 100);
+            GameObject level2 = HomeScreenText("Level 2", gameBounds.x / 2, 600, 100);
+            GameObject level3 = HomeScreenText("Level 3", gameBounds.x / 2, 700, 100);
+            GameObject level4 = HomeScreenText("Level 4", gameBounds.x / 2, 800, 100);
+            GameObject level5 = HomeScreenText("Level 5", gameBounds.x / 2, 900, 100);
+            scene.AddGameObject(gameTitle);
+            scene.AddGameObject(level1);
+            scene.AddGameObject(level2);
+            scene.AddGameObject(level3);
+            scene.AddGameObject(level4);
+            scene.AddGameObject(level5);
+
+
 
             return scene;
+        }
+
+
+        private static GameObject HomeScreenText(string text, double x, double y, int fontSize)
+        {
+            
+            var textObject = new GameObject(text);
+            textObject.transform.position = new Vec2D(x, y);
+            var textComponent = textObject.AddComponent<TextRenderer>();
+            textComponent.color = new Color(148, 0, 211, 255);
+            textComponent.SetFontSize(fontSize);
+            textComponent.SetText(text);
+            textComponent.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            textObject.AddComponent<MenuMouseTracker>();
+            return textObject;
+
         }
     }
 
 
-    public class HomeScreenScript : Script
+
+
+    class MenuMouseTracker : Script
     {
-        
+        public event Action<string> OnClick;
 
-        protected Vec2D gameBounds = new Vec2D(1920, 1080);
-
-        public override void Start()
+        public override void Update()
         {
-           
+            if (Input.GetMouseButtonDown(0))
+            {
+                Vec2D mousePosition = Input.GetMousePosition();
+                GameObject gameObject = this.gameObject;
+                Camera camera = Camera.GetCamera(gameObject);
 
-            gameBounds = GetCamera()?.GetWorldSize() ?? new Vec2D(1920, 1080);
+                if (camera != null)
+                {
+                    mousePosition = camera.ScreenToWorld(mousePosition);
+                }
 
-            
+                TextRenderer textRenderer = gameObject.GetComponent<TextRenderer>();
 
-            var gameTitle = new GameObject("gameTitle");
-            gameTitle.transform.position = new Vec2D(gameBounds.x / 2, 50);
-            var titleText = gameTitle.AddComponent<TextRenderer>();
-            titleText.color = new Color(0, 255, 255, 205);
-            titleText.SetFontSize(100);
-            titleText.SetText("Pong");
-            //titleText.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
-            titleText.SetFontPath("Assets/Fonts/Roboto-Regular.ttf");
+                // Get the position and dimensions of the text object
+                Vec2D position = gameObject.transform.position;
+                Rect rect = new Rect(position.x-200, position.y-50, 400, 100);
+                
+                 if (rect.Contains(mousePosition))
+                {
+                    if(gameObject.GetName().Equals("Level 1"))
+                    {
+                        SceneManager.LoadScene(LevelManager.CreateLevel1());
+                    }
+                }
 
-
+            }
         }
     }
 }

@@ -11,6 +11,11 @@ namespace SDL2Engine
     /// </summary>
     public static class Input
     {
+        public static readonly int MOUSE_BUTTON_LEFT = 0;
+        public static readonly int MOUSE_BUTTON_MIDDLE = 1;
+        public static readonly int MOUSE_BUTTON_RIGHT = 2;
+
+
         private static readonly int[] downKeys = new int[16];
         private static readonly int[] pressedKeys = new int[16];
         private static readonly int[] releasedKeys = new int[16];
@@ -21,6 +26,9 @@ namespace SDL2Engine
         private static bool[] mouseButtonsPressed = new bool[3];
         private static bool[] mouseButtonsReleased = new bool[3];
 
+        /*
+         * Checks if a key is pressed or held down
+         */
         public static bool GetKeyPressed(int key)
         {
             for (int i = 0; i < pressedKeys.Length; i++)
@@ -34,11 +42,17 @@ namespace SDL2Engine
             return false;
         }
 
+        /*
+         * Checks if a key is pressed or held down
+         */
         public static bool GetKeyPressed(SDL_Keycode key)
         {
             return GetKeyPressed((int)key);
         }
 
+        /*
+         * Checks if a key was pressed in the current frame
+         */
         public static bool GetKeyDown(int key)
         {
             for (int i = 0; i < downKeys.Length; i++)
@@ -52,11 +66,17 @@ namespace SDL2Engine
             return false;
         }
 
+        /*
+         * Checks if a key was pressed in the current frame
+         */
         public static bool GetKeyDown(SDL_Keycode key)
         {
             return GetKeyDown((int)key);
         }
 
+        /*
+         * Checks if a key was released in the current frame
+         */
         public static bool GetKeyReleased(int key)
         {
             for (int i = 0; i < releasedKeys.Length; i++)
@@ -70,11 +90,16 @@ namespace SDL2Engine
             return false;
         }
 
+        /*
+         * Checks if a key was released in the current frame
+         */
         public static bool GetKeyReleased(SDL_Keycode key)
         {
             return GetKeyReleased((int)key);
         }
 
+        // The following methods are used to set the state of the keys
+        // usually only called by the engine
         public static void SetKeyDown(int key)
         {
             for (int i = 0; i < downKeys.Length; i++)
@@ -139,6 +164,8 @@ namespace SDL2Engine
             SetKeyReleased((int)key);
         }
 
+        // Clear all inputs at the end of the frame
+        // Pressed keys are reset when the key is released
         public static void ClearInputs()
         {
             
@@ -180,16 +207,30 @@ namespace SDL2Engine
             }
         }
 
+        /*
+         * Mouse input handling
+         */
+
+
+        /*
+         * Get the current mouse position
+         */
         public static Vec2D GetMousePosition()
         {
             return mousePosition;
         }
 
+        /*
+         * Get the change in mouse position since the last frame
+         */
         public static Vec2D GetMouseDelta()
         {
             return mouseDelta;
         }
 
+        /*
+         * Checks if a mouse button was pressed in the current frame
+         */
         public static bool GetMouseButtonDown(int button)
         {
             if (button < 0 || button >= mouseButtonsDown.Length)
@@ -199,6 +240,9 @@ namespace SDL2Engine
             return mouseButtonsDown[button];
         }
 
+        /*
+         *         * Checks if a mouse button is pressed or held down
+         */
         public static bool GetMouseButtonPressed(int button)
         {
             if (button < 0 || button >= mouseButtonsPressed.Length)
@@ -208,6 +252,9 @@ namespace SDL2Engine
             return mouseButtonsPressed[button];
         }
 
+        /*
+         * Checks if a mouse button was released in the current frame
+         */
         public static bool GetMouseButtonReleased(int button)
         {
             if (button < 0 || button >= mouseButtonsReleased.Length)
@@ -217,6 +264,8 @@ namespace SDL2Engine
             return mouseButtonsReleased[button];
         }
 
+        // The following methods are used to set the state of the mouse buttons
+        // usually only called by the engine
         public static void SetMouseButtonDown(int button)
         {
             if (button < 0 || button >= mouseButtonsDown.Length)

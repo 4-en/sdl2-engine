@@ -186,6 +186,8 @@ namespace Pong
             var highscores = Component.CreateWithGameObject<Div>("Highscores");
             highscores.Item1.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y - 50);
             highscores.Item2.Text = "Highscores";
+            highscores.Item2.BackgroundColor = new Color(0, 0, 0, 100);
+            highscores.Item2.PreferredSize = new Rect(200, 200);
 
             ResetGame();
 

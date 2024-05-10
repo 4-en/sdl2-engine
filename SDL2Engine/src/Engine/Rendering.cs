@@ -22,18 +22,78 @@ namespace SDL2Engine
 
     public struct Color
     {
-        public byte r;
-        public byte g;
-        public byte b;
-        public byte a;
+        public UInt32 color;
+
+        public byte r
+        {
+            set
+            {
+                color = (color & 0x00FFFFFF) | (UInt32)value << 24;
+            }
+
+            get
+            {
+                return (byte)((color & 0xFF000000) >> 24);
+            }
+        }
+
+        public byte g
+        {
+            set
+            {
+                color = (color & 0xFF00FFFF) | (UInt32)value << 16;
+            }
+
+            get
+            {
+                return (byte)((color & 0x00FF0000) >> 16);
+            }
+        }
+
+        public byte b
+        {
+            set
+            {
+                color = (color & 0xFFFF00FF) | (UInt32)value << 8;
+            }
+
+            get
+            {
+                return (byte)((color & 0x0000FF00) >> 8);
+            }
+        }
+
+        public byte a
+        {
+            set
+            {
+                color = (color & 0xFFFFFF00) | (UInt32)value;
+            }
+
+            get
+            {
+                return (byte)(color & 0x000000FF);
+            }
+        }
 
         public Color(byte r, byte g, byte b, byte a = 255)
         {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.a = a;
+            color = (UInt32)(r << 24 | g << 16 | b << 8 | a);
         }
+
+        public Color() : this(0, 0, 0, 255)
+        {
+        }
+
+        public static Color White = new Color(255, 255, 255, 255);
+        public static Color Black = new Color(0, 0, 0, 255);
+        public static Color Red = new Color(255, 0, 0, 255);
+        public static Color Green = new Color(0, 255, 0, 255);
+        public static Color Blue = new Color(0, 0, 255, 255);
+        public static Color Magenta = new Color(255, 0, 255, 255);
+        public static Color Yellow = new Color(255, 255, 0, 255);
+        public static Color Cyan = new Color(0, 255, 255, 255);
+        public static Color Gold = new Color(255, 215, 0, 255);
     }
 
     // DepthBuffer class to store depth values for each pixel of the screen

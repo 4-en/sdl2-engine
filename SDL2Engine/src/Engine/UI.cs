@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SDL2;
+using static SDL2.SDL;
 
 namespace SDL2Engine.UI
 {
@@ -460,6 +462,14 @@ namespace SDL2Engine.UI
             {
                 // redraw textures and stuff
                 changed = false;
+            }
+
+            var destRect = this.GetDestRect();
+
+            if(this.backgroundColor.a > 0)
+            {
+                SDL_SetRenderDrawColor(Engine.renderer, this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                SDL_RenderFillRect(Engine.renderer, ref destRect);
             }
         }
     }

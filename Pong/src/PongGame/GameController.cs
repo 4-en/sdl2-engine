@@ -87,7 +87,7 @@ namespace Pong
         public override void Start()
         {
             sound = AddComponent<SoundPlayer>();
-            sound?.Load("Assets/Audio/test_sound.mp3");
+            sound?.Load("Assets/Audio/bounce.mp3");
         }
 
         public override void OnCollisionEnter(CollisionPair collision)

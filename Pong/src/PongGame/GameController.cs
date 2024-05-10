@@ -22,12 +22,14 @@ namespace Pong
             gameObject.AddChild(highscoresTitle.Item1);
             highscoresTitle.Item2.color = new Color(255, 255, 255, 205);
             highscoresTitle.Item2.SetFontSize(100);
-            highscoresTitle.Item2.SetText("Highscores");
+            highscoresTitle.Item2.SetText("- Highscores -");
+            highscoresTitle.Item2.anchorPoint = AnchorPoint.TopCenter;
 
-            highscoresTitle.Item1.transform.position = new Vec2D(1920 / 2, 100);
 
             this.highscoresTitle = highscoresTitle.Item2;
             this.gameObject.AddChild(highscoresTitle.Item1);
+
+            gameObject.SetPosition(new Vec2D(1920 / 2, 100));
 
             SetHighscores(GetHighscores());
         }
@@ -51,7 +53,8 @@ namespace Pong
 
         public override void Update()
         {
-            if(Input.GetKeyDown(SDL_Keycode.SDLK_h))
+
+            if (Input.GetKeyDown(SDL_Keycode.SDLK_h))
             {
                 gameObject.ToggleEnabled();
 
@@ -59,7 +62,6 @@ namespace Pong
                 // we need to re-enable this script, otherwise we can't enable the gameObject again
                 this.Enable();
 
-                Console.WriteLine("Highscore script enabled: " + gameObject.IsEnabled());
             }
         }
 
@@ -81,14 +83,13 @@ namespace Pong
                 nameText = name_renderer.Item2;
                 nameText.color = new Color(255, 255, 255, 205);
                 nameText.SetFontSize(50);
+                nameText.anchorPoint = AnchorPoint.TopLeft;
 
-                name_renderer.Item1.transform.position = new Vec2D(-300, 200);
+                name_renderer.Item1.SetLocalPosition(new Vec2D(-200, 200));
 
             }
-            else
-            {
-                nameText.SetText(nameString);
-            }
+            nameText.SetText(nameString);
+
 
             if (scoreText == null)
             {
@@ -97,13 +98,12 @@ namespace Pong
                 scoreText = score_renderer.Item2;
                 scoreText.color = new Color(255, 255, 255, 205);
                 scoreText.SetFontSize(50);
+                scoreText.anchorPoint = AnchorPoint.TopRight;
 
-                score_renderer.Item1.transform.position = new Vec2D(300, 200);
+                score_renderer.Item1.SetLocalPosition(new Vec2D(200, 200));
             }
-            else
-            {
-                scoreText.SetText(scoreString);
-            }
+            scoreText.SetText(scoreString);
+
         }
 
     }
@@ -209,7 +209,8 @@ namespace Pong
             if (SDL2Engine.Utils.MouseHelper.IsRectPressed(GetCamera()?.RectToScreen(rect) ?? new Rect()))
             {
                 filledRect.color = new Color(255, 0, 0, 255);
-            } else
+            }
+            else
             {
                 filledRect.color = new Color(255, 255, 255, 255);
             }
@@ -303,7 +304,7 @@ namespace Pong
             scoreText.SetFontSize(100);
             var highscoreRoot = new GameObject("HighscoreRoot");
             var highscoreScript = highscoreRoot.AddComponent<HighscoreScript>();
-            
+
 
             ResetGame();
 
@@ -332,7 +333,7 @@ namespace Pong
             var body = ball?.GetComponent<PhysicsBody>();
             if (body != null)
             {
-                body.Velocity += body.Velocity.Normalize()* increase;
+                body.Velocity += body.Velocity.Normalize() * increase;
             }
         }
 

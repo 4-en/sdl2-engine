@@ -257,11 +257,11 @@ namespace SDL2Engine
 
         // get the rect based on the anchor point in local coordinates
         // for example, if the anchor point is Center, the rect will be centered around the anchor point (move the rect to the left and up by half its size)
-        public Rect GetRect()
+        public Rect GetRect(Rect? custom_rect = null)
         {
             // return rect relative to anchor point
-            Vec2D size = rect.GetSize();
-            Vec2D position = rect.GetTopLeft();
+            Vec2D size = custom_rect?.GetSize() ?? rect.GetSize();
+            Vec2D position = custom_rect?.GetTopLeft() ?? rect.GetTopLeft();
 
             switch(this.anchorPoint)
             {
@@ -292,13 +292,13 @@ namespace SDL2Engine
             }
             return new Rect(position.x, position.y, size.x, size.y);
         }
-        public SDL.SDL_Rect GetDestRect()
+        public SDL.SDL_Rect GetDestRect(Rect? custom_rect = null)
         {
             var scene = gameObject.GetScene();
             Camera? camera = scene?.GetCamera();
             if (camera != null)
             {
-                return camera.RectToScreen(this.GetRect(), gameObject.GetPosition()).ToSDLRect();
+                return camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition()).ToSDLRect();
             } else
             {
                 Console.WriteLine("Camera not found");
@@ -307,9 +307,9 @@ namespace SDL2Engine
         }
 
         // get the rect in world coordinates
-        public Rect GetWorldRect()
+        public Rect GetWorldRect(Rect? custom_rect = null)
         {
-            return GetRect() + gameObject.GetPosition();
+            return custom_rect ?? GetRect() + gameObject.GetPosition();
         }
 
         public override void Draw(Camera camera)
@@ -342,7 +342,8 @@ namespace SDL2Engine
         private bool updateTexture = true;
         private bool updateFont = true;
         private Font? font;
-        private IntPtr texture = IntPtr.Zero;
+        private IntPtr[]? textures = null;
+        private Rect[]? textureRects = null;
 
         public void SetText(string text)
         {
@@ -390,10 +391,15 @@ namespace SDL2Engine
                 LoadFont();
             }
 
-            if (texture != IntPtr.Zero)
+            if (textures != null)
             {
-                SDL_DestroyTexture(texture);
-                texture = IntPtr.Zero;
+                foreach(var texture in textures)
+                {
+                    if (texture != IntPtr.Zero)
+                    {
+                        SDL_DestroyTexture(texture);
+                    }
+                }
             }
 
             if (font == null)
@@ -402,8 +408,16 @@ namespace SDL2Engine
             }
 
             Rect out_rect;
-            texture = font.RenderTexture(text, color.ToSDLColor(), out out_rect);
-            this.rect = out_rect;
+            string[] texts = text.Split('\n');
+            textures = new IntPtr[texts.Length];
+            textureRects = new Rect[texts.Length];
+            for (int i = 0; i < texts.Length; i++)
+            {
+                textures[i] = font.RenderTexture(texts[i], color.ToSDLColor(), out out_rect);
+                this.rect.w = Math.Max(this.rect.w, out_rect.w);
+                this.rect.h += out_rect.h + 10;
+                textureRects[i] = out_rect;
+            }
 
             this.updateTexture = false;
         }
@@ -416,23 +430,42 @@ namespace SDL2Engine
                 CreateTextTexture();
             }
 
+            if (textures == null || textureRects == null)
+            {
+                return;
+            }
+
 
             var renderer = Engine.renderer;
             
-            var dest_rect = this.GetDestRect();
 
             // draw the texture
-            SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dest_rect);
+            for (int i = 0; i < textures.Length; i++)
+            {
+                var texture = textures[i];
+                var out_rect = textureRects[i];
+                out_rect.y += i * (out_rect.h + 10);
+                var dst_rect = GetDestRect(out_rect);
+                
+                SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dst_rect);
+            }
+            
         }
 
         public override void Dispose()
         {
             base.Dispose();
-            if (texture != IntPtr.Zero)
+            if (textures != null)
             {
-                SDL_DestroyTexture(texture);
-                texture = IntPtr.Zero;
+                foreach (var texture in textures)
+                {
+                    if (texture != IntPtr.Zero)
+                    {
+                        SDL_DestroyTexture(texture);
+                    }
+                }
             }
+            
 
             if (font != null)
             {

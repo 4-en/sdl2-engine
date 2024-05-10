@@ -565,7 +565,7 @@ namespace SDL2Engine
         public static UInt32 targetFPS = 500;
         public static int windowWidth = 1000;
         public static int windowHeight = (int)(windowWidth / aspectRatio);
-        private IntPtr font = IntPtr.Zero;
+        private Font? font = null;
         public static string gameName = "Unknown Game";
 
 
@@ -675,6 +675,13 @@ namespace SDL2Engine
 
         private void Cleanup()
         {
+            if (font != null)
+            {
+                font.Dispose();
+            }
+
+
+
             // Destroy renderer
             SDL.SDL_DestroyRenderer(renderer);
             renderer = IntPtr.Zero;
@@ -817,14 +824,19 @@ namespace SDL2Engine
         {
             SDL.SDL_Color textColor = new SDL.SDL_Color { r = 255, g = 255, b = 255, a = 255 };
             SDL.SDL_Color backgroundColor = new SDL.SDL_Color { r = 0x1A, g = 0x1A, b = 0x1A, a = 0xFF }; // Black color for background
-            if (font == IntPtr.Zero)
-                font = SDL_ttf.TTF_OpenFont("Assets/Fonts/Roboto-Regular.ttf", 24);
+            if (font == null) {
+                font =  AssetManager.LoadFont("Assets/Fonts/Roboto-Regular.ttf", 24);
+                font.Load();
+            }
+            
 
-            if (font == IntPtr.Zero)
+            if (!font.IsLoaded())
             {
                 Console.WriteLine("Failed to load font! SDL_ttf");
                 return;
             }
+
+            IntPtr fontPtr = font.Get();
 
             int totalScenes = SceneManager.GetScenes().Count;
             int totalObjects = 0;
@@ -858,7 +870,7 @@ namespace SDL2Engine
             for (int i = 0; i < debugStrings.Length; i++)
             {
                 int texW = 0, texH = 0;
-                if (SDL_ttf.TTF_SizeText(font, debugStrings[i], out texW, out texH) != 0)
+                if (SDL_ttf.TTF_SizeText(fontPtr, debugStrings[i], out texW, out texH) != 0)
                 {
                     Console.WriteLine("Failed to size text! SDL_ttf Error: " + SDL.SDL_GetError());
                 }
@@ -869,7 +881,7 @@ namespace SDL2Engine
                 SDL.SDL_RenderFillRect(renderer, ref backgroundRect);
 
                 // Render Text
-                IntPtr surface = SDL_ttf.TTF_RenderText_Solid(font, debugStrings[i], textColor);
+                IntPtr surface = SDL_ttf.TTF_RenderUTF8_Blended(fontPtr, debugStrings[i], textColor);
                 IntPtr texture = SDL.SDL_CreateTextureFromSurface(renderer, surface);
                 SDL.SDL_Rect dst = new SDL.SDL_Rect { x = 10, y = 10 + i * 30, w = texW, h = texH };
                 SDL.SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dst);

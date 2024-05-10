@@ -308,18 +308,20 @@ namespace SDL2Engine
         {
             return this._transform.GetPosition();
         }
-
+        // Set the absolute world position of the GameObject
         public void SetPosition(Vec2D position)
         {
             this._transform.position = position;
 
         }
-
+        // Use this to set the position of the GameObject relative to the parent
         public void SetLocalPosition(Vec2D position)
         {
             this._transform.localPosition = position;
         }
 
+        // Set the position of the parent GameObject
+        // world position = parent position + local position
         public void SetParentPosition(Vec2D position)
         {
             this._transform.SetParentPosition(position);

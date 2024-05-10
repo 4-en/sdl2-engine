@@ -85,6 +85,11 @@ namespace SDL2Engine
         {
         }
 
+        public SDL.SDL_Color ToSDLColor()
+        {
+            return new SDL.SDL_Color() { r = r, g = g, b = b, a = a };
+        }
+
         public static Color White = new Color(255, 255, 255, 255);
         public static Color Black = new Color(0, 0, 0, 255);
         public static Color Red = new Color(255, 0, 0, 255);
@@ -329,12 +334,14 @@ namespace SDL2Engine
 
     }
 
-    public class TextRenderer : DrawableRect
+    public class TextRenderer : DrawableRect, ILoadable
     {
         private string text = "[TEXT]";
         private int fontSize = 24;
         private string fontPath = "Assets/Fonts/Roboto-Regular.ttf";
         private bool updateTexture = true;
+        private bool updateFont = true;
+        private Font? font;
         private IntPtr texture = IntPtr.Zero;
 
         public void SetText(string text)
@@ -348,38 +355,56 @@ namespace SDL2Engine
         {
             this.fontSize = fontSize;
             updateTexture = true;
+            updateFont = true;
         }
 
         public void SetFontPath(string fontPath)
         {
             this.fontPath = fontPath;
             updateTexture = true;
+            updateFont = true;
+        }
+
+        private void LoadFont()
+        {
+            if (font != null && !updateFont)
+            {
+                return;
+            }
+
+            if (font != null)
+            {
+                font.Dispose();
+                font = null;
+            }
+
+            font = AssetManager.LoadAsset<Font>(fontPath + "@" + fontSize);
+            font.Load();
+            updateFont = false;
         }
 
         private void CreateTextTexture()
         {
+            if(!IsLoaded() || this.font == null || this.updateFont)
+            {
+                LoadFont();
+            }
+
             if (texture != IntPtr.Zero)
             {
                 SDL_DestroyTexture(texture);
                 texture = IntPtr.Zero;
             }
 
-            IntPtr font = SDL_ttf.TTF_OpenFont(fontPath, fontSize);
-            if (font == IntPtr.Zero)
+            if (font == null)
             {
-                Console.WriteLine("Failed to load font: " + SDL_GetError());
                 return;
             }
 
-            IntPtr surface = SDL_ttf.TTF_RenderUTF8_Blended(font, text, new SDL.SDL_Color() { r = color.r, g = color.g, b = color.b, a = color.a });
-            texture = SDL_CreateTextureFromSurface(Engine.renderer, surface);
+            Rect out_rect;
+            texture = font.RenderTexture(text, color.ToSDLColor(), out out_rect);
+            this.rect = out_rect;
 
-            // get the size of the texture
-            int w, h;
-            SDL_QueryTexture(texture, out _, out _, out w, out h);
-            rect = new Rect(0, 0, w, h);
-            SDL_ttf.TTF_CloseFont(font);
-            SDL_FreeSurface(surface);
             this.updateTexture = false;
         }
 
@@ -406,7 +431,24 @@ namespace SDL2Engine
             if (texture != IntPtr.Zero)
             {
                 SDL_DestroyTexture(texture);
+                texture = IntPtr.Zero;
             }
+
+            if (font != null)
+            {
+                font.Dispose();
+                font = null;
+            }
+        }
+
+        public void Load()
+        {
+            LoadFont();
+        }
+
+        public bool IsLoaded()
+        {
+            return font != null;
         }
     }
 

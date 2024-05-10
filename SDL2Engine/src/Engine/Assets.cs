@@ -181,6 +181,52 @@ namespace SDL2Engine
     }
     */
 
+    public class Font : Asset<IntPtr>
+    {
+
+        public Font(AssetHandler<IntPtr> handler) : base(handler)
+        {
+        }
+
+        public override IntPtr GetDefault()
+        {
+            return IntPtr.Zero;
+        }
+
+        public IntPtr RenderTexture(string text, SDL_Color color, out Rect rect)
+        {
+            rect = new Rect(0, 0);
+            var ptr = this.Get();
+            if (ptr == IntPtr.Zero)
+            {
+                return IntPtr.Zero;
+            }
+
+            IntPtr surface = SDL_ttf.TTF_RenderUTF8_Blended(ptr, text, color);
+            var texture = SDL_CreateTextureFromSurface(Engine.renderer, surface);
+
+            // get the size of the texture
+            int w, h;
+            SDL_QueryTexture(texture, out _, out _, out w, out h);
+            rect = new Rect(0, 0, w, h);
+            SDL_FreeSurface(surface);
+
+            return texture;
+        }
+
+        public Font GetSize(int size)
+        {
+            string path = handler.GetPath();
+            int at_index = path.LastIndexOf('@');
+            if (at_index != -1)
+            {
+                path = path.Substring(0, at_index);
+            }
+            path += "@" + size;
+            return AssetManager.LoadAsset<Font>(path);
+        }
+    }
+
 
     public class Texture : Asset<IntPtr>
     {
@@ -508,6 +554,77 @@ namespace SDL2Engine
 
     }
 
+    class FontHandler : AssetHandler<IntPtr>
+    {
+        public FontHandler(string path) : base(path)
+        {
+        }
+
+        public override bool LoadAsset()
+        {
+            // Load font
+            if (loaded)
+            {
+                return true;
+            }
+            if (loadFailed)
+            {
+                return false;
+            }
+
+            // check if path ends with @size
+            // if it does, extract the size and load the font with that size
+            // if it doesn't, load the font with size 24
+            string load_path = path;
+            int size = 24;
+            int at_index = path.LastIndexOf('@');
+            if (at_index != -1)
+            {
+                string size_str = path.Substring(at_index + 1);
+                if (int.TryParse(size_str, out size))
+                {
+                    load_path = path.Substring(0, at_index);
+                }
+            }
+            if (load_path == "")
+            {
+                Console.WriteLine("FontHandler: Invalid font path: " + path);
+                loadFailed = true;
+                return false;
+            }
+
+
+            asset = SDL_ttf.TTF_OpenFont(load_path, size);
+            if (asset == IntPtr.Zero)
+            {
+                Console.WriteLine("FontHandler: Failed to load font: " + path);
+                loadFailed = true;
+                return false;
+            }
+            loaded = true;
+
+            return true;
+        }
+
+        public override bool UnloadAsset()
+        {
+            // Unload font
+            if (!loaded)
+            {
+                return false;
+            }
+
+            if (asset != IntPtr.Zero)
+            {
+                SDL_ttf.TTF_CloseFont(asset);
+                asset = IntPtr.Zero;
+                loaded = false;
+                return true;
+            }
+            return false;
+        }
+    }
+
     class TextureHandler : AssetHandler<IntPtr>
     {
         private Rect rect;
@@ -676,6 +793,7 @@ namespace SDL2Engine
         private static Dictionary<string, TextureHandler> texture_assets = new();
         private static Dictionary<string, SoundHandler> sound_assets = new();
         private static Dictionary<string, MusicHandler> music_assets = new();
+        private static Dictionary<string, FontHandler> font_assets = new();
 
         public static Texture LoadTexture(string path)
         {
@@ -727,6 +845,23 @@ namespace SDL2Engine
             return new Music(handler);
         }
 
+        public static Font LoadFont(string path)
+        {
+            FontHandler? handler = null;
+            if (font_assets.ContainsKey(path))
+            {
+                handler = font_assets[path];
+            }
+            else
+            {
+                handler = new FontHandler(path);
+                font_assets[path] = handler;
+                // handler.LoadAsset();
+            }
+
+            return new Font(handler);
+        }
+
         /*
          * Can be used to load assets of different types that inherit from Asset<T>
          * If multiple assets with the same path are loaded, the same asset will be returned to avoid loading the same asset multiple times
@@ -749,6 +884,10 @@ namespace SDL2Engine
             else if (typeof(T) == typeof(Music))
             {
                 return LoadMusic(path) as T ?? throw new Exception("Failed to load music");
+            }
+            else if (typeof(T) == typeof(Font))
+            {
+                return LoadFont(path) as T ?? throw new Exception("Failed to load font");
             }
             else
             {

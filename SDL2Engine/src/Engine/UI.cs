@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace SDL2Engine.UI
 {
-    class Div : Drawable
+    class Div : DrawableRect
     {
         // TODO: Implement Div class as base class for UI elements
 
-        // implement useful features from HTML/CSS
+        // implement useful features from HTML/CSS (not all of those are needed, just some ideas)
         // - position
         // - size
         // - background color

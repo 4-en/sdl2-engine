@@ -22,6 +22,11 @@
     <Content Include="Assets\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Remove="Assets\Audio\Fire.mp3" />
+    <None Remove="Assets\Audio\Water.mp3" />
+    <None Remove="Assets\Audio\Water2.mp3" />
+    <None Remove="Assets\Audio\Water3.mp3" />
+    <None Remove="Assets\Audio\Wave.mp3" />
     <None Update="SDL2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

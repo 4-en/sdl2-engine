@@ -515,6 +515,11 @@ namespace SDL2Engine
             // maybe it should be assumed that the texture is loaded
             if (texture == null) {
                 this.Load();
+
+                if (texture == null)
+                {
+                    return;
+                }
             }
 
             var texture_ptr = texture.Get();

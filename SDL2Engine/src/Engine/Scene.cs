@@ -209,7 +209,8 @@ namespace SDL2Engine
             } else if (parent != null)
             {
                 // check if parent is in the toAdd list
-                if (toAdd.Contains(parent) || toAdd.Contains(gameObject.GetDeepParent()))
+                GameObject? deepParent = parent.GetDeepParent();
+                if (toAdd.Contains(parent) || (deepParent != null && toAdd.Contains(deepParent)))
                 {
                     // if the parent is in the toAdd list, we can assume that it will be added later
                     // in this case, we don't need to add this child to the list as well

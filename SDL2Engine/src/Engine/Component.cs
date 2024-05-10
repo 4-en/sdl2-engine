@@ -57,6 +57,25 @@ namespace SDL2Engine
             return myParent.AddComponent<T>(newComponent);
         }
 
+        /*
+         * Create a new component of type T and add it to a GameObject
+         *
+         * This method is used to create new components
+         * and add them to a GameObject
+         *
+         * This creates a new GameObject
+         *
+         * The GameObject is named after the component type
+         * 
+         * This returns a Tuple with the GameObject and the Component
+         */
+        public static Tuple<GameObject, T> CreateWithGameObject<T>(string? gameObjectName=null) where T : Component, new()
+        {
+            gameObjectName ??= typeof(T).Name + "GameObject";
+            var gameObject = new GameObject(gameObjectName);
+            return new Tuple<GameObject, T>(gameObject, gameObject.AddComponent<T>());
+        }
+
         public void SetEnabled(bool status)
         {
             this.enabled = status;

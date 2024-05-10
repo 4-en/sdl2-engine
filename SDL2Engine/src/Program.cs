@@ -272,18 +272,6 @@ namespace SDL2Engine.Testing
         static void Main(string[] args)
         {
 
-            var hs = Highscores<int>.Load("highscores.txt");
-            var rand = new Random();
-            hs.AddHighscore("test", rand.Next(0, 100));
-            hs.Save("highscores.txt");
-
-            // print highscores
-            foreach (var highscore in hs)
-            {
-                Console.WriteLine(highscore);
-            }
-
-
             Console.WriteLine("Starting SDL2 Engine...");
 
             // create an empty world and add it to the engine

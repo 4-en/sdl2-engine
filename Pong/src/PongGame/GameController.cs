@@ -1,6 +1,7 @@
 using SDL2Engine;
 using SDL2;
 using static SDL2.SDL;
+using SDL2Engine.UI;
 
 namespace Pong
 {
@@ -181,6 +182,10 @@ namespace Pong
             scoreText = scoreObject.AddComponent<TextRenderer>();
             scoreText.color = new Color(255, 255, 255, 205);
             scoreText.SetFontSize(100);
+
+            var highscores = Component.CreateWithGameObject<Div>("Highscores");
+            highscores.Item1.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y - 50);
+            highscores.Item2.Text = "Highscores";
 
             ResetGame();
 

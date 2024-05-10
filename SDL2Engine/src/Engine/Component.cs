@@ -86,6 +86,11 @@ namespace SDL2Engine
             return enabled;
         }
 
+        public bool IsDisabled()
+        {
+            return !enabled;
+        }
+
         public void Enable()
         {
             SetEnabled(true);

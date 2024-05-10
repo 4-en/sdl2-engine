@@ -604,6 +604,7 @@ namespace SDL2Engine
                 PhysicsBody? physicsBody = gameObject.GetComponent<PhysicsBody>();
                 if (physicsBody == null) continue;
                 if (!physicsBody.IsMovable) continue;
+                if (!physicsBody.IsEnabled()) continue;
 
 
                 //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);

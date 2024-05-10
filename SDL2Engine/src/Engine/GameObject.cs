@@ -256,6 +256,11 @@ namespace SDL2Engine
             return enabled;
         }
 
+        public bool IsDisabled()
+        {
+            return !enabled;
+        }
+
         public bool ToggleEnabled()
         {
             this.SetEnabled(!enabled);

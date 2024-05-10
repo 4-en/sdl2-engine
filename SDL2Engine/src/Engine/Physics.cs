@@ -898,7 +898,6 @@ namespace SDL2Engine
 
 
         // after all collisions are resolved, notify objects that a collision has occured
-        // TODO: Implement event listeners for OnCollisionEnter, OnCollisionStay, OnCollisionExit, etc.
         public static void NotifyCollisions(List<CollisionPair> collisions)
         {
             foreach (var pair in collisions)

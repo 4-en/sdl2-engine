@@ -1,5 +1,7 @@
 ﻿
 
+using static SDL2.SDL;
+
 namespace SDL2Engine
 {
     /// <summary>
@@ -9,9 +11,9 @@ namespace SDL2Engine
     /// </summary>
     public static class Input
     {
-        private static readonly UInt32[] downKeys = new UInt32[16];
-        private static readonly UInt32[] pressedKeys = new UInt32[16];
-        private static readonly UInt32[] releasedKeys = new UInt32[16];
+        private static readonly int[] downKeys = new int[16];
+        private static readonly int[] pressedKeys = new int[16];
+        private static readonly int[] releasedKeys = new int[16];
 
         private static Vec2D mousePosition = new();
         private static Vec2D mouseDelta = new();
@@ -19,7 +21,7 @@ namespace SDL2Engine
         private static bool[] mouseButtonsPressed = new bool[3];
         private static bool[] mouseButtonsReleased = new bool[3];
 
-        public static bool GetKeyPressed(UInt32 key)
+        public static bool GetKeyPressed(int key)
         {
             for (int i = 0; i < pressedKeys.Length; i++)
             {
@@ -32,7 +34,12 @@ namespace SDL2Engine
             return false;
         }
 
-        public static bool GetKeyDown(UInt32 key)
+        public static bool GetKeyPressed(SDL_Keycode key)
+        {
+            return GetKeyPressed((int)key);
+        }
+
+        public static bool GetKeyDown(int key)
         {
             for (int i = 0; i < downKeys.Length; i++)
             {
@@ -45,7 +52,12 @@ namespace SDL2Engine
             return false;
         }
 
-        public static bool GetKeyReleased(UInt32 key)
+        public static bool GetKeyDown(SDL_Keycode key)
+        {
+            return GetKeyDown((int)key);
+        }
+
+        public static bool GetKeyReleased(int key)
         {
             for (int i = 0; i < releasedKeys.Length; i++)
             {
@@ -58,13 +70,18 @@ namespace SDL2Engine
             return false;
         }
 
-        public static void SetKeyDown(UInt32 key)
+        public static bool GetKeyReleased(SDL_Keycode key)
+        {
+            return GetKeyReleased((int)key);
+        }
+
+        public static void SetKeyDown(int key)
         {
             for (int i = 0; i < downKeys.Length; i++)
             {
                 if (downKeys[i] == 0)
                 {
-                    downKeys[i] = (UInt32)key;
+                    downKeys[i] = key;
                     break;
                 }
             }
@@ -72,26 +89,36 @@ namespace SDL2Engine
             SetKeyPressed(key);
         }
 
-        public static void SetKeyPressed(UInt32 key)
+        public static void SetKeyDown(SDL_Keycode key)
+        {
+            SetKeyDown((int)key);
+        }
+
+        public static void SetKeyPressed(int key)
         {
             for (int i = 0; i < pressedKeys.Length; i++)
             {
                 if (pressedKeys[i] == 0)
                 {
-                    pressedKeys[i] = (UInt32)key;
+                    pressedKeys[i] = key;
                     break;
                 }
             }
 
         }
 
-        public static void SetKeyReleased(UInt32 key)
+        public static void SetKeyPressed(SDL_Keycode key)
+        {
+            SetKeyPressed((int)key);
+        }
+
+        public static void SetKeyReleased(int key)
         {
             for (int i = 0; i < releasedKeys.Length; i++)
             {
                 if (releasedKeys[i] == 0)
                 {
-                    releasedKeys[i] = (UInt32)key;
+                    releasedKeys[i] = key;
                     break;
                 }
             }
@@ -105,6 +132,11 @@ namespace SDL2Engine
                     break;
                 }
             }
+        }
+
+        public static void SetKeyReleased(SDL_Keycode key)
+        {
+            SetKeyReleased((int)key);
         }
 
         public static void ClearInputs()

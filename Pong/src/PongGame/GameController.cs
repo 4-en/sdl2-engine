@@ -58,8 +58,8 @@ namespace Pong
     public class KeyboardController : Script
     {
         private PaddleController? paddleController = null;
-        public uint keyUp = (uint)SDL_Keycode.SDLK_w;
-        public uint keyDown = (uint)SDL_Keycode.SDLK_s;
+        public int keyUp = (int)SDL_Keycode.SDLK_w;
+        public int keyDown = (int)SDL_Keycode.SDLK_s;
 
         public override void Start()
         {
@@ -161,8 +161,8 @@ namespace Pong
             BoxCollider.FromDrawableRect(player2);
             player2.AddComponent<PaddleController>().gameController = this;
             var keyboard_controller = player2.AddComponent<KeyboardController>();
-            keyboard_controller.keyUp = (uint)SDL_Keycode.SDLK_UP;
-            keyboard_controller.keyDown = (uint)SDL_Keycode.SDLK_DOWN;
+            keyboard_controller.keyUp = (int)SDL_Keycode.SDLK_UP;
+            keyboard_controller.keyDown = (int)SDL_Keycode.SDLK_DOWN;
 
             // create the walls
             var create_barrier = (string name, Rect area) =>
@@ -300,7 +300,7 @@ namespace Pong
         {
 
             // reset game if r is pressed
-            if (Input.GetKeyPressed((uint)SDL_Keycode.SDLK_r))
+            if (Input.GetKeyPressed((int)SDL_Keycode.SDLK_r))
             {
                 ResetGame();
                 return;

@@ -566,6 +566,7 @@ namespace SDL2Engine
         public static int windowWidth = 1000;
         public static int windowHeight = (int)(windowWidth / aspectRatio);
         private IntPtr font = IntPtr.Zero;
+        public static string gameName = "Unknown Game";
 
 
         // SDL variables
@@ -577,12 +578,14 @@ namespace SDL2Engine
          * Starts the engine with an initial scene
          * this scene will run in the SceneManager and can be used to bootstrap the game, including other scenes
          */
-        public Engine(Scene? scene = null)
+        public Engine(Scene? scene = null, string gameName = "Unknown Game")
         {
             if (instance != null)
             {
                 throw new Exception("Engine instance already exists");
             }
+
+            Engine.gameName = gameName;
 
             instance = this;
 
@@ -692,7 +695,7 @@ namespace SDL2Engine
             // add key to down keys
             if (keyEvent.repeat == 0)
             {
-                Input.SetKeyDown((uint)keyEvent.keysym.sym);
+                Input.SetKeyDown((int)keyEvent.keysym.sym);
             }
 
             switch (keyEvent.keysym.sym)
@@ -756,7 +759,7 @@ namespace SDL2Engine
 
                     // release key
                     case SDL.SDL_EventType.SDL_KEYUP:
-                        Input.SetKeyReleased((uint)sdlEvent.key.keysym.sym);
+                        Input.SetKeyReleased((int)sdlEvent.key.keysym.sym);
                         break;
 
                     // window resize event

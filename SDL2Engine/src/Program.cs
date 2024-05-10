@@ -74,7 +74,7 @@ namespace SDL2Engine.Testing
 
             gameObject.SetPosition(mousePosition);
 
-            if (Input.GetKeyDown((uint)SDL.SDL_Keycode.SDLK_x))
+            if (Input.GetKeyDown((int)SDL.SDL_Keycode.SDLK_x))
             {
                 // remove a random root game object
                 var scene = gameObject.GetScene();

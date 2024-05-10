@@ -119,7 +119,7 @@ namespace Pong
 
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
 
-        private double roundTimer = -3;
+        protected double roundTimer = -3;
         private bool roundStarted = false;
 
         private GameMode gameMode = GameMode.DUEL;
@@ -185,6 +185,8 @@ namespace Pong
             ResetGame();
 
         }
+
+        
 
         public void UpdateScoreText()
         {

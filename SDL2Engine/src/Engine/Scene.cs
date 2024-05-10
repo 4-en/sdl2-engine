@@ -422,6 +422,59 @@ namespace SDL2Engine
             return gameObjects;
         }
 
+        /*
+         * Find a GameObject by name
+         * Returns null if no GameObject with the given name was found
+         */
+        public GameObject? Find(string name)
+        {
+            // first check the root game objects
+            foreach (GameObject gameObject in gameObjects)
+            {
+                if (gameObject.GetName() == name)
+                {
+                    return gameObject;
+                }
+            }
+            
+            // if not found, do a deep search
+            foreach (GameObject gameObject in gameObjects)
+            {
+                GameObject? found = gameObject.FindChild(name);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+            return null;
+        }
+
+        public T? FindComponent<T>() where T : Component
+        {
+            T? component = null;
+            
+            // first check components of root game objects
+            foreach (GameObject gameObject in gameObjects)
+            {
+                component = gameObject.GetComponent<T>();
+                if (component != null)
+                {
+                    return component;
+                }
+            }
+
+            // if not found, do a deep search
+            foreach (GameObject gameObject in gameObjects)
+            {
+                component = gameObject.FindComponentInChildren<T>();
+                if (component != null)
+                {
+                    return component;
+                }
+            }
+            return null;
+        }
+
         private void HandleAddComponent<T>(T component) where T : Component
         {
             // Call Awake on the component

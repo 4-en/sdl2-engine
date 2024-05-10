@@ -17,7 +17,7 @@ namespace SDL2Engine
 
         // if true, the object will not be destroyed when the scene is changed and instead will be moved
         // to a buffer of persistent objects where it can be accessed by any scene
-        private bool persistent = false; 
+        private bool persistent = false;
 
         public GameObject(string name = "GameObject", Scene? scene = null)
         {
@@ -136,7 +136,7 @@ namespace SDL2Engine
             }
 
             return newObject;
-            
+
         }
 
         public void SetPersistent(bool persistent)
@@ -337,7 +337,8 @@ namespace SDL2Engine
                     this.GetScene()?.AddGameObject(child);
                     */
                     throw new Exception("Cannot add GameObject to a different scene");
-                } else
+                }
+                else
                 {
                     childScene.RemoveGameObjectFromRoot(child);
                 }
@@ -401,63 +402,57 @@ namespace SDL2Engine
          * this should only be done when the Component is not already attached to a GameObject
          * and could lead to unexpected behavior if the Component is already attached to a GameObject
          */
-        public T AddComponent<T>(T? instance = null) where T : Component , new()
+        public T AddComponent<T>(T? instance = null) where T : Component, new()
         {
-            
-            
+
+
             T newComponent = instance ?? new T();
-            
-            if (newComponent != null)
+
+
+
+            newComponent.Init(this);
+
+            this.scene?.AddComponent(newComponent);
+
+            // add specific built-in components to fields instead of adding them to the components list
+            // GameObject should only have one of each of these components
+            // if multiple colliders or physics bodies are needed, use a child object or CompositeCollider
+            if (newComponent is Collider collider)
             {
+                this._collider = collider;
+            }
 
-
-                newComponent.Init(this);
-
-                this.scene?.AddComponent(newComponent);
-
-                // add specific built-in components to fields instead of adding them to the components list
-                // GameObject should only have one of each of these components
-                // if multiple colliders or physics bodies are needed, use a child object or CompositeCollider
-                if (newComponent is Collider collider)
-                {
-                    this._collider = collider;
-                }
-
-                else if (newComponent is PhysicsBody physicsBody)
-                {
-                    this._physicsBody = physicsBody;
-                }
-
-                else if (newComponent is Transform transform)
-                {
-                    _transform = transform;
-                }
-
-                else if (newComponent is Drawable drawable)
-                {
-                    _drawable = drawable;
-                }
-
-                else if (newComponent is Script script)
-                {
-                    components.Add(newComponent);
-                    // Commented out because Awake is called by the scene during the first step of the update loop
-                    // when a new component is added to the scene
-                    // script.Awake();
-                }
-
-                else
-                {
-                    components.Add(newComponent);
-                }
-
-                return newComponent;
-            } else
+            else if (newComponent is PhysicsBody physicsBody)
             {
-                Console.WriteLine("Failed to create component of type " + typeof(T).Name);
+                this._physicsBody = physicsBody;
+            }
+
+            else if (newComponent is Transform transform)
+            {
+                _transform = transform;
+            }
+
+            else if (newComponent is Drawable drawable)
+            {
+                _drawable = drawable;
+            }
+
+            else if (newComponent is Script script)
+            {
+                components.Add(newComponent);
+                // Commented out because Awake is called by the scene during the first step of the update loop
+                // when a new component is added to the scene
+                // script.Awake();
+            }
+
+            else
+            {
+                components.Add(newComponent);
             }
 
             return newComponent;
+
+
         }
 
         public bool RemoveComponent(Component script)
@@ -478,11 +473,120 @@ namespace SDL2Engine
             return false;
         }
 
+        /*
+         * Finds a child GameObject by name
+         * Returns the first child with the specified name
+         * or null if no child with the specified name was found
+         */
+        public GameObject? FindChild(string name)
+        {
+            foreach (GameObject child in children)
+            {
+                if (child.name == name)
+                {
+                    return child;
+                }
+            }
+
+            foreach (GameObject child in children)
+            {
+                GameObject? found = child.FindChild(name);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+        /*
+         * Finds a GameObject by name
+         * Returns the first GameObject with the specified name
+         * or null if no GameObject with the specified name was found
+         * 
+         * This method can be very slow if used frequently.
+         * Best practice is to store the result in a variable
+         * and then use that variable for future references
+         * 
+         * Search Order:
+         * 1. Search this GameObject
+         * 2. Search children
+         * 3. Search all GameObjects in the scene
+         *
+         * This method does not search other scenes
+         * To search withing all scenes, use SceneManager.Find()
+         */
+        public GameObject? Find(string name)
+        {
+            if (this.name == name)
+            {
+                return this;
+            }
+
+            // search children
+            GameObject? found = this.FindChild(name);
+            if (found != null)
+            {
+                return found;
+            }
+
+            // search all GameObjects in the scene
+            // this does not search other scenes
+            return this.scene?.Find(name);
+        }
+
+        public T? FindComponentInChildren<T>() where T : Component
+        {
+            foreach (GameObject child in children)
+            {
+                T? found = child.GetComponent<T>();
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        /*
+         * Finds a component of type T
+         * 
+         * This method can be very slow if used frequently.
+         * Best practice is to store the result in a variable
+         * and then use that variable for future references
+         * 
+         * Search Order:
+         * 1. Search this GameObject
+         * 2. Search children
+         * 3. Search all GameObjects in the scene
+         * 
+         */
+        public T? FindComponent<T>() where T : Component
+        {
+            T? component = GetComponent<T>();
+            if (component != null)
+            {
+                return component;
+            }
+
+            // search children
+            component = FindComponentInChildren<T>();
+            if (component != null)
+            {
+                return component;
+            }
+
+            // search all GameObjects in the scene
+            // this does not search other scenes
+            return this.scene?.FindComponent<T>();
+        }
+
         // Gets first component of type T
         public T? GetComponent<T>() where T : Component
         {
             // if component is transform, physics body, collider, or drawable, return the field directly
-            if(transform is T t_component)
+            if (transform is T t_component)
             {
                 return t_component;
             }
@@ -522,7 +626,7 @@ namespace SDL2Engine
                 foundComponents.Add(t_component);
             }
 
-            if(drawable is T d_component)
+            if (drawable is T d_component)
             {
                 foundComponents.Add(d_component);
             }
@@ -537,7 +641,7 @@ namespace SDL2Engine
                 foundComponents.Add(p_component);
             }
 
-            
+
             foreach (Component component in components)
             {
                 if (component is T)
@@ -577,7 +681,7 @@ namespace SDL2Engine
         {
             // TODO: optimize this by keeping a list of scripts in scene
             // Update all scripts
-            for(int i = 0; i < components.Count; i++)
+            for (int i = 0; i < components.Count; i++)
             {
                 // check if script is a script
                 if (components[i] is Script)
@@ -587,7 +691,7 @@ namespace SDL2Engine
             }
 
             // Update all children
-            for(int i = 0; i < children.Count; i++)
+            for (int i = 0; i < children.Count; i++)
             {
                 children[i].Update();
             }

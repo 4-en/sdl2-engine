@@ -499,6 +499,11 @@ namespace SDL2Engine
         // Iterate through all Drawable components and call their Draw method using the main camera defined in the scene
         public void Draw()
         {
+            // TODO: optimize this later
+            // TODO: sort the drawable list by depth (Vec2D.z)
+            // also use occlusion- and frustum culling (at least frustum culling)
+            // aaalso, sort objects of the same depth by their texture, so gpu can batch draw calls
+            // the sorting should not be done every frame, but only when a drawable is added or removed (and then only once before rendering)
             foreach (Drawable drawable in drawableList)
             {
                 if (drawable.IsEnabled())

@@ -18,10 +18,6 @@ namespace SDL2Engine
     {
         protected GameObject gameObject = GameObject.Default;
 
-        // this tracks if the component was enabled on the last frame
-        // this is used to call OnEnable and OnDisable
-        private bool wasEnabled = false;
-
         public Component()
         {
 

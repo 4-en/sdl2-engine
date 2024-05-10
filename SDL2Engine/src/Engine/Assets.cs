@@ -119,7 +119,13 @@ namespace SDL2Engine
         {
             if(loaded)
             {
-                return handler.Get();
+                T? asset = handler.Get();
+                if(asset != null)
+                {
+                    return asset;
+                }
+                loaded = false;
+                loadFailed = true;
             }
 
             if(loadFailed)
@@ -134,7 +140,7 @@ namespace SDL2Engine
 
             Load();
 
-            return loaded && !loadFailed ? handler.Get() : GetDefault();
+            return loaded && !loadFailed ? handler.Get() ?? GetDefault() : GetDefault(); // <- nice code >:D
         }
 
         public string GetPath()

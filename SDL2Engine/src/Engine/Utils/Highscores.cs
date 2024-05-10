@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SDL2Engine.Utils
 {
-    public class Highscores<N> : IEnumerable<Tuple<string, N>> where N : IComparable
+    public class Highscores<N> : IEnumerable<Tuple<string, N>> where N : IComparable, IFormattable
     {
 
         private List<Tuple<string, N>> highscores;
@@ -116,6 +116,17 @@ namespace SDL2Engine.Utils
             highscores.SortHighscores();
 
             return highscores;
+        }
+
+        public List<Tuple<string, string>> AsString()
+        {
+            List<Tuple<string, string>> result = new();
+            for (int i = 0; i < highscores.Count; i++)
+            {
+                result.Add(new Tuple<string, string>(highscores[i].Item1, item2: highscores[i].Item2.ToString() ?? "null"));
+            }
+
+            return result;
         }
 
         public IEnumerator<Tuple<string, N>> GetEnumerator()

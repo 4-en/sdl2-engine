@@ -230,6 +230,11 @@ namespace SDL2Engine
                 components[i].SetEnabled(active);
             }
 
+            collider?.SetEnabled(active);
+            physicsBody?.SetEnabled(active);
+            drawable?.SetEnabled(active);
+
+
             for (int i = 0; i < children.Count; i++)
             {
                 children[i].SetEnabled(active);
@@ -248,6 +253,12 @@ namespace SDL2Engine
 
         public bool IsEnabled()
         {
+            return enabled;
+        }
+
+        public bool ToggleEnabled()
+        {
+            this.SetEnabled(!enabled);
             return enabled;
         }
 

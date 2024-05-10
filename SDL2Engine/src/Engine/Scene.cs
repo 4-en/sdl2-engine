@@ -501,7 +501,8 @@ namespace SDL2Engine
         {
             foreach (Drawable drawable in drawableList)
             {
-                drawable.Draw(mainCamera);
+                if (drawable.IsEnabled())
+                    drawable.Draw(mainCamera);
             }
         }
 

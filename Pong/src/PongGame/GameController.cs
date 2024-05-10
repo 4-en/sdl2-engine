@@ -2,9 +2,111 @@ using SDL2Engine;
 using SDL2;
 using static SDL2.SDL;
 using SDL2Engine.UI;
+using SDL2Engine.Utils;
 
 namespace Pong
 {
+
+    public class HighscoreScript : Script
+    {
+        private int highscore = 0;
+        private TextRenderer? textRenderer = null;
+
+        private TextRenderer? scoreText = null;
+        private TextRenderer? nameText = null;
+        private TextRenderer? highscoresTitle = null;
+
+        public override void Start()
+        {
+            var highscoresTitle = Component.CreateWithGameObject<TextRenderer>("HighscoresTitle");
+            gameObject.AddChild(highscoresTitle.Item1);
+            highscoresTitle.Item2.color = new Color(255, 255, 255, 205);
+            highscoresTitle.Item2.SetFontSize(100);
+            highscoresTitle.Item2.SetText("Highscores");
+
+            highscoresTitle.Item1.transform.position = new Vec2D(1920 / 2, 100);
+
+            this.highscoresTitle = highscoresTitle.Item2;
+            this.gameObject.AddChild(highscoresTitle.Item1);
+
+            SetHighscores(GetHighscores());
+        }
+
+        private List<Tuple<string, string>> GetHighscores()
+        {
+            return new List<Tuple<string, string>>()
+            {
+                new Tuple<string, string>("Player 1", "100"),
+                new Tuple<string, string>("Player 2", "90"),
+                new Tuple<string, string>("Player 3", "80"),
+                new Tuple<string, string>("Player 4", "70"),
+                new Tuple<string, string>("Player 5", "60"),
+                new Tuple<string, string>("Player 6", "50"),
+                new Tuple<string, string>("Player 7", "40"),
+                new Tuple<string, string>("Player 8", "30"),
+                new Tuple<string, string>("Player 9", "20"),
+                new Tuple<string, string>("Player 10", "10"),
+            };
+        }
+
+        public override void Update()
+        {
+            if(Input.GetKeyDown(SDL_Keycode.SDLK_h))
+            {
+                gameObject.ToggleEnabled();
+
+                // since gameObject disables all children and components
+                // we need to re-enable this script, otherwise we can't enable the gameObject again
+                this.Enable();
+
+                Console.WriteLine("Highscore script enabled: " + gameObject.IsEnabled());
+            }
+        }
+
+        public void SetHighscores(List<Tuple<string, string>> scores)
+        {
+            string nameString = "";
+            string scoreString = "";
+
+            foreach (var score in scores)
+            {
+                nameString += score.Item1 + "\n";
+                scoreString += score.Item2 + "\n";
+            }
+
+            if (nameText == null)
+            {
+                var name_renderer = Component.CreateWithGameObject<TextRenderer>("HighscoreNames");
+                gameObject.AddChild(name_renderer.Item1);
+                nameText = name_renderer.Item2;
+                nameText.color = new Color(255, 255, 255, 205);
+                nameText.SetFontSize(50);
+
+                name_renderer.Item1.transform.position = new Vec2D(-300, 200);
+
+            }
+            else
+            {
+                nameText.SetText(nameString);
+            }
+
+            if (scoreText == null)
+            {
+                var score_renderer = Component.CreateWithGameObject<TextRenderer>("HighscoreScores");
+                gameObject.AddChild(score_renderer.Item1);
+                scoreText = score_renderer.Item2;
+                scoreText.color = new Color(255, 255, 255, 205);
+                scoreText.SetFontSize(50);
+
+                score_renderer.Item1.transform.position = new Vec2D(300, 200);
+            }
+            else
+            {
+                scoreText.SetText(scoreString);
+            }
+        }
+
+    }
     public class PaddleController : Script
     {
         public double speed = 1000;
@@ -95,6 +197,23 @@ namespace Pong
         {
             sound?.Play();
         }
+
+        public override void Update()
+        {
+            var collider = gameObject.GetComponent<BoxCollider>();
+            var filledRect = gameObject.GetComponent<FilledRect>();
+            if (collider == null || filledRect == null) return;
+
+            var rect = collider.GetCollisionBox();
+
+            if (SDL2Engine.Utils.MouseHelper.IsRectHovered(GetCamera()?.RectToScreen(rect) ?? new Rect()))
+            {
+                filledRect.color = new Color(255, 0, 0, 255);
+            } else
+            {
+                filledRect.color = new Color(255, 255, 255, 255);
+            }
+        }
     }
 
     public enum GameMode
@@ -182,13 +301,9 @@ namespace Pong
             scoreText = scoreObject.AddComponent<TextRenderer>();
             scoreText.color = new Color(255, 255, 255, 205);
             scoreText.SetFontSize(100);
-
-            var highscores = Component.CreateWithGameObject<Div>("Highscores");
-            highscores.Item1.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y - 50);
-            highscores.Item2.Text = "Highscores";
-            highscores.Item2.TextColor = new Color(255, 255, 255, 255);
-            highscores.Item2.BackgroundColor = new Color(0, 0, 0, 100);
-            highscores.Item2.PreferredSize = new Rect(200, 200);
+            var highscoreRoot = new GameObject("HighscoreRoot");
+            var highscoreScript = highscoreRoot.AddComponent<HighscoreScript>();
+            
 
             ResetGame();
 

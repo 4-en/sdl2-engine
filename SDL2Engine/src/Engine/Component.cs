@@ -96,6 +96,12 @@ namespace SDL2Engine
             SetEnabled(false);
         }
 
+        public bool ToggleEnabled()
+        {
+            SetEnabled(!enabled);
+            return enabled;
+        }
+
         // This is called for every compenent when it gets added to a Scene
         // This doesn't necessarily mean that the owning GameObject has been completely initialized
         public virtual void Awake()

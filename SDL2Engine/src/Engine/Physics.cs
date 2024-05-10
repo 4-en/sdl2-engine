@@ -684,11 +684,17 @@ namespace SDL2Engine
                 colliderI = gameObjects[(int)i].GetComponent<Collider>();
 
                 if (colliderI == null) continue;
+                if (!colliderI.IsEnabled()) continue;
 
-                // check if it has a physics body
-                // if it doesn't it can't move, so we don't need to check for collisions from it, only with it
+
+                // We can skip checking FROM objects that don't have a physics body
+                // we also don't need to check for collisions with objects that meet the following conditions:
+                // - they are not enabled
+                // - the physics body is not movable
+                // - the velocity is 0
+
                 PhysicsBody? physicsBody = gameObjects[(int)i].GetComponent<PhysicsBody>();
-                if (physicsBody == null || !physicsBody.IsMovable) continue;
+                if (physicsBody == null || !physicsBody.IsMovable || !physicsBody.IsEnabled() || physicsBody.Velocity.LengthSquared() == 0) continue;
 
                 colliderI.SwapCollisions();
 
@@ -696,6 +702,7 @@ namespace SDL2Engine
                 {
                     colliderJ = gameObjects[(int)j].GetComponent<Collider>();
                     if (colliderJ == null) continue;
+                    if (!colliderJ.IsEnabled()) continue;
                     colliderJ.SwapCollisions();
 
                     if (colliderI.CollidesWith(colliderJ))

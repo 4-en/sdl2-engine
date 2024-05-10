@@ -91,7 +91,7 @@ namespace SDL2Engine.UI
         }
     }
 
-    public class Div : DrawableRect
+    public class Div : DrawableRect, ILoadable
     {
         // TODO: Implement Div class as base class for UI elements
 
@@ -122,8 +122,11 @@ namespace SDL2Engine.UI
         // sounds like fun :)
 
         private string text = "";
-        private string fontPath = "";
-        private int fontSize = 12;
+        private string fontPath = "Assets/Fonts/Roboto-Regular.ttf";
+        private int fontSize = 24;
+        private Font? font = null;
+        private bool fontChanged = true;
+        private IntPtr texture = IntPtr.Zero;
         private Color textColor = new Color(0, 0, 0, 255);
         private Color backgroundColor = new Color(255, 255, 255, 0);
         private AnchorPoint textAlignment = AnchorPoint.TopLeft;
@@ -458,18 +461,80 @@ namespace SDL2Engine.UI
                 RecalculateDimensions();
             }
 
-            if (changed)
-            {
-                // redraw textures and stuff
-                changed = false;
-            }
-
             var destRect = this.GetDestRect();
 
             if(this.backgroundColor.a > 0)
             {
                 SDL_SetRenderDrawColor(Engine.renderer, this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
                 SDL_RenderFillRect(Engine.renderer, ref destRect);
+            }
+
+            if (text != "" && this.textColor.a > 0)
+            {
+                CreateTextTexture();
+                var d_rect = GetCamera()?.RectToScreen(textSize, gameObject.transform.position).ToSDLRect() ?? this.GetDestRect();
+                SDL_RenderCopy(Engine.renderer, texture, IntPtr.Zero, ref d_rect);
+            }
+        }
+
+        public void CreateTextTexture()
+        {
+            if(!changed && texture != IntPtr.Zero)
+            {
+                return;
+            }
+
+            if (font == null)
+            {
+                LoadFont();
+            }
+
+            if (font == null) return;
+
+            if (texture != IntPtr.Zero)
+            {
+                SDL_DestroyTexture(texture);
+                texture = IntPtr.Zero;
+            }
+
+            
+            Rect outRect = new Rect(0, 0);
+            this.texture = font.RenderTexture(text, textColor.ToSDLColor(), out outRect);
+            this.textSize = outRect;
+            changed = false;
+        }   
+
+        public void LoadFont()
+        {
+            if (fontPath != "" && fontChanged)
+            {
+                font = AssetManager.LoadFont(fontPath, fontSize);
+            }
+        }
+
+        public void Load()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsLoaded()
+        {
+            return this.font != null;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            if (font != null)
+            {
+                font.Dispose();
+                font = null;
+            }
+
+            if (texture != IntPtr.Zero)
+            {
+                SDL_DestroyTexture(texture);
+                texture = IntPtr.Zero;
             }
         }
     }

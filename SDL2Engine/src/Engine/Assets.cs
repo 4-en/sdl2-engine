@@ -845,8 +845,13 @@ namespace SDL2Engine
             return new Music(handler);
         }
 
-        public static Font LoadFont(string path)
+        public static Font LoadFont(string path, int size=-1)
         {
+            if (size != -1)
+            {
+                path += "@" + size;
+            }
+
             FontHandler? handler = null;
             if (font_assets.ContainsKey(path))
             {

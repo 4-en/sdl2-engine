@@ -664,8 +664,11 @@ namespace SDL2Engine
             SDL.SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
             Console.WriteLine("Engine initialized");
-
+            Console.WriteLine();
+            Console.WriteLine("Press ESC to quit");
             Console.WriteLine("Press F3 to toggle debug info");
+            Console.WriteLine("Press F11 to toggle fullscreen");
+            Console.WriteLine();
 
 
         }

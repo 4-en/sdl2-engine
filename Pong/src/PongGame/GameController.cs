@@ -127,6 +127,12 @@ namespace Pong
         private double roundTimer = -3;
         private bool roundStarted = false;
 
+        private Sound scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Fire.mp3");
+        private Sound scoreSoundWater = AssetManager.LoadAsset<Sound>("Assets/Audio/Wave.mp3");
+
+        private double lastColorChangeTime = 0;
+        private bool restedColor = false;
+
         private GameMode gameMode = GameMode.DUEL;
 
         public int scoreToWin = 11;
@@ -318,11 +324,7 @@ namespace Pong
                 ResetGame();
             }
         }
-        private Sound scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Fire.mp3");
-        private Sound scoreSoundWater = AssetManager.LoadAsset<Sound>("Assets/Audio/Wave.mp3");
 
-        private double lastColorChangeTime = 0;
-        private bool restedColor = false;
         public override void Update()
         {
 

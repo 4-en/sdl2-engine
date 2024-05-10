@@ -644,7 +644,7 @@ namespace SDL2Engine
             return scenes;
         }
 
-        private static void SetActiveScene(Scene scene)
+        public static void SetActiveScene(Scene scene)
         {
             activeScene = scene;
         }

@@ -1,3 +1,4 @@
+using Pong.src;
 using SDL2Engine;
 
 
@@ -9,12 +10,14 @@ namespace Pong
         public static void Start()
         {
             LoadLevel(0);
+            //LoadHomeScreen();
 
             var engine = new Engine();
             engine.Run();
         }
 
 
+        private static Scene? homeScreen;
         private static Scene? level;
         private static int levelIndex = 0;
 
@@ -71,6 +74,19 @@ namespace Pong
             LoadLevel(nextLevelIndex);
         }
 
+        public static void LoadHomeScreen()
+        {
+            if (homeScreen == null)
+            {
+                homeScreen = CreateHomeScreen();
+                SceneManager.AddScene(homeScreen);
+            }
+            else
+            {
+                SceneManager.SetActiveScene(homeScreen);
+            }
+        }
+
         public static Scene CreateBaseLevel()
         {
             var level = new Scene("BaseLevel");
@@ -101,6 +117,11 @@ namespace Pong
             return level;
         }
 
+        private static Scene CreateHomeScreen()
+        {
+            var homeScreen = HomeScreen.CreateScene();
+            return homeScreen;
+        }
     }
 }
 

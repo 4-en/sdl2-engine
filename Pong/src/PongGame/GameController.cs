@@ -1,5 +1,5 @@
-using SDL2Engine;
 using SDL2;
+using SDL2Engine;
 using static SDL2.SDL;
 
 namespace Pong
@@ -115,12 +115,23 @@ namespace Pong
         protected GameObject? bottomWall = null;
 
         protected GameObject? scoreObject = null;
+        protected GameObject? scoreObject2 = null;
+        protected GameObject? scoreObject3 = null;
+
         protected TextRenderer? scoreText = null;
+        protected TextRenderer? scoreText2 = null;
+        protected TextRenderer? scoreText3 = null;
 
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
 
         protected double roundTimer = -3;
         private bool roundStarted = false;
+
+        private Sound scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Fire.mp3");
+        private Sound scoreSoundWater = AssetManager.LoadAsset<Sound>("Assets/Audio/Wave.mp3");
+
+        private double lastColorChangeTime = 0;
+        private bool restedColor = false;
 
         private GameMode gameMode = GameMode.DUEL;
 
@@ -146,7 +157,7 @@ namespace Pong
             // create the paddles
             player1 = new GameObject("Player1");
             var player1_drawable = player1.AddComponent<FilledRect>();
-            player1_drawable.color = new Color(055, 055, 255, 255);
+            player1_drawable.color = new Color(30, 144, 255, 255);
             player1_drawable.SetRect(new Rect(40, 200));
             player1_drawable.anchorPoint = AnchorPoint.TopLeft;
             BoxCollider.FromDrawableRect(player1);
@@ -176,11 +187,24 @@ namespace Pong
             topWall = create_barrier("Top Barrier", new Rect(0, -100, 1920, 100));
             bottomWall = create_barrier("Bottom Barrier", new Rect(0, 1080, 1920, 100));
 
-            scoreObject = new GameObject("Score");
-            scoreObject.transform.position = new Vec2D(gameBounds.x / 2, 50);
+            scoreObject = new GameObject("ScorePlayer1");
+            scoreObject.transform.position = new Vec2D(gameBounds.x / 2 - 90, 80);
             scoreText = scoreObject.AddComponent<TextRenderer>();
             scoreText.color = new Color(255, 255, 255, 205);
             scoreText.SetFontSize(100);
+
+            scoreObject3 = new GameObject("ScorePlayer1");
+            scoreObject3.transform.position = new Vec2D(gameBounds.x / 2, 80);
+            scoreText3 = scoreObject3.AddComponent<TextRenderer>();
+            scoreText3.color = new Color(255, 255, 255, 205);
+            scoreText3.SetText("-");
+            scoreText3.SetFontSize(100);
+
+            scoreObject2 = new GameObject("ScorePlayer2");
+            scoreObject2.transform.position = new Vec2D(gameBounds.x / 2 + 90, 80);
+            scoreText2 = scoreObject2.AddComponent<TextRenderer>();
+            scoreText2.color = new Color(255, 255, 255, 205);
+            scoreText2.SetFontSize(100);
 
             ResetGame();
 
@@ -190,11 +214,16 @@ namespace Pong
 
         public void UpdateScoreText()
         {
-            if (scoreText == null) return;
+            if (scoreText == null || scoreText2 == null) return;
 
-            string scoreString = $"{player_1_score} - {player_2_score}";
+            string scoreString = $"{player_1_score}";
+            string scoreString2 = $"{player_2_score}";
+
+
             scoreText.SetText(scoreString);
+            scoreText2.SetText(scoreString2);
         }
+
 
         public void SetGameMode(GameMode mode)
         {
@@ -211,7 +240,7 @@ namespace Pong
             var body = ball?.GetComponent<PhysicsBody>();
             if (body != null)
             {
-                body.Velocity += body.Velocity.Normalize()* increase;
+                body.Velocity += body.Velocity.Normalize() * increase;
             }
         }
 
@@ -324,13 +353,32 @@ namespace Pong
 
             if (ball.transform.position.x < -tolerance)
             {
+                scoreSoundFire.Play();
+
                 player_2_score++;
+                scoreText2.SetFontSize(120);
+                scoreText2.color = new Color(255, 0, 0, 205);
+                restedColor = false;
+                UpdateScoreText();
+
+                lastColorChangeTime = Time.time;
+                // Console.WriteLine("lastColorChangeTime" + lastColorChangeTime);
+
                 Console.WriteLine($"Player 1: {player_1_score} Player 2: {player_2_score}");
                 ResetBall();
+
             }
             else if (ball.transform.position.x > gameBounds.x + tolerance)
             {
+                scoreSoundWater.Play();
                 player_1_score++;
+                scoreText.SetFontSize(120);
+                scoreText.color = new Color(30, 144, 255, 255);
+                restedColor = false;
+                UpdateScoreText();
+
+                lastColorChangeTime = Time.time;
+
                 Console.WriteLine($"Player 1: {player_1_score} Player 2: {player_2_score}");
                 ResetBall();
             }
@@ -348,8 +396,25 @@ namespace Pong
                 roundStarted = true;
             }
 
-            UpdateScoreText();
+            // Überprüfen Sie, ob die Zeit für die Farbänderung abgelaufen ist
+            if (lastColorChangeTime != 0 & Time.time - lastColorChangeTime > 2) // 3 Sekunden
+            {
+                if (scoreText2 == null || scoreText == null) return;
 
+                if (restedColor == false)
+                {
+                    // Setzen Sie die Textfarbe auf die Standardfarbe
+                    Console.WriteLine("Standardfarbe");
+                    scoreText2.SetFontSize(100);
+                    scoreText2.color = new Color(255, 255, 255, 205);
+
+                    scoreText.SetFontSize(100);
+                    scoreText.color = new Color(255, 255, 255, 205);
+                    // Standardfarbe
+                    restedColor = true;
+                    //UpdateScoreText();
+                }
+            }
             switch (gameMode)
             {
                 case GameMode.DUEL:

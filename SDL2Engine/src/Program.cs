@@ -266,8 +266,12 @@ namespace SDL2Engine.Testing
             return world;
         }
 #if ENGINE_TEST
+
+
         static void Main(string[] args)
         {
+
+
             Console.WriteLine("Starting SDL2 Engine...");
 
             // create an empty world and add it to the engine

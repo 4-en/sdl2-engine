@@ -7,106 +7,6 @@ using SDL2Engine.Utils;
 namespace Pong
 {
 
-    public class HighscoreScript : Script
-    {
-        private int highscore = 0;
-        private TextRenderer? textRenderer = null;
-
-        private TextRenderer? scoreText = null;
-        private TextRenderer? nameText = null;
-        private TextRenderer? highscoresTitle = null;
-
-        public override void Start()
-        {
-            var highscoresTitle = Component.CreateWithGameObject<TextRenderer>("HighscoresTitle");
-            gameObject.AddChild(highscoresTitle.Item1);
-            highscoresTitle.Item2.color = new Color(255, 255, 255, 205);
-            highscoresTitle.Item2.SetFontSize(100);
-            highscoresTitle.Item2.SetText("- Highscores -");
-            highscoresTitle.Item2.anchorPoint = AnchorPoint.TopCenter;
-
-
-            this.highscoresTitle = highscoresTitle.Item2;
-            this.gameObject.AddChild(highscoresTitle.Item1);
-
-            gameObject.SetPosition(new Vec2D(1920 / 2, 100));
-
-            SetHighscores(GetHighscores());
-        }
-
-        private List<Tuple<string, string>> GetHighscores()
-        {
-            return new List<Tuple<string, string>>()
-            {
-                new Tuple<string, string>("Player 1", "100"),
-                new Tuple<string, string>("Player 2", "90"),
-                new Tuple<string, string>("Player 3", "80"),
-                new Tuple<string, string>("Player 4", "70"),
-                new Tuple<string, string>("Player 5", "60"),
-                new Tuple<string, string>("Player 6", "50"),
-                new Tuple<string, string>("Player 7", "40"),
-                new Tuple<string, string>("Player 8", "30"),
-                new Tuple<string, string>("Player 9", "20"),
-                new Tuple<string, string>("Player 10", "10"),
-            };
-        }
-
-        public override void Update()
-        {
-
-            if (Input.GetKeyDown(SDL_Keycode.SDLK_h))
-            {
-                gameObject.ToggleEnabled();
-
-                // since gameObject disables all children and components
-                // we need to re-enable this script, otherwise we can't enable the gameObject again
-                this.Enable();
-
-            }
-        }
-
-        public void SetHighscores(List<Tuple<string, string>> scores)
-        {
-            string nameString = "";
-            string scoreString = "";
-
-            foreach (var score in scores)
-            {
-                nameString += score.Item1 + "\n";
-                scoreString += score.Item2 + "\n";
-            }
-
-            if (nameText == null)
-            {
-                var name_renderer = Component.CreateWithGameObject<TextRenderer>("HighscoreNames");
-                gameObject.AddChild(name_renderer.Item1);
-                nameText = name_renderer.Item2;
-                nameText.color = new Color(255, 255, 255, 205);
-                nameText.SetFontSize(50);
-                nameText.anchorPoint = AnchorPoint.TopLeft;
-
-                name_renderer.Item1.SetLocalPosition(new Vec2D(-200, 200));
-
-            }
-            nameText.SetText(nameString);
-
-
-            if (scoreText == null)
-            {
-                var score_renderer = Component.CreateWithGameObject<TextRenderer>("HighscoreScores");
-                gameObject.AddChild(score_renderer.Item1);
-                scoreText = score_renderer.Item2;
-                scoreText.color = new Color(255, 255, 255, 205);
-                scoreText.SetFontSize(50);
-                scoreText.anchorPoint = AnchorPoint.TopRight;
-
-                score_renderer.Item1.SetLocalPosition(new Vec2D(200, 200));
-            }
-            scoreText.SetText(scoreString);
-
-        }
-
-    }
     public class PaddleController : Script
     {
         public double speed = 1000;
@@ -238,6 +138,8 @@ namespace Pong
         protected GameObject? scoreObject = null;
         protected TextRenderer? scoreText = null;
 
+        protected TextRenderer? timeText = null;
+
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
 
         private double roundTimer = -3;
@@ -302,6 +204,14 @@ namespace Pong
             scoreText = scoreObject.AddComponent<TextRenderer>();
             scoreText.color = new Color(255, 255, 255, 205);
             scoreText.SetFontSize(100);
+
+            timeText = Component.CreateWithGameObject<TextRenderer>("TimeCounter").Item2;
+            timeText.color = new Color(255, 255, 255, 205);
+            timeText.SetFontSize(32);
+            timeText.anchorPoint = AnchorPoint.TopLeft;
+            timeText.GetGameObject().SetPosition(new Vec2D(gameBounds.x - 200, 25));
+            timeText.SetText("Time: 0");
+
             var highscoreRoot = new GameObject("HighscoreRoot");
             var highscoreScript = highscoreRoot.AddComponent<HighscoreScript>();
 
@@ -423,6 +333,11 @@ namespace Pong
         public override void Update()
         {
 
+            if (timeText != null)
+            {
+                // 2 decimal places
+                timeText.SetText($"Time: {Math.Round(roundTimer, 2)}");
+            }
             // reset game if r is pressed
             if (Input.GetKeyPressed((int)SDL_Keycode.SDLK_r))
             {

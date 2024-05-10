@@ -206,7 +206,7 @@ namespace Pong
 
             var rect = collider.GetCollisionBox();
 
-            if (SDL2Engine.Utils.MouseHelper.IsRectHovered(GetCamera()?.RectToScreen(rect) ?? new Rect()))
+            if (SDL2Engine.Utils.MouseHelper.IsRectPressed(GetCamera()?.RectToScreen(rect) ?? new Rect()))
             {
                 filledRect.color = new Color(255, 0, 0, 255);
             } else

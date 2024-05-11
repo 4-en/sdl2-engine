@@ -3,6 +3,7 @@ using SDL2;
 using static SDL2.SDL;
 
 using SDL2Engine;
+using SDL2Engine.Utils;
 
 namespace SDL2Engine.Testing
 {
@@ -40,7 +41,10 @@ namespace SDL2Engine.Testing
             square.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/forsenE.png");
             square.AddChild().AddComponent<TextRenderer>().SetText("forsenE");
             var bc = BoxCollider.FromDrawableRect(square);
-            bc.IsTrigger = true;
+            if(bc != null)
+            {
+                bc.IsTrigger = true;
+            }
             square.AddComponent<DestroyOnCollision>();
             square.SetPosition(this.gameObject.GetPosition());
 
@@ -74,7 +78,7 @@ namespace SDL2Engine.Testing
 
             gameObject.SetPosition(mousePosition);
 
-            if (Input.GetKeyDown((uint)SDL.SDL_Keycode.SDLK_x))
+            if (Input.GetKeyDown((int)SDL.SDL_Keycode.SDLK_x))
             {
                 // remove a random root game object
                 var scene = gameObject.GetScene();
@@ -266,8 +270,11 @@ namespace SDL2Engine.Testing
             return world;
         }
 #if ENGINE_TEST
+
+
         static void Main(string[] args)
         {
+
             Console.WriteLine("Starting SDL2 Engine...");
 
             // create an empty world and add it to the engine

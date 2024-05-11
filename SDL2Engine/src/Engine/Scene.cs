@@ -1,4 +1,6 @@
 ﻿
+using System.Collections;
+
 namespace SDL2Engine
 {
 
@@ -15,7 +17,7 @@ namespace SDL2Engine
      * Probably really slow, but it works for now
      * TODO: optimize this later
      */
-    class TimedQueue<T> where T : class
+    class TimedQueue<T> : IEnumerable<T> where T : class
     {
         class NodeValue
         {
@@ -70,7 +72,7 @@ namespace SDL2Engine
             {
                 return default;
             }
-            if (node.Value.key < key)
+            if (node.Value.key <= key)
             {
                 T value = node.Value.value;
                 list.RemoveFirst();
@@ -98,10 +100,24 @@ namespace SDL2Engine
             return list.First?.Value.value ?? null;
         }
 
+        public IEnumerator<T> GetEnumerator()
+        {
+            List<T> values = new();
+            foreach (NodeValue nodeValue in list)
+            {
+                values.Add(nodeValue.value);
+            }
+            return values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 
 
-    public class Scene
+    public class Scene : ILoadable
     {
 
         // TODO: use something like this to limit the number of new objects per frame
@@ -109,6 +125,7 @@ namespace SDL2Engine
 
         private string name = "Scene";
         private int gameObjectsCount = 0;
+        private bool doPhysics = true;
 
         private Camera mainCamera;
         private SceneType sceneType = SceneType.GAME;
@@ -209,7 +226,8 @@ namespace SDL2Engine
             } else if (parent != null)
             {
                 // check if parent is in the toAdd list
-                if (toAdd.Contains(parent) || toAdd.Contains(gameObject.GetDeepParent()))
+                GameObject? deepParent = parent.GetDeepParent();
+                if (toAdd.Contains(parent) || (deepParent != null && toAdd.Contains(deepParent)))
                 {
                     // if the parent is in the toAdd list, we can assume that it will be added later
                     // in this case, we don't need to add this child to the list as well
@@ -232,6 +250,13 @@ namespace SDL2Engine
                 Console.WriteLine("WARNING: Component has no GameObject. Make sure to add the component to a GameObject before adding it to a scene.");
                 return;
             }
+
+            if (gameObject.GetScene() != null && gameObject.GetScene() != this)
+            {
+                Console.WriteLine("WARNING: GameObject is in another scene. Make sure to remove the GameObject from the previous scene before adding it to a new scene.");
+                return;
+            }
+            component.SetScene(this);
 
             // if the game objectis in toAdd, dont add the component to the lists since it will be added later
             if (toAdd.Contains(gameObject))
@@ -287,7 +312,7 @@ namespace SDL2Engine
             else
             {
                 // if delay is not 0, we need to find the correct position in the queue
-                // since most objects will be destroyed with a delay of 0, we can optimize this by adding the object to the end of the queue
+                // since most objects will be destroyed with a delay of 0, we can optimize this by starting at the end of the queue
                 this.toDestroy.AddBackwards(Time.time + delay, engineObject);
             }
         }
@@ -374,6 +399,16 @@ namespace SDL2Engine
                 DestroyComponent(component, removeFromGameObject: false);
             }
 
+            if (gameObject.GetScene() != this)
+            {
+                Console.WriteLine("WARNING: GameObject is not in this scene. Make sure to remove the GameObject from the correct scene.");
+                return;
+            }
+            else
+            {
+                this.gameObjectsCount--;
+            }
+
             // remove children components
             List<GameObject> children = gameObject.GetChildren();
             for (int i = 0; i < children.Count; i++)
@@ -413,8 +448,7 @@ namespace SDL2Engine
                 // by calling Dispose recursively on its children and components
                 gameObject.Dispose();
             }
-
-            this.gameObjectsCount--;
+            
         }
 
         public List<GameObject> GetGameObjects()
@@ -496,12 +530,23 @@ namespace SDL2Engine
             }
         }
 
+        public void SetPhysics(bool doPhysics)
+        {
+            this.doPhysics = doPhysics;
+        }
+
         // Iterate through all Drawable components and call their Draw method using the main camera defined in the scene
         public void Draw()
         {
+            // TODO: optimize this later
+            // TODO: sort the drawable list by depth (Vec2D.z)
+            // also use occlusion- and frustum culling (at least frustum culling)
+            // aaalso, sort objects of the same depth by their texture, so gpu can batch draw calls
+            // the sorting should not be done every frame, but only when a drawable is added or removed (and then only once before rendering)
             foreach (Drawable drawable in drawableList)
             {
-                drawable.Draw(mainCamera);
+                if (drawable.IsEnabled())
+                    drawable.Draw(mainCamera);
             }
         }
 
@@ -595,15 +640,18 @@ namespace SDL2Engine
 
             // Physics
             // get all game objects with colliders
-            List<GameObject> goWithPhysics = new();
-            foreach (Collider collider in colliderList)
-            {
-                // TODO: this might cause problems if we add a parent game object and a child game object
-                // maybe fix this later
-                goWithPhysics.Add(collider.GetGameObject());
+            if (doPhysics)
+            { 
+                List<GameObject> goWithPhysics = new();
+                foreach (Collider collider in colliderList)
+                {
+                    // TODO: this might cause problems if we add a parent game object and a child game object
+                    // maybe fix this later
+                    goWithPhysics.Add(collider.GetGameObject());
+                }
+                Physics.UpdatePhysics(goWithPhysics);
             }
-            Physics.UpdatePhysics(goWithPhysics);
-
+            
 
             // start scripts that are scheduled to be started
             foreach (Script script in toStart)
@@ -667,7 +715,47 @@ namespace SDL2Engine
 
         }
 
+        public void Load()
+        {
+            // TODO: implement this (load all resources)
+            // this should call Load on all ILoadable objects in the scene before updating and rendering
+            // to keep the game running smoothly, only update up to a certain amount of objects per frame
+            // this could be done in the background while another scene is running
+            // the scene manager should handle this and can use IsLoaded to check if the scene is ready to rendered
+            return;
+        }
 
+        // This loads the next GameObject in queue
+        public void LoadNext()
+        { }
+
+        // This loads n GameObjects in queue
+        public void Load(int n)
+        {
+            // load n objects
+            // this should be called in the background while another scene is running
+            // the scene manager should handle this and can use IsLoaded to check if the scene is ready to rendered
+            return;
+        }
+
+        public bool IsLoaded()
+        {
+            // TODO: implement this
+            // this should return true if all resources are loaded
+            // after this, the scene can be updated and rendered
+          
+            return true;
+        }
+
+        public void Dispose()
+        {
+            // this should only be called when the scene is removed from the scene manager
+            // (hopefully) remove all game objects and components and calls their Dispose methods
+            for(int i = gameObjects.Count - 1; i >= 0; i--)
+            {
+                DeepDestroyGameObject(gameObjects[i]);
+            }
+        }
     }
 
     /*
@@ -687,6 +775,9 @@ namespace SDL2Engine
 
         private static List<GameObject> persistentGameObjects = new();
 
+        private static List<Scene> toAdd = new();
+        private static List<Scene> toRemove = new();
+
         public static Scene? GetActiveScene()
         {
             return activeScene;
@@ -697,7 +788,10 @@ namespace SDL2Engine
             return scenes;
         }
 
-        public static void SetActiveScene(Scene scene)
+        // this is used internally to set the active scene
+        // that is currently being updated and rendered
+        // this is used to add new GameObjects to the current scene
+        private static void SetActiveScene(Scene scene)
         {
             activeScene = scene;
         }
@@ -706,20 +800,35 @@ namespace SDL2Engine
         {
             for (int i = 0; i < scenes.Count; i++)
             {
-                activeScene = scenes[i];
+                SetActiveScene(scenes[i]);
                 scenes[i].Draw();
-                activeScene = null;
             }
         }
 
+        private static void AddRemoveScenes()
+        {
+            for (int i = 0; i < toAdd.Count; i++)
+            {
+                toAdd[i].Load();
+                scenes.Add(toAdd[i]);
+            }
+            toAdd.Clear();
+
+            for (int i = 0; i < toRemove.Count; i++)
+            {
+                scenes.Remove(toRemove[i]);
+            }
+            toRemove.Clear();
+        }
 
         public static void UpdateScenes()
         {
+            AddRemoveScenes();
+
             for (int i = 0; i < scenes.Count; i++)
             {
-                activeScene = scenes[i];
+                SetActiveScene(scenes[i]);
                 scenes[i].Update();
-                activeScene = null;
             }
         }
 
@@ -747,30 +856,44 @@ namespace SDL2Engine
             return null;
         }
 
-        public static void LoadScene(Scene scene)
+        /*
+         * Replaces the current scene with a new scene
+         * Clears all other scenes
+         */
+        public static void SetScene(Scene scene)
         {
-            scenes.Clear();
-            scenes.Add(scene);
+            for (int i = scenes.Count - 1; i >= 0; i--)
+            {
+                RemoveScene(scenes[i]);
+            }
+
+            AddScene(scene);
         }
 
         public static void AddScene(Scene scene)
         {
-            scenes.Add(scene);
+            toAdd.Add(scene);
         }
 
         public static void AddBefore(Scene scene, Scene before)
         {
-            scenes.Insert(scenes.IndexOf(before), scene);
+            // TODO: implement this
+            //scene.Load();
+            //scenes.Insert(scenes.IndexOf(before), scene);
+            AddScene(scene);
         }
 
         public static void AddAfter(Scene scene, Scene after)
         {
-            scenes.Insert(scenes.IndexOf(after) + 1, scene);
+            // TODO: implement this
+            //scene.Load();
+            //scenes.Insert(scenes.IndexOf(after) + 1, scene);
+            AddScene(scene);
         }
 
         public static void RemoveScene(Scene scene)
         {
-            scenes.Remove(scene);
+            toRemove.Add(scene);
         }
 
         public static void SortScenesBySceneType()
@@ -788,9 +911,6 @@ namespace SDL2Engine
             scenes.Remove(scene);
             scenes.Insert(index, scene);
         }
-
-
-
 
     }
 }

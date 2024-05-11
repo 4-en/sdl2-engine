@@ -341,6 +341,11 @@ namespace SDL2Engine
 
         public GameObject AddChild(GameObject child)
         {
+            if(child.GetParent() != null)
+            {
+                throw new Exception("Cannot add GameObject to multiple parents");
+            }
+
             child.SetParent(this);
 
             Scene? childScene = child.GetScene();
@@ -363,6 +368,12 @@ namespace SDL2Engine
             }
 
             child.SetScene(this.scene);
+
+
+            // TODO: remove this check?
+            // its probably a bit slow, there should be a better way to handle this
+            
+
             children.Add(child);
 
             child.SetParentPosition(this.GetPosition());

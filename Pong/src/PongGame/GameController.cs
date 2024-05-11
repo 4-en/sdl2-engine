@@ -345,6 +345,17 @@ namespace Pong
                 return;
             }
 
+            if (Input.GetKeyPressed(SDL_Keycode.SDLK_x))
+            {
+                Console.WriteLine(Time.tick);
+                var scene = GetScene();
+                if (scene != null)
+                {
+                    Console.WriteLine("Destroying all game objects");
+                    scene.GetGameObjects().ForEach(o => Destroy(o));
+                } else { Console.WriteLine("Scene is null"); }
+            }
+
             // basic game logic here
             // check for out of bounds
             // keep track of score

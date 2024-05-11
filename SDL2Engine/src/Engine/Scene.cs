@@ -1,4 +1,6 @@
 ﻿
+using System.Collections;
+
 namespace SDL2Engine
 {
 
@@ -15,7 +17,7 @@ namespace SDL2Engine
      * Probably really slow, but it works for now
      * TODO: optimize this later
      */
-    class TimedQueue<T> where T : class
+    class TimedQueue<T> : IEnumerable<T> where T : class
     {
         class NodeValue
         {
@@ -70,7 +72,7 @@ namespace SDL2Engine
             {
                 return default;
             }
-            if (node.Value.key < key)
+            if (node.Value.key <= key)
             {
                 T value = node.Value.value;
                 list.RemoveFirst();
@@ -98,6 +100,20 @@ namespace SDL2Engine
             return list.First?.Value.value ?? null;
         }
 
+        public IEnumerator<T> GetEnumerator()
+        {
+            List<T> values = new();
+            foreach (NodeValue nodeValue in list)
+            {
+                values.Add(nodeValue.value);
+            }
+            return values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 
 
@@ -234,6 +250,13 @@ namespace SDL2Engine
                 return;
             }
 
+            if (gameObject.GetScene() != null && gameObject.GetScene() != this)
+            {
+                Console.WriteLine("WARNING: GameObject is in another scene. Make sure to remove the GameObject from the previous scene before adding it to a new scene.");
+                return;
+            }
+            component.SetScene(this);
+
             // if the game objectis in toAdd, dont add the component to the lists since it will be added later
             if (toAdd.Contains(gameObject))
             {
@@ -288,7 +311,7 @@ namespace SDL2Engine
             else
             {
                 // if delay is not 0, we need to find the correct position in the queue
-                // since most objects will be destroyed with a delay of 0, we can optimize this by adding the object to the end of the queue
+                // since most objects will be destroyed with a delay of 0, we can optimize this by starting at the end of the queue
                 this.toDestroy.AddBackwards(Time.time + delay, engineObject);
             }
         }
@@ -375,6 +398,16 @@ namespace SDL2Engine
                 DestroyComponent(component, removeFromGameObject: false);
             }
 
+            if (gameObject.GetScene() != this)
+            {
+                Console.WriteLine("WARNING: GameObject is not in this scene. Make sure to remove the GameObject from the correct scene.");
+                return;
+            }
+            else
+            {
+                this.gameObjectsCount--;
+            }
+
             // remove children components
             List<GameObject> children = gameObject.GetChildren();
             for (int i = 0; i < children.Count; i++)
@@ -414,8 +447,7 @@ namespace SDL2Engine
                 // by calling Dispose recursively on its children and components
                 gameObject.Dispose();
             }
-
-            this.gameObjectsCount--;
+            
         }
 
         public List<GameObject> GetGameObjects()

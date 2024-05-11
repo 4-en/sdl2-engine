@@ -38,7 +38,6 @@ namespace Pong
 
 
             this.highscoresTitle = highscoresTitle.Item2;
-            this.gameObject.AddChild(highscoresTitle.Item1);
 
             gameObject.SetPosition(new Vec2D(1920 / 2, 100));
 

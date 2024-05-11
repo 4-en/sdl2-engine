@@ -604,6 +604,7 @@ namespace SDL2Engine
                 PhysicsBody? physicsBody = gameObject.GetComponent<PhysicsBody>();
                 if (physicsBody == null) continue;
                 if (!physicsBody.IsMovable) continue;
+                if (!physicsBody.IsEnabled()) continue;
 
 
                 //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);
@@ -684,11 +685,17 @@ namespace SDL2Engine
                 colliderI = gameObjects[(int)i].GetComponent<Collider>();
 
                 if (colliderI == null) continue;
+                if (!colliderI.IsEnabled()) continue;
 
-                // check if it has a physics body
-                // if it doesn't it can't move, so we don't need to check for collisions from it, only with it
+
+                // We can skip checking FROM objects that don't have a physics body
+                // we also don't need to check for collisions with objects that meet the following conditions:
+                // - they are not enabled
+                // - the physics body is not movable
+                // - the velocity is 0
+
                 PhysicsBody? physicsBody = gameObjects[(int)i].GetComponent<PhysicsBody>();
-                if (physicsBody == null || !physicsBody.IsMovable) continue;
+                if (physicsBody == null || !physicsBody.IsMovable || !physicsBody.IsEnabled() || physicsBody.Velocity.LengthSquared() == 0) continue;
 
                 colliderI.SwapCollisions();
 
@@ -696,6 +703,7 @@ namespace SDL2Engine
                 {
                     colliderJ = gameObjects[(int)j].GetComponent<Collider>();
                     if (colliderJ == null) continue;
+                    if (!colliderJ.IsEnabled()) continue;
                     colliderJ.SwapCollisions();
 
                     if (colliderI.CollidesWith(colliderJ))
@@ -727,6 +735,7 @@ namespace SDL2Engine
                 //calculate the collision point between two box colliders
                 var box1 = gameObject1.GetComponent<Collider>() as BoxCollider;
                 var box2 = gameObject2.GetComponent<Collider>() as BoxCollider;
+                if (box1 == null || box2 == null) return new Vec2D(0, 0);
                 double x = Math.Max(box1.box.x, Math.Min(box2.box.x + box2.box.w, box1.box.x + box1.box.w));
                 double y = Math.Max(box1.box.y, Math.Min(box2.box.y + box2.box.h, box1.box.y + box1.box.h));
                 Vec2D collisionPoint = new Vec2D(x, y);
@@ -739,6 +748,7 @@ namespace SDL2Engine
                 //calculate the collision point between a box collider and a circle collider
                 var box = gameObject1.GetComponent<Collider>() as BoxCollider;
                 var circle = gameObject2.GetComponent<Collider>() as CircleCollider;
+                if (box == null || circle == null) return new Vec2D(0, 0);
                 double closestX = Math.Max(box.box.x, Math.Min(circle.center.x, box.box.x + box.box.w));
                 double closestY = Math.Max(box.box.y, Math.Min(circle.center.y, box.box.y + box.box.h));
                 Vec2D collisionPoint = new Vec2D(closestX, closestY);
@@ -836,6 +846,7 @@ namespace SDL2Engine
         // for custom behaviour, use Script components
         // for example, use a Script with OnCollisionEnter method to handle collision between PongSquare and BoarderLeft,
         // optimally, this should just work without having to modify the Physics class, since its just a bounce of the ball on a static object
+        /*
         private static void ResolveCollisionsForPong(GameObject obj1, GameObject obj2)
         {
 
@@ -886,11 +897,11 @@ namespace SDL2Engine
             }
             // Console.WriteLine("Collision between" + obj1.GetName() + " and " + obj2.GetName());
         }
+        */
 
 
 
         // after all collisions are resolved, notify objects that a collision has occured
-        // TODO: Implement event listeners for OnCollisionEnter, OnCollisionStay, OnCollisionExit, etc.
         public static void NotifyCollisions(List<CollisionPair> collisions)
         {
             foreach (var pair in collisions)

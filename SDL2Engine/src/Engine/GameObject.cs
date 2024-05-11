@@ -230,6 +230,11 @@ namespace SDL2Engine
                 components[i].SetEnabled(active);
             }
 
+            collider?.SetEnabled(active);
+            physicsBody?.SetEnabled(active);
+            drawable?.SetEnabled(active);
+
+
             for (int i = 0; i < children.Count; i++)
             {
                 children[i].SetEnabled(active);
@@ -248,6 +253,17 @@ namespace SDL2Engine
 
         public bool IsEnabled()
         {
+            return enabled;
+        }
+
+        public bool IsDisabled()
+        {
+            return !enabled;
+        }
+
+        public bool ToggleEnabled()
+        {
+            this.SetEnabled(!enabled);
             return enabled;
         }
 
@@ -292,18 +308,20 @@ namespace SDL2Engine
         {
             return this._transform.GetPosition();
         }
-
+        // Set the absolute world position of the GameObject
         public void SetPosition(Vec2D position)
         {
             this._transform.position = position;
 
         }
-
+        // Use this to set the position of the GameObject relative to the parent
         public void SetLocalPosition(Vec2D position)
         {
             this._transform.localPosition = position;
         }
 
+        // Set the position of the parent GameObject
+        // world position = parent position + local position
         public void SetParentPosition(Vec2D position)
         {
             this._transform.SetParentPosition(position);
@@ -323,6 +341,11 @@ namespace SDL2Engine
 
         public GameObject AddChild(GameObject child)
         {
+            if(child.GetParent() != null)
+            {
+                throw new Exception("Cannot add GameObject to multiple parents");
+            }
+
             child.SetParent(this);
 
             Scene? childScene = child.GetScene();
@@ -345,6 +368,12 @@ namespace SDL2Engine
             }
 
             child.SetScene(this.scene);
+
+
+            // TODO: remove this check?
+            // its probably a bit slow, there should be a better way to handle this
+            
+
             children.Add(child);
 
             child.SetParentPosition(this.GetPosition());
@@ -656,61 +685,6 @@ namespace SDL2Engine
         public List<Component> GetAllComponents()
         {
             return GetComponents<Component>();
-        }
-
-        public void Start()
-        {
-            foreach (Component script in components)
-            {
-
-                // TODO: optimize this by keeping a list of scripts in scene
-                // check if script is a script
-                if (script is Script)
-                {
-                    ((Script)script).Start();
-                }
-            }
-
-            foreach (GameObject child in children)
-            {
-                child.Start();
-            }
-        }
-
-        public void Update()
-        {
-            // TODO: optimize this by keeping a list of scripts in scene
-            // Update all scripts
-            for (int i = 0; i < components.Count; i++)
-            {
-                // check if script is a script
-                if (components[i] is Script)
-                {
-                    ((Script)components[i]).Update();
-                }
-            }
-
-            // Update all children
-            for (int i = 0; i < children.Count; i++)
-            {
-                children[i].Update();
-            }
-        }
-
-        // Override this method to draw custom graphics
-        // By default, this method does nothing
-        public void Draw(Camera camera)
-        {
-            if (_drawable != null)
-            {
-                _drawable.Draw(camera);
-            }
-
-            // Draw all children
-            foreach (GameObject child in children)
-            {
-                child.Draw(camera);
-            }
         }
 
     }

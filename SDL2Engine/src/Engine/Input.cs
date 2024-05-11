@@ -1,5 +1,7 @@
 ﻿
 
+using static SDL2.SDL;
+
 namespace SDL2Engine
 {
     /// <summary>
@@ -9,9 +11,14 @@ namespace SDL2Engine
     /// </summary>
     public static class Input
     {
-        private static readonly UInt32[] downKeys = new UInt32[16];
-        private static readonly UInt32[] pressedKeys = new UInt32[16];
-        private static readonly UInt32[] releasedKeys = new UInt32[16];
+        public static readonly int MOUSE_BUTTON_LEFT = 0;
+        public static readonly int MOUSE_BUTTON_MIDDLE = 1;
+        public static readonly int MOUSE_BUTTON_RIGHT = 2;
+
+
+        private static readonly int[] downKeys = new int[16];
+        private static readonly int[] pressedKeys = new int[16];
+        private static readonly int[] releasedKeys = new int[16];
 
         private static Vec2D mousePosition = new();
         private static Vec2D mouseDelta = new();
@@ -19,7 +26,10 @@ namespace SDL2Engine
         private static bool[] mouseButtonsPressed = new bool[3];
         private static bool[] mouseButtonsReleased = new bool[3];
 
-        public static bool GetKeyPressed(UInt32 key)
+        /*
+         * Checks if a key is pressed or held down
+         */
+        public static bool GetKeyPressed(int key)
         {
             for (int i = 0; i < pressedKeys.Length; i++)
             {
@@ -32,7 +42,18 @@ namespace SDL2Engine
             return false;
         }
 
-        public static bool GetKeyDown(UInt32 key)
+        /*
+         * Checks if a key is pressed or held down
+         */
+        public static bool GetKeyPressed(SDL_Keycode key)
+        {
+            return GetKeyPressed((int)key);
+        }
+
+        /*
+         * Checks if a key was pressed in the current frame
+         */
+        public static bool GetKeyDown(int key)
         {
             for (int i = 0; i < downKeys.Length; i++)
             {
@@ -45,7 +66,18 @@ namespace SDL2Engine
             return false;
         }
 
-        public static bool GetKeyReleased(UInt32 key)
+        /*
+         * Checks if a key was pressed in the current frame
+         */
+        public static bool GetKeyDown(SDL_Keycode key)
+        {
+            return GetKeyDown((int)key);
+        }
+
+        /*
+         * Checks if a key was released in the current frame
+         */
+        public static bool GetKeyReleased(int key)
         {
             for (int i = 0; i < releasedKeys.Length; i++)
             {
@@ -58,13 +90,23 @@ namespace SDL2Engine
             return false;
         }
 
-        public static void SetKeyDown(UInt32 key)
+        /*
+         * Checks if a key was released in the current frame
+         */
+        public static bool GetKeyReleased(SDL_Keycode key)
+        {
+            return GetKeyReleased((int)key);
+        }
+
+        // The following methods are used to set the state of the keys
+        // usually only called by the engine
+        public static void SetKeyDown(int key)
         {
             for (int i = 0; i < downKeys.Length; i++)
             {
                 if (downKeys[i] == 0)
                 {
-                    downKeys[i] = (UInt32)key;
+                    downKeys[i] = key;
                     break;
                 }
             }
@@ -72,26 +114,36 @@ namespace SDL2Engine
             SetKeyPressed(key);
         }
 
-        public static void SetKeyPressed(UInt32 key)
+        public static void SetKeyDown(SDL_Keycode key)
+        {
+            SetKeyDown((int)key);
+        }
+
+        public static void SetKeyPressed(int key)
         {
             for (int i = 0; i < pressedKeys.Length; i++)
             {
                 if (pressedKeys[i] == 0)
                 {
-                    pressedKeys[i] = (UInt32)key;
+                    pressedKeys[i] = key;
                     break;
                 }
             }
 
         }
 
-        public static void SetKeyReleased(UInt32 key)
+        public static void SetKeyPressed(SDL_Keycode key)
+        {
+            SetKeyPressed((int)key);
+        }
+
+        public static void SetKeyReleased(int key)
         {
             for (int i = 0; i < releasedKeys.Length; i++)
             {
                 if (releasedKeys[i] == 0)
                 {
-                    releasedKeys[i] = (UInt32)key;
+                    releasedKeys[i] = key;
                     break;
                 }
             }
@@ -107,6 +159,13 @@ namespace SDL2Engine
             }
         }
 
+        public static void SetKeyReleased(SDL_Keycode key)
+        {
+            SetKeyReleased((int)key);
+        }
+
+        // Clear all inputs at the end of the frame
+        // Pressed keys are reset when the key is released
         public static void ClearInputs()
         {
             
@@ -148,16 +207,30 @@ namespace SDL2Engine
             }
         }
 
+        /*
+         * Mouse input handling
+         */
+
+
+        /*
+         * Get the current mouse position
+         */
         public static Vec2D GetMousePosition()
         {
             return mousePosition;
         }
 
+        /*
+         * Get the change in mouse position since the last frame
+         */
         public static Vec2D GetMouseDelta()
         {
             return mouseDelta;
         }
 
+        /*
+         * Checks if a mouse button was pressed in the current frame
+         */
         public static bool GetMouseButtonDown(int button)
         {
             if (button < 0 || button >= mouseButtonsDown.Length)
@@ -167,6 +240,9 @@ namespace SDL2Engine
             return mouseButtonsDown[button];
         }
 
+        /*
+         *         * Checks if a mouse button is pressed or held down
+         */
         public static bool GetMouseButtonPressed(int button)
         {
             if (button < 0 || button >= mouseButtonsPressed.Length)
@@ -176,6 +252,9 @@ namespace SDL2Engine
             return mouseButtonsPressed[button];
         }
 
+        /*
+         * Checks if a mouse button was released in the current frame
+         */
         public static bool GetMouseButtonReleased(int button)
         {
             if (button < 0 || button >= mouseButtonsReleased.Length)
@@ -185,6 +264,8 @@ namespace SDL2Engine
             return mouseButtonsReleased[button];
         }
 
+        // The following methods are used to set the state of the mouse buttons
+        // usually only called by the engine
         public static void SetMouseButtonDown(int button)
         {
             if (button < 0 || button >= mouseButtonsDown.Length)

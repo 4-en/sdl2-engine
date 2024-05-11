@@ -19,20 +19,20 @@ namespace Pong.src
             var scene = new Scene("Home Screen");
             Vec2D gameBounds = new Vec2D(1920, 1080);
 
-            GameObject gameTitle = HomeScreenText("Pong", gameBounds.x / 2, 200, 200);
-            GameObject level1 = HomeScreenText("Level 1", gameBounds.x / 2, 500, 100);
-            GameObject level2 = HomeScreenText("Level 2", gameBounds.x / 2, 600, 100);
-            GameObject level3 = HomeScreenText("Level 3", gameBounds.x / 2, 700, 100);
-            GameObject level4 = HomeScreenText("Level 4", gameBounds.x / 2, 800, 100);
-            GameObject level5 = HomeScreenText("Level 5", gameBounds.x / 2, 900, 100);
-            scene.AddGameObject(gameTitle);
-            scene.AddGameObject(level1);
-            scene.AddGameObject(level2);
-            scene.AddGameObject(level3);
-            scene.AddGameObject(level4);
-            scene.AddGameObject(level5);
-
-
+            using (var activeScene = scene.Activate()) {
+                GameObject gameTitle = HomeScreenText("Pong", gameBounds.x / 2, 200, 200);
+                GameObject level1 = HomeScreenText("Level 1", gameBounds.x / 2, 500, 100);
+                GameObject level2 = HomeScreenText("Level 2", gameBounds.x / 2, 600, 100);
+                GameObject level3 = HomeScreenText("Level 3", gameBounds.x / 2, 700, 100);
+                GameObject level4 = HomeScreenText("Level 4", gameBounds.x / 2, 800, 100);
+                GameObject level5 = HomeScreenText("Level 5", gameBounds.x / 2, 900, 100);
+                scene.AddGameObject(gameTitle);
+                scene.AddGameObject(level1);
+                scene.AddGameObject(level2);
+                scene.AddGameObject(level3);
+                scene.AddGameObject(level4);
+                scene.AddGameObject(level5);
+            }
 
             return scene;
         }
@@ -84,11 +84,11 @@ namespace Pong.src
                 {
                     if(gameObject.GetName().Equals("Level 1"))
                     {
-                        SceneManager.LoadScene(LevelManager.CreateLevel1());
+                        SceneManager.SetScene(LevelManager.CreateLevel1());
                     }
                     if (gameObject.GetName().Equals("Level 2"))
                     {
-                        SceneManager.LoadScene(LevelManager.CreateLevel2());
+                        SceneManager.SetScene(LevelManager.CreateLevel2());
                     }
                 }
 

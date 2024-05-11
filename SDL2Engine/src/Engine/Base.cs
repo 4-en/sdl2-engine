@@ -381,6 +381,11 @@ namespace SDL2Engine
             return "Rect: x=" + x + ", y=" + y + ", w=" + w + ", h=" + h;
         }
 
+        public Vec2D Center()
+        {
+            return new Vec2D(x + w / 2, y + h / 2);
+        }
+
         public SDL.SDL_Rect ToSDLRect()
         {
             SDL.SDL_Rect sdlRect = new SDL.SDL_Rect();

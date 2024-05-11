@@ -119,40 +119,53 @@ namespace Pong
 
     class BallPaddleCollisionScript : Script
     {
-       
+        protected BoxCollider? paddleCollider = null;
+        protected BoxCollider? ballCollider = null;
+
+        public override void Start()
+        {
+            this.paddleCollider = gameObject.GetComponent<BoxCollider>();
+
+            var ball = Find("Ball");
+            if (ball != null)
+            {
+                this.ballCollider = ball.GetComponent<BoxCollider>();
+            }
+        }
+
         public override void OnCollisionEnter(CollisionPair collision)
         {
-            
-            var gameobjects = gameObject.GetScene().GetGameObjects();
 
-            gameobjects.ForEach((obj) =>
+            if (paddleCollider == null || ballCollider == null) return;
+
+            if (collision.obj1.GetName() != "Ball" && collision.obj2.GetName() != "Ball")
             {
-                if (obj.GetName() == "Ball")
-                {
-                    var ball = obj.GetComponent<PhysicsBody>();
-                    ball.GetComponent<FilledRect>();
-                    var ballHeight = ball.GetComponent<FilledRect>().GetRect().h;
+                return;
+            }
 
-                    var ballCollider = gameObject.GetComponent<BoxCollider>();
-                    if (ball != null && ballCollider != null)
-                    {
-                        
-                        double paddleHeight = ballCollider.box.h;
-                        double paddleY = gameObject.transform.position.y;
-                        double paddleMid = paddleY + paddleHeight / 2;
-                        Vec2D ballCenter = obj.GetPosition();
-                        ballCenter.y += ballHeight/2;
-                        
-                        //calculate relative position of the ball on the paddle (-1,1)
-                        var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);
-                        ball.Velocity = new Vec2D(-ball.Velocity.x, relativePosition * 250);
+            var ball_body = ballCollider.GetGameObject().GetComponent<PhysicsBody>();
 
-                    }
+            var ballHeight = ball_body?.GetComponent<FilledRect>()?.GetRect().h ?? 50;
+
+            if (ball_body != null && ballCollider != null)
+            {
+
+                double paddleHeight = paddleCollider.box.h;
+                double paddleY = gameObject.transform.position.y;
+                double paddleMid = paddleY + paddleHeight / 2;
+                Vec2D ballCenter = ballCollider.GetGameObject().transform.position;
+                ballCenter.y += ballHeight / 2;
+
+                //calculate relative position of the ball on the paddle (-1,1)
+                var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);
+                ball_body.Velocity = new Vec2D(-ball_body.Velocity.x, relativePosition * 350);
+
+            }
 
 
-                }
-            });
+
         }
+
     }
 
     public enum GameMode
@@ -240,9 +253,13 @@ namespace Pong
             BoxCollider.FromDrawableRect(player2);
             player2.AddComponent<PaddleController>().gameController = this;
             player2.AddComponent<BallPaddleCollisionScript>();
+            player2.AddComponent<AIController>();
+
+            /*
             var keyboard_controller = player2.AddComponent<KeyboardController>();
             keyboard_controller.keyUp = (int)SDL_Keycode.SDLK_UP;
             keyboard_controller.keyDown = (int)SDL_Keycode.SDLK_DOWN;
+            */
 
             // create the walls
             var create_barrier = (string name, Rect area) =>
@@ -288,7 +305,7 @@ namespace Pong
 
         }
 
-        
+
 
         public void UpdateScoreText()
         {
@@ -392,12 +409,12 @@ namespace Pong
                 Console.WriteLine("Game Over");
                 string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
                 Console.WriteLine($"{winner_name} wins!");
-                
+
                 var resultRoot = new GameObject("ResultRoot");
                 var resultScript = resultRoot.AddComponent<GameResultScript>();
                 resultScript.score[0] = player_1_score;
                 resultScript.score[1] = player_2_score;
-                
+
             }
         }
 
@@ -468,7 +485,8 @@ namespace Pong
                 {
                     Console.WriteLine("Destroying all game objects");
                     scene.GetGameObjects().ForEach(o => Destroy(o));
-                } else { Console.WriteLine("Scene is null"); }
+                }
+                else { Console.WriteLine("Scene is null"); }
             }
 
             // basic game logic here

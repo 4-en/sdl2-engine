@@ -165,10 +165,7 @@ namespace Pong
 
             textRenderHelper.OnClick += (object? source, TextRenderer renderer) =>
             {
-                if (onClick())
-                {
-                    Console.WriteLine("Button clicked");
-                }
+                onClick.Invoke();
             };
 
             return new Tuple<GameObject, TextRenderer, TextRenderHelper>(button, textRenderer, textRenderHelper);

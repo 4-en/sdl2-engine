@@ -96,6 +96,40 @@ namespace Pong
         }
     }
 
+    class BallPaddleCollisionScript : Script
+    {
+       
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            
+            var gameobjects = gameObject.GetScene().GetGameObjects();
+
+            gameobjects.ForEach((obj) =>
+            {
+                if (obj.GetName() == "Ball")
+                {
+                    var ball = obj.GetComponent<PhysicsBody>();
+                    if (ball != null)
+                    {
+                        
+                        double paddleHeight = gameObject.GetComponent<BoxCollider>().box.h;
+                        double paddleY = gameObject.transform.position.y;
+                        double paddleMid = paddleY + paddleHeight / 2;
+                        Vec2D ballCenter = obj.GetPosition();
+
+                        //calculate relative position of the ball on the paddle (-1,1)
+                        var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);
+
+                        ball.Velocity = new Vec2D(-ball.Velocity.x, relativePosition * 250);
+
+                    }
+
+
+                }
+            });
+        }
+    }
+
     public enum GameMode
     {
         DUEL = 0,
@@ -161,6 +195,7 @@ namespace Pong
             player1_drawable.SetRect(new Rect(40, 200));
             player1_drawable.anchorPoint = AnchorPoint.TopLeft;
             BoxCollider.FromDrawableRect(player1);
+            player1.AddComponent<BallPaddleCollisionScript>();
             player1.AddComponent<PaddleController>().gameController = this;
             player1.AddComponent<KeyboardController>();
 
@@ -171,6 +206,7 @@ namespace Pong
             player2_drawable.anchorPoint = AnchorPoint.TopLeft;
             BoxCollider.FromDrawableRect(player2);
             player2.AddComponent<PaddleController>().gameController = this;
+            player2.AddComponent<BallPaddleCollisionScript>();
             var keyboard_controller = player2.AddComponent<KeyboardController>();
             keyboard_controller.keyUp = (uint)SDL_Keycode.SDLK_UP;
             keyboard_controller.keyDown = (uint)SDL_Keycode.SDLK_DOWN;

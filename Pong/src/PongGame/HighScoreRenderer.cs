@@ -354,7 +354,7 @@ namespace Pong
                 {
                     Destroy(gameController.GetGameObject());
                 }
-                LevelManager.LoadHomeScreen();
+                LevelManager.LoadPlayerSelection();
             };
 
             menuHelper.OnHover += (object? _, TextRenderer _) =>

@@ -49,6 +49,17 @@ namespace Pong.src
             textComponent.SetText(text);
             textComponent.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
             textObject.AddComponent<MenuMouseTracker>();
+            var helper = textObject.AddComponent<TextRenderHelper>();
+            helper.OnHover += (object? source, TextRenderer renderer) =>
+            {
+                renderer.SetColor(Color.Gold);
+            };
+
+            helper.OnLeave += (object? source, TextRenderer renderer) =>
+            {
+                renderer.SetColor(new Color(148, 0, 211, 255));
+            };
+
             return textObject;
 
         }

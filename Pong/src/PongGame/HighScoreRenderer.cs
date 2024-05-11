@@ -104,7 +104,7 @@ namespace Pong
                 {
                     Destroy(gameController.GetGameObject());
                 }
-                //gameController?.GoToMenu();
+                LevelManager.LoadHomeScreen();
             };
 
             menuHelper.OnHover += (object? _, TextRenderer _) =>
@@ -132,7 +132,7 @@ namespace Pong
             levelHelper.OnClick += (object? _, TextRenderer _) =>
             {
                 Destroy(gameObject);
-                // gameController?.GoToLevel();
+                LevelManager.LoadHomeScreen();
             };
 
             levelHelper.OnHover += (object? _, TextRenderer _) =>
@@ -354,7 +354,7 @@ namespace Pong
                 {
                     Destroy(gameController.GetGameObject());
                 }
-                //gameController?.GoToMenu();
+                LevelManager.LoadHomeScreen();
             };
 
             menuHelper.OnHover += (object? _, TextRenderer _) =>
@@ -382,7 +382,7 @@ namespace Pong
             levelHelper.OnClick += (object? _, TextRenderer _) =>
             {
                 Destroy(gameObject);
-                // gameController?.GoToLevel();
+                LevelManager.LoadHomeScreen();
             };
 
             levelHelper.OnHover += (object? _, TextRenderer _) =>

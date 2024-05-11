@@ -62,7 +62,7 @@ namespace Pong
             button1.SetLocalPosition(new Vec2D(0, -50));
             menu.AddChild(button1);
 
-            var button2Tuple = Button("Main Menu", () => { LevelManager.LoadLevel(0); return true; }, new Rect(0, 0, 350, 150), Color.White, 44);
+            var button2Tuple = Button("Main Menu", () => { LevelManager.LoadHomeScreen(); return true; }, new Rect(0, 0, 350, 150), Color.White, 44);
             var button2 = button2Tuple.Item1;
             button2.SetLocalPosition(new Vec2D(0, 150));
             menu.AddChild(button2);

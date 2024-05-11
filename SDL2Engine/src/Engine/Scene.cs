@@ -120,6 +120,24 @@ namespace SDL2Engine
     public class Scene : ILoadable
     {
 
+        class ActiveSceneManager : IDisposable
+        {
+            private Scene? originalScene;
+            private Scene tempScene;
+
+            public ActiveSceneManager(Scene scene)
+            {
+                this.originalScene = SceneManager.GetActiveScene();
+                this.tempScene = scene;
+                SceneManager.SetActiveScene(scene);
+            }
+
+            public void Dispose()
+            {
+                SceneManager.SetActiveScene(originalScene);
+            }
+        }
+
         // TODO: use something like this to limit the number of new objects per frame
         public static readonly uint MAX_ADDS_PER_FRAME = 1;
 
@@ -172,6 +190,11 @@ namespace SDL2Engine
             return name;
         }
 
+        public IDisposable Activate()
+        {
+            return new ActiveSceneManager(this);
+        }
+
         public int GetGameObjectsCount()
         {
             return gameObjectsCount;
@@ -204,7 +227,7 @@ namespace SDL2Engine
 
         public void AddGameObject(GameObject gameObject)
         {
-            if (gameObject.GetScene() != null)
+            if (gameObject.GetScene() != null && gameObject.GetScene() != this)
             {
                 /*
                 Console.WriteLine("WARNING: GameObject already has a scene. This could result in duplicate objects in the scene" +
@@ -791,7 +814,7 @@ namespace SDL2Engine
         // this is used internally to set the active scene
         // that is currently being updated and rendered
         // this is used to add new GameObjects to the current scene
-        private static void SetActiveScene(Scene scene)
+        internal static void SetActiveScene(Scene? scene)
         {
             activeScene = scene;
         }
@@ -809,6 +832,11 @@ namespace SDL2Engine
         {
             for (int i = 0; i < toAdd.Count; i++)
             {
+                if (scenes.Contains(toAdd[i]))
+                {
+                    Console.WriteLine("WARNING: Scene is already in the scene list");
+                    continue;
+                }
                 toAdd[i].Load();
                 scenes.Add(toAdd[i]);
             }
@@ -817,6 +845,10 @@ namespace SDL2Engine
             for (int i = 0; i < toRemove.Count; i++)
             {
                 scenes.Remove(toRemove[i]);
+                if (activeScene == toRemove[i])
+                {
+                    activeScene = null;
+                }
             }
             toRemove.Clear();
         }
@@ -871,6 +903,11 @@ namespace SDL2Engine
         }
 
         public static void AddScene(Scene scene)
+        {
+            toAdd.Add(scene);
+        }
+
+        public static void LoadScene(Scene scene)
         {
             toAdd.Add(scene);
         }

@@ -61,9 +61,14 @@ namespace Pong
                 level = null;
             }
 
+            if (homeScreen != null)
+            {
+                SceneManager.RemoveScene(homeScreen);
+                homeScreen = null;
+            }
             var creator = levelCreators[index];
             var new_level = creator();
-            SceneManager.AddScene(new_level);
+            SceneManager.SetScene(new_level);
             level = new_level;
 
         }
@@ -80,15 +85,10 @@ namespace Pong
 
         public static void LoadHomeScreen()
         {
-            if (homeScreen == null)
-            {
-                homeScreen = CreateHomeScreen();
-                SceneManager.AddScene(homeScreen);
-            }
-            else
-            {
-                SceneManager.SetActiveScene(homeScreen);
-            }
+            
+            homeScreen = CreateHomeScreen();
+            SceneManager.SetScene(homeScreen);
+            
         }
 
         public static Scene CreateBaseLevel()

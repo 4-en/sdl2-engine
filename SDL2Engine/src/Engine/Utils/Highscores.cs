@@ -22,7 +22,7 @@ namespace SDL2Engine.Utils
             this.highscores = new();
         }
 
-        public void AddHighscore(string name, N score)
+        public void AddHighscore(string name, N score, bool save=false)
         {
             bool remove_last = highscores.Count >= maxHighscores;
             int maxIndex = highscores.Count >= maxHighscores ? maxHighscores : highscores.Count;
@@ -37,6 +37,11 @@ namespace SDL2Engine.Utils
                     {
                         highscores.RemoveAt(maxHighscores);
                     }
+                    if (save)
+                    {
+                        Save();
+                    }
+
                     return;
                 }
             }
@@ -44,6 +49,10 @@ namespace SDL2Engine.Utils
             if (highscores.Count < maxHighscores)
             {
                 highscores.Add(new Tuple<string, N>(name, score));
+                if (save)
+                {
+                    Save();
+                }
             }
             
         }
@@ -85,7 +94,7 @@ namespace SDL2Engine.Utils
             return new Tuple<string, N>(parts[0], (N)Convert.ChangeType(parts[1], typeof(N)));
         }
 
-        public void Save(string? path=null)
+        public virtual void Save(string? path=null)
         {
             path = path ?? this.path ?? "highscores.txt"; // default path is "highscores.txt
 
@@ -99,12 +108,13 @@ namespace SDL2Engine.Utils
 
         }
 
-        public static Highscores<N> Load(string? path, int maxHighscores=100)
+        public static Highscores<N> LoadFile(string? path, int maxHighscores=100)
         {
 
             path = path ?? "highscores.txt"; // default path is "highscores.txt
 
             Highscores<N> highscores = new(maxHighscores);
+            highscores.path = path;
 
             string[] strings = Serialization.LoadArray<string>((string s) => s, path);
 
@@ -118,10 +128,17 @@ namespace SDL2Engine.Utils
             return highscores;
         }
 
-        public List<Tuple<string, string>> AsString()
+        public virtual void Update()
         {
+            
+        }
+
+        public List<Tuple<string, string>> AsString(int max=0)
+        {
+            max = max > 0 ? max : highscores.Count;
+            max = Math.Min(max, highscores.Count);
             List<Tuple<string, string>> result = new();
-            for (int i = 0; i < highscores.Count; i++)
+            for (int i = 0; i < max; i++)
             {
                 result.Add(new Tuple<string, string>(highscores[i].Item1, item2: highscores[i].Item2.ToString() ?? "null"));
             }

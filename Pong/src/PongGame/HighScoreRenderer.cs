@@ -35,6 +35,8 @@ namespace Pong
             highscoresTitle.Item2.SetFontSize(100);
             highscoresTitle.Item2.SetText("- Highscores -");
             highscoresTitle.Item2.anchorPoint = AnchorPoint.TopCenter;
+            highscoresTitle.Item2.SetPreferredSize(new Rect(1920/2, 800));
+            highscoresTitle.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
 
 
             this.highscoresTitle = highscoresTitle.Item2;

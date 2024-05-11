@@ -132,6 +132,16 @@ namespace Pong
             return level;
         }
 
+        public static Scene CreateLevel4()
+        {
+            var level = new Scene("Level4");
+
+            var gameControllerObject = new GameObject("GameController4", level);
+            gameControllerObject.AddComponent<Level4GameController>();
+
+            return level;
+        }
+
         private static Scene CreateHomeScreen()
             {
                 var homeScreen = HomeScreen.CreateScene();
@@ -248,7 +258,7 @@ public class Level3GameController : GameController
         base.Update();
         Vec2D gameBounds = new Vec2D(1920, 1080);
 
-        if (powerupTimer > 3)
+        if (powerupTimer > 6)
         {
             powerupTimer = 0;
             var powerup = new GameObject("Powerup");
@@ -263,6 +273,56 @@ public class Level3GameController : GameController
             var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);
 
             powerup.SetPosition(new Vec2D(randomX, randomY));
+        }
+
+
+    }
+}
+
+public class Level4GameController : GameController
+{
+
+    public override void Update()
+    {
+
+        base.Update();
+        Vec2D gameBounds = new Vec2D(1920, 1080);
+
+        if (powerupTimer > 5)
+        {
+           
+            var rand = new Random().Next(0, 2);
+            var powerup = new GameObject("Powerup");
+            var texture = powerup.AddComponent<TextureRenderer>();
+            var bc = BoxCollider.FromDrawableRect(powerup);
+            bc.IsTrigger = true;
+
+            if (rand < 1)
+            {
+               
+                
+                
+                texture?.SetSource("Assets/Textures/change_direction_powerup.png");
+
+                
+                powerup.AddComponent<DestroyAndChangeDirectionOnCollision>();
+               
+            }
+            else
+            {
+                
+                
+                texture?.SetSource("Assets/Textures/speed_powerup.png");
+                
+                powerup.AddComponent<DestroyAndIncreaseSpeedOnCollision>();
+                
+            }
+            //random value between x and y
+            int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);
+            var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);
+
+            powerup.SetPosition(new Vec2D(randomX, randomY));
+            powerupTimer = 0;
         }
 
 

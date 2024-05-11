@@ -1,9 +1,12 @@
 using SDL2;
 using SDL2Engine;
 using static SDL2.SDL;
+using SDL2Engine.UI;
+using SDL2Engine.Utils;
 
 namespace Pong
 {
+
     public class PaddleController : Script
     {
         public double speed = 1000;
@@ -58,8 +61,8 @@ namespace Pong
     public class KeyboardController : Script
     {
         private PaddleController? paddleController = null;
-        public uint keyUp = (uint)SDL_Keycode.SDLK_w;
-        public uint keyDown = (uint)SDL_Keycode.SDLK_s;
+        public int keyUp = (int)SDL_Keycode.SDLK_w;
+        public int keyDown = (int)SDL_Keycode.SDLK_s;
 
         public override void Start()
         {
@@ -87,12 +90,30 @@ namespace Pong
         public override void Start()
         {
             sound = AddComponent<SoundPlayer>();
-            sound?.Load("Assets/Audio/test_sound.mp3");
+            sound?.Load("Assets/Audio/bounce.mp3");
         }
 
         public override void OnCollisionEnter(CollisionPair collision)
         {
             sound?.Play();
+        }
+
+        public override void Update()
+        {
+            var collider = gameObject.GetComponent<BoxCollider>();
+            var filledRect = gameObject.GetComponent<FilledRect>();
+            if (collider == null || filledRect == null) return;
+
+            var rect = collider.GetCollisionBox();
+
+            if (SDL2Engine.Utils.MouseHelper.IsRectPressed(GetCamera()?.RectToScreen(rect) ?? new Rect()))
+            {
+                filledRect.color = new Color(255, 0, 0, 255);
+            }
+            else
+            {
+                filledRect.color = new Color(255, 255, 255, 255);
+            }
         }
     }
 
@@ -136,11 +157,13 @@ namespace Pong
     public enum GameMode
     {
         DUEL = 0,
-        HIGHSCORE = 1
+        HIGHSCORE = 1,
+        TIMED = 2
     }
 
     public class GameController : Script
     {
+        public int level_id = 0;
         protected int player_1_score = 0;
         protected int player_2_score = 0;
 
@@ -159,10 +182,14 @@ namespace Pong
         protected TextRenderer? scoreText2 = null;
         protected TextRenderer? scoreText3 = null;
 
+        protected TextRenderer? timeText = null;
+        private GameObject? escapeMenu = null;
+
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
 
         protected double roundTimer = -3;
         private bool roundStarted = false;
+        public double timeLimit = 60;
 
         private Sound scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Fire.mp3");
         private Sound scoreSoundWater = AssetManager.LoadAsset<Sound>("Assets/Audio/Wave.mp3");
@@ -172,7 +199,9 @@ namespace Pong
 
         private GameMode gameMode = GameMode.DUEL;
 
-        public int scoreToWin = 11;
+        private bool stopped = false;
+
+        public int scoreToWin = 1;
         public override void Start()
         {
             // create basic game object here
@@ -211,8 +240,8 @@ namespace Pong
             player2.AddComponent<PaddleController>().gameController = this;
             player2.AddComponent<BallPaddleCollisionScript>();
             var keyboard_controller = player2.AddComponent<KeyboardController>();
-            keyboard_controller.keyUp = (uint)SDL_Keycode.SDLK_UP;
-            keyboard_controller.keyDown = (uint)SDL_Keycode.SDLK_DOWN;
+            keyboard_controller.keyUp = (int)SDL_Keycode.SDLK_UP;
+            keyboard_controller.keyDown = (int)SDL_Keycode.SDLK_DOWN;
 
             // create the walls
             var create_barrier = (string name, Rect area) =>
@@ -244,6 +273,15 @@ namespace Pong
             scoreText2 = scoreObject2.AddComponent<TextRenderer>();
             scoreText2.color = new Color(255, 255, 255, 205);
             scoreText2.SetFontSize(100);
+
+            timeText = Component.CreateWithGameObject<TextRenderer>("TimeCounter").Item2;
+            timeText.color = new Color(255, 255, 255, 205);
+            timeText.SetFontSize(32);
+            timeText.anchorPoint = AnchorPoint.TopLeft;
+            timeText.GetGameObject().SetPosition(new Vec2D(gameBounds.x - 200, 25));
+            timeText.SetText("Time: 0");
+
+
 
             ResetGame();
 
@@ -338,6 +376,8 @@ namespace Pong
             {
                 player2.transform.position = new Vec2D(gameBounds.x - 50 - 40, gameBounds.y / 2);
             }
+
+            stopped = false;
         }
 
         private void HandleDuel()
@@ -347,10 +387,16 @@ namespace Pong
 
             if (player_1_score >= scoreToWin || player_2_score >= scoreToWin)
             {
+                this.stopped = true;
                 Console.WriteLine("Game Over");
                 string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
                 Console.WriteLine($"{winner_name} wins!");
-                ResetGame();
+                
+                var resultRoot = new GameObject("ResultRoot");
+                var resultScript = resultRoot.AddComponent<GameResultScript>();
+                resultScript.score[0] = player_1_score;
+                resultScript.score[1] = player_2_score;
+                
             }
         }
 
@@ -360,26 +406,76 @@ namespace Pong
             // end game if player 2 scores a point
             if (player_2_score > 0)
             {
+                this.stopped = true;
                 Console.WriteLine("Game Over");
                 Console.WriteLine($"Player 1 scored {player_1_score} points");
-                ResetGame();
+
+                var highscoreRoot = new GameObject("HighscoreRoot");
+                var highscoreScript = highscoreRoot.AddComponent<HighscoreScript>();
+                highscoreScript.AddHighscoreState(player_1_score);
+                var hs = new Highscores<int>(100, $"pong_level_{this.level_id}.txt");
+                highscoreScript.SetHighscores(hs);
             }
         }
 
         public override void Update()
         {
 
+            if (timeText != null)
+            {
+                // 2 decimal places
+                timeText.SetText($"Time: {Math.Round(roundTimer, 2)}");
+            }
+
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_ESCAPE))
+            {
+                if (this.escapeMenu != null)
+                {
+                    this.escapeMenu.Destroy();
+                    this.escapeMenu = null;
+                }
+                else
+                {
+                    var stopState = !!stopped;
+                    var escapemenu = UI.EscapeMenu("Paused", () =>
+                    {
+
+                        this.stopped = stopState;
+                        GetScene()?.SetPhysics(true);
+                        this.escapeMenu = null;
+                        return true;
+                    });
+
+                    this.escapeMenu = escapemenu;
+                    this.stopped = true;
+                    GetScene()?.SetPhysics(false);
+                }
+            }
+
             // reset game if r is pressed
-            if (Input.GetKeyPressed((uint)SDL_Keycode.SDLK_r))
+            if (Input.GetKeyPressed((int)SDL_Keycode.SDLK_r))
             {
                 ResetGame();
                 return;
+            }
+
+            if (Input.GetKeyPressed(SDL_Keycode.SDLK_x))
+            {
+                Console.WriteLine(Time.tick);
+                var scene = GetScene();
+                if (scene != null)
+                {
+                    Console.WriteLine("Destroying all game objects");
+                    scene.GetGameObjects().ForEach(o => Destroy(o));
+                } else { Console.WriteLine("Scene is null"); }
             }
 
             // basic game logic here
             // check for out of bounds
             // keep track of score
             // reset ball if needed
+
+            if (stopped) return;
 
             if (ball == null) return;
 

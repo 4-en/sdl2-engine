@@ -22,17 +22,93 @@ namespace SDL2Engine
 
     public struct Color
     {
-        public byte r;
-        public byte g;
-        public byte b;
-        public byte a;
+        public UInt32 color;
+
+        public byte r
+        {
+            set
+            {
+                color = (color & 0x00FFFFFF) | (UInt32)value << 24;
+            }
+
+            get
+            {
+                return (byte)((color & 0xFF000000) >> 24);
+            }
+        }
+
+        public byte g
+        {
+            set
+            {
+                color = (color & 0xFF00FFFF) | (UInt32)value << 16;
+            }
+
+            get
+            {
+                return (byte)((color & 0x00FF0000) >> 16);
+            }
+        }
+
+        public byte b
+        {
+            set
+            {
+                color = (color & 0xFFFF00FF) | (UInt32)value << 8;
+            }
+
+            get
+            {
+                return (byte)((color & 0x0000FF00) >> 8);
+            }
+        }
+
+        public byte a
+        {
+            set
+            {
+                color = (color & 0xFFFFFF00) | (UInt32)value;
+            }
+
+            get
+            {
+                return (byte)(color & 0x000000FF);
+            }
+        }
 
         public Color(byte r, byte g, byte b, byte a = 255)
         {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.a = a;
+            color = (UInt32)(r << 24 | g << 16 | b << 8 | a);
+        }
+
+        public Color() : this(0, 0, 0, 255)
+        {
+        }
+
+        public SDL.SDL_Color ToSDLColor()
+        {
+            return new SDL.SDL_Color() { r = r, g = g, b = b, a = a };
+        }
+
+        public static Color White = new Color(255, 255, 255, 255);
+        public static Color Black = new Color(0, 0, 0, 255);
+        public static Color Red = new Color(255, 0, 0, 255);
+        public static Color Green = new Color(0, 255, 0, 255);
+        public static Color Blue = new Color(0, 0, 255, 255);
+        public static Color Magenta = new Color(255, 0, 255, 255);
+        public static Color Yellow = new Color(255, 255, 0, 255);
+        public static Color Cyan = new Color(0, 255, 255, 255);
+        public static Color Gold = new Color(255, 215, 0, 255);
+        public static Color Transparent = new Color(0, 0, 0, 0);
+
+        public static bool operator ==(Color a, Color b)
+        {
+            return a.color == b.color;
+        }
+
+        public static bool operator !=(Color a, Color b)
+        {
+            return a.color != b.color;
         }
     }
 
@@ -192,11 +268,11 @@ namespace SDL2Engine
 
         // get the rect based on the anchor point in local coordinates
         // for example, if the anchor point is Center, the rect will be centered around the anchor point (move the rect to the left and up by half its size)
-        public Rect GetRect()
+        public Rect GetRect(Rect? custom_rect = null)
         {
             // return rect relative to anchor point
-            Vec2D size = rect.GetSize();
-            Vec2D position = rect.GetTopLeft();
+            Vec2D size = custom_rect?.GetSize() ?? rect.GetSize();
+            Vec2D position = custom_rect?.GetTopLeft() ?? rect.GetTopLeft();
 
             switch(this.anchorPoint)
             {
@@ -227,13 +303,13 @@ namespace SDL2Engine
             }
             return new Rect(position.x, position.y, size.x, size.y);
         }
-        public SDL.SDL_Rect GetDestRect()
+        public SDL.SDL_Rect GetDestRect(Rect? custom_rect = null)
         {
             var scene = gameObject.GetScene();
             Camera? camera = scene?.GetCamera();
             if (camera != null)
             {
-                return camera.RectToScreen(this.GetRect(), gameObject.GetPosition()).ToSDLRect();
+                return camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition()).ToSDLRect();
             } else
             {
                 Console.WriteLine("Camera not found");
@@ -242,9 +318,20 @@ namespace SDL2Engine
         }
 
         // get the rect in world coordinates
-        public Rect GetWorldRect()
+        public Rect GetWorldRect(Rect? custom_rect = null)
         {
-            return GetRect() + gameObject.GetPosition();
+            return custom_rect ?? GetRect() + gameObject.GetPosition();
+        }
+
+        public Rect GetScreenRect(Rect? custom_rect = null)
+        {
+            var scene = gameObject.GetScene();
+            Camera? camera = scene?.GetCamera();
+            if (camera != null)
+            {
+                return camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
+            }
+            return GetRect(custom_rect);
         }
 
         public override void Draw(Camera camera)
@@ -269,13 +356,55 @@ namespace SDL2Engine
 
     }
 
-    public class TextRenderer : DrawableRect
+    public class TextRenderer : DrawableRect, ILoadable
     {
         private string text = "[TEXT]";
         private int fontSize = 24;
         private string fontPath = "Assets/Fonts/Roboto-Regular.ttf";
         private bool updateTexture = true;
-        private IntPtr texture = IntPtr.Zero;
+        private bool updateFont = true;
+        private Font? font;
+        private IntPtr[]? textures = null;
+        private Rect[]? textureRects = null;
+        private Rect preferredSize = new Rect(0, 0, 0, 0);
+        private Rect textTextureSize;
+        private double borderSize = 0;
+        private Color backgroundColor = new Color(0,0,0,0);
+        private Color borderColor = new Color(0, 0, 0, 0);
+
+        public void SetBorderSize(double borderSize)
+        {
+            if (this.borderSize == borderSize) return;
+            this.borderSize = borderSize;
+            updateTexture = true;
+        }
+
+        public void SetBackgroundColor(Color color)
+        {
+            if (color == backgroundColor) return;
+            this.backgroundColor = color;
+            updateTexture = true;
+        }
+
+        public void SetBorderColor(Color color)
+        {
+            if (color == borderColor) return;
+            this.borderColor = color;
+            updateTexture = true;
+        }
+
+        public void SetPreferredSize(Rect size)
+        {
+            this.preferredSize = size;
+            updateTexture = true;
+        }
+
+        public void SetTextSize(Rect size)
+        {
+            this.textTextureSize = size;
+            updateTexture = true;
+        }
+
 
         public void SetText(string text)
         {
@@ -293,38 +422,73 @@ namespace SDL2Engine
         {
             this.fontSize = fontSize;
             updateTexture = true;
+            updateFont = true;
         }
 
         public void SetFontPath(string fontPath)
         {
             this.fontPath = fontPath;
             updateTexture = true;
+            updateFont = true;
+        }
+
+        private void LoadFont()
+        {
+            if (font != null && !updateFont)
+            {
+                return;
+            }
+
+            if (font != null)
+            {
+                font.Dispose();
+                font = null;
+            }
+
+            font = AssetManager.LoadAsset<Font>(fontPath + "@" + fontSize);
+            font.Load();
+            updateFont = false;
         }
 
         private void CreateTextTexture()
         {
-            if (texture != IntPtr.Zero)
+            if(!IsLoaded() || this.font == null || this.updateFont)
             {
-                SDL_DestroyTexture(texture);
-                texture = IntPtr.Zero;
+                LoadFont();
             }
 
-            IntPtr font = SDL_ttf.TTF_OpenFont(fontPath, fontSize);
-            if (font == IntPtr.Zero)
+            if (textures != null)
             {
-                Console.WriteLine("Failed to load font: " + SDL_GetError());
+                foreach(var texture in textures)
+                {
+                    if (texture != IntPtr.Zero)
+                    {
+                        SDL_DestroyTexture(texture);
+                    }
+                }
+            }
+
+            if (font == null)
+            {
                 return;
             }
 
-            IntPtr surface = SDL_ttf.TTF_RenderUTF8_Blended(font, text, new SDL.SDL_Color() { r = color.r, g = color.g, b = color.b, a = color.a });
-            texture = SDL_CreateTextureFromSurface(Engine.renderer, surface);
+            Rect out_rect;
+            string[] texts = text.Split('\n');
+            textures = new IntPtr[texts.Length];
+            textureRects = new Rect[texts.Length];
+            this.textTextureSize = new Rect(0, 0, 0, 0);
+            for (int i = 0; i < texts.Length; i++)
+            {
+                textures[i] = font.RenderTexture(texts[i], color.ToSDLColor(), out out_rect);
+                this.textTextureSize.w = Math.Max(this.rect.w, out_rect.w);
+                this.textTextureSize.h += out_rect.h + 10;
+                textureRects[i] = out_rect;
+            }
 
-            // get the size of the texture
-            int w, h;
-            SDL_QueryTexture(texture, out _, out _, out w, out h);
-            rect = new Rect(0, 0, w, h);
-            SDL_ttf.TTF_CloseFont(font);
-            SDL_FreeSurface(surface);
+            this.rect.h = Math.Max(this.textTextureSize.h, this.preferredSize.h);
+            this.rect.w = Math.Max(this.textTextureSize.w, this.preferredSize.w);
+
             this.updateTexture = false;
         }
 
@@ -336,23 +500,133 @@ namespace SDL2Engine
                 CreateTextTexture();
             }
 
+            if (textures == null || textureRects == null)
+            {
+                return;
+            }
+
 
             var renderer = Engine.renderer;
+            var bg_rect = GetDestRect();
+            if (backgroundColor.a > 0)
+            {
+                SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+                SDL_RenderFillRect(renderer, ref bg_rect);
+            }
             
-            var dest_rect = this.GetDestRect();
 
             // draw the texture
-            SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dest_rect);
+            for (int i = 0; i < textures.Length; i++)
+            {
+                var texture = textures[i];
+                var out_rect = textureRects[i];
+                out_rect.y += i * (out_rect.h + 10);
+                var dst_rect = GetDestRect(out_rect);
+                
+                SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dst_rect);
+            }
+
+            if (borderSize > 0 && borderColor.a > 0)
+            {
+                SDL_SetRenderDrawColor(renderer, borderColor.r, borderColor.g, borderColor.b, borderColor.a);
+                
+                // draw lines around bg_rect as fill rect
+                var lineTop = new SDL_Rect() { x = bg_rect.x, y = bg_rect.y, w = bg_rect.w, h = (int)borderSize };
+                var lineBottom = new SDL_Rect() { x = bg_rect.x, y = bg_rect.y + bg_rect.h - (int)borderSize, w = bg_rect.w, h = (int)borderSize };
+                // dont overlap top or bottom lines
+                var lineLeft = new SDL_Rect() { x = bg_rect.x, y = bg_rect.y + (int)borderSize, w = (int)borderSize, h = bg_rect.h - 2 * (int)borderSize };
+                var lineRight = new SDL_Rect() { x = bg_rect.x + bg_rect.w - (int)borderSize, y = bg_rect.y + (int)borderSize, w = (int)borderSize, h = bg_rect.h - 2 * (int)borderSize };
+
+                SDL_RenderFillRect(renderer, ref lineTop);
+                SDL_RenderFillRect(renderer, ref lineBottom);
+                SDL_RenderFillRect(renderer, ref lineLeft);
+                SDL_RenderFillRect(renderer, ref lineRight);
+
+            }
+            
         }
 
         public override void Dispose()
         {
             base.Dispose();
-            if (texture != IntPtr.Zero)
+            if (textures != null)
             {
-                SDL_DestroyTexture(texture);
+                foreach (var texture in textures)
+                {
+                    if (texture != IntPtr.Zero)
+                    {
+                        SDL_DestroyTexture(texture);
+                    }
+                }
+            }
+            
+
+            if (font != null)
+            {
+                font.Dispose();
+                font = null;
             }
         }
+
+        public void Load()
+        {
+            LoadFont();
+        }
+
+        public bool IsLoaded()
+        {
+            return font != null;
+        }
+    }
+
+    // Helper class to render text and handle events
+    public class TextRenderHelper : Script
+    {
+
+        TextRenderer? textRenderer;
+        bool wasHovered = false;
+        public override void Start()
+        {
+            textRenderer = GetComponent<TextRenderer>();
+        }
+
+        public EventHandler<TextRenderer>? OnClick;
+        public EventHandler<TextRenderer>? OnHover;
+        public EventHandler<TextRenderer>? OnLeave;
+
+        public override void Update()
+        {
+            if (textRenderer == null)
+            {
+                return;
+            }
+
+            
+            Rect rect = textRenderer.GetScreenRect();
+            bool hovered = SDL2Engine.Utils.MouseHelper.IsRectHovered(rect);
+            bool clicked = SDL2Engine.Utils.MouseHelper.IsRectClicked(rect);
+            bool left = !hovered && wasHovered;
+            wasHovered = hovered;
+
+            if (hovered)
+            {
+                OnHover?.Invoke(this, textRenderer);
+            }
+
+            if (clicked)
+            {
+                OnClick?.Invoke(this, textRenderer);
+            }
+
+            if (left)
+            {
+                OnLeave?.Invoke(this, textRenderer);
+            }
+
+            
+        }
+
+
     }
 
     public class FilledRect : DrawableRect
@@ -418,6 +692,11 @@ namespace SDL2Engine
             // maybe it should be assumed that the texture is loaded
             if (texture == null) {
                 this.Load();
+
+                if (texture == null)
+                {
+                    return;
+                }
             }
 
             var texture_ptr = texture.Get();

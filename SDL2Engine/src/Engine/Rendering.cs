@@ -99,6 +99,7 @@ namespace SDL2Engine
         public static Color Yellow = new Color(255, 255, 0, 255);
         public static Color Cyan = new Color(0, 255, 255, 255);
         public static Color Gold = new Color(255, 215, 0, 255);
+        public static Color Transparent = new Color(0, 0, 0, 0);
 
         public static bool operator ==(Color a, Color b)
         {

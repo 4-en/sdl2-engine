@@ -141,6 +141,7 @@ namespace Pong
         protected TextRenderer? scoreText = null;
 
         protected TextRenderer? timeText = null;
+        private GameObject? escapeMenu = null;
 
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
 
@@ -355,6 +356,32 @@ namespace Pong
                 // 2 decimal places
                 timeText.SetText($"Time: {Math.Round(roundTimer, 2)}");
             }
+
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_ESCAPE))
+            {
+                if (this.escapeMenu != null)
+                {
+                    this.escapeMenu.Destroy();
+                    this.escapeMenu = null;
+                }
+                else
+                {
+                    var stopState = !!stopped;
+                    var escapemenu = UI.EscapeMenu("Paused", () =>
+                    {
+
+                        this.stopped = stopState;
+                        GetScene()?.SetPhysics(true);
+                        this.escapeMenu = null;
+                        return true;
+                    });
+
+                    this.escapeMenu = escapemenu;
+                    this.stopped = true;
+                    GetScene()?.SetPhysics(false);
+                }
+            }
+
             // reset game if r is pressed
             if (Input.GetKeyPressed((int)SDL_Keycode.SDLK_r))
             {

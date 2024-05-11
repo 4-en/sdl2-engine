@@ -714,7 +714,7 @@ namespace SDL2Engine
             switch (keyEvent.keysym.sym)
             {
                 case SDL.SDL_Keycode.SDLK_ESCAPE:
-                    running = false;
+                    // running = false;
                     break;
                 case SDL.SDL_Keycode.SDLK_F3:
                     showDebug = !showDebug;
@@ -806,6 +806,14 @@ namespace SDL2Engine
                         break;
 
                 }
+            }
+        }
+
+        public static void Stop()
+        {
+            if (instance != null)
+            {
+                instance.running = false;
             }
         }
 

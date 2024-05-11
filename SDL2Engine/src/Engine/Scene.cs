@@ -125,6 +125,7 @@ namespace SDL2Engine
 
         private string name = "Scene";
         private int gameObjectsCount = 0;
+        private bool doPhysics = true;
 
         private Camera mainCamera;
         private SceneType sceneType = SceneType.GAME;
@@ -529,6 +530,11 @@ namespace SDL2Engine
             }
         }
 
+        public void SetPhysics(bool doPhysics)
+        {
+            this.doPhysics = doPhysics;
+        }
+
         // Iterate through all Drawable components and call their Draw method using the main camera defined in the scene
         public void Draw()
         {
@@ -634,15 +640,18 @@ namespace SDL2Engine
 
             // Physics
             // get all game objects with colliders
-            List<GameObject> goWithPhysics = new();
-            foreach (Collider collider in colliderList)
-            {
-                // TODO: this might cause problems if we add a parent game object and a child game object
-                // maybe fix this later
-                goWithPhysics.Add(collider.GetGameObject());
+            if (doPhysics)
+            { 
+                List<GameObject> goWithPhysics = new();
+                foreach (Collider collider in colliderList)
+                {
+                    // TODO: this might cause problems if we add a parent game object and a child game object
+                    // maybe fix this later
+                    goWithPhysics.Add(collider.GetGameObject());
+                }
+                Physics.UpdatePhysics(goWithPhysics);
             }
-            Physics.UpdatePhysics(goWithPhysics);
-
+            
 
             // start scripts that are scheduled to be started
             foreach (Script script in toStart)
@@ -766,6 +775,9 @@ namespace SDL2Engine
 
         private static List<GameObject> persistentGameObjects = new();
 
+        private static List<Scene> toAdd = new();
+        private static List<Scene> toRemove = new();
+
         public static Scene? GetActiveScene()
         {
             return activeScene;
@@ -776,6 +788,9 @@ namespace SDL2Engine
             return scenes;
         }
 
+        // this is used internally to set the active scene
+        // that is currently being updated and rendered
+        // this is used to add new GameObjects to the current scene
         private static void SetActiveScene(Scene scene)
         {
             activeScene = scene;
@@ -790,9 +805,26 @@ namespace SDL2Engine
             }
         }
 
+        private static void AddRemoveScenes()
+        {
+            for (int i = 0; i < toAdd.Count; i++)
+            {
+                toAdd[i].Load();
+                scenes.Add(toAdd[i]);
+            }
+            toAdd.Clear();
+
+            for (int i = 0; i < toRemove.Count; i++)
+            {
+                scenes.Remove(toRemove[i]);
+            }
+            toRemove.Clear();
+        }
 
         public static void UpdateScenes()
         {
+            AddRemoveScenes();
+
             for (int i = 0; i < scenes.Count; i++)
             {
                 SetActiveScene(scenes[i]);
@@ -840,29 +872,28 @@ namespace SDL2Engine
 
         public static void AddScene(Scene scene)
         {
-            scene.Load();
-            scenes.Add(scene);
+            toAdd.Add(scene);
         }
 
         public static void AddBefore(Scene scene, Scene before)
         {
-            scene.Load();
-            scenes.Insert(scenes.IndexOf(before), scene);
+            // TODO: implement this
+            //scene.Load();
+            //scenes.Insert(scenes.IndexOf(before), scene);
+            AddScene(scene);
         }
 
         public static void AddAfter(Scene scene, Scene after)
         {
-            scene.Load();
-            scenes.Insert(scenes.IndexOf(after) + 1, scene);
+            // TODO: implement this
+            //scene.Load();
+            //scenes.Insert(scenes.IndexOf(after) + 1, scene);
+            AddScene(scene);
         }
 
         public static void RemoveScene(Scene scene)
         {
-            bool was_removed = scenes.Remove(scene);
-            if (was_removed)
-            {
-                scene.Dispose();
-            }
+            toRemove.Add(scene);
         }
 
         public static void SortScenesBySceneType()

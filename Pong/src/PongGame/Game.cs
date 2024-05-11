@@ -116,17 +116,23 @@ namespace Pong
         {
             var level = new Scene("Level2");
 
-            var gameControllerObject = new GameObject("GameController", level);
+            var gameControllerObject = new GameObject("GameController2", level);
             gameControllerObject.AddComponent<Level2GameController>();
 
             return level;
         }
 
-        //q: how can I spawn every 10 seconds a new powerup?
-        //a: you can use a Timer script that will spawn a new powerup every 10 seconds
+        public static Scene CreateLevel3()
+        {
+            var level = new Scene("Level3");
 
+            var gameControllerObject = new GameObject("GameController3", level);
+            gameControllerObject.AddComponent<Level3GameController>();
 
-            private static Scene CreateHomeScreen()
+            return level;
+        }
+
+        private static Scene CreateHomeScreen()
             {
                 var homeScreen = HomeScreen.CreateScene();
                 return homeScreen;
@@ -180,6 +186,31 @@ class DestroyAndIncreaseSpeedOnCollision : Script
     }
 }
 
+class DestroyAndChangeDirectionOnCollision : Script
+{
+    public override void OnCollisionEnter(CollisionPair collision)
+    {
+        // destroy if colliding with anything (thats movable, since two static objects can't collide)
+        Destroy(this.gameObject);
+        //change ball direction
+        foreach (var obj in this.gameObject.GetScene().GetGameObjects())
+        {
+            if (obj.GetName() == "Ball")
+            {
+                obj.GetComponent<PhysicsBody>().Velocity =   new Vec2D(obj.GetComponent<PhysicsBody>().Velocity.x, - obj.GetComponent<PhysicsBody>().Velocity.y);
+            }
+        }
+
+    }
+
+    public override void Update()
+    {
+        // rotate with time
+
+        transform.rotation = Time.time * 360 / 3 % 360;
+    }
+}
+
 public class Level2GameController : GameController
 {
 
@@ -197,6 +228,36 @@ public class Level2GameController : GameController
             var bc = BoxCollider.FromDrawableRect(powerup);
             bc.IsTrigger = true;
             powerup.AddComponent<DestroyAndIncreaseSpeedOnCollision>();
+            //random value between x and y
+            int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);
+            var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);
+
+            powerup.SetPosition(new Vec2D(randomX, randomY));
+        }
+
+
+    }
+}
+
+public class Level3GameController : GameController
+{
+
+    public override void Update()
+    {
+
+        base.Update();
+        Vec2D gameBounds = new Vec2D(1920, 1080);
+
+        if (powerupTimer > 3)
+        {
+            powerupTimer = 0;
+            var powerup = new GameObject("Powerup");
+            var texture = powerup.AddComponent<TextureRenderer>();
+            texture?.SetSource("Assets/Textures/change_direction_powerup.png");
+            
+            var bc = BoxCollider.FromDrawableRect(powerup);
+            bc.IsTrigger = true;
+            powerup.AddComponent<DestroyAndChangeDirectionOnCollision>();
             //random value between x and y
             int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);
             var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);

@@ -199,7 +199,7 @@ class HomeMusik : Script
     public override void Start()
     {
         scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Homemusik.mp3");
-        scoreSoundFire.SetVolume(128);
+        scoreSoundFire.SetVolume(0.3);
     }
 
     public override void Update()

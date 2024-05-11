@@ -104,7 +104,7 @@ namespace SDL2Engine
 
         public override void Dispose()
         {
-            if(!hasRef)
+            if (!hasRef)
             {
                 return;
             }
@@ -117,10 +117,10 @@ namespace SDL2Engine
 
         public T Get()
         {
-            if(loaded)
+            if (loaded)
             {
                 T? asset = handler.Get();
-                if(asset != null)
+                if (asset != null)
                 {
                     return asset;
                 }
@@ -128,12 +128,12 @@ namespace SDL2Engine
                 loadFailed = true;
             }
 
-            if(loadFailed)
+            if (loadFailed)
             {
                 return GetDefault();
             }
 
-            if(!hasRef)
+            if (!hasRef)
             {
                 return GetDefault();
             }
@@ -308,7 +308,7 @@ namespace SDL2Engine
         {
         }
 
-        public abstract bool Play(int loops=0);
+        public abstract bool Play(int loops = 0);
         public abstract bool Stop();
         public abstract bool SetVolume(double volume);
         public abstract bool IsPlaying();
@@ -329,7 +329,7 @@ namespace SDL2Engine
         {
             ChannelFinishedCallback = (int channel) =>
             {
-                if(channel == this.channel)
+                if (channel == this.channel)
                 {
                     this.channel = -1;
                 }
@@ -341,7 +341,7 @@ namespace SDL2Engine
         // Can only play one sound at a time
         // To play multiple sounds at the same time (even the same sound/same sound file), create multiple Sound objects
         // If called while the sound is already playing, returns false
-        public override bool Play(int loops=0)
+        public override bool Play(int loops = 0)
         {
             // Play sound
             IntPtr sound_ref = Get();
@@ -382,10 +382,10 @@ namespace SDL2Engine
         // Set the volume of the sounds channel
         public override bool SetVolume(double volume)
         {
-            if (channel == -1)
-            {
-                return false;
-            }
+            //if (channel == -1)
+            //{
+            //    return false;
+            //}
             int result = SDL2.SDL_mixer.Mix_Volume(channel, (int)(volume * 128));
             return result != -1;
         }
@@ -418,7 +418,7 @@ namespace SDL2Engine
         // int loops: number of times to loop the music, -1 for infinite looping
         // Can only play one music at a time (no matter how many Music objects are created)
         // Playing a new music will stop the currently playing music
-        public override bool Play(int loops=0)
+        public override bool Play(int loops = 0)
         {
             // Play music
             IntPtr music_ref = Get();
@@ -428,7 +428,7 @@ namespace SDL2Engine
                 return false;
             }
             int result = SDL2.SDL_mixer.Mix_PlayMusic(music_ref, loops);
-            
+
             if (result == -1)
             {
                 Console.WriteLine("Music: Failed to play music: " + handler.GetPath());
@@ -477,10 +477,10 @@ namespace SDL2Engine
         {
             return IntPtr.Zero;
         }
-        
+
     }
 
-    
+
 
     public abstract class AssetHandler<T>
     {
@@ -509,7 +509,7 @@ namespace SDL2Engine
 
         public T? Get()
         {
-            if(loadFailed)
+            if (loadFailed)
             {
                 return default;
             }
@@ -641,13 +641,13 @@ namespace SDL2Engine
 
         public override bool LoadAsset()
         {
-            
 
-            if(loaded)
+
+            if (loaded)
             {
                 return true;
             }
-            if(loadFailed)
+            if (loadFailed)
             {
                 return false;
             }
@@ -657,7 +657,7 @@ namespace SDL2Engine
                 Console.WriteLine("TextureHandler: Failed to load texture: " + path);
                 loadFailed = true;
                 return false;
-                
+
             }
             int w, h;
             SDL_QueryTexture(asset, out _, out _, out w, out h);
@@ -807,13 +807,14 @@ namespace SDL2Engine
             if (texture_assets.ContainsKey(path))
             {
                 handler = texture_assets[path];
-            } else
+            }
+            else
             {
                 handler = new TextureHandler(path);
                 texture_assets[path] = handler;
                 // handler.LoadAsset();
             }
-            
+
             return new Texture(handler);
         }
 
@@ -851,7 +852,7 @@ namespace SDL2Engine
             return new Music(handler);
         }
 
-        public static Font LoadFont(string path, int size=-1)
+        public static Font LoadFont(string path, int size = -1)
         {
             if (size != -1)
             {
@@ -909,7 +910,7 @@ namespace SDL2Engine
         // TODO: implement something that checks for unused assets and unloads them periodically
         public static void CleanUnusedAssets()
         {
-            
+
         }
 
     }

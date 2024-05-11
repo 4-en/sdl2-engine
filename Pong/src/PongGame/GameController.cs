@@ -1,8 +1,8 @@
 using SDL2;
 using SDL2Engine;
-using static SDL2.SDL;
 using SDL2Engine.UI;
 using SDL2Engine.Utils;
+using static SDL2.SDL;
 
 namespace Pong
 {
@@ -156,7 +156,7 @@ namespace Pong
                 Vec2D ballCenter = ballCollider.GetGameObject().transform.position;
                 ballCenter.y += ballHeight / 2;
 
-               
+
                 //calculate relative position of the ball on the paddle (-1,1)
                 var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);
                 double ball_vel = ball_body.Velocity.Length();
@@ -309,6 +309,7 @@ namespace Pong
             scoreText = scoreObject.AddComponent<TextRenderer>();
             scoreText.color = new Color(255, 255, 255, 205);
             scoreText.SetFontSize(100);
+            scoreText.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
 
             scoreObject3 = new GameObject("ScorePlayer1");
             scoreObject3.transform.position = new Vec2D(gameBounds.x / 2, 80);
@@ -322,6 +323,7 @@ namespace Pong
             scoreText2 = scoreObject2.AddComponent<TextRenderer>();
             scoreText2.color = new Color(255, 255, 255, 205);
             scoreText2.SetFontSize(100);
+            scoreText2.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
 
             timeText = Component.CreateWithGameObject<TextRenderer>("TimeCounter").Item2;
             timeText.color = new Color(255, 255, 255, 205);

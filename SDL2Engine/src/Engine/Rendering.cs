@@ -99,6 +99,16 @@ namespace SDL2Engine
         public static Color Yellow = new Color(255, 255, 0, 255);
         public static Color Cyan = new Color(0, 255, 255, 255);
         public static Color Gold = new Color(255, 215, 0, 255);
+
+        public static bool operator ==(Color a, Color b)
+        {
+            return a.color == b.color;
+        }
+
+        public static bool operator !=(Color a, Color b)
+        {
+            return a.color != b.color;
+        }
     }
 
     // DepthBuffer class to store depth values for each pixel of the screen
@@ -363,18 +373,21 @@ namespace SDL2Engine
 
         public void SetBorderSize(double borderSize)
         {
+            if (this.borderSize == borderSize) return;
             this.borderSize = borderSize;
             updateTexture = true;
         }
 
         public void SetBackgroundColor(Color color)
         {
+            if (color == backgroundColor) return;
             this.backgroundColor = color;
             updateTexture = true;
         }
 
         public void SetBorderColor(Color color)
         {
+            if (color == borderColor) return;
             this.borderColor = color;
             updateTexture = true;
         }

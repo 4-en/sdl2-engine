@@ -24,11 +24,19 @@ namespace Pong
         private TextRenderer? nameText = null;
         private TextRenderer? highscoresTitle = null;
         private Highscores<int> highscores = new Highscores<int>();
+        private GameController? gameController = null;
 
         private HighscoreState state = HighscoreState.None;
 
+        public void SetHighscores(Highscores<int> highscores)
+        {
+            this.highscores = highscores;
+        }
+
         public override void Start()
         {
+            gameController = FindComponent<GameController>();
+
             var backgroundOverlay = Component.CreateWithGameObject<FilledRect>("HighscoreBackground");
             gameObject.AddChild(backgroundOverlay.Item1);
             backgroundOverlay.Item2.color = new Color(10, 10, 20, 200);
@@ -50,15 +58,75 @@ namespace Pong
 
             this.highscoresTitle = highscoresTitle.Item2;
 
+            var resetButton = Component.CreateWithGameObject<TextRenderer>("ResetButton");
+            gameObject.AddChild(resetButton.Item1);
+            resetButton.Item2.color = new Color(255, 255, 255, 205);
+            resetButton.Item2.SetFontSize(50);
+            resetButton.Item2.SetText("Reset");
+            resetButton.Item2.anchorPoint = AnchorPoint.Center;
+            resetButton.Item2.SetPreferredSize(new Rect(200, 100));
+            resetButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            resetButton.Item1.SetLocalPosition(new Vec2D(250, 150));
+            resetButton.Item2.SetBorderSize(2);
+            resetButton.Item2.SetBorderColor(new Color(255, 255, 255, 255));
+            var helper = resetButton.Item1.AddComponent<TextRenderHelper>();
+            helper.OnClick += (object? _, TextRenderer _) =>
+            {
+                Destroy(gameObject);
+                gameController?.ResetGame();
+            };
+            helper.OnHover += (object? _, TextRenderer _) =>
+            {
+                resetButton.Item2.SetBackgroundColor(new Color(123, 0, 0, 150));
+            };
+
+            helper.OnLeave += (object? _, TextRenderer _) =>
+            {
+                resetButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            };
+
+            var menuButton = Component.CreateWithGameObject<TextRenderer>("MenuButton");
+            gameObject.AddChild(menuButton.Item1);
+            menuButton.Item2.color = new Color(255, 255, 255, 205);
+            menuButton.Item2.SetFontSize(50);
+            menuButton.Item2.SetText("Menu");
+            menuButton.Item2.anchorPoint = AnchorPoint.Center;
+            menuButton.Item2.SetPreferredSize(new Rect(200, 100));
+            menuButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            menuButton.Item1.SetLocalPosition(new Vec2D(1920 - 250, 150));
+            menuButton.Item2.SetBorderSize(2);
+            menuButton.Item2.SetBorderColor(new Color(255, 255, 255, 255));
+            var menuHelper = menuButton.Item1.AddComponent<TextRenderHelper>();
+            menuHelper.OnClick += (object? _, TextRenderer _) =>
+            {
+                Destroy(gameObject);
+                if (gameController != null)
+                {
+                    Destroy(gameController.GetGameObject());
+                }
+                //gameController?.GoToMenu();
+            };
+
+            menuHelper.OnHover += (object? _, TextRenderer _) =>
+            {
+                menuButton.Item2.SetBackgroundColor(new Color(123, 0, 0, 150));
+            };
+
+            menuHelper.OnLeave += (object? _, TextRenderer _) =>
+            {
+                menuButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            };
+
+
             //gameObject.SetPosition(new Vec2D(1920 / 2, 100));
 
-            SetHighscores(GetHighscores());
+            //SetHighscores(GetHighscores());
         }
 
         private List<Tuple<string, string>> GetHighscores()
         {
-            // return this.highscores.AsString(10);
-
+            return this.highscores.AsString(10);
+            /*
             string env_name = Environment.UserName;
             
             return new List<Tuple<string, string>>()
@@ -74,6 +142,7 @@ namespace Pong
                 new Tuple<string, string>("Player 9", "20"),
                 new Tuple<string, string>("Player 10", "10"),
             };
+            */
             
         }
 

@@ -125,6 +125,7 @@ namespace Pong
 
     public class GameController : Script
     {
+        public int level_id = 0;
         protected int player_1_score = 0;
         protected int player_2_score = 0;
 
@@ -145,7 +146,9 @@ namespace Pong
         private double roundTimer = -3;
         private bool roundStarted = false;
 
-        private GameMode gameMode = GameMode.DUEL;
+        private GameMode gameMode = GameMode.HIGHSCORE;
+
+        private bool stopped = false;
 
         public int scoreToWin = 11;
         public override void Start()
@@ -212,8 +215,6 @@ namespace Pong
             timeText.GetGameObject().SetPosition(new Vec2D(gameBounds.x - 200, 25));
             timeText.SetText("Time: 0");
 
-            var highscoreRoot = new GameObject("HighscoreRoot");
-            var highscoreScript = highscoreRoot.AddComponent<HighscoreScript>();
 
 
             ResetGame();
@@ -302,6 +303,8 @@ namespace Pong
             {
                 player2.transform.position = new Vec2D(gameBounds.x - 50 - 40, gameBounds.y / 2);
             }
+
+            stopped = false;
         }
 
         private void HandleDuel()
@@ -324,9 +327,15 @@ namespace Pong
             // end game if player 2 scores a point
             if (player_2_score > 0)
             {
+                this.stopped = true;
                 Console.WriteLine("Game Over");
                 Console.WriteLine($"Player 1 scored {player_1_score} points");
-                ResetGame();
+
+                var highscoreRoot = new GameObject("HighscoreRoot");
+                var highscoreScript = highscoreRoot.AddComponent<HighscoreScript>();
+                highscoreScript.AddHighscoreState(player_1_score);
+                var hs = new Highscores<int>(100, $"pong_level_{this.level_id}.txt");
+                highscoreScript.SetHighscores(hs);
             }
         }
 
@@ -360,6 +369,8 @@ namespace Pong
             // check for out of bounds
             // keep track of score
             // reset ball if needed
+
+            if (stopped) return;
 
             if (ball == null) return;
 

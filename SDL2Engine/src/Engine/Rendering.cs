@@ -386,6 +386,13 @@ namespace SDL2Engine
             updateTexture = true;
         }
 
+        public void SetColor(Color color)
+        {
+            if (color == this.color) return;
+            this.color = color;
+            updateTexture = true;
+        }
+
         public void SetBorderColor(Color color)
         {
             if (color == borderColor) return;

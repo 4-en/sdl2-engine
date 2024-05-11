@@ -33,13 +33,26 @@ namespace Pong.src
                 scene.AddGameObject(level3);
                 scene.AddGameObject(level4);
                 scene.AddGameObject(level5);
+
+                // to player select button in top left
+                var toSelectTuple = UI.Button("Back", () =>
+                {
+                    LevelManager.LoadPlayerSelection();
+                    return true;
+                });
+
+                scene.AddGameObject(toSelectTuple.Item1);
+                toSelectTuple.Item1.transform.position = new Vec2D(170, 100);
+                toSelectTuple.Item2.anchorPoint = AnchorPoint.Center;
+                toSelectTuple.Item2.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+                toSelectTuple.Item2.SetFontSize(50);
             }
 
             return scene;
         }
 
 
-        private static GameObject HomeScreenText(string text, double x, double y, int fontSize)
+        internal static GameObject HomeScreenText(string text, double x, double y, int fontSize)
         {
 
             var textObject = new GameObject(text);
@@ -50,6 +63,17 @@ namespace Pong.src
             textComponent.SetText(text);
             textComponent.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
             textObject.AddComponent<MenuMouseTracker>();
+            var helper = textObject.AddComponent<TextRenderHelper>();
+            helper.OnHover += (object? source, TextRenderer renderer) =>
+            {
+                renderer.SetColor(Color.Gold);
+            };
+
+            helper.OnLeave += (object? source, TextRenderer renderer) =>
+            {
+                renderer.SetColor(new Color(148, 0, 211, 255));
+            };
+
             return textObject;
 
         }

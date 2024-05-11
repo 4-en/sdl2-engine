@@ -8,15 +8,28 @@ using static SDL2.SDL;
 
 namespace Pong
 {
-
+    public enum PlayerType
+    {
+        WS,
+        ArrowKeys,
+        Mouse,
+        Controller,
+        AI
+    }
     public static partial class LevelManager
     {
+
+        public static PlayerType player1Type = PlayerType.WS;
+        public static PlayerType player2Type = PlayerType.AI;
+        public static GameMode gameMode = GameMode.DUEL;
+
         public static void Start()
         {
-            
-            LoadHomeScreen();
 
-            var engine = new Engine();
+            
+            LoadPlayerSelection();
+
+            var engine = new Engine(null, "PongPongPong");
             engine.Run();
         }
 
@@ -81,6 +94,12 @@ namespace Pong
                 nextLevelIndex = levelIndex + 1;
             }
             LoadLevel(nextLevelIndex);
+        }
+
+        public static void LoadPlayerSelection()
+        {
+            var playerSelection = UI.PlayerSelectScene();
+            SceneManager.SetScene(playerSelection);
         }
 
         public static void LoadHomeScreen()

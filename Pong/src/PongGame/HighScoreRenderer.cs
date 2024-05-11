@@ -41,9 +41,11 @@ namespace Pong
             highscoresTitle.Item2.SetFontSize(100);
             highscoresTitle.Item2.SetText("- Highscores -");
             highscoresTitle.Item2.anchorPoint = AnchorPoint.TopCenter;
-            highscoresTitle.Item2.SetPreferredSize(new Rect(1920/2, 800));
+            highscoresTitle.Item2.SetPreferredSize(new Rect(700, 900));
             highscoresTitle.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
-            highscoresTitle.Item1.SetLocalPosition(new Vec2D(1920 / 2, 100));
+            highscoresTitle.Item1.SetLocalPosition(new Vec2D(1920 / 2, 50));
+            highscoresTitle.Item2.SetBorderSize(5);
+            highscoresTitle.Item2.SetBorderColor(new Color(255, 255, 255, 255));
 
 
             this.highscoresTitle = highscoresTitle.Item2;
@@ -55,11 +57,13 @@ namespace Pong
 
         private List<Tuple<string, string>> GetHighscores()
         {
-            return this.highscores.AsString();
-            /*
+            // return this.highscores.AsString(10);
+
+            string env_name = Environment.UserName;
+            
             return new List<Tuple<string, string>>()
             {
-                new Tuple<string, string>("Player 1", "100"),
+                new Tuple<string, string>(env_name, "100"),
                 new Tuple<string, string>("Player 2", "90"),
                 new Tuple<string, string>("Player 3", "80"),
                 new Tuple<string, string>("Player 4", "70"),
@@ -70,7 +74,7 @@ namespace Pong
                 new Tuple<string, string>("Player 9", "20"),
                 new Tuple<string, string>("Player 10", "10"),
             };
-            */
+            
         }
 
         public void SetState(HighscoreState state)
@@ -95,7 +99,12 @@ namespace Pong
 
             // get windows/linux/mac username
             string name = Environment.UserName;
-            this.highscores.AddHighscore(name, score);
+            Task.Run(() =>
+            {
+                highscores.AddHighscore(name, score, true);
+                highscores.Update();
+                SetHighscores(GetHighscores());
+            });
 
         }
 
@@ -127,13 +136,13 @@ namespace Pong
             if (nameText == null)
             {
                 var name_renderer = Component.CreateWithGameObject<TextRenderer>("HighscoreNames");
-                gameObject.AddChild(name_renderer.Item1);
+                highscoresTitle?.GetGameObject().AddChild(name_renderer.Item1);
                 nameText = name_renderer.Item2;
                 nameText.color = new Color(255, 255, 255, 205);
                 nameText.SetFontSize(50);
                 nameText.anchorPoint = AnchorPoint.TopLeft;
 
-                name_renderer.Item1.SetLocalPosition(new Vec2D(-200, 200));
+                name_renderer.Item1.SetLocalPosition(new Vec2D(-200, 150));
 
             }
             nameText.SetText(nameString);
@@ -142,13 +151,13 @@ namespace Pong
             if (scoreText == null)
             {
                 var score_renderer = Component.CreateWithGameObject<TextRenderer>("HighscoreScores");
-                gameObject.AddChild(score_renderer.Item1);
+                highscoresTitle?.GetGameObject().AddChild(score_renderer.Item1);
                 scoreText = score_renderer.Item2;
                 scoreText.color = new Color(255, 255, 255, 205);
                 scoreText.SetFontSize(50);
                 scoreText.anchorPoint = AnchorPoint.TopRight;
 
-                score_renderer.Item1.SetLocalPosition(new Vec2D(200, 200));
+                score_renderer.Item1.SetLocalPosition(new Vec2D(200, 150));
             }
             scoreText.SetText(scoreString);
 

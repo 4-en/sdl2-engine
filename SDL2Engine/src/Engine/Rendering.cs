@@ -467,8 +467,8 @@ namespace SDL2Engine
                 textureRects[i] = out_rect;
             }
 
-            this.rect.h = Math.Max(this.textTextureSize.h, this.rect.h);
-            this.rect.w = Math.Max(this.textTextureSize.w, this.rect.w);
+            this.rect.h = Math.Max(this.textTextureSize.h, this.preferredSize.h);
+            this.rect.w = Math.Max(this.textTextureSize.w, this.preferredSize.w);
 
             this.updateTexture = false;
         }

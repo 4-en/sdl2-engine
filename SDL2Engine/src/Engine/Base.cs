@@ -660,6 +660,9 @@ namespace SDL2Engine
                 return;
             }
 
+            // alpha blending
+            SDL.SDL_SetRenderDrawBlendMode(renderer, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND);
+
             // Initialize renderer color
             SDL.SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 

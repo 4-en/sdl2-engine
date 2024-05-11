@@ -344,6 +344,42 @@ namespace SDL2Engine
         private Font? font;
         private IntPtr[]? textures = null;
         private Rect[]? textureRects = null;
+        private Rect preferredSize = new Rect(0, 0, 0, 0);
+        private Rect textTextureSize;
+        private double borderSize = 0;
+        private Color backgroundColor = new Color(0,0,0,0);
+        private Color borderColor = new Color(0, 0, 0, 0);
+
+        public void SetBorderSize(double borderSize)
+        {
+            this.borderSize = borderSize;
+            updateTexture = true;
+        }
+
+        public void SetBackgroundColor(Color color)
+        {
+            this.backgroundColor = color;
+            updateTexture = true;
+        }
+
+        public void SetBorderColor(Color color)
+        {
+            this.borderColor = color;
+            updateTexture = true;
+        }
+
+        public void SetPreferredSize(Rect size)
+        {
+            this.preferredSize = size;
+            updateTexture = true;
+        }
+
+        public void SetTextSize(Rect size)
+        {
+            this.textTextureSize = size;
+            updateTexture = true;
+        }
+
 
         public void SetText(string text)
         {
@@ -411,13 +447,17 @@ namespace SDL2Engine
             string[] texts = text.Split('\n');
             textures = new IntPtr[texts.Length];
             textureRects = new Rect[texts.Length];
+            this.textTextureSize = new Rect(0, 0, 0, 0);
             for (int i = 0; i < texts.Length; i++)
             {
                 textures[i] = font.RenderTexture(texts[i], color.ToSDLColor(), out out_rect);
-                this.rect.w = Math.Max(this.rect.w, out_rect.w);
-                this.rect.h += out_rect.h + 10;
+                this.textTextureSize.w = Math.Max(this.rect.w, out_rect.w);
+                this.textTextureSize.h += out_rect.h + 10;
                 textureRects[i] = out_rect;
             }
+
+            this.rect.h = Math.Max(this.textTextureSize.h, this.rect.h);
+            this.rect.w = Math.Max(this.textTextureSize.w, this.rect.w);
 
             this.updateTexture = false;
         }
@@ -437,6 +477,12 @@ namespace SDL2Engine
 
 
             var renderer = Engine.renderer;
+            var bg_rect = GetDestRect();
+            if (backgroundColor.a > 0)
+            {
+                SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+                SDL_RenderFillRect(renderer, ref bg_rect);
+            }
             
 
             // draw the texture
@@ -448,6 +494,24 @@ namespace SDL2Engine
                 var dst_rect = GetDestRect(out_rect);
                 
                 SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dst_rect);
+            }
+
+            if (borderSize > 0 && borderColor.a > 0)
+            {
+                SDL_SetRenderDrawColor(renderer, borderColor.r, borderColor.g, borderColor.b, borderColor.a);
+                
+                // draw lines around bg_rect as fill rect
+                var lineTop = new SDL_Rect() { x = bg_rect.x, y = bg_rect.y, w = bg_rect.w, h = (int)borderSize };
+                var lineBottom = new SDL_Rect() { x = bg_rect.x, y = bg_rect.y + bg_rect.h - (int)borderSize, w = bg_rect.w, h = (int)borderSize };
+                // dont overlap top or bottom lines
+                var lineLeft = new SDL_Rect() { x = bg_rect.x, y = bg_rect.y + (int)borderSize, w = (int)borderSize, h = bg_rect.h - 2 * (int)borderSize };
+                var lineRight = new SDL_Rect() { x = bg_rect.x + bg_rect.w - (int)borderSize, y = bg_rect.y + (int)borderSize, w = (int)borderSize, h = bg_rect.h - 2 * (int)borderSize };
+
+                SDL_RenderFillRect(renderer, ref lineTop);
+                SDL_RenderFillRect(renderer, ref lineBottom);
+                SDL_RenderFillRect(renderer, ref lineLeft);
+                SDL_RenderFillRect(renderer, ref lineRight);
+
             }
             
         }

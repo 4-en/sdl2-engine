@@ -363,7 +363,7 @@ namespace Pong
             if (body != null)
             {
                 int total_score = player_1_score + player_2_score;
-                double speed = 500 + total_score * 50; // increase speed as game progresses
+                double speed = 800 + total_score * 50; // increase speed as game progresses
                 var rand = new System.Random();
 
                 // angle should be between -45 and 45 degrees

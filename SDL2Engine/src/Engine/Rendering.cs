@@ -312,6 +312,17 @@ namespace SDL2Engine
             return custom_rect ?? GetRect() + gameObject.GetPosition();
         }
 
+        public Rect GetScreenRect(Rect? custom_rect = null)
+        {
+            var scene = gameObject.GetScene();
+            Camera? camera = scene?.GetCamera();
+            if (camera != null)
+            {
+                return camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
+            }
+            return GetRect(custom_rect);
+        }
+
         public override void Draw(Camera camera)
         {
             var renderer = Engine.renderer;
@@ -547,6 +558,56 @@ namespace SDL2Engine
         {
             return font != null;
         }
+    }
+
+    // Helper class to render text and handle events
+    public class TextRenderHelper : Script
+    {
+
+        TextRenderer? textRenderer;
+        bool wasHovered = false;
+        public override void Start()
+        {
+            textRenderer = GetComponent<TextRenderer>();
+        }
+
+        public EventHandler<TextRenderer>? OnClick;
+        public EventHandler<TextRenderer>? OnHover;
+        public EventHandler<TextRenderer>? OnLeave;
+
+        public override void Update()
+        {
+            if (textRenderer == null)
+            {
+                return;
+            }
+
+            
+            Rect rect = textRenderer.GetScreenRect();
+            bool hovered = SDL2Engine.Utils.MouseHelper.IsRectHovered(rect);
+            bool clicked = SDL2Engine.Utils.MouseHelper.IsRectClicked(rect);
+            bool left = !hovered && wasHovered;
+            wasHovered = hovered;
+
+            if (hovered)
+            {
+                OnHover?.Invoke(this, textRenderer);
+            }
+
+            if (clicked)
+            {
+                OnClick?.Invoke(this, textRenderer);
+            }
+
+            if (left)
+            {
+                OnLeave?.Invoke(this, textRenderer);
+            }
+
+            
+        }
+
+
     }
 
     public class FilledRect : DrawableRect

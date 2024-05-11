@@ -29,6 +29,12 @@ namespace Pong
 
         public override void Start()
         {
+            var backgroundOverlay = Component.CreateWithGameObject<FilledRect>("HighscoreBackground");
+            gameObject.AddChild(backgroundOverlay.Item1);
+            backgroundOverlay.Item2.color = new Color(10, 10, 20, 200);
+            backgroundOverlay.Item2.SetRect(new Rect(1920, 1080));
+            backgroundOverlay.Item2.anchorPoint = AnchorPoint.TopLeft;
+
             var highscoresTitle = Component.CreateWithGameObject<TextRenderer>("HighscoresTitle");
             gameObject.AddChild(highscoresTitle.Item1);
             highscoresTitle.Item2.color = new Color(255, 255, 255, 205);
@@ -37,11 +43,12 @@ namespace Pong
             highscoresTitle.Item2.anchorPoint = AnchorPoint.TopCenter;
             highscoresTitle.Item2.SetPreferredSize(new Rect(1920/2, 800));
             highscoresTitle.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            highscoresTitle.Item1.SetLocalPosition(new Vec2D(1920 / 2, 100));
 
 
             this.highscoresTitle = highscoresTitle.Item2;
 
-            gameObject.SetPosition(new Vec2D(1920 / 2, 100));
+            //gameObject.SetPosition(new Vec2D(1920 / 2, 100));
 
             SetHighscores(GetHighscores());
         }

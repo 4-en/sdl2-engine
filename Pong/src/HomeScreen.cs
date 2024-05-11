@@ -3,12 +3,10 @@ using SDL2Engine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using static SDL2.SDL;
 using static System.Formats.Asn1.AsnWriter;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Pong.src
 {
@@ -63,15 +61,8 @@ namespace Pong.src
     class MenuMouseTracker : Script
     {
         public event Action<string> OnClick;
-        private int originalFontSize = 100;
+        private const int OriginalFontSize = 100;
         private bool isMouseOver;
-        private TextRenderer textRenderer;
-
-        public override void Start()
-        {
-            textRenderer = gameObject.GetComponent<TextRenderer>();
-            // originalFontSize = textRenderer.GetFontSize();
-        }
         public override void Update()
         {
             Vec2D mousePosition = Input.GetMousePosition();
@@ -83,55 +74,13 @@ namespace Pong.src
                 mousePosition = camera.ScreenToWorld(mousePosition);
             }
 
+            TextRenderer textRenderer = gameObject.GetComponent<TextRenderer>();
+
+            // Get the position and dimensions of the text object
             Vec2D position = gameObject.transform.position;
             Rect rect = new Rect(position.x - 200, position.y - 50, 400, 100);
-
-            if (rect.Contains(mousePosition))
-            {
-
-                // Mouse is over the text
-                if (!isMouseOver)
-                {
-                    // Change text size when mouse enters
-                    isMouseOver = true;
-
-                    string text = textRenderer.GetText();
-                    if (text != "Pong")
-                    {
-                        textRenderer.SetFontSize(originalFontSize + 10); // Adjust the size increase as needed
-                    }
-                }
-            }
-            else
-            {
-                // Mouse is not over the text
-                if (isMouseOver)
-                {
-                    string text = textRenderer.GetText();
-
-                    // Restore original size when mouse leaves
-                    isMouseOver = false;
-                    if (text != "Pong")
-                    {
-                        textRenderer.SetFontSize(originalFontSize); // Adjust the size increase as needed
-
-                    }
-                }
-            }
-
-
-
             if (Input.GetMouseButtonDown(0))
             {
-
-
-                if (camera != null)
-                {
-                    mousePosition = camera.ScreenToWorld(mousePosition);
-                }
-
-                TextRenderer textRenderer = gameObject.GetComponent<TextRenderer>();
-
 
 
                 if (rect.Contains(mousePosition))
@@ -152,9 +101,40 @@ namespace Pong.src
                     {
                         SceneManager.SetScene(LevelManager.CreateLevel4());
                     }
-
                 }
 
+            }
+            if (rect.Contains(mousePosition))
+            {
+
+                // Mouse is over the text
+                if (!isMouseOver)
+                {
+                    // Change text size when mouse enters
+                    isMouseOver = true;
+
+                    string text = textRenderer.GetText();
+                    if (text != "Pong")
+                    {
+                        textRenderer.SetFontSize(OriginalFontSize + 10); // Adjust the size increase as needed
+                    }
+                }
+            }
+            else
+            {
+                // Mouse is not over the text
+                if (isMouseOver)
+                {
+                    string text = textRenderer.GetText();
+
+                    // Restore original size when mouse leaves
+                    isMouseOver = false;
+                    if (text != "Pong")
+                    {
+                        textRenderer.SetFontSize(OriginalFontSize); // Adjust the size increase as needed
+
+                    }
+                }
             }
         }
     }

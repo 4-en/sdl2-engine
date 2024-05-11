@@ -109,14 +109,16 @@ namespace Pong
                 if (obj.GetName() == "Ball")
                 {
                     var ball = obj.GetComponent<PhysicsBody>();
-                    if (ball != null)
+
+                    var ballCollider = gameObject.GetComponent<BoxCollider>();
+                    if (ball != null && ballCollider != null)
                     {
                         
-                        double paddleHeight = gameObject.GetComponent<BoxCollider>().box.h;
+                        double paddleHeight = ballCollider.box.h;
                         double paddleY = gameObject.transform.position.y;
                         double paddleMid = paddleY + paddleHeight / 2;
                         Vec2D ballCenter = obj.GetPosition();
-                        ballCenter.y += obj.GetComponent<BoxCollider>().box.h / 2;
+                        ballCenter.y += ballCollider.box.h / 2;
 
                         //calculate relative position of the ball on the paddle (-1,1)
                         var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);

@@ -201,7 +201,7 @@ namespace Pong
 
         private bool stopped = false;
 
-        public int scoreToWin = 1;
+        public int scoreToWin = 11;
         public override void Start()
         {
             // create basic game object here

@@ -120,7 +120,8 @@ namespace Pong
     public enum GameMode
     {
         DUEL = 0,
-        HIGHSCORE = 1
+        HIGHSCORE = 1,
+        TIMED = 2
     }
 
     public class GameController : Script
@@ -145,6 +146,7 @@ namespace Pong
 
         private double roundTimer = -3;
         private bool roundStarted = false;
+        public double timeLimit = 60;
 
         private GameMode gameMode = GameMode.DUEL;
 

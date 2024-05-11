@@ -94,6 +94,10 @@ namespace Pong.src
                     {
                         SceneManager.SetScene(LevelManager.CreateLevel3());
                     }
+                    if (gameObject.GetName().Equals("Level 4"))
+                    {
+                        SceneManager.SetScene(LevelManager.CreateLevel4());
+                    }
                 }
 
             }

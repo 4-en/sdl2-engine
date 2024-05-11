@@ -8,9 +8,21 @@ using static SDL2.SDL;
 
 namespace Pong
 {
-
+    public enum PlayerType
+    {
+        WS,
+        ArrowKeys,
+        Mouse,
+        Controller,
+        AI
+    }
     public static partial class LevelManager
     {
+
+        public static PlayerType player1Type = PlayerType.WS;
+        public static PlayerType player2Type = PlayerType.ArrowKeys;
+        public static GameMode gameMode = GameMode.DUEL;
+
         public static void Start()
         {
             

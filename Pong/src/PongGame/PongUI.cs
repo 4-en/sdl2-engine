@@ -12,6 +12,49 @@ namespace Pong
 {
     public static class UI
     {
+
+        public static Scene PlayerSelectScene()
+        {
+            var scene = new Scene("PlayerSelectScene");
+
+            using(var _ = scene.Activate())
+            {
+
+                var background = new GameObject("Background");
+                background.AddComponent<FilledRect>().color = new Color(0, 0, 0, 255);
+                background.AddComponent<DrawableRect>().SetRect(new Rect(0, 0, 1920, 1080));
+                scene.AddGameObject(background);
+
+                var title = new GameObject("Title");
+                title.AddComponent<TextRenderer>().SetText("Player Select");
+                title.GetComponent<TextRenderer>().SetFontSize(64);
+                title.GetComponent<TextRenderer>().SetPreferredSize(new Rect(0, 0, 500, 200));
+                title.GetComponent<TextRenderer>().anchorPoint = AnchorPoint.Center;
+                title.SetPosition(new Vec2D(1920 / 2, 200));
+                scene.AddGameObject(title);
+
+                var player1Button = Button("Player 1", () => { LevelManager.LoadLevel(1); return true; }, new Rect(0, 0, 350, 150), Color.White, 44);
+                player1Button.Item1.SetPosition(new Vec2D(1920 / 2, 400));
+                scene.AddGameObject(player1Button.Item1);
+
+                var player2Button = Button("Player 2", () => { LevelManager.LoadLevel(2); return true; }, new Rect(0, 0, 350, 150), Color.White, 44);
+                player2Button.Item1.SetPosition(new Vec2D(1920 / 2, 600));
+                scene.AddGameObject(player2Button.Item1);
+
+                var player3Button = Button("Player 3", () => { LevelManager.LoadLevel(3); return true; }, new Rect(0, 0, 350, 150), Color.White, 44);
+                player3Button.Item1.SetPosition(new Vec2D(1920 / 2, 800));
+                scene.AddGameObject(player3Button.Item1);
+
+                var player4Button = Button("Player 4", () => { LevelManager.LoadLevel(4); return true; }, new Rect(0, 0, 350, 150), Color.White, 44);
+                player4Button.Item1.SetPosition(new Vec2D(1920 / 2, 1000));
+                scene.AddGameObject(player4Button.Item1);
+
+            }
+
+
+            return scene;
+        }
+
         class EscapeListener : Script
         {
 

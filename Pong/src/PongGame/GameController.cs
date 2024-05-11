@@ -156,9 +156,14 @@ namespace Pong
                 Vec2D ballCenter = ballCollider.GetGameObject().transform.position;
                 ballCenter.y += ballHeight / 2;
 
+               
                 //calculate relative position of the ball on the paddle (-1,1)
                 var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);
-                ball_body.Velocity = new Vec2D(-ball_body.Velocity.x, relativePosition * 350);
+                double ball_vel = ball_body.Velocity.Length();
+                double deltaVelocity = relativePosition * ball_vel * 0.5;
+                Vec2D newVelocity = ball_body.Velocity + new Vec2D(0, deltaVelocity);
+                newVelocity = newVelocity.Normalize() * ball_body.Velocity.Length();
+                ball_body.Velocity = newVelocity;
 
             }
 
@@ -205,6 +210,7 @@ namespace Pong
         protected double powerupTimer = -3;
         private bool roundStarted = false;
         public double timeLimit = 60;
+        public double gameTimer = 0;
 
         private Sound scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Fire.mp3");
         private Sound scoreSoundWater = AssetManager.LoadAsset<Sound>("Assets/Audio/Wave.mp3");
@@ -212,7 +218,7 @@ namespace Pong
         private double lastColorChangeTime = 0;
         private bool restedColor = false;
 
-        private GameMode gameMode = GameMode.DUEL;
+        private GameMode gameMode = LevelManager.gameMode;
 
         private bool stopped = false;
 
@@ -385,6 +391,7 @@ namespace Pong
             UpdateScoreText();
             ResetBall();
             roundTimer = -4;
+            gameTimer = 0;
             powerupTimer = -4;
 
             // set paddles to starting position
@@ -436,6 +443,24 @@ namespace Pong
                 highscoreScript.AddHighscoreState(player_1_score);
                 var hs = new Highscores<int>(100, $"pong_level_{this.level_id}.txt");
                 highscoreScript.SetHighscores(hs);
+            }
+        }
+
+        private void HandleTimed()
+        {
+            // track player 1 and player 2 scores
+            // end game if timeLimit is reached
+            if (gameTimer > timeLimit && player_1_score != player_2_score)
+            {
+                this.stopped = true;
+                Console.WriteLine("Game Over");
+                string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
+                Console.WriteLine($"{winner_name} wins!");
+
+                var resultRoot = new GameObject("ResultRoot");
+                var resultScript = resultRoot.AddComponent<GameResultScript>();
+                resultScript.score[0] = player_1_score;
+                resultScript.score[1] = player_2_score;
             }
         }
 
@@ -501,6 +526,7 @@ namespace Pong
 
             if (ball == null) return;
 
+            gameTimer += Time.deltaTime;
             roundTimer += Time.deltaTime;
             powerupTimer += Time.deltaTime;
 
@@ -580,6 +606,9 @@ namespace Pong
                     break;
                 case GameMode.HIGHSCORE:
                     HandleHighscore();
+                    break;
+                case GameMode.TIMED:
+                    HandleTimed();
                     break;
 
             }

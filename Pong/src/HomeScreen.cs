@@ -67,11 +67,17 @@ namespace Pong.src
             helper.OnHover += (object? source, TextRenderer renderer) =>
             {
                 renderer.SetColor(Color.Gold);
+                renderer.SetFontSize(renderer.GetText() != "Pong" ? 110 : 200);
+
+
             };
 
             helper.OnLeave += (object? source, TextRenderer renderer) =>
             {
                 renderer.SetColor(new Color(148, 0, 211, 255));
+                renderer.SetFontSize(renderer.GetText() != "Pong" ? 100 : 200);
+
+
             };
 
             return textObject;
@@ -85,27 +91,25 @@ namespace Pong.src
     class MenuMouseTracker : Script
     {
         public event Action<string> OnClick;
-        private const int OriginalFontSize = 100;
-        private bool isMouseOver;
+
         public override void Update()
         {
-            Vec2D mousePosition = Input.GetMousePosition();
-            GameObject gameObject = this.gameObject;
-            Camera camera = Camera.GetCamera(gameObject);
-
-            if (camera != null)
-            {
-                mousePosition = camera.ScreenToWorld(mousePosition);
-            }
-
-            TextRenderer textRenderer = gameObject.GetComponent<TextRenderer>();
-
-            // Get the position and dimensions of the text object
-            Vec2D position = gameObject.transform.position;
-            Rect rect = new Rect(position.x - 200, position.y - 50, 400, 100);
             if (Input.GetMouseButtonDown(0))
             {
+                Vec2D mousePosition = Input.GetMousePosition();
+                GameObject gameObject = this.gameObject;
+                Camera camera = Camera.GetCamera(gameObject);
 
+                if (camera != null)
+                {
+                    mousePosition = camera.ScreenToWorld(mousePosition);
+                }
+
+                TextRenderer textRenderer = gameObject.GetComponent<TextRenderer>();
+
+                // Get the position and dimensions of the text object
+                Vec2D position = gameObject.transform.position;
+                Rect rect = new Rect(position.x - 200, position.y - 50, 400, 100);
 
                 if (rect.Contains(mousePosition))
                 {
@@ -127,38 +131,6 @@ namespace Pong.src
                     }
                 }
 
-            }
-            if (rect.Contains(mousePosition))
-            {
-
-                // Mouse is over the text
-                if (!isMouseOver)
-                {
-                    // Change text size when mouse enters
-                    isMouseOver = true;
-
-                    string text = textRenderer.GetText();
-                    if (text != "Pong")
-                    {
-                        textRenderer.SetFontSize(OriginalFontSize + 10); // Adjust the size increase as needed
-                    }
-                }
-            }
-            else
-            {
-                // Mouse is not over the text
-                if (isMouseOver)
-                {
-                    string text = textRenderer.GetText();
-
-                    // Restore original size when mouse leaves
-                    isMouseOver = false;
-                    if (text != "Pong")
-                    {
-                        textRenderer.SetFontSize(OriginalFontSize); // Adjust the size increase as needed
-
-                    }
-                }
             }
         }
     }

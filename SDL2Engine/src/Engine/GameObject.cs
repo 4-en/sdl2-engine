@@ -39,7 +39,6 @@ namespace SDL2Engine
 
         public GameObject(GameObject parent, string name = "GameObject")
         {
-            this.Parent = parent;
 
             if (parent != null)
             {
@@ -82,7 +81,7 @@ namespace SDL2Engine
         public GameObject CreateChild(string name = "GameObject")
         {
             GameObject newGameObject = new GameObject(this, name);
-            this.AddChild(newGameObject);
+            //this.AddChild(newGameObject);
             return newGameObject;
         }
 

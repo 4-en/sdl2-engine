@@ -38,7 +38,7 @@ namespace Pong.src
         }
 
 
-        private static GameObject HomeScreenText(string text, double x, double y, int fontSize)
+        internal static GameObject HomeScreenText(string text, double x, double y, int fontSize)
         {
             
             var textObject = new GameObject(text);

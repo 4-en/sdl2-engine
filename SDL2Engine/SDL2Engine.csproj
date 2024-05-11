@@ -23,6 +23,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Remove="Assets\Audio\Fire.mp3" />
+    <None Remove="Assets\Audio\Homemusik.mp3" />
     <None Remove="Assets\Audio\Water.mp3" />
     <None Remove="Assets\Audio\Water2.mp3" />
     <None Remove="Assets\Audio\Water3.mp3" />

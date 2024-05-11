@@ -223,6 +223,28 @@ namespace Pong
         private bool stopped = false;
 
         public int scoreToWin = 11;
+
+        private Component AddController(PlayerType ptype, GameObject obj)
+        {
+            switch (ptype)
+            {
+                case PlayerType.WS:
+                    var ws_controller = obj.AddComponent<KeyboardController>();
+                    ws_controller.keyUp = (int)SDL_Keycode.SDLK_w;
+                    ws_controller.keyDown = (int)SDL_Keycode.SDLK_s;
+                    return ws_controller;
+                case PlayerType.ArrowKeys:
+                    var arrow_controller = obj.AddComponent<KeyboardController>();
+                    arrow_controller.keyUp = (int)SDL_Keycode.SDLK_UP;
+                    arrow_controller.keyDown = (int)SDL_Keycode.SDLK_DOWN;
+                    return arrow_controller;
+                case PlayerType.AI:
+                    return obj.AddComponent<AIController>();
+                default:
+                    return obj.AddComponent<KeyboardController>();
+
+            }
+        }
         public override void Start()
         {
             // create basic game object here
@@ -230,6 +252,8 @@ namespace Pong
             // (anything that needs to have a reference to it)
 
             gameBounds = GetCamera()?.GetWorldSize() ?? new Vec2D(1920, 1080);
+
+            Console.WriteLine($"Mode: {gameMode}");
 
             // create the ball
             ball = new GameObject("Ball");
@@ -250,7 +274,7 @@ namespace Pong
             BoxCollider.FromDrawableRect(player1);
             player1.AddComponent<BallPaddleCollisionScript>();
             player1.AddComponent<PaddleController>().gameController = this;
-            player1.AddComponent<KeyboardController>();
+            AddController(LevelManager.player1Type, player1);
 
             player2 = new GameObject("Player2");
             var player2_drawable = player2.AddComponent<FilledRect>();
@@ -260,7 +284,7 @@ namespace Pong
             BoxCollider.FromDrawableRect(player2);
             player2.AddComponent<PaddleController>().gameController = this;
             player2.AddComponent<BallPaddleCollisionScript>();
-            player2.AddComponent<AIController>();
+            AddController(LevelManager.player2Type, player2);
 
             /*
             var keyboard_controller = player2.AddComponent<KeyboardController>();
@@ -588,7 +612,7 @@ namespace Pong
                 if (restedColor == false)
                 {
                     // Setzen Sie die Textfarbe auf die Standardfarbe
-                    Console.WriteLine("Standardfarbe");
+                    //Console.WriteLine("Standardfarbe");
                     scoreText2.SetFontSize(100);
                     scoreText2.color = new Color(255, 255, 255, 205);
 

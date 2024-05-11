@@ -32,6 +32,19 @@ namespace Pong.src
                 scene.AddGameObject(level3);
                 scene.AddGameObject(level4);
                 scene.AddGameObject(level5);
+
+                // to player select button in top left
+                var toSelectTuple = UI.Button("Back", () =>
+                {
+                    LevelManager.LoadPlayerSelection();
+                    return true;
+                });
+
+                scene.AddGameObject(toSelectTuple.Item1);
+                toSelectTuple.Item1.transform.position = new Vec2D(170, 100);
+                toSelectTuple.Item2.anchorPoint = AnchorPoint.Center;
+                toSelectTuple.Item2.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+                toSelectTuple.Item2.SetFontSize(50);
             }
 
             return scene;

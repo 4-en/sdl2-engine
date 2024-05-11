@@ -189,6 +189,7 @@ namespace Pong
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
 
         protected double roundTimer = -3;
+        protected double powerupTimer = -3;
         private bool roundStarted = false;
         public double timeLimit = 60;
 
@@ -333,6 +334,7 @@ namespace Pong
                 body.Velocity = new Vec2D(0, 0);
             }
             roundTimer = -2;
+            powerupTimer = -2;
             roundStarted = false;
         }
 
@@ -366,6 +368,7 @@ namespace Pong
             UpdateScoreText();
             ResetBall();
             roundTimer = -4;
+            powerupTimer = -4;
 
             // set paddles to starting position
             if (player1 != null)
@@ -481,6 +484,7 @@ namespace Pong
             if (ball == null) return;
 
             roundTimer += Time.deltaTime;
+            powerupTimer += Time.deltaTime;
 
             // check bounds
             var ball_collider = ball.GetComponent<BoxCollider>();

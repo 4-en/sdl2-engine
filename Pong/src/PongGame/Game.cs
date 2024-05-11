@@ -189,9 +189,9 @@ public class Level2GameController : GameController
         base.Update();
         Vec2D gameBounds = new Vec2D(1920, 1080);
 
-        if (roundTimer > 10)
+        if (powerupTimer > 10)
         {
-            roundTimer = 0;
+            powerupTimer = 0;
             var powerup = new GameObject("Powerup");
             powerup.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/speed_powerup.png");
             var bc = BoxCollider.FromDrawableRect(powerup);

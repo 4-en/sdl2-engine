@@ -288,7 +288,7 @@ public class Level4GameController : GameController
         base.Update();
         Vec2D gameBounds = new Vec2D(1920, 1080);
 
-        if (powerupTimer > 3)
+        if (powerupTimer > 5)
         {
            
             var rand = new Random().Next(0, 2);

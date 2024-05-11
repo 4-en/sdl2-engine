@@ -146,11 +146,11 @@ namespace Pong
         private double roundTimer = -3;
         private bool roundStarted = false;
 
-        private GameMode gameMode = GameMode.HIGHSCORE;
+        private GameMode gameMode = GameMode.DUEL;
 
         private bool stopped = false;
 
-        public int scoreToWin = 11;
+        public int scoreToWin = 1;
         public override void Start()
         {
             // create basic game object here
@@ -314,10 +314,16 @@ namespace Pong
 
             if (player_1_score >= scoreToWin || player_2_score >= scoreToWin)
             {
+                this.stopped = true;
                 Console.WriteLine("Game Over");
                 string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
                 Console.WriteLine($"{winner_name} wins!");
-                ResetGame();
+                
+                var resultRoot = new GameObject("ResultRoot");
+                var resultScript = resultRoot.AddComponent<GameResultScript>();
+                resultScript.score[0] = player_1_score;
+                resultScript.score[1] = player_2_score;
+                
             }
         }
 

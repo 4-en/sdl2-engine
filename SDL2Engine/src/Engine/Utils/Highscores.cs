@@ -116,21 +116,25 @@ namespace SDL2Engine.Utils
             Highscores<N> highscores = new(maxHighscores);
             highscores.path = path;
 
-            string[] strings = Serialization.LoadArray<string>((string s) => s, path);
-
-            for (int i = 0; i < strings.Length; i++)
-            {
-                highscores.AddHighscore(ConvertStringToTuple(strings[i]).Item1, ConvertStringToTuple(strings[i]).Item2);
-            }
-
-            highscores.SortHighscores();
+            highscores.Update();
 
             return highscores;
         }
 
         public virtual void Update()
         {
-            
+
+            var hs_path = path ?? "highscores.txt";
+
+            string[] strings = Serialization.LoadArray<string>((string s) => s, hs_path);
+
+            for (int i = 0; i < strings.Length; i++)
+            {
+                AddHighscore(ConvertStringToTuple(strings[i]).Item1, ConvertStringToTuple(strings[i]).Item2);
+            }
+
+            SortHighscores();
+
         }
 
         public List<Tuple<string, string>> AsString(int max=0)

@@ -62,7 +62,7 @@ namespace Pong
             gameObject.AddChild(resetButton.Item1);
             resetButton.Item2.color = new Color(255, 255, 255, 205);
             resetButton.Item2.SetFontSize(50);
-            resetButton.Item2.SetText("Reset");
+            resetButton.Item2.SetText("Restart");
             resetButton.Item2.anchorPoint = AnchorPoint.Center;
             resetButton.Item2.SetPreferredSize(new Rect(200, 100));
             resetButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
@@ -93,7 +93,7 @@ namespace Pong
             menuButton.Item2.anchorPoint = AnchorPoint.Center;
             menuButton.Item2.SetPreferredSize(new Rect(200, 100));
             menuButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
-            menuButton.Item1.SetLocalPosition(new Vec2D(1920 - 250, 150));
+            menuButton.Item1.SetLocalPosition(new Vec2D(250, 450));
             menuButton.Item2.SetBorderSize(2);
             menuButton.Item2.SetBorderColor(new Color(255, 255, 255, 255));
             var menuHelper = menuButton.Item1.AddComponent<TextRenderHelper>();
@@ -115,6 +115,34 @@ namespace Pong
             menuHelper.OnLeave += (object? _, TextRenderer _) =>
             {
                 menuButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            };
+
+            var levelButton = Component.CreateWithGameObject<TextRenderer>("LevelButton");
+            gameObject.AddChild(levelButton.Item1);
+            levelButton.Item2.color = new Color(255, 255, 255, 205);
+            levelButton.Item2.SetFontSize(50);
+            levelButton.Item2.SetText("Level");
+            levelButton.Item2.anchorPoint = AnchorPoint.Center;
+            levelButton.Item2.SetPreferredSize(new Rect(200, 100));
+            levelButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            levelButton.Item1.SetLocalPosition(new Vec2D(250, 300));
+            levelButton.Item2.SetBorderSize(2);
+            levelButton.Item2.SetBorderColor(new Color(255, 255, 255, 255));
+            var levelHelper = levelButton.Item1.AddComponent<TextRenderHelper>();
+            levelHelper.OnClick += (object? _, TextRenderer _) =>
+            {
+                Destroy(gameObject);
+                // gameController?.GoToLevel();
+            };
+
+            levelHelper.OnHover += (object? _, TextRenderer _) =>
+            {
+                levelButton.Item2.SetBackgroundColor(new Color(123, 0, 0, 150));
+            };
+
+            levelHelper.OnLeave += (object? _, TextRenderer _) =>
+            {
+                levelButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
             };
 
 
@@ -170,8 +198,8 @@ namespace Pong
             string name = Environment.UserName;
             Task.Run(() =>
             {
-                highscores.AddHighscore(name, score, true);
                 highscores.Update();
+                highscores.AddHighscore(name, score, true);
                 SetHighscores(GetHighscores());
             });
 
@@ -233,8 +261,140 @@ namespace Pong
         }
 
     }
-    public class HighScoreRenderer : DrawableRect
+    public class GameResultScript : Script
     {
+        private GameController? gameController = null;
+        private TextRenderer? textRenderer = null;
+        private HighscoreScript? highscoreScript = null;
+        public int[] score = new int[2];
 
+        public override void Start()
+        {
+            gameController = FindComponent<GameController>();
+
+            var backgroundOverlay = Component.CreateWithGameObject<FilledRect>("GameResultBackground");
+            gameObject.AddChild(backgroundOverlay.Item1);
+            backgroundOverlay.Item2.color = new Color(10, 10, 20, 200);
+            backgroundOverlay.Item2.SetRect(new Rect(1920, 1080));
+            backgroundOverlay.Item2.anchorPoint = AnchorPoint.TopLeft;
+
+            var resultText = Component.CreateWithGameObject<TextRenderer>("ResultText");
+            gameObject.AddChild(resultText.Item1);
+            resultText.Item2.color = new Color(255, 255, 255, 205);
+            resultText.Item2.SetFontSize(100);
+            resultText.Item2.SetText("Game Over");
+            resultText.Item2.anchorPoint = AnchorPoint.TopCenter;
+            resultText.Item2.SetPreferredSize(new Rect(700, 900));
+            resultText.Item1.SetLocalPosition(new Vec2D(1920 / 2, 50));
+
+            var winnerText = Component.CreateWithGameObject<TextRenderer>("WinnerText");
+            gameObject.AddChild(winnerText.Item1);
+            winnerText.Item2.color = new Color(255, 255, 255, 205);
+            winnerText.Item2.SetFontSize(50);
+            string winnerName = score[0] > score[1] ? "Player 1" : "Player 2";
+            winnerText.Item2.SetText(winnerName + " wins!");
+            winnerText.Item2.anchorPoint = AnchorPoint.TopCenter;
+            winnerText.Item2.SetPreferredSize(new Rect(700, 900));
+            winnerText.Item1.SetLocalPosition(new Vec2D(1920 / 2, 200));
+            winnerText.Item2.SetFontSize(50);
+
+            var scoreText = Component.CreateWithGameObject<TextRenderer>("ScoreText");
+            gameObject.AddChild(scoreText.Item1);
+            scoreText.Item2.color = new Color(255, 255, 255, 205);
+            scoreText.Item2.SetFontSize(50);
+            scoreText.Item2.SetText("Score: " + score[0] + " - " + score[1]);
+            scoreText.Item2.anchorPoint = AnchorPoint.TopCenter;
+            scoreText.Item2.SetPreferredSize(new Rect(700, 900));
+            scoreText.Item1.SetLocalPosition(new Vec2D(1920 / 2, 300));
+            scoreText.Item2.SetFontSize(50);
+
+            var restartButton = Component.CreateWithGameObject<TextRenderer>("RestartButton");
+            gameObject.AddChild(restartButton.Item1);
+            restartButton.Item2.color = new Color(255, 255, 255, 205);
+            restartButton.Item2.SetFontSize(50);
+            restartButton.Item2.SetText("Restart");
+            restartButton.Item2.anchorPoint = AnchorPoint.Center;
+            restartButton.Item2.SetPreferredSize(new Rect(200, 100));
+            restartButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            restartButton.Item1.SetLocalPosition(new Vec2D(250, 150));
+            restartButton.Item2.SetBorderSize(2);
+            restartButton.Item2.SetBorderColor(new Color(255, 255, 255, 255));
+            var helper = restartButton.Item1.AddComponent<TextRenderHelper>();
+            helper.OnClick += (object? _, TextRenderer _) =>
+            {
+                Destroy(gameObject);
+                gameController?.ResetGame();
+            };
+            helper.OnHover += (object? _, TextRenderer _) =>
+            {
+                restartButton.Item2.SetBackgroundColor(new Color(123, 0, 0, 150));
+            };
+
+            helper.OnLeave += (object? _, TextRenderer _) =>
+            {
+                restartButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            };
+
+            var menuButton = Component.CreateWithGameObject<TextRenderer>("MenuButton");
+            gameObject.AddChild(menuButton.Item1);
+            menuButton.Item2.color = new Color(255, 255, 255, 205);
+            menuButton.Item2.SetFontSize(50);
+            menuButton.Item2.SetText("Menu");
+            menuButton.Item2.anchorPoint = AnchorPoint.Center;
+            menuButton.Item2.SetPreferredSize(new Rect(200, 100));
+            menuButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            menuButton.Item1.SetLocalPosition(new Vec2D(250, 450));
+            menuButton.Item2.SetBorderSize(2);
+            menuButton.Item2.SetBorderColor(new Color(255, 255, 255, 255));
+            var menuHelper = menuButton.Item1.AddComponent<TextRenderHelper>();
+            menuHelper.OnClick += (object? _, TextRenderer _) =>
+            {
+                Destroy(gameObject);
+                if (gameController != null)
+                {
+                    Destroy(gameController.GetGameObject());
+                }
+                //gameController?.GoToMenu();
+            };
+
+            menuHelper.OnHover += (object? _, TextRenderer _) =>
+            {
+                menuButton.Item2.SetBackgroundColor(new Color(123, 0, 0, 150));
+            };
+
+            menuHelper.OnLeave += (object? _, TextRenderer _) =>
+            {
+                menuButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            };
+
+            var levelButton = Component.CreateWithGameObject<TextRenderer>("LevelButton");
+            gameObject.AddChild(levelButton.Item1);
+            levelButton.Item2.color = new Color(255, 255, 255, 205);
+            levelButton.Item2.SetFontSize(50);
+            levelButton.Item2.SetText("Level");
+            levelButton.Item2.anchorPoint = AnchorPoint.Center;
+            levelButton.Item2.SetPreferredSize(new Rect(200, 100));
+            levelButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            levelButton.Item1.SetLocalPosition(new Vec2D(250, 300));
+            levelButton.Item2.SetBorderSize(2);
+            levelButton.Item2.SetBorderColor(new Color(255, 255, 255, 255));
+            var levelHelper = levelButton.Item1.AddComponent<TextRenderHelper>();
+            levelHelper.OnClick += (object? _, TextRenderer _) =>
+            {
+                Destroy(gameObject);
+                // gameController?.GoToLevel();
+            };
+
+            levelHelper.OnHover += (object? _, TextRenderer _) =>
+            {
+                levelButton.Item2.SetBackgroundColor(new Color(123, 0, 0, 150));
+            };
+
+            levelHelper.OnLeave += (object? _, TextRenderer _) =>
+            {
+                levelButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
+            };
+
+        }
     }
 }

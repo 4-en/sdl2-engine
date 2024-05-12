@@ -82,7 +82,6 @@ namespace Pong
                 player1_renderer.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
 
                 string[] control_values = new string[] { "W/S", "Arrows", "Mouse", "AI" };
-                string[] control_values2 = new string[] { "AI", "W/S", "Arrows", "Mouse" };
 
 
                 var player1_controls = UI.CycleButton(
@@ -95,6 +94,17 @@ namespace Pong
                     new Rect(0, 0, 250, 100),
                     Color.White,
                     48);
+
+                var PlayerTypeToString = new Dictionary<PlayerType, string>
+                {
+                    { PlayerType.WS, "W/S" },
+                    { PlayerType.ArrowKeys, "Arrows" },
+                    { PlayerType.AI, "AI" },
+                    { PlayerType.Mouse, "Mouse" },
+                    { PlayerType.Controller, "Controller" }
+                };
+
+                player1_controls.Item2.SetText(PlayerTypeToString[LevelManager.player1Type]);
 
                 var player1_controls_obj = player1_controls.Item1;
                 player1_controls_obj.SetLocalPosition(new Vec2D(300, 0));
@@ -109,7 +119,7 @@ namespace Pong
                 player2_renderer.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
 
                 var player2_controls = UI.CycleButton(
-                    control_values2,
+                    control_values,
                     (string s) =>
                     {
                         LevelManager.player2Type = StringToPlayerType(s);
@@ -119,6 +129,7 @@ namespace Pong
                     Color.White,
                     48);
 
+                player2_controls.Item2.SetText(PlayerTypeToString[LevelManager.player2Type]);
                 var player2_controls_obj = player2_controls.Item1;
                 player2_controls_obj.SetLocalPosition(new Vec2D(300, 0));
                 player2.AddChild(player2_controls_obj);

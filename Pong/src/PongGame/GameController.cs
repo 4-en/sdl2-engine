@@ -20,6 +20,8 @@ namespace Pong
 
         public void Move(double strength)
         {
+            if(gameController == null || gameController.IsStopped()) return;
+
             double movement = speed * Time.deltaTime * strength;
             gameObject.transform.position += new Vec2D(0, movement);
 
@@ -87,14 +89,18 @@ namespace Pong
     public class MouseController : Script
     {
         private PaddleController? paddleController = null;
+        private GameController? gameController = null;
 
         public override void Start()
         {
             paddleController = gameObject.GetComponent<PaddleController>();
+            gameController = Find("GameController")?.GetComponent<GameController>();
         }
 
         public override void Update()
         {
+            if (gameController == null || gameController.IsStopped()) return;
+
             if (paddleController == null) return;
 
             var mousePos = Input.GetMousePosition();
@@ -271,6 +277,11 @@ namespace Pong
                     return obj.AddComponent<KeyboardController>();
 
             }
+        }
+
+        public bool IsStopped()
+        {
+            return stopped;
         }
         public override void Start()
         {

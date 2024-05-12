@@ -358,7 +358,7 @@ namespace SDL2Engine
 
     public class TextRenderer : DrawableRect, ILoadable
     {
-        private string text = "[TEXT]";
+        private string text = "";
         private int fontSize = 24;
         private string fontPath = "Assets/Fonts/Roboto-Regular.ttf";
         private bool updateTexture = true;

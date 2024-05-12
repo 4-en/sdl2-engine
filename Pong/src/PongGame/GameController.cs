@@ -448,8 +448,8 @@ namespace Pong
             {
                 body.Velocity = new Vec2D(0, 0);
             }
-            roundTimer = -2;
-            powerupTimer = -2;
+            roundTimer = -1;
+            powerupTimer = -1;
             roundStarted = false;
         }
 
@@ -482,9 +482,9 @@ namespace Pong
             player_2_score = 0;
             UpdateScoreText();
             ResetBall();
-            roundTimer = -4;
+            roundTimer = -3;
             gameTimer = 0;
-            powerupTimer = -4;
+            powerupTimer = -3;
 
             // set paddles to starting position
             if (player1 != null)
@@ -542,7 +542,7 @@ namespace Pong
                 var hs = new OnlineHighscores<int>(100, GetLevelName());
                 highscoreScript.SetHighscores(hs);
 
-                highscoreScript.AddHighscoreState(player_1_score);
+                highscoreScript.AddHighscoreState(GetScore());
                 
             }
             else
@@ -561,7 +561,7 @@ namespace Pong
 
             UpdateCountdown();
 
-            if (gameTimer > timeLimit && player_1_score != player_2_score)
+            if (gameTimer > timeLimit)
             {
                 ResetBall();
                 this.stopped = true;
@@ -581,6 +581,21 @@ namespace Pong
         private string GetLevelName()
         {
             return $"pong_level_{level_id}_{gameMode}";
+        }
+
+        private int GetScore()
+        {
+            switch (gameMode)
+            {
+                case GameMode.DUEL:
+                    return player_1_score;
+                case GameMode.HIGHSCORE:
+                    return player_1_score;
+                case GameMode.TIMED:
+                    return player_1_score - player_2_score;
+                default:
+                    return 0;
+            }
         }
 
         public override void Update()

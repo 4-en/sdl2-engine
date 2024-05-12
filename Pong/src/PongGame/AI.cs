@@ -137,6 +137,7 @@ namespace Pong
             {
                 strategyChangeTime = Time.time + 10 - 7 * difficulty;
                 strategy = (Strategy)random.Next(0, 4);
+                randStratDouble = random.NextDouble();
             }
         }
 
@@ -227,6 +228,7 @@ namespace Pong
 
         }
 
+        private double randStratDouble = 0.5;
         private double ApplyStrategy(double predBallY)
         {
             if(paddleCollider == null)
@@ -239,7 +241,7 @@ namespace Pong
             double paddleTop = paddleY.Item1;
             double paddleBottom = paddleY.Item3;
 
-            double safetyMargin = 20;
+            double safetyMargin = 10;
             paddleTop += safetyMargin;
             paddleBottom -= safetyMargin;
 
@@ -253,12 +255,12 @@ namespace Pong
             {
                 case Strategy.Center:
                     return predBallY;
-                case Strategy.Counter:
-                    return ballYDirection > 0 ? predBallY + paddleTopOffset : predBallY + paddleBottomOffset;
                 case Strategy.MaxAngle:
+                    return ballYDirection > 0 ? predBallY + paddleTopOffset : predBallY + paddleBottomOffset;
+                case Strategy.Counter:
                     return ballYDirection < 0 ? predBallY + paddleTopOffset : predBallY + paddleBottomOffset;
                 case Strategy.Random:
-                    return predBallY + random.NextDouble() * (paddleBottomOffset - paddleTopOffset) + paddleTopOffset;
+                    return predBallY + paddleBottomOffset + randStratDouble * (paddleTopOffset - paddleBottomOffset);
                 default:
                     return paddleCenter;
             }
@@ -287,12 +289,13 @@ namespace Pong
             double directInfluence = Math.Min( 250 , ballPaddleDistX) / 250;
             perfectY = perfectY * directInfluence + ballCenter.y * (1 - directInfluence);
 
-
+            /*
             double max_error = difficulty * 100;
             double ball_error = random.NextDouble() * max_error - max_error / 2;
-            predBallY += ball_error;
+            perfectY += ball_error;
+            */
 
-            predBallY = ApplyStrategy(predBallY);
+            perfectY = ApplyStrategy(perfectY);
 
             double strength = (perfectY - paddleController.GetGameObject().GetPosition().y) * 0.01;
             strength = Math.Min(strength, 1);

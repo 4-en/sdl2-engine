@@ -12,14 +12,15 @@ namespace Pong.src
 {
     internal class HomeScreen
     {
-        
+
 
         public static Scene CreateScene()
         {
             var scene = new Scene("Home Screen");
             Vec2D gameBounds = new Vec2D(1920, 1080);
 
-            using (var activeScene = scene.Activate()) {
+            using (var activeScene = scene.Activate())
+            {
                 GameObject gameTitle = HomeScreenText("Pong", gameBounds.x / 2, 200, 200);
                 GameObject level1 = HomeScreenText("Level 1", gameBounds.x / 2, 500, 100);
                 GameObject level2 = HomeScreenText("Level 2", gameBounds.x / 2, 600, 100);
@@ -53,7 +54,7 @@ namespace Pong.src
 
         internal static GameObject HomeScreenText(string text, double x, double y, int fontSize)
         {
-            
+
             var textObject = new GameObject(text);
             textObject.transform.position = new Vec2D(x, y);
             var textComponent = textObject.AddComponent<TextRenderer>();
@@ -66,11 +67,17 @@ namespace Pong.src
             helper.OnHover += (object? source, TextRenderer renderer) =>
             {
                 renderer.SetColor(Color.Gold);
+                renderer.SetFontSize(renderer.GetText() != "Pong" ? 110 : 200);
+
+
             };
 
             helper.OnLeave += (object? source, TextRenderer renderer) =>
             {
                 renderer.SetColor(new Color(148, 0, 211, 255));
+                renderer.SetFontSize(renderer.GetText() != "Pong" ? 100 : 200);
+
+
             };
 
             return textObject;
@@ -102,11 +109,11 @@ namespace Pong.src
 
                 // Get the position and dimensions of the text object
                 Vec2D position = gameObject.transform.position;
-                Rect rect = new Rect(position.x-200, position.y-50, 400, 100);
-                
-                 if (rect.Contains(mousePosition))
+                Rect rect = new Rect(position.x - 200, position.y - 50, 400, 100);
+
+                if (rect.Contains(mousePosition))
                 {
-                    if(gameObject.GetName().Equals("Level 1"))
+                    if (gameObject.GetName().Equals("Level 1"))
                     {
                         SceneManager.SetScene(LevelManager.CreateLevel1());
                     }

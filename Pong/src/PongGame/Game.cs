@@ -4,6 +4,7 @@ using SDL2;
 using SDL2Engine;
 using System.Reflection.Metadata.Ecma335;
 using static SDL2.SDL;
+using static System.Formats.Asn1.AsnWriter;
 
 
 namespace Pong
@@ -18,6 +19,7 @@ namespace Pong
     }
     public static partial class LevelManager
     {
+        static bool musikplaying = false;
 
         public static PlayerType player1Type = PlayerType.WS;
         public static PlayerType player2Type = PlayerType.AI;
@@ -26,7 +28,7 @@ namespace Pong
         public static void Start()
         {
 
-            
+
             LoadPlayerSelection();
 
             var engine = new Engine(null, "PongPongPong");
@@ -60,9 +62,11 @@ namespace Pong
         {
             return levelCreators.Keys.ToArray();
         }
-        
+
         public static void LoadLevel(int index)
         {
+            //     musikObject.GetComponent<HomeMusik>()?.StopMusic();
+
             if (!levelCreators.ContainsKey(index))
             {
                 throw new Exception($"No level creator found for index {index}");
@@ -98,22 +102,30 @@ namespace Pong
 
         public static void LoadPlayerSelection()
         {
+
             var playerSelection = UI.PlayerSelectScene();
+            if (musikplaying == false)
+            {
+                musikObject = new GameObject("ScorePlayer1", playerSelection);
+                musikObject.AddComponent<HomeMusik>();
+                musikplaying = true;
+            }
+
             SceneManager.SetScene(playerSelection);
+
         }
 
         public static void LoadHomeScreen()
         {
-            
+
             homeScreen = CreateHomeScreen();
             SceneManager.SetScene(homeScreen);
-            
+
         }
 
         public static Scene CreateBaseLevel()
         {
             var level = new Scene("BaseLevel");
-
             var gameControllerObject = new GameObject("GameController", level);
             gameControllerObject.AddComponent<GameController>();
 
@@ -123,6 +135,7 @@ namespace Pong
         public static Scene CreateLevel1()
         {
             var level = CreateBaseLevel();
+            musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
 
             // so some level specific stuff here...
             // for example, add powerup GameObject to level, change speed of ball, idk
@@ -133,6 +146,7 @@ namespace Pong
 
         public static Scene CreateLevel2()
         {
+            //  musikObject.GetComponent<HomeMusik>()?.StopMusic();
             var level = new Scene("Level2");
 
             var gameControllerObject = new GameObject("GameController2", level);
@@ -143,6 +157,8 @@ namespace Pong
 
         public static Scene CreateLevel3()
         {
+            //     musikObject.GetComponent<HomeMusik>()?.StopMusic();
+
             var level = new Scene("Level3");
 
             var gameControllerObject = new GameObject("GameController3", level);
@@ -153,6 +169,8 @@ namespace Pong
 
         public static Scene CreateLevel4()
         {
+            //    musikObject.GetComponent<HomeMusik>()?.StopMusic();
+
             var level = new Scene("Level4");
 
             var gameControllerObject = new GameObject("GameController4", level);
@@ -161,18 +179,50 @@ namespace Pong
             return level;
         }
 
+        static GameObject musikObject = new GameObject();
+
         private static Scene CreateHomeScreen()
-            {
-                var homeScreen = HomeScreen.CreateScene();
-                return homeScreen;
-            }
+        {
+            var homeScreen = HomeScreen.CreateScene();
+
+
+            return homeScreen;
         }
+    }
 
 }
+class HomeMusik : Script
+{
+    private Sound scoreSoundFire;
+    private bool musicStarted = false;
 
+    public override void Start()
+    {
+        scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Homemusik.mp3");
+        scoreSoundFire.SetVolume(0.3);
+    }
+
+    public override void Update()
+    {
+        // Starte die Musik nur, wenn sie noch nicht gestartet wurde
+        if (!musicStarted)
+        {
+            scoreSoundFire.Play();
+            musicStarted = true;
+        }
+    }
+
+    public bool StopMusic(bool musikplaying)
+    {
+        // Stoppe die Musik
+        scoreSoundFire.Stop();
+        musikplaying = false;
+        return musikplaying;
+    }
+}
 class SpeedPowerup : Script
 {
-    
+
 
 
     public override void Start()
@@ -204,7 +254,7 @@ class DestroyAndIncreaseSpeedOnCollision : Script
                 obj.GetComponent<PhysicsBody>().Velocity = obj.GetComponent<PhysicsBody>().Velocity * new Vec2D(1.5, 1.5);
             }
         }
-        
+
     }
 
     public override void Update()
@@ -226,7 +276,7 @@ class DestroyAndChangeDirectionOnCollision : Script
         {
             if (obj.GetName() == "Ball")
             {
-                obj.GetComponent<PhysicsBody>().Velocity =   new Vec2D(obj.GetComponent<PhysicsBody>().Velocity.x, - obj.GetComponent<PhysicsBody>().Velocity.y);
+                obj.GetComponent<PhysicsBody>().Velocity = new Vec2D(obj.GetComponent<PhysicsBody>().Velocity.x, -obj.GetComponent<PhysicsBody>().Velocity.y);
             }
         }
 
@@ -283,7 +333,7 @@ public class Level3GameController : GameController
             var powerup = new GameObject("Powerup");
             var texture = powerup.AddComponent<TextureRenderer>();
             texture?.SetSource("Assets/Textures/change_direction_powerup.png");
-            
+
             var bc = BoxCollider.FromDrawableRect(powerup);
             bc.IsTrigger = true;
             powerup.AddComponent<DestroyAndChangeDirectionOnCollision>();
@@ -309,7 +359,7 @@ public class Level4GameController : GameController
 
         if (powerupTimer > 5)
         {
-           
+
             var rand = new Random().Next(0, 2);
             var powerup = new GameObject("Powerup");
             var texture = powerup.AddComponent<TextureRenderer>();
@@ -318,23 +368,23 @@ public class Level4GameController : GameController
 
             if (rand < 1)
             {
-               
-                
-                
+
+
+
                 texture?.SetSource("Assets/Textures/change_direction_powerup.png");
 
-                
+
                 powerup.AddComponent<DestroyAndChangeDirectionOnCollision>();
-               
+
             }
             else
             {
-                
-                
+
+
                 texture?.SetSource("Assets/Textures/speed_powerup.png");
-                
+
                 powerup.AddComponent<DestroyAndIncreaseSpeedOnCollision>();
-                
+
             }
             //random value between x and y
             int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);

@@ -358,4 +358,33 @@ public class Level4GameController : GameController
 
 
     }
+
+    public class Level123GameController : GameController
+    {
+        public Level123GameController()
+        {
+            this.level_id = 6;
+        }
+        public override void Update()
+        {
+
+            base.Update();
+            Vec2D gameBounds = new Vec2D(1920, 1080);
+
+            if (powerupTimer > 10)
+            {
+                powerupTimer = 0;
+                var powerup = new GameObject("Powerup");
+                powerup.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/speed_powerup.png");
+                var bc = BoxCollider.FromDrawableRect(powerup);
+                bc.IsTrigger = true;
+                powerup.AddComponent<DestroyAndIncreaseSpeedOnCollision>();
+                //random value between x and y
+                int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);
+                var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);
+
+                powerup.SetPosition(new Vec2D(randomX, randomY));
+            }
+        }
+    }
 }

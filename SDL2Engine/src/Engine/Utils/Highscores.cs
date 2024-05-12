@@ -163,14 +163,21 @@ namespace SDL2Engine.Utils
         }
     }
 
+    /*
+     * OnlineHighscores: Highscores that are saved and loaded from a server
+     * Compatible with: https://github.com/4-en/highscore_api
+     */
     public class OnlineHighscores<N> : Highscores<N> where N : IComparable, IFormattable
     {
-        private static readonly string base_url = "http://api.aiko.lol:25500/";
-        private static readonly string save_url = base_url + "highscore/save/";
-        private static readonly string load_url = base_url + "highscore/";
+        private string base_url = "http://api.aiko.lol:25500/";
+        private string save_url = "http://api.aiko.lol:25500/" + "highscore/save/";
+        private string load_url = "http://api.aiko.lol:25500/" + "highscore/";
 
-        public OnlineHighscores(int maxHighscores = 100, string? path = null) : base(maxHighscores, path)
+        public OnlineHighscores(int maxHighscores = 100, string? path = null, string base_url= "http://api.aiko.lol:25500/") : base(maxHighscores, path)
         {
+            this.base_url = base_url;
+            this.save_url = base_url + "highscore/save/";
+            this.load_url = base_url + "highscore/";
         }
 
         /*

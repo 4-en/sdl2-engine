@@ -84,6 +84,26 @@ namespace Pong
         }
     }
 
+    public class MouseController : Script
+    {
+        private PaddleController? paddleController = null;
+
+        public override void Start()
+        {
+            paddleController = gameObject.GetComponent<PaddleController>();
+        }
+
+        public override void Update()
+        {
+            if (paddleController == null) return;
+
+            var mousePos = Input.GetMousePosition();
+            var worldPos = GetCamera()?.ScreenToWorld(mousePos) ?? new Vec2D();
+
+            gameObject.transform.position = new Vec2D(gameObject.transform.position.x, worldPos.y - gameObject.GetComponent<BoxCollider>()?.box.h / 2 ?? 0);
+        }
+    }
+
     class BallBounceScript : Script
     {
         SoundPlayer? sound = null;
@@ -160,9 +180,13 @@ namespace Pong
                 //calculate relative position of the ball on the paddle (-1,1)
                 var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);
                 double ball_vel = ball_body.Velocity.Length();
+
+                double bounceBoost = 100;
+
+                
                 double deltaVelocity = relativePosition * ball_vel * 0.5;
                 Vec2D newVelocity = ball_body.Velocity + new Vec2D(0, deltaVelocity);
-                newVelocity = newVelocity.Normalize() * ball_body.Velocity.Length();
+                newVelocity = newVelocity.Normalize() * (ball_body.Velocity.Length() + bounceBoost);
                 ball_body.Velocity = newVelocity;
 
             }
@@ -202,6 +226,7 @@ namespace Pong
         protected TextRenderer? scoreText3 = null;
 
         protected TextRenderer? timeText = null;
+        protected TextRenderer? countdownText = null;
         private GameObject? escapeMenu = null;
 
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
@@ -240,6 +265,8 @@ namespace Pong
                     return arrow_controller;
                 case PlayerType.AI:
                     return obj.AddComponent<AIController>();
+                case PlayerType.Mouse:
+                    return obj.AddComponent<MouseController>();
                 default:
                     return obj.AddComponent<KeyboardController>();
 
@@ -325,15 +352,43 @@ namespace Pong
 
             timeText = Component.CreateWithGameObject<TextRenderer>("TimeCounter").Item2;
             timeText.color = new Color(255, 255, 255, 205);
-            timeText.SetFontSize(32);
+            timeText.SetFontSize(52);
             timeText.anchorPoint = AnchorPoint.TopLeft;
-            timeText.GetGameObject().SetPosition(new Vec2D(gameBounds.x - 200, 25));
-            timeText.SetText("Time: 0");
+            timeText.GetGameObject().SetPosition(new Vec2D(gameBounds.x - 300, 25));
+            timeText.SetText("Round: 0");
+
+            if(gameMode == GameMode.TIMED)
+            {
+                countdownText = Component.CreateWithGameObject<TextRenderer>("Countdown").Item2;
+                countdownText.color = new Color(255, 255, 255, 205);
+                countdownText.SetFontSize(52);
+                countdownText.anchorPoint = AnchorPoint.TopLeft;
+                countdownText.GetGameObject().SetPosition(new Vec2D(25, 25));
+                
+                UpdateCountdown();
+            }
 
 
 
             ResetGame();
 
+        }
+
+        private void UpdateCountdown()
+        {
+            if (countdownText == null) return;
+
+            double timeLeft = timeLimit - gameTimer;
+            bool tied = player_1_score == player_2_score;
+            if (timeLeft < 0) timeLeft = 0;
+
+            if(tied && timeLeft <= 0)
+            {
+                // sudden death
+                countdownText.SetText("SUDDEN DEATH");
+            }
+
+            countdownText.SetText($"{Math.Round(timeLeft, 0)}");
         }
 
 
@@ -439,6 +494,7 @@ namespace Pong
 
             if (player_1_score >= scoreToWin || player_2_score >= scoreToWin)
             {
+                ResetBall();
                 this.stopped = true;
                 Console.WriteLine("Game Over");
                 string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
@@ -458,6 +514,7 @@ namespace Pong
             // end game if player 2 scores a point
             if (player_2_score > 0)
             {
+                ResetBall();
                 this.stopped = true;
                 Console.WriteLine("Game Over");
                 Console.WriteLine($"Player 1 scored {player_1_score} points");
@@ -474,8 +531,12 @@ namespace Pong
         {
             // track player 1 and player 2 scores
             // end game if timeLimit is reached
+
+            UpdateCountdown();
+
             if (gameTimer > timeLimit && player_1_score != player_2_score)
             {
+                ResetBall();
                 this.stopped = true;
                 Console.WriteLine("Game Over");
                 string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
@@ -488,13 +549,23 @@ namespace Pong
             }
         }
 
+        private bool QualifiedForHighscores()
+        {
+            return LevelManager.player1Type != PlayerType.AI && LevelManager.player2Type == PlayerType.AI && (gameMode == GameMode.HIGHSCORE || gameMode == GameMode.TIMED);
+        }
+
+        private string GetLevelName()
+        {
+            return $"pong_level_{level_id}_{gameMode}";
+        }
+
         public override void Update()
         {
 
             if (timeText != null)
             {
-                // 2 decimal places
-                timeText.SetText($"Time: {Math.Round(roundTimer, 2)}");
+                // 1 decimal place
+                timeText.SetText($"Time: {Math.Round(roundTimer, 1)}");
             }
 
             if (Input.GetKeyDown((int)SDL_Keycode.SDLK_ESCAPE))
@@ -529,17 +600,6 @@ namespace Pong
                 return;
             }
 
-            if (Input.GetKeyPressed(SDL_Keycode.SDLK_x))
-            {
-                Console.WriteLine(Time.tick);
-                var scene = GetScene();
-                if (scene != null)
-                {
-                    Console.WriteLine("Destroying all game objects");
-                    scene.GetGameObjects().ForEach(o => Destroy(o));
-                }
-                else { Console.WriteLine("Scene is null"); }
-            }
 
             // basic game logic here
             // check for out of bounds
@@ -564,8 +624,10 @@ namespace Pong
                 scoreSoundFire.Play();
 
                 player_2_score++;
-                scoreText2.SetFontSize(120);
-                scoreText2.color = new Color(255, 0, 0, 205);
+                if(scoreText2 != null) {
+                    scoreText2.SetFontSize(120);
+                    scoreText2.color = new Color(255, 0, 0, 205);
+                }
                 restedColor = false;
                 UpdateScoreText();
 
@@ -580,8 +642,10 @@ namespace Pong
             {
                 scoreSoundWater.Play();
                 player_1_score++;
-                scoreText.SetFontSize(120);
-                scoreText.color = new Color(30, 144, 255, 255);
+                if (scoreText != null) {
+                    scoreText.SetFontSize(120);
+                    scoreText.color = new Color(30, 144, 255, 255);
+                }
                 restedColor = false;
                 UpdateScoreText();
 

@@ -187,7 +187,7 @@ namespace Pong
                 //calculate relative position of the ball on the paddle (-1,1)
                 var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);
                 double ball_vel = ball_body.Velocity.Length();
-                Console.WriteLine(ball_vel);
+                // Console.WriteLine(ball_vel);
                 double bounceBoost = 100;
 
 

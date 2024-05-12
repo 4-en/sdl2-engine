@@ -354,17 +354,7 @@ namespace Pong
         {
             this.level_id = 3;
         }
-        public override void Start()
-        {
-            base.Start();
 
-            Vec2D gameBounds = new Vec2D(1920, 1080);
-
-            obsticle = new GameObject("obsticle");
-            obsticle.AddComponent<ObsticalCreate>();
-
-
-        }
         public override void Update()
         {
 
@@ -452,6 +442,17 @@ namespace Pong
         public Level4GameController()
         {
             this.level_id = 4;
+        }
+        public override void Start()
+        {
+            base.Start();
+
+            Vec2D gameBounds = new Vec2D(1920, 1080);
+
+            obsticle = new GameObject("obsticle");
+            obsticle.AddComponent<ObsticalCreate>();
+
+
         }
         public override void Update()
         {

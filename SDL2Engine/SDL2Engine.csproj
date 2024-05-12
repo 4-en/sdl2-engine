@@ -29,6 +29,7 @@
     <None Remove="Assets\Audio\Water3.mp3" />
     <None Remove="Assets\Audio\Wave.mp3" />
     <None Remove="Assets\Textures\change_direction_powerup.png" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <None Update="SDL2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

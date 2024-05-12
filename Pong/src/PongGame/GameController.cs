@@ -539,7 +539,7 @@ namespace Pong
             {
                 var highscoreRoot = new GameObject("HighscoreRoot");
                 var highscoreScript = highscoreRoot.AddComponent<HighscoreScript>();
-                var hs = new Highscores<int>(100, GetLevelName());
+                var hs = new OnlineHighscores<int>(100, GetLevelName());
                 highscoreScript.SetHighscores(hs);
 
                 highscoreScript.AddHighscoreState(player_1_score);
@@ -679,7 +679,7 @@ namespace Pong
                 ResetBall();
             }
 
-            if (ball.transform.position.y < -tolerance || ball.transform.position.y > gameBounds.y + tolerance)
+            if (ball.transform.position.y < -tolerance * 10 || ball.transform.position.y > gameBounds.y + tolerance * 10)
             {
                 // somehow the ball is out of bounds, reset without scoring
                 Console.WriteLine("Ball out of bounds");

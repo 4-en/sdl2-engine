@@ -154,13 +154,13 @@ namespace Pong
 
     class HomeMusik : Script
     {
-        private Sound scoreSoundFire;
+        private Sound Musik;
         private bool musicStarted = false;
 
         public override void Start()
         {
-            scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Homemusik.mp3");
-            scoreSoundFire.SetVolume(0.3);
+            Musik = AssetManager.LoadAsset<Sound>("Assets/Audio/Homemusik.mp3");
+            Musik.SetVolume(0.3);
         }
 
         public override void Update()
@@ -168,7 +168,7 @@ namespace Pong
             // Starte die Musik nur, wenn sie noch nicht gestartet wurde
             if (!musicStarted)
             {
-                scoreSoundFire.Play();
+                Musik.Play();
                 musicStarted = true;
             }
         }
@@ -176,7 +176,7 @@ namespace Pong
         public bool StopMusic(bool musikplaying)
         {
             // Stoppe die Musik
-            scoreSoundFire.Stop();
+            Musik.Stop();
             musikplaying = false;
             return musikplaying;
         }

@@ -95,7 +95,7 @@ namespace Pong
 
         public static Scene CreateLevel2()
         {
-            //  musikObject.GetComponent<HomeMusik>()?.StopMusic();
+            musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
             var level = new Scene("Level2");
 
             var gameControllerObject = new GameObject("GameController2", level);
@@ -106,7 +106,7 @@ namespace Pong
 
         public static Scene CreateLevel3()
         {
-            //     musikObject.GetComponent<HomeMusik>()?.StopMusic();
+            musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
 
             var level = new Scene("Level3");
 
@@ -118,7 +118,7 @@ namespace Pong
 
         public static Scene CreateLevel4()
         {
-            //    musikObject.GetComponent<HomeMusik>()?.StopMusic();
+            musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
 
             var level = new Scene("Level4");
 
@@ -130,7 +130,7 @@ namespace Pong
 
         public static Scene CreateLevel5()
         {
-            //    musikObject.GetComponent<HomeMusik>()?.StopMusic();
+            musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
 
             var level = new Scene("Level5");
 
@@ -344,7 +344,7 @@ namespace Pong
 
             }
 
-            if(resetChecker != lastReset)
+            if (resetChecker != lastReset)
             {
                 foreach (var powerup in powerups)
                 {

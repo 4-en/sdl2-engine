@@ -502,10 +502,7 @@ namespace Pong
                 string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
                 Console.WriteLine($"{winner_name} wins!");
 
-                var resultRoot = new GameObject("ResultRoot");
-                var resultScript = resultRoot.AddComponent<GameResultScript>();
-                resultScript.score[0] = player_1_score;
-                resultScript.score[1] = player_2_score;
+                ShowEndScreen();
 
             }
         }
@@ -521,11 +518,28 @@ namespace Pong
                 Console.WriteLine("Game Over");
                 Console.WriteLine($"Player 1 scored {player_1_score} points");
 
+                ShowEndScreen();
+            }
+        }
+
+        private void ShowEndScreen()
+        {
+            if(QualifiedForHighscores())
+            {
                 var highscoreRoot = new GameObject("HighscoreRoot");
                 var highscoreScript = highscoreRoot.AddComponent<HighscoreScript>();
-                highscoreScript.AddHighscoreState(player_1_score);
-                var hs = new Highscores<int>(100, $"pong_level_{this.level_id}.txt");
+                var hs = new Highscores<int>(100, GetLevelName());
                 highscoreScript.SetHighscores(hs);
+
+                highscoreScript.AddHighscoreState(player_1_score);
+                
+            }
+            else
+            {
+                var resultRoot = new GameObject("ResultRoot");
+                var resultScript = resultRoot.AddComponent<GameResultScript>();
+                resultScript.score[0] = player_1_score;
+                resultScript.score[1] = player_2_score;
             }
         }
 
@@ -544,10 +558,7 @@ namespace Pong
                 string winner_name = player_1_score > player_2_score ? "Player 1" : "Player 2";
                 Console.WriteLine($"{winner_name} wins!");
 
-                var resultRoot = new GameObject("ResultRoot");
-                var resultScript = resultRoot.AddComponent<GameResultScript>();
-                resultScript.score[0] = player_1_score;
-                resultScript.score[1] = player_2_score;
+                ShowEndScreen();
             }
         }
 

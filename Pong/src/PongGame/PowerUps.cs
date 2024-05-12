@@ -17,7 +17,7 @@ namespace Pong
             public ConnectedPortal? other;
             public bool onCooldown = false;
             public double lastTeleport = 0;
-            public double cooldownTime = 2;
+            public double cooldownTime = 1;
 
 
             public override void Start()

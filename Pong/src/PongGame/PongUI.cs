@@ -40,6 +40,8 @@ namespace Pong
                 case "Duel":
                     return GameMode.DUEL;
                 case "Endless":
+                case "Highscore":
+                case "HiScore":
                     return GameMode.HIGHSCORE;
                 case "Timed":
                     return GameMode.TIMED;
@@ -134,7 +136,7 @@ namespace Pong
                 player2_controls_obj.SetLocalPosition(new Vec2D(300, 0));
                 player2.AddChild(player2_controls_obj);
 
-                string[] mode_values = new string[] { "Duel", "Endless", "Timed" };
+                string[] mode_values = new string[] { "Duel", "Hiscore", "Timed" };
 
                 var mode = text_root.CreateChild("Mode");
                 mode.SetLocalPosition(new Vec2D(-100, 600));

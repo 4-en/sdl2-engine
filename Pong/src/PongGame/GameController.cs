@@ -94,7 +94,7 @@ namespace Pong
         public override void Start()
         {
             paddleController = gameObject.GetComponent<PaddleController>();
-            gameController = Find("GameController")?.GetComponent<GameController>();
+            gameController = FindComponent<GameController>();
         }
 
         public override void Update()

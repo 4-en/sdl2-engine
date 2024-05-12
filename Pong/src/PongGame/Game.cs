@@ -250,7 +250,70 @@ namespace Pong
             transform.rotation = Time.time * 360 / 3 % 360;
         }
     }
+    class ObsticalMove : Script
+    {
+        bool movingUp = true; // Variable, um die Bewegungsrichtung zu steuern
+        float speed = 120f; // Geschwindigkeit der Bewegung
+        Vec2D gameBounds = new Vec2D(1920, 1080);
 
+        public override void Update()
+        {
+            Vec2D pos = gameObject.GetPosition();
+
+            // Vertikale Bewegung innerhalb der Spielfeldgrenzen
+            if (pos.y <= 0 + 55) // Wenn das Hindernis die obere Grenze erreicht hat
+            {
+                movingUp = false; // Ändere die Richtung nach unten
+            }
+            else if (pos.y >= gameBounds.y - 55) // Wenn das Hindernis die untere Grenze erreicht hat
+            {
+                movingUp = true; // Ändere die Richtung nach oben
+            }
+
+            // Bewegung entsprechend der Richtung und Geschwindigkeit
+            if (movingUp)
+            {
+                gameObject.transform.position = new Vec2D(pos.x, pos.y - speed * Time.deltaTime); // Bewegung nach oben
+            }
+            else
+            {
+                gameObject.transform.position = new Vec2D(pos.x, pos.y + speed * Time.deltaTime); // Bewegung nach unten
+            }
+            //     transform.position = new Vec2D(gameBounds.x / 2 - 300, gameBounds.y / 2 - 300);
+        }
+    }
+
+
+    class ObsticalCreate : Script
+    {
+
+        public override void Start()
+        {
+            Vec2D gameBounds = new Vec2D(1920, 1080);
+
+            var obsticle1 = new GameObject("obsticle1");
+            var obs1 = obsticle1.AddComponent<FilledRect>();
+            obs1.color = Color.Gold;
+            obs1.SetRect(new Rect(60, 100));
+            obs1.anchorPoint = AnchorPoint.Center;
+            BoxCollider.FromDrawableRect(obsticle1);
+            //obsticle1.AddComponent<BoxCollider>().UpdateColliderSize(60, 100);
+            obsticle1.transform.position = new Vec2D(gameBounds.x / 2 - 300, gameBounds.y / 2 - 500);
+            obsticle1.AddComponent<ObsticalMove>();
+
+
+            var obsticle2 = new GameObject("obsticle2");
+            var obs2 = obsticle2.AddComponent<FilledRect>();
+            obs2.color = Color.Gold;
+            obs2.SetRect(new Rect(60, 100));
+            obs2.anchorPoint = AnchorPoint.Center;
+            BoxCollider.FromDrawableRect(obsticle2);
+            //obsticle1.AddComponent<BoxCollider>().UpdateColliderSize(60, 100);
+            obsticle2.transform.position = new Vec2D(gameBounds.x / 2 + 300, gameBounds.y / 2 + 500);
+            obsticle2.AddComponent<ObsticalMove>();
+        }
+
+    }
     public class Level2GameController : GameController
     {
 
@@ -379,6 +442,17 @@ namespace Pong
         public Level4GameController()
         {
             this.level_id = 4;
+        }
+        public override void Start()
+        {
+            base.Start();
+
+            Vec2D gameBounds = new Vec2D(1920, 1080);
+
+            obsticle = new GameObject("obsticle");
+            obsticle.AddComponent<ObsticalCreate>();
+
+
         }
         public override void Update()
         {

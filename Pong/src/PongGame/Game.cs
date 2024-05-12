@@ -95,7 +95,7 @@ namespace Pong
 
         public static Scene CreateLevel2()
         {
-            //  musikObject.GetComponent<HomeMusik>()?.StopMusic();
+            musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
             var level = new Scene("Level2");
 
             var gameControllerObject = new GameObject("GameController2", level);
@@ -106,7 +106,7 @@ namespace Pong
 
         public static Scene CreateLevel3()
         {
-            //     musikObject.GetComponent<HomeMusik>()?.StopMusic();
+            musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
 
             var level = new Scene("Level3");
 
@@ -118,7 +118,7 @@ namespace Pong
 
         public static Scene CreateLevel4()
         {
-            //    musikObject.GetComponent<HomeMusik>()?.StopMusic();
+            musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
 
             var level = new Scene("Level4");
 
@@ -130,7 +130,7 @@ namespace Pong
 
         public static Scene CreateLevel5()
         {
-            //    musikObject.GetComponent<HomeMusik>()?.StopMusic();
+            musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
 
             var level = new Scene("Level5");
 
@@ -154,13 +154,13 @@ namespace Pong
 
     class HomeMusik : Script
     {
-        private Sound scoreSoundFire;
+        private Sound Musik;
         private bool musicStarted = false;
 
         public override void Start()
         {
-            scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Homemusik.mp3");
-            scoreSoundFire.SetVolume(0.3);
+            Musik = AssetManager.LoadAsset<Sound>("Assets/Audio/Homemusik.mp3");
+            Musik.SetVolume(0.3);
         }
 
         public override void Update()
@@ -168,7 +168,7 @@ namespace Pong
             // Starte die Musik nur, wenn sie noch nicht gestartet wurde
             if (!musicStarted)
             {
-                scoreSoundFire.Play();
+                Musik.Play();
                 musicStarted = true;
             }
         }
@@ -176,7 +176,7 @@ namespace Pong
         public bool StopMusic(bool musikplaying)
         {
             // Stoppe die Musik
-            scoreSoundFire.Stop();
+            Musik.Stop();
             musikplaying = false;
             return musikplaying;
         }
@@ -344,7 +344,7 @@ namespace Pong
 
             }
 
-            if(resetChecker != lastReset)
+            if (resetChecker != lastReset)
             {
                 foreach (var powerup in powerups)
                 {

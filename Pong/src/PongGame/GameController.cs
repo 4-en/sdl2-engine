@@ -117,6 +117,7 @@ namespace Pong
         {
             sound = AddComponent<SoundPlayer>();
             sound?.Load("Assets/Audio/bounce.mp3");
+            sound?.SetVolume(0.4);
         }
 
         public override void OnCollisionEnter(CollisionPair collision)
@@ -355,8 +356,9 @@ namespace Pong
             scoreText.color = new Color(255, 255, 255, 205);
             scoreText.SetFontSize(100);
             scoreText.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            scoreSoundWater.SetVolume(0.6);
 
-            scoreObject3 = new GameObject("ScorePlayer1");
+            scoreObject3 = new GameObject("ScorePlayer-");
             scoreObject3.transform.position = new Vec2D(gameBounds.x / 2, 80);
             scoreText3 = scoreObject3.AddComponent<TextRenderer>();
             scoreText3.color = new Color(255, 255, 255, 205);
@@ -369,6 +371,7 @@ namespace Pong
             scoreText2.color = new Color(255, 255, 255, 205);
             scoreText2.SetFontSize(100);
             scoreText2.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            scoreSoundFire.SetVolume(0.8);
 
             timeText = Component.CreateWithGameObject<TextRenderer>("TimeCounter").Item2;
             timeText.color = new Color(255, 255, 255, 205);
@@ -468,6 +471,7 @@ namespace Pong
             if (body != null)
             {
                 int total_score = player_1_score + player_2_score;
+                Console.WriteLine(body.Velocity);
                 double speed = 800 + total_score * 50; // increase speed as game progresses
                 var rand = new System.Random();
 

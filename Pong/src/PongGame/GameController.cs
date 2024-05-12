@@ -271,7 +271,7 @@ namespace Pong
                     arrow_controller.keyDown = (int)SDL_Keycode.SDLK_DOWN;
                     return arrow_controller;
                 case PlayerType.AI:
-                    return obj.AddComponent<AIController>();
+                    return obj.AddComponent<BetterAIController>();
                 case PlayerType.Mouse:
                     return obj.AddComponent<MouseController>();
                 default:

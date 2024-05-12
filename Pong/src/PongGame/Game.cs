@@ -326,7 +326,7 @@ namespace Pong
         protected double resetChecker = 0;
         public Level123GameController()
         {
-            this.level_id = 6;
+            this.level_id = 5;
         }
         public override void Update()
         {

@@ -337,7 +337,7 @@ namespace Pong
             {
                 powerupTimer = 0;
 
-                if (random.NextDouble() > 0.7)
+                if (random.NextDouble() > 0.5)
                 {
                     AddPortal();
                 }

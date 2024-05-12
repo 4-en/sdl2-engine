@@ -42,6 +42,7 @@ namespace Pong
                 case "Endless":
                 case "Highscore":
                 case "HiScore":
+                case "Hiscore":
                     return GameMode.HIGHSCORE;
                 case "Timed":
                     return GameMode.TIMED;

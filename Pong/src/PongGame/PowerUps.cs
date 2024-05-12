@@ -18,6 +18,7 @@ namespace Pong
             public bool onCooldown = false;
             public double lastTeleport = 0;
             public double cooldownTime = 1;
+            public ulong currentCollision = 0;
 
 
             public override void Start()
@@ -34,15 +35,6 @@ namespace Pong
 
             public override void Update()
             {
-                if(this.portalScript == null || this.other == null)
-                {
-                    return;
-                }
-
-                if (onCooldown && Time.time - lastTeleport > cooldownTime)
-                {
-                    onCooldown = false;
-                }
 
             }
 
@@ -63,11 +55,13 @@ namespace Pong
                 other.onCooldown = true;
                 lastTeleport = Time.time;
                 other.lastTeleport = Time.time;
+                this.currentCollision = Time.tick;
+                other.currentCollision = Time.tick;
             }
 
             public override void OnCollisionEnter(CollisionPair collision)
             {
-                if (this.portalScript == null || this.other == null || onCooldown)
+                if (this.portalScript == null || this.other == null)
                 {
                     return;
                 }
@@ -76,6 +70,20 @@ namespace Pong
                 if (otherObject.GetName() != "Ball")
                 {
                     return;
+                }
+
+                ulong tick = Time.tick;
+                if (tick <= currentCollision+2)
+                {
+                    currentCollision = tick;
+                    other.currentCollision = tick;
+                    other.onCooldown = true;
+                    onCooldown = true;
+                    return;
+                } else
+                {
+                    onCooldown = false;
+                    other.onCooldown = false;
                 }
 
                 Teleport(otherObject);

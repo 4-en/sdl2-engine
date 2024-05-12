@@ -112,9 +112,12 @@ namespace Pong
         {
             if(color == null)
             {
-                var bytes = new byte[3];
-                random.NextBytes(bytes);
-                color = new Color(bytes[0], bytes[1], bytes[2]);
+                byte[] bytes = new byte[3];
+                for (int i = 0; i < 3; i++)
+                {
+                    bytes[i] = (byte)random.Next(123, 255);
+                }
+                color = new Color(bytes[0], bytes[1], bytes[2], 255);
             }
 
             var portal1 = Component.CreateWithGameObject<ConnectedPortal>();

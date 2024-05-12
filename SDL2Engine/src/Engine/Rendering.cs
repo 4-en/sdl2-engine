@@ -81,6 +81,11 @@ namespace SDL2Engine
             color = (UInt32)(r << 24 | g << 16 | b << 8 | a);
         }
 
+        public Color(UInt32 color)
+        {
+            this.color = color;
+        }
+
         public Color() : this(0, 0, 0, 255)
         {
         }

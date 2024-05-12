@@ -187,7 +187,7 @@ namespace Pong
                 //calculate relative position of the ball on the paddle (-1,1)
                 var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);
                 double ball_vel = ball_body.Velocity.Length();
-
+                Console.WriteLine(ball_vel);
                 double bounceBoost = 100;
 
 
@@ -471,7 +471,6 @@ namespace Pong
             if (body != null)
             {
                 int total_score = player_1_score + player_2_score;
-                Console.WriteLine(body.Velocity);
                 double speed = 800 + total_score * 50; // increase speed as game progresses
                 var rand = new System.Random();
 

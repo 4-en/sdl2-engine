@@ -9,7 +9,7 @@ namespace Pong
 
     public class PaddleController : Script
     {
-        public double speed = 1000;
+        public double speed = 1200;
         private BoxCollider? boxCollider = null;
         public GameController? gameController = null;
 
@@ -188,7 +188,7 @@ namespace Pong
                 var relativePosition = (ballCenter.y - paddleMid) / (paddleHeight / 2);
                 double ball_vel = ball_body.Velocity.Length();
                 // Console.WriteLine(ball_vel);
-                double bounceBoost = 100;
+                double bounceBoost = 50;
 
 
                 double deltaVelocity = relativePosition * ball_vel * 0.5;

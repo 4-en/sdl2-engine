@@ -40,65 +40,7 @@ namespace Pong
         private static Scene? level;
         private static int levelIndex = 0;
 
-        private static Dictionary<int, Func<Scene>> levelCreators = new Dictionary<int, Func<Scene>>
-        {
-            { 0, CreateBaseLevel },
-            { 1, CreateLevel1 },
-            { 2, CreateLevel2 }
-        };
 
-        public static bool RegisterLevelCreator(int index, Func<Scene> creator)
-        {
-            if (levelCreators.ContainsKey(index))
-            {
-                return false;
-            }
-
-            levelCreators.Add(index, creator);
-            return true;
-        }
-
-        public static int[] GetLevelIndices()
-        {
-            return levelCreators.Keys.ToArray();
-        }
-
-        public static void LoadLevel(int index)
-        {
-            //     musikObject.GetComponent<HomeMusik>()?.StopMusic();
-
-            if (!levelCreators.ContainsKey(index))
-            {
-                throw new Exception($"No level creator found for index {index}");
-            }
-            levelIndex = index;
-            if (level != null)
-            {
-                SceneManager.RemoveScene(level);
-                level = null;
-            }
-
-            if (homeScreen != null)
-            {
-                SceneManager.RemoveScene(homeScreen);
-                homeScreen = null;
-            }
-            var creator = levelCreators[index];
-            var new_level = creator();
-            SceneManager.SetScene(new_level);
-            level = new_level;
-
-        }
-
-        public static void LoadNextLevel()
-        {
-            int nextLevelIndex = levelIndex;
-            if (level != null)
-            {
-                nextLevelIndex = levelIndex + 1;
-            }
-            LoadLevel(nextLevelIndex);
-        }
 
         public static void LoadPlayerSelection()
         {
@@ -123,18 +65,25 @@ namespace Pong
 
         }
 
-        public static Scene CreateBaseLevel()
+        public static Tuple<Scene, GameObject> CreateBaseLevel()
         {
             var level = new Scene("BaseLevel");
             var gameControllerObject = new GameObject("GameController", level);
             gameControllerObject.AddComponent<GameController>();
 
-            return level;
+            return new Tuple<Scene, GameObject>(level, gameControllerObject);
         }
 
         public static Scene CreateLevel1()
         {
-            var level = CreateBaseLevel();
+            var tuple = CreateBaseLevel();
+            var level = tuple.Item1;
+            var gameControllerObject = tuple.Item2;
+            var controller = gameControllerObject.GetComponent<GameController>();
+            if (controller != null)
+            {
+                controller.level_id = 1;
+            }
             musikplaying = (bool)(musikObject.GetComponent<HomeMusik>()?.StopMusic(musikplaying));
 
             // so some level specific stuff here...
@@ -293,6 +242,11 @@ class DestroyAndChangeDirectionOnCollision : Script
 public class Level2GameController : GameController
 {
 
+    public Level2GameController()
+    {
+        this.level_id = 2;
+    }
+
     public override void Update()
     {
 
@@ -320,6 +274,11 @@ public class Level2GameController : GameController
 
 public class Level3GameController : GameController
 {
+
+    public Level3GameController()
+    {
+        this.level_id = 3;
+    }
 
     public override void Update()
     {
@@ -350,7 +309,10 @@ public class Level3GameController : GameController
 
 public class Level4GameController : GameController
 {
-
+    public Level4GameController()
+    {
+        this.level_id = 4;
+    }
     public override void Update()
     {
 

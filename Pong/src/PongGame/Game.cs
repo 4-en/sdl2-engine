@@ -128,6 +128,18 @@ namespace Pong
             return level;
         }
 
+        public static Scene CreateLevel5()
+        {
+            //    musikObject.GetComponent<HomeMusik>()?.StopMusic();
+
+            var level = new Scene("Level5");
+
+            var gameControllerObject = new GameObject("GameController5", level);
+            gameControllerObject.AddComponent<Level123GameController>();
+
+            return level;
+        }
+
         static GameObject musikObject = new GameObject();
 
         private static Scene CreateHomeScreen()
@@ -139,232 +151,114 @@ namespace Pong
         }
     }
 
-}
-class HomeMusik : Script
-{
-    private Sound scoreSoundFire;
-    private bool musicStarted = false;
 
-    public override void Start()
+    class HomeMusik : Script
     {
-        scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Homemusik.mp3");
-        scoreSoundFire.SetVolume(0.3);
-    }
+        private Sound scoreSoundFire;
+        private bool musicStarted = false;
 
-    public override void Update()
-    {
-        // Starte die Musik nur, wenn sie noch nicht gestartet wurde
-        if (!musicStarted)
+        public override void Start()
         {
-            scoreSoundFire.Play();
-            musicStarted = true;
+            scoreSoundFire = AssetManager.LoadAsset<Sound>("Assets/Audio/Homemusik.mp3");
+            scoreSoundFire.SetVolume(0.3);
         }
-    }
 
-    public bool StopMusic(bool musikplaying)
-    {
-        // Stoppe die Musik
-        scoreSoundFire.Stop();
-        musikplaying = false;
-        return musikplaying;
-    }
-}
-class SpeedPowerup : Script
-{
-
-
-
-    public override void Start()
-    {
-        var powerup = new GameObject("Powerup");
-        powerup.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/speed_powerup.png");
-        var bc = BoxCollider.FromDrawableRect(powerup);
-        bc.IsTrigger = true;
-        powerup.AddComponent<DestroyAndIncreaseSpeedOnCollision>();
-        powerup.SetPosition(new Vec2D(500, 500));
-    }
-    public override void Update()
-    {
-
-    }
-}
-
-class DestroyAndIncreaseSpeedOnCollision : Script
-{
-    public override void OnCollisionEnter(CollisionPair collision)
-    {
-        // destroy if colliding with anything (thats movable, since two static objects can't collide)
-        Destroy(this.gameObject);
-        //increase ball speed
-        foreach (var obj in this.gameObject.GetScene().GetGameObjects())
+        public override void Update()
         {
-            if (obj.GetName() == "Ball")
+            // Starte die Musik nur, wenn sie noch nicht gestartet wurde
+            if (!musicStarted)
             {
-                obj.GetComponent<PhysicsBody>().Velocity = obj.GetComponent<PhysicsBody>().Velocity * new Vec2D(1.5, 1.5);
+                scoreSoundFire.Play();
+                musicStarted = true;
             }
         }
 
-    }
-
-    public override void Update()
-    {
-        // rotate with time
-
-        transform.rotation = Time.time * 360 / 3 % 360;
-    }
-}
-
-class DestroyAndChangeDirectionOnCollision : Script
-{
-    public override void OnCollisionEnter(CollisionPair collision)
-    {
-        // destroy if colliding with anything (thats movable, since two static objects can't collide)
-        Destroy(this.gameObject);
-        //change ball direction
-        foreach (var obj in this.gameObject.GetScene().GetGameObjects())
+        public bool StopMusic(bool musikplaying)
         {
-            if (obj.GetName() == "Ball")
-            {
-                obj.GetComponent<PhysicsBody>().Velocity = new Vec2D(obj.GetComponent<PhysicsBody>().Velocity.x, -obj.GetComponent<PhysicsBody>().Velocity.y);
-            }
+            // Stoppe die Musik
+            scoreSoundFire.Stop();
+            musikplaying = false;
+            return musikplaying;
         }
-
     }
-
-    public override void Update()
-    {
-        // rotate with time
-
-        transform.rotation = Time.time * 360 / 3 % 360;
-    }
-}
-
-public class Level2GameController : GameController
-{
-
-    public Level2GameController()
-    {
-        this.level_id = 2;
-    }
-
-    public override void Update()
+    class SpeedPowerup : Script
     {
 
-        base.Update();
-        Vec2D gameBounds = new Vec2D(1920, 1080);
 
-        if (powerupTimer > 10)
+
+        public override void Start()
         {
-            powerupTimer = 0;
             var powerup = new GameObject("Powerup");
             powerup.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/speed_powerup.png");
             var bc = BoxCollider.FromDrawableRect(powerup);
             bc.IsTrigger = true;
             powerup.AddComponent<DestroyAndIncreaseSpeedOnCollision>();
-            //random value between x and y
-            int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);
-            var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);
-
-            powerup.SetPosition(new Vec2D(randomX, randomY));
+            powerup.SetPosition(new Vec2D(500, 500));
         }
-
-
-    }
-}
-
-public class Level3GameController : GameController
-{
-
-    public Level3GameController()
-    {
-        this.level_id = 3;
-    }
-
-    public override void Update()
-    {
-
-        base.Update();
-        Vec2D gameBounds = new Vec2D(1920, 1080);
-
-        if (powerupTimer > 6)
-        {
-            powerupTimer = 0;
-            var powerup = new GameObject("Powerup");
-            var texture = powerup.AddComponent<TextureRenderer>();
-            texture?.SetSource("Assets/Textures/change_direction_powerup.png");
-
-            var bc = BoxCollider.FromDrawableRect(powerup);
-            bc.IsTrigger = true;
-            powerup.AddComponent<DestroyAndChangeDirectionOnCollision>();
-            //random value between x and y
-            int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);
-            var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);
-
-            powerup.SetPosition(new Vec2D(randomX, randomY));
-        }
-
-
-    }
-}
-
-public class Level4GameController : GameController
-{
-    public Level4GameController()
-    {
-        this.level_id = 4;
-    }
-    public override void Update()
-    {
-
-        base.Update();
-        Vec2D gameBounds = new Vec2D(1920, 1080);
-
-        if (powerupTimer > 5)
+        public override void Update()
         {
 
-            var rand = new Random().Next(0, 2);
-            var powerup = new GameObject("Powerup");
-            var texture = powerup.AddComponent<TextureRenderer>();
-            var bc = BoxCollider.FromDrawableRect(powerup);
-            bc.IsTrigger = true;
+        }
+    }
 
-            if (rand < 1)
+    class DestroyAndIncreaseSpeedOnCollision : Script
+    {
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            // destroy if colliding with anything (thats movable, since two static objects can't collide)
+            Destroy(this.gameObject);
+            //increase ball speed
+            foreach (var obj in this.gameObject.GetScene().GetGameObjects())
             {
-
-
-
-                texture?.SetSource("Assets/Textures/change_direction_powerup.png");
-
-
-                powerup.AddComponent<DestroyAndChangeDirectionOnCollision>();
-
+                if (obj.GetName() == "Ball")
+                {
+                    obj.GetComponent<PhysicsBody>().Velocity = obj.GetComponent<PhysicsBody>().Velocity * new Vec2D(1.5, 1.5);
+                }
             }
-            else
-            {
 
-
-                texture?.SetSource("Assets/Textures/speed_powerup.png");
-
-                powerup.AddComponent<DestroyAndIncreaseSpeedOnCollision>();
-
-            }
-            //random value between x and y
-            int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);
-            var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);
-
-            powerup.SetPosition(new Vec2D(randomX, randomY));
-            powerupTimer = 0;
         }
 
+        public override void Update()
+        {
+            // rotate with time
 
+            transform.rotation = Time.time * 360 / 3 % 360;
+        }
     }
 
-    public class Level123GameController : GameController
+    class DestroyAndChangeDirectionOnCollision : Script
     {
-        public Level123GameController()
+        public override void OnCollisionEnter(CollisionPair collision)
         {
-            this.level_id = 6;
+            // destroy if colliding with anything (thats movable, since two static objects can't collide)
+            Destroy(this.gameObject);
+            //change ball direction
+            foreach (var obj in this.gameObject.GetScene().GetGameObjects())
+            {
+                if (obj.GetName() == "Ball")
+                {
+                    obj.GetComponent<PhysicsBody>().Velocity = new Vec2D(obj.GetComponent<PhysicsBody>().Velocity.x, -obj.GetComponent<PhysicsBody>().Velocity.y);
+                }
+            }
+
         }
+
+        public override void Update()
+        {
+            // rotate with time
+
+            transform.rotation = Time.time * 360 / 3 % 360;
+        }
+    }
+
+    public class Level2GameController : GameController
+    {
+
+        public Level2GameController()
+        {
+            this.level_id = 2;
+        }
+
         public override void Update()
         {
 
@@ -385,6 +279,151 @@ public class Level4GameController : GameController
 
                 powerup.SetPosition(new Vec2D(randomX, randomY));
             }
+
+
+        }
+    }
+
+    public class Level3GameController : GameController
+    {
+
+        public Level3GameController()
+        {
+            this.level_id = 3;
+        }
+
+        public override void Update()
+        {
+
+            base.Update();
+            Vec2D gameBounds = new Vec2D(1920, 1080);
+
+            if (powerupTimer > 6)
+            {
+                powerupTimer = 0;
+                var powerup = new GameObject("Powerup");
+                var texture = powerup.AddComponent<TextureRenderer>();
+                texture?.SetSource("Assets/Textures/change_direction_powerup.png");
+
+                var bc = BoxCollider.FromDrawableRect(powerup);
+                bc.IsTrigger = true;
+                powerup.AddComponent<DestroyAndChangeDirectionOnCollision>();
+                //random value between x and y
+                int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);
+                var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);
+
+                powerup.SetPosition(new Vec2D(randomX, randomY));
+            }
+
+
+        }
+    }
+
+    public class Level123GameController : GameController
+    {
+
+        private List<GameObject> powerups = new List<GameObject>();
+        protected double resetChecker = 0;
+        public Level123GameController()
+        {
+            this.level_id = 6;
+        }
+        public override void Update()
+        {
+
+            base.Update();
+
+            if (powerupTimer > 3)
+            {
+                powerupTimer = 0;
+
+                if (random.NextDouble() > 0.7)
+                {
+                    AddPortal();
+                }
+
+            }
+
+            if(resetChecker != lastReset)
+            {
+                foreach (var powerup in powerups)
+                {
+                    powerup.Destroy();
+                }
+                powerups.Clear();
+                resetChecker = lastReset;
+            }
+
+
+        }
+
+        private void AddPortal()
+        {
+            var portal = new GameObject("Portal");
+            portal.AddComponent<PortalScript>();
+
+            this.gameObject.AddChild(portal);
+            this.powerups.Add(portal);
+
+            if (powerups.Count > 2)
+            {
+                var toRemove = powerups[0];
+                powerups.RemoveAt(0);
+                toRemove.Destroy();
+            }
+        }
+    }
+
+    public class Level4GameController : GameController
+    {
+        public Level4GameController()
+        {
+            this.level_id = 4;
+        }
+        public override void Update()
+        {
+
+            base.Update();
+            Vec2D gameBounds = new Vec2D(1920, 1080);
+
+            if (powerupTimer > 5)
+            {
+
+                var rand = new Random().Next(0, 2);
+                var powerup = new GameObject("Powerup");
+                var texture = powerup.AddComponent<TextureRenderer>();
+                var bc = BoxCollider.FromDrawableRect(powerup);
+                bc.IsTrigger = true;
+
+                if (rand < 1)
+                {
+
+
+
+                    texture?.SetSource("Assets/Textures/change_direction_powerup.png");
+
+
+                    powerup.AddComponent<DestroyAndChangeDirectionOnCollision>();
+
+                }
+                else
+                {
+
+
+                    texture?.SetSource("Assets/Textures/speed_powerup.png");
+
+                    powerup.AddComponent<DestroyAndIncreaseSpeedOnCollision>();
+
+                }
+                //random value between x and y
+                int randomX = new Random().Next((int)gameBounds.x / 2 - 500, (int)gameBounds.x / 2 + 500);
+                var randomY = new Random().Next((int)gameBounds.y / 2 - 500, (int)gameBounds.y / 2 + 500);
+
+                powerup.SetPosition(new Vec2D(randomX, randomY));
+                powerupTimer = 0;
+            }
+
+
         }
     }
 }

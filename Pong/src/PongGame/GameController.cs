@@ -252,6 +252,7 @@ namespace Pong
         private GameMode gameMode = LevelManager.gameMode;
 
         private bool stopped = false;
+        protected double lastReset = 0;
 
         public int scoreToWin = 11;
 
@@ -478,6 +479,7 @@ namespace Pong
 
         public void ResetGame()
         {
+            lastReset = Time.time;
             player_1_score = 0;
             player_2_score = 0;
             UpdateScoreText();

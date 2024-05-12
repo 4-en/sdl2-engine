@@ -20,7 +20,7 @@ namespace Pong
 
         public void Move(double strength)
         {
-            if(gameController == null || gameController.IsStopped()) return;
+            if (gameController == null || gameController.IsStopped()) return;
 
             double movement = speed * Time.deltaTime * strength;
             gameObject.transform.position += new Vec2D(0, movement);
@@ -189,7 +189,7 @@ namespace Pong
 
                 double bounceBoost = 100;
 
-                
+
                 double deltaVelocity = relativePosition * ball_vel * 0.5;
                 Vec2D newVelocity = ball_body.Velocity + new Vec2D(0, deltaVelocity);
                 newVelocity = newVelocity.Normalize() * (ball_body.Velocity.Length() + bounceBoost);
@@ -222,6 +222,8 @@ namespace Pong
 
         protected GameObject? topWall = null;
         protected GameObject? bottomWall = null;
+
+        protected GameObject? obsticle = null;
 
         protected GameObject? scoreObject = null;
         protected GameObject? scoreObject2 = null;
@@ -371,14 +373,14 @@ namespace Pong
             timeText.GetGameObject().SetPosition(new Vec2D(gameBounds.x - 300, 25));
             timeText.SetText("Round: 0");
 
-            if(gameMode == GameMode.TIMED)
+            if (gameMode == GameMode.TIMED)
             {
                 countdownText = Component.CreateWithGameObject<TextRenderer>("Countdown").Item2;
                 countdownText.color = new Color(255, 255, 255, 205);
                 countdownText.SetFontSize(52);
                 countdownText.anchorPoint = AnchorPoint.TopLeft;
                 countdownText.GetGameObject().SetPosition(new Vec2D(25, 25));
-                
+
                 UpdateCountdown();
             }
 
@@ -396,7 +398,7 @@ namespace Pong
             bool tied = player_1_score == player_2_score;
             if (timeLeft < 0) timeLeft = 0;
 
-            if(tied && timeLeft <= 0)
+            if (tied && timeLeft <= 0)
             {
                 // sudden death
                 countdownText.SetText("SUDDEN DEATH");
@@ -537,7 +539,7 @@ namespace Pong
 
         private void ShowEndScreen()
         {
-            if(QualifiedForHighscores())
+            if (QualifiedForHighscores())
             {
                 var highscoreRoot = new GameObject("HighscoreRoot");
                 var highscoreScript = highscoreRoot.AddComponent<HighscoreScript>();
@@ -545,7 +547,7 @@ namespace Pong
                 highscoreScript.SetHighscores(hs);
 
                 highscoreScript.AddHighscoreState(GetScore());
-                
+
             }
             else
             {
@@ -665,7 +667,8 @@ namespace Pong
                 scoreSoundFire.Play();
 
                 player_2_score++;
-                if(scoreText2 != null) {
+                if (scoreText2 != null)
+                {
                     scoreText2.SetFontSize(120);
                     scoreText2.color = new Color(255, 0, 0, 205);
                 }
@@ -683,7 +686,8 @@ namespace Pong
             {
                 scoreSoundWater.Play();
                 player_1_score++;
-                if (scoreText != null) {
+                if (scoreText != null)
+                {
                     scoreText.SetFontSize(120);
                     scoreText.color = new Color(30, 144, 255, 255);
                 }

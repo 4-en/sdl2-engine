@@ -276,6 +276,10 @@ namespace Pong
                     return obj.AddComponent<BetterAIController>();
                 case PlayerType.Mouse:
                     return obj.AddComponent<MouseController>();
+                case PlayerType.UNFAIR:
+                    var ai = obj.AddComponent<BetterAIController>();
+                    ai.unfair = true;
+                    return ai;
                 default:
                     return obj.AddComponent<KeyboardController>();
 

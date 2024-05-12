@@ -15,7 +15,8 @@ namespace Pong
         ArrowKeys,
         Mouse,
         Controller,
-        AI
+        AI,
+        UNFAIR
     }
     public static partial class LevelManager
     {

@@ -28,6 +28,8 @@ namespace Pong
                     return PlayerType.Mouse;
                 case "Controller":
                     return PlayerType.Controller;
+                case "UNFAIR":
+                    return PlayerType.UNFAIR;
                 default:
                     return PlayerType.WS;
             }
@@ -84,7 +86,7 @@ namespace Pong
                 player1_renderer.SetFontSize(48);
                 player1_renderer.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
 
-                string[] control_values = new string[] { "W/S", "Arrows", "Mouse", "AI" };
+                string[] control_values = new string[] { "W/S", "Arrows", "Mouse", "AI", "UNFAIR" };
 
 
                 var player1_controls = UI.CycleButton(
@@ -104,7 +106,8 @@ namespace Pong
                     { PlayerType.ArrowKeys, "Arrows" },
                     { PlayerType.AI, "AI" },
                     { PlayerType.Mouse, "Mouse" },
-                    { PlayerType.Controller, "Controller" }
+                    { PlayerType.Controller, "Controller" },
+                    { PlayerType.UNFAIR, "UNFAIR" }
                 };
 
                 player1_controls.Item2.SetText(PlayerTypeToString[LevelManager.player1Type]);

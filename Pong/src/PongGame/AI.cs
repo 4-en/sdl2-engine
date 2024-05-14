@@ -127,6 +127,11 @@ namespace Pong
             base.Start();
             difficulty = 0.4;
 
+            if(unfair)
+            {
+                difficulty = 10;
+            }
+
         }
 
         public override void Update()

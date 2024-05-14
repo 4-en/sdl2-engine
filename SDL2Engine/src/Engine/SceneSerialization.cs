@@ -105,6 +105,9 @@ namespace SDL2Engine
         public static Scene? LoadScene(string name)
         {
             // TODO: Implement this method
+            // TODO: handle prefab loading
+            // maybe create special prefab class that contains name of prefab and
+            // separate file with prefab data
             
             // 1. prepare path
             string path = "Assets/Scenes/" + name + ".scene";

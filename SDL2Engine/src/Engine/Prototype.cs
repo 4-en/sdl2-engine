@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,14 +17,29 @@ namespace SDL2Engine
     [Serializable]
     public class Prototype
     {
+        [JsonProperty]
         private string name;
+        [JsonProperty]
         private GameObject gameObject;
         // private GameObject previousState;
+
+        [JsonProperty]
+        private List<String> child_prototypes;
+
+        public GameObject GameObject { get => gameObject; set => gameObject = value; }
+
+        protected Prototype()
+        {
+            this.name = "";
+            this.gameObject = new GameObject(true, "");
+            this.child_prototypes = new List<String>();
+        }
 
         public Prototype(string name)
         {
             this.name = name;
             this.gameObject = new GameObject(true, name);
+            this.child_prototypes = new List<String>();
             // this.previousState = gameObject.Clone();
         }
 
@@ -31,11 +47,12 @@ namespace SDL2Engine
         {
             this.name = name;
             this.gameObject = gameObject;
+            this.child_prototypes = new List<String>();
         }
 
         public GameObject Instantiate()
         {
-            var new_instance = gameObject.Clone();
+            var new_instance = GameObject.Clone();
 
             // add current scene if it exists
             Scene? activeScene = SceneManager.GetActiveScene();
@@ -45,6 +62,8 @@ namespace SDL2Engine
             }
             return new_instance;
         }
+
+        
 
         public string GetName()
         {

@@ -26,6 +26,8 @@ namespace SDL2Engine.Testing
 
     class MouseTracker : Script
     {
+
+        private Prototype forsenBullet = new Prototype("forsenBullet");
         private GameObject? AddSquare(GameObject? parent = null)
         {
             var square = new GameObject("Child Square");
@@ -65,6 +67,15 @@ namespace SDL2Engine.Testing
                 music.Play(-1);
             }
             */
+
+            // create prototype
+            forsenBullet.GameObject.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/forsenE.png");
+            var collider = forsenBullet.GameObject.AddComponent<BoxCollider>();
+            var pb = forsenBullet.GameObject.AddComponent<PhysicsBody>();
+            pb.IsMovable = true;
+            pb.Velocity = new Vec2D(1000, 0);
+            pb.Drag = 0;
+            forsenBullet.GameObject.AddComponent<DestroyOnCollision>();
         }
         public override void Update()
         {
@@ -110,6 +121,17 @@ namespace SDL2Engine.Testing
                     {
                         child.SetPosition(child.GetPosition() + offset);
                     }
+                }
+            }
+
+            // test prototype instantiation
+            if (Input.GetKeyDown((int)SDL.SDL_Keycode.SDLK_p))
+            {
+                // instantiate a forsen bullet
+                var bullet = forsenBullet.Instantiate();
+                if (bullet != null)
+                {
+                    bullet.SetPosition(gameObject.GetPosition());
                 }
             }
 

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace SDL2Engine
 {
@@ -101,11 +102,11 @@ namespace SDL2Engine
         }
 
         // creates a deep copy of the GameObject
-        public static GameObject Instantiate(GameObject source)
+        public GameObject Clone()
         {
-
+            var source = this;
             // setups the new object
-            GameObject newObject = new GameObject(source.name, source.scene);
+            GameObject newObject = source.scene == null ? new GameObject(true, source.GetName()) : new GameObject(source.GetName(), source.scene);
             newObject.layer = source.layer;
             newObject.enabled = source.enabled;
 
@@ -143,7 +144,7 @@ namespace SDL2Engine
             // copy all children
             foreach (GameObject child in source.children)
             {
-                GameObject newChild = GameObject.Instantiate(child);
+                GameObject newChild = child.Clone();
                 // fix references to new object
                 newChild.Parent = newObject;
                 newObject.children.Add(newChild);

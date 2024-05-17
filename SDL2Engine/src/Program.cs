@@ -97,6 +97,22 @@ namespace SDL2Engine.Testing
                 }
             }
 
+            // check if c key is pressed
+            if (Input.GetKeyDown((int)SDL.SDL_Keycode.SDLK_c))
+            {
+                // clone the game object
+                var clone = gameObject.Clone();
+                if (clone != null)
+                {
+                    // move all children by a random amount
+                    Vec2D offset = new Vec2D(random.Next(-100, 100), random.Next(-100, 100));
+                    foreach (var child in clone.GetChildren())
+                    {
+                        child.SetPosition(child.GetPosition() + offset);
+                    }
+                }
+            }
+
             if (Input.GetMouseButtonDown(0))
             {
                 // play a sound

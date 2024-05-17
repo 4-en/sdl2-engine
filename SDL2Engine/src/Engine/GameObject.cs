@@ -117,7 +117,7 @@ namespace SDL2Engine
             newObject.Parent = source.Parent;
 
             // copy all components
-            foreach (Component script in source.components)
+            foreach (Component script in source.GetAllComponents())
             {
                 Type type = script.GetType();
                 // create a new instance of the script
@@ -146,8 +146,8 @@ namespace SDL2Engine
             {
                 GameObject newChild = child.Clone();
                 // fix references to new object
-                newChild.Parent = newObject;
-                newObject.children.Add(newChild);
+                newChild.SetParent(null);
+                newObject.AddChild(newChild);
             }
 
             return newObject;

@@ -37,6 +37,21 @@ namespace SDL2Engine
             this.transform.Init(this);
         }
 
+        public GameObject(bool no_scene, string name = "GameObject")
+        {
+            this.Parent = null;
+
+            if (!no_scene)
+            {
+                this.scene = SceneManager.GetActiveScene();
+                this.scene?.AddGameObject(this);
+            }
+
+            this.name = name;
+            this.transform.Init(this);
+        }
+        
+
         public GameObject(GameObject parent, string name = "GameObject")
         {
 

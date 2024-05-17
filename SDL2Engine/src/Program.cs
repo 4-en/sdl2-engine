@@ -54,15 +54,17 @@ namespace SDL2Engine.Testing
         }
 
         private Sound sound = AssetManager.LoadAsset<Sound>("Assets/Audio/test_sound.mp3");
-        private Music music = AssetManager.LoadAsset<Music>("Assets/Audio/tetris.mp3");
+        // private Music music = AssetManager.LoadAsset<Music>("Assets/Audio/tetris.mp3");
 
         public override void Start()
         {
             // play music
+            /*
             if (music != null)
             {
                 music.Play(-1);
             }
+            */
         }
         public override void Update()
         {

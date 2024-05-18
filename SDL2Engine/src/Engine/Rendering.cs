@@ -936,7 +936,7 @@ namespace SDL2Engine
         }
 
         // changes the current animation to the animation with the given name
-        public void SetAnimation(string name)
+        public void SetAnimation(string name, AnimationType? type = null)
         {
             if (currentAnimation == name)
             {
@@ -952,18 +952,23 @@ namespace SDL2Engine
                 animationType = animations[name].type;
                 animationSpeed = animations[name].speed;
             }
+
+            if (type != null)
+            {
+                animationType = type.Value;
+            }
         }
 
         // changes the current animation to the animation with the given name
-        public void PlayAnimation(string name)
+        public void PlayAnimation(string name, AnimationType? type = null)
         {
-            SetAnimation(name);
+            SetAnimation(name, type);
         }
 
         // changes the current animation to the animation with the given name
-        public void Play(string name)
+        public void Play(string name, AnimationType? type = null)
         {
-            SetAnimation(name);
+            SetAnimation(name, type);
         }
 
         // changes the speed of the current animation

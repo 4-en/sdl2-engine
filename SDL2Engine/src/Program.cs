@@ -83,8 +83,10 @@ namespace SDL2Engine.Testing
             {
                 spriteRenderer.SetTexture("Assets/Textures/test_map.png");
                 spriteRenderer.SetSpriteSize(150, 150);
+                spriteRenderer.SetSize(500, 500);
                 spriteRenderer.AddAnimation(new AnimationInfo("idle", 0, 30, 0.1));
                 spriteRenderer.PlayAnimation("idle");
+                spriteRenderer.SetAnimationType(AnimationType.LoopReversed);
             }
         }
         public override void Update()

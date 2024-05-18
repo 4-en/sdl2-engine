@@ -723,7 +723,7 @@ namespace SDL2Engine
         }
     }
     [Serializable]
-    public struct AnimationInfo
+    public class AnimationInfo
     {
         public string name;
         public List<int> frames;
@@ -795,8 +795,8 @@ namespace SDL2Engine
 
         public void Reverse()
         {
-            frames.Reverse();
-            direction *= -1;
+            direction = -direction;
+            //frames.Reverse();
         }
 
     }
@@ -810,6 +810,10 @@ namespace SDL2Engine
         OnceAndDestroy
     }
 
+    /*
+     * This class is used to render sprites from a spritesheet,
+     * as well as animations that can be defined using the AnimationInfo class
+     */
     public class SpriteRenderer : DrawableRect, ILoadable
     {
         [JsonIgnore]
@@ -838,7 +842,11 @@ namespace SDL2Engine
         private bool flipX = false;
         [JsonProperty]
         private bool flipY = false;
+        [JsonProperty]
+        private bool customWorldSize = false;
 
+        // Sets the size of individual sprites in the spritesheet
+        // This is used to calculate the correct source rect for the sprite, based on an index
         public void SetSpriteSize(Vec2D size)
         {
             this.spriteSize = size;
@@ -867,45 +875,67 @@ namespace SDL2Engine
             }
         }
 
+        // Sets the index of the sprite in the spritesheet
         public void SetSpriteIndex(int index)
         {
             this.spriteIndex = index;
         }
 
+        // Sets the size of the rendered sprite in world coordinates (camera.WorldSize)
         public void SetWorldSize(Vec2D size)
         {
+            customWorldSize = true;
             this.rect = new Rect(0, 0, size.x, size.y);
         }
 
+        public void SetWorldSize(int width, int height)
+        {
+            customWorldSize = true;
+            this.rect = new Rect(0, 0, width, height);
+        }
+
+        // Sets the size of the rendered sprite in world coordinates (camera.WorldSize)
         public void SetSize(Vec2D size)
         {
+            customWorldSize = true;
             this.rect = new Rect(0, 0, size.x, size.y);
         }
 
+        public void SetSize(int width, int height)
+        {
+            customWorldSize = true;
+            this.rect = new Rect(0, 0, width, height);
+        }
+
+        // Flips the sprite horizontally
         public void SetFlipX(bool flip)
         {
             this.flipX = flip;
         }
+
+        // Flips the sprite vertically
         public void SetFlipY(bool flip) { this.flipY = flip; }
 
+        // Flips the sprite horizontally and vertically
         public void SetFlip(bool flipX, bool flipY)
         {
             this.flipX = flipX;
             this.flipY = flipY;
         }
 
+        // Registers an animation with the given name, starting frame, frame count and speed
         public void AddAnimation(string name, int frame, int frameCount, double speed=0.1)
         {
             animations[name] = new AnimationInfo(name, frame, frameCount, speed);
         }
 
-
-
+        // Registers an animation by using an AnimationInfo object
         public void AddAnimation(AnimationInfo animation)
         {
             animations[animation.name] = animation;
         }
 
+        // changes the current animation to the animation with the given name
         public void SetAnimation(string name)
         {
             if (currentAnimation == name)
@@ -919,29 +949,37 @@ namespace SDL2Engine
                 currentAnimation = name;
                 lastFrameTime = Time.time;
                 spriteIndex = animations[name].firstFrame;
+                animationType = animations[name].type;
+                animationSpeed = animations[name].speed;
             }
         }
 
+        // changes the current animation to the animation with the given name
         public void PlayAnimation(string name)
         {
             SetAnimation(name);
         }
 
+        // changes the current animation to the animation with the given name
         public void Play(string name)
         {
             SetAnimation(name);
         }
 
+        // changes the speed of the current animation
         public void SetAnimationSpeed(double speed)
         {
             this.animationSpeed = speed;
         }
 
+        // changes the type of the current animation
         public void SetAnimationType(AnimationType type)
         {
             this.animationType = type;
         }
 
+        // creates a default sprite to show if no custom animation or index was set
+        // if no parameters are given, this is equal to the entire texture/spritesheet
         private void AddDefaultSprite()
         {
 
@@ -951,6 +989,7 @@ namespace SDL2Engine
 
         }
 
+        // loads the texture from the source path
         public void Load()
         {
             if (texture != null)
@@ -963,7 +1002,7 @@ namespace SDL2Engine
                 texture = AssetManager.LoadTexture(source);
                 texture.Load();
                 this.source_rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
-                this.rect = this.source_rect * 1;
+                //this.rect = this.source_rect * 1;
                 this.AddDefaultSprite();
                 if (_tempSetSpriteByCount.x != -1)
                 {
@@ -973,39 +1012,44 @@ namespace SDL2Engine
                 }
                 else if (this.spriteSize.x == -1)
                 {
-                    this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
+                    // this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
                 }
                 
                 if(this.currentAnimation == "")
                 {
                     this.SetAnimation("default");
                 }
-
-                this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
+                if(!customWorldSize)
+                    this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
             }
         }
 
+        // loads a texture from the given path
         public void LoadTexture(string path)
         {
             this.source = path;
             this.Load();
         }
 
+        // sets the path to the texture without loading it immediately
         public void SetTexture(string path)
         {
             this.source = path;
         }
 
+        // sets the path to the texture without loading it immediately
         public void SetSprite(string path)
         {
             this.source = path;
         }
 
+        // true if the texture is loaded
         public bool IsLoaded()
         {
             return texture != null && texture.IsLoaded();
         }
 
+        // draws the sprite
         public override void Draw(Camera camera)
         {
             if (texture == null)
@@ -1053,17 +1097,16 @@ namespace SDL2Engine
             var animation = animations[currentAnimation];
             double time = Time.time;
             double deltaTime = time - lastFrameTime;
-            double speed = animation.speed;
-            if (deltaTime > speed)
+            if (deltaTime > animationSpeed)
             {
                 // get next frame index from animation
                 spriteIndex += animation.direction;
                 lastFrameTime = time;
             }
 
-            if (this.spriteIndex >= animation.frames.Count)
+            if (this.spriteIndex > animation.lastFrame || this.spriteIndex < animation.firstFrame)
             {
-                switch (animation.type)
+                switch (animationType)
                 {
                     case AnimationType.Loop:
                         this.spriteIndex = animation.firstFrame;
@@ -1076,7 +1119,7 @@ namespace SDL2Engine
                         break;
                     case AnimationType.LoopReversed:
                         animation.Reverse();
-                        this.spriteIndex = animation.firstFrame;
+                        this.spriteIndex+=animation.direction;
                         break;
                     case AnimationType.OnceAndDestroy:
                         this.spriteIndex = animation.lastFrame;
@@ -1087,6 +1130,7 @@ namespace SDL2Engine
 
         }
 
+        // removes reference to texture and disposes it
         public override void Dispose()
         {
             base.Dispose();

@@ -138,6 +138,7 @@ namespace SDL2Engine
         private double bounciness = 1.0;
         private double friction = 0.0;
         private double drag = 0.0;
+        private bool rotateWithVelocity = false;
 
         public PhysicsBody()
         {
@@ -157,6 +158,12 @@ namespace SDL2Engine
             this.bounciness = bounciness;
             this.friction = friction;
             this.drag = drag;
+        }
+
+        public bool RotateWithVelocity
+        {
+            get { return rotateWithVelocity; }
+            set { rotateWithVelocity = value; }
         }
 
         public bool IsMovable
@@ -667,7 +674,10 @@ namespace SDL2Engine
                     physicsBody.Velocity += dragForce / physicsBody.Mass * deltaTime;
                 }
                 
-
+                if(physicsBody.RotateWithVelocity)
+                {
+                    t.rotation = Math.Atan2(physicsBody.Velocity.y, physicsBody.Velocity.x);
+                }
 
 
             }

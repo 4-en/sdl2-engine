@@ -724,6 +724,224 @@ namespace SDL2Engine
         }
     }
 
+    public struct AnimationInfo
+    {
+        public string name;
+        public List<int> frames;
+        public double speed;
+        public AnimationType type;
+
+        public AnimationInfo(string name, int frame, double speed=0.1)
+        {
+            this.name = name;
+            this.frames = new List<int>() { frame };
+            this.speed = speed;
+            this.type = AnimationType.Loop;
+        }
+
+        public AnimationInfo(string name, int firstFrame, int frameCount, double speed=0.1)
+        {
+            this.name = name;
+            this.frames = new List<int>();
+            for (int i = 0; i < frameCount; i++)
+            {
+                this.frames.Add(firstFrame + i);
+            }
+            this.speed = speed;
+            this.type = AnimationType.Loop;
+        }
+
+        public AnimationInfo(string name, List<int> frames, double speed)
+        {
+            this.name = name;
+            this.frames = frames;
+            this.speed = speed;
+            this.type = AnimationType.Loop;
+        }
+
+        public AnimationInfo(string name, List<int> frames, double speed, AnimationType type)
+        {
+            this.name = name;
+            this.frames = frames;
+            this.speed = speed;
+            this.type = type;
+        }
+    }
+
+    public enum AnimationType
+    {
+        Loop,
+        Once,
+        OnceAndHold,
+        PingPong
+    }
+
+    public class SpriteRenderer : DrawableRect, ILoadable
+    {
+        private Texture? texture;
+        private String source = "";
+        private Rect source_rect = new Rect(0, 0, 1, 1);
+        private Vec2D spriteSize = new Vec2D(64, 64);
+        private int spriteIndex = 0;
+        private Dictionary<string, AnimationInfo> animations = new Dictionary<string, AnimationInfo>();
+        private string currentAnimation = "";
+        private double animationSpeed = 0.1;
+        private double lastFrameTime = 0;
+        private AnimationType animationType = AnimationType.Loop;
+
+        public void SetSpriteSize(Vec2D size)
+        {
+            this.spriteSize = size;
+            this.rect = new Rect(0, 0, size.x, size.y);
+        }
+
+        public void SetSpriteIndex(int index)
+        {
+            this.spriteIndex = index;
+        }
+
+        public void AddAnimation(AnimationInfo animation)
+        {
+            animations[animation.name] = animation;
+        }
+
+        public void SetAnimation(string name)
+        {
+            if (currentAnimation == name)
+            {
+                return;
+            }
+
+            if (animations.ContainsKey(name))
+            {
+                currentAnimation = name;
+                lastFrameTime = Time.time;
+            }
+        }
+
+        public void SetAnimationSpeed(double speed)
+        {
+            this.animationSpeed = speed;
+        }
+
+        public void SetAnimationType(AnimationType type)
+        {
+            this.animationType = type;
+        }
+
+        private void AddDefaultSprite()
+        {
+
+            var defAnim = new AnimationInfo("default", 0, 1, 1.0);
+            animations["default"] = defAnim;
+
+
+        }
+
+        public void Load()
+        {
+            if (texture != null)
+            {
+                return;
+            }
+
+            if (source != "")
+            {
+                texture = AssetManager.LoadTexture(source);
+                texture.Load();
+                this.source_rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
+                this.rect = this.source_rect * 1;
+                this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
+                this.AddDefaultSprite();
+                this.SetAnimation("default");
+            }
+        }
+
+        public void LoadTexture(string path)
+        {
+            this.source = path;
+            this.Load();
+        }
+
+        public bool IsLoaded()
+        {
+            return texture != null && texture.IsLoaded();
+        }
+
+        public override void Draw(Camera camera)
+        {
+            if (texture == null)
+            {
+                this.Load();
+            }
+
+            if (texture == null)
+            {
+                return;
+            }
+
+            var texture_ptr = texture.Get();
+
+            if (currentAnimation == "")
+            {
+                return;
+            }
+
+            var animation = animations[currentAnimation];
+            double time = Time.time;
+            double deltaTime = time - lastFrameTime;
+            int frameIndex = (int)(deltaTime / animation.speed) % animation.frames.Count;
+            int frame = animation.frames[frameIndex];
+            this.spriteIndex = frame;
+
+            int x = frame % (int)(texture.GetTextureRect()?.w ?? 1);
+            int y = frame / (int)(texture.GetTextureRect()?.w ?? 1);
+
+            this.source_rect = new Rect(x * spriteSize.x, y * spriteSize.y, spriteSize.x, spriteSize.y);
+
+            var srcRect = this.source_rect.ToSDLRect();
+            var dstRect = this.GetDestRect();
+
+            double angle = gameObject.transform.rotation;
+
+            SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
+
+            if (animationType == AnimationType.Once)
+            {
+                if (frameIndex == animation.frames.Count - 1)
+                {
+                    currentAnimation = "";
+                }
+            }
+            else if (animationType == AnimationType.OnceAndHold)
+            {
+                if (frameIndex == animation.frames.Count - 1)
+                {
+                    lastFrameTime = time;
+                }
+            }
+            else if (animationType == AnimationType.PingPong)
+            {
+                if (frameIndex == animation.frames.Count - 1)
+                {
+                    animation.frames.Reverse();
+                }
+            }
+
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            if (texture != null)
+            {
+                texture.Dispose();
+                texture = null;
+            }
+        }
+
+    }
+
     public class TextureRendererOld : DrawableRect
     {
         private IntPtr texture_ptr = IntPtr.Zero;

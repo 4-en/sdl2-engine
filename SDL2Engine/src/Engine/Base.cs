@@ -434,6 +434,7 @@ namespace SDL2Engine
 
     }
 
+    [Serializable]
     public class EngineObject : IDisposable
     {
         protected static Random random = new Random(DateTime.Now.Millisecond);

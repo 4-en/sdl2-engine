@@ -1,11 +1,18 @@
 ﻿
 namespace SDL2Engine.Rand
 {
+
     public class RandomGenerator
     {
 
         private uint _seed;
         private uint _state;
+
+        public RandomGenerator()
+        {
+            _seed = (uint)System.Environment.TickCount;
+            _state = _seed;
+        }
 
         public RandomGenerator(uint seed)
         {
@@ -43,6 +50,11 @@ namespace SDL2Engine.Rand
 
         private int seed;
         private int state = 0x6969;
+
+        public StableRandom()
+        {
+            seed = System.Environment.TickCount;
+        }
 
         public StableRandom(int seed)
         {

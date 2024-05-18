@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,7 @@ namespace SDL2Engine
      */
     public class Component : EngineObject
     {
+        [JsonProperty]
         protected GameObject gameObject = GameObject.Default;
 
         public Component()

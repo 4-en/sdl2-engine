@@ -1,4 +1,5 @@
-﻿using SDL2;
+﻿using Newtonsoft.Json;
+using SDL2;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -439,9 +440,12 @@ namespace SDL2Engine
     {
         protected static Random random = new Random(DateTime.Now.Millisecond);
 
+        [JsonProperty]
         protected string name = "unnamed";
+        [JsonProperty]
         protected bool enabled = true;
         protected Scene? scene = null;
+        [JsonProperty]
         protected uint uid = GetRandomUID();
         protected bool _to_be_destroyed = false;
         protected bool _disposed = false;

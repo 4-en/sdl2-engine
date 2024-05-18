@@ -795,6 +795,18 @@ namespace SDL2Engine
             this.rect = new Rect(0, 0, size.x, size.y);
         }
 
+        public void SetSpriteSize(int width, int height)
+        {
+            this.spriteSize = new Vec2D(width, height);
+            this.rect = new Rect(0, 0, width, height);
+        }
+
+        public void SetSpriteSizeByCount(int rows, int columns)
+        {
+            this.spriteSize = new Vec2D(this.source_rect.w / columns, this.source_rect.h / rows);
+            this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
+        }
+
         public void SetSpriteIndex(int index)
         {
             this.spriteIndex = index;

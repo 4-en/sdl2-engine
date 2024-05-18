@@ -723,7 +723,7 @@ namespace SDL2Engine
 
         }
     }
-
+    [Serializable]
     public struct AnimationInfo
     {
         public string name;
@@ -767,7 +767,7 @@ namespace SDL2Engine
             this.type = type;
         }
     }
-
+    [Serializable]
     public enum AnimationType
     {
         Loop,
@@ -781,13 +781,15 @@ namespace SDL2Engine
         private Texture? texture;
         private String source = "";
         private Rect source_rect = new Rect(0, 0, 1, 1);
-        private Vec2D spriteSize = new Vec2D(64, 64);
+        private Vec2D spriteSize = new Vec2D(-1, -1);
         private int spriteIndex = 0;
         private Dictionary<string, AnimationInfo> animations = new Dictionary<string, AnimationInfo>();
         private string currentAnimation = "";
         private double animationSpeed = 0.1;
         private double lastFrameTime = 0;
         private AnimationType animationType = AnimationType.Loop;
+        private bool flipX = false;
+        private bool flipY = false;
 
         public void SetSpriteSize(Vec2D size)
         {
@@ -812,6 +814,35 @@ namespace SDL2Engine
             this.spriteIndex = index;
         }
 
+        public void SetWorldSize(Vec2D size)
+        {
+            this.rect = new Rect(0, 0, size.x, size.y);
+        }
+
+        public void SetSize(Vec2D size)
+        {
+            this.rect = new Rect(0, 0, size.x, size.y);
+        }
+
+        public void SetFlipX(bool flip)
+        {
+            this.flipX = flip;
+        }
+        public void SetFlipY(bool flip) { this.flipY = flip; }
+
+        public void SetFlip(bool flipX, bool flipY)
+        {
+            this.flipX = flipX;
+            this.flipY = flipY;
+        }
+
+        public void AddAnimation(string name, int frame, int frameCount, double speed=0.1)
+        {
+            animations[name] = new AnimationInfo(name, frame, frameCount, speed);
+        }
+
+
+
         public void AddAnimation(AnimationInfo animation)
         {
             animations[animation.name] = animation;
@@ -829,6 +860,16 @@ namespace SDL2Engine
                 currentAnimation = name;
                 lastFrameTime = Time.time;
             }
+        }
+
+        public void PlayAnimation(string name)
+        {
+            SetAnimation(name);
+        }
+
+        public void Play(string name)
+        {
+            SetAnimation(name);
         }
 
         public void SetAnimationSpeed(double speed)
@@ -863,9 +904,16 @@ namespace SDL2Engine
                 texture.Load();
                 this.source_rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
                 this.rect = this.source_rect * 1;
-                this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
                 this.AddDefaultSprite();
-                this.SetAnimation("default");
+                if (this.spriteSize.x == -1)
+                {
+                    this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
+                }
+                
+                if(this.currentAnimation == "")
+                {
+                    this.SetAnimation("default");
+                }
             }
         }
 
@@ -873,6 +921,16 @@ namespace SDL2Engine
         {
             this.source = path;
             this.Load();
+        }
+
+        public void SetTexture(string path)
+        {
+            this.source = path;
+        }
+
+        public void SetSprite(string path)
+        {
+            this.source = path;
         }
 
         public bool IsLoaded()
@@ -906,8 +964,10 @@ namespace SDL2Engine
             int frame = animation.frames[frameIndex];
             this.spriteIndex = frame;
 
-            int x = frame % (int)(texture.GetTextureRect()?.w ?? 1);
-            int y = frame / (int)(texture.GetTextureRect()?.w ?? 1);
+            var spriteSize = this.spriteSize;
+            int framesPerRow = (int)(source_rect.w / spriteSize.x);
+            int x = frame % framesPerRow;
+            int y = frame / framesPerRow;
 
             this.source_rect = new Rect(x * spriteSize.x, y * spriteSize.y, spriteSize.x, spriteSize.y);
 
@@ -916,7 +976,17 @@ namespace SDL2Engine
 
             double angle = gameObject.transform.rotation;
 
-            SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
+            var flip = SDL_RendererFlip.SDL_FLIP_NONE;
+            if (flipX)
+            {
+                flip |= SDL_RendererFlip.SDL_FLIP_HORIZONTAL;
+            }
+            if (flipY)
+            {
+                flip |= SDL_RendererFlip.SDL_FLIP_VERTICAL;
+            }
+
+            SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, flip);
 
             if (animationType == AnimationType.Once)
             {

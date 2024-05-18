@@ -76,6 +76,16 @@ namespace SDL2Engine.Testing
             pb.Velocity = new Vec2D(1000, 0);
             pb.Drag = 0;
             forsenBullet.GameObject.AddComponent<DestroyOnCollision>();
+
+            // test sprite renderer
+            var spriteRenderer = this.gameObject.AddComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.SetTexture("Assets/Textures/test_map.png");
+                spriteRenderer.SetSpriteSize(150, 150);
+                spriteRenderer.AddAnimation(new AnimationInfo("idle", 0, 30));
+                spriteRenderer.PlayAnimation("idle");
+            }
         }
         public override void Update()
         {

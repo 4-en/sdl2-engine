@@ -66,7 +66,9 @@ git submodule update --init --recursive
 
 Required Libraries (so far):
 - SDL2
-- SDL2_ttf (for text rendering)
+- SDL2_ttf
+- SDL2_image
+- SDL2_mixer
 
 Windows DLLs are already provided.
 For Linux, use install_requirements.sh to install libraries or build from source manually.

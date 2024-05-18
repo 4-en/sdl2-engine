@@ -1,23 +1,32 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
 
 namespace SDL2Engine
 {
     public class GameObject : EngineObject
     {
+        [JsonProperty]
         public uint layer = 0;
         // Position of the GameObject
+        [JsonProperty]
         protected Transform _transform = new Transform();
+        [JsonProperty]
         protected Collider? _collider;
+        [JsonProperty]
         protected PhysicsBody? _physicsBody;
+        [JsonProperty]
         protected Drawable? _drawable;
+        [JsonProperty]
         protected GameObject? Parent { get; set; }
+        [JsonProperty]
         private readonly List<GameObject> children = [];
+        [JsonProperty]
         private readonly List<Component> components = [];
         private static readonly GameObject defaultObject = new("default");
 
         // if true, the object will not be destroyed when the scene is changed and instead will be moved
         // to a buffer of persistent objects where it can be accessed by any scene
+        [JsonProperty]
         private bool persistent = false;
 
         public GameObject(string name = "GameObject", Scene? scene = null)

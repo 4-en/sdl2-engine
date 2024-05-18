@@ -1,7 +1,6 @@
 ﻿using SDL2;
 using static SDL2.SDL;
-using System;
-using System.IO;
+using Newtonsoft.Json;
 
 namespace SDL2Engine
 {
@@ -730,6 +729,7 @@ namespace SDL2Engine
         public List<int> frames;
         public double speed;
         public AnimationType type;
+        public int direction = 1;
 
         public AnimationInfo(string name, int frame, double speed=0.1)
         {
@@ -757,6 +757,7 @@ namespace SDL2Engine
             this.frames = frames;
             this.speed = speed;
             this.type = AnimationType.Loop;
+            this.frames = frames;
         }
 
         public AnimationInfo(string name, List<int> frames, double speed, AnimationType type)
@@ -765,7 +766,39 @@ namespace SDL2Engine
             this.frames = frames;
             this.speed = speed;
             this.type = type;
+            this.frames = frames;
         }
+
+        public int firstFrame
+        {
+            get
+            {
+                return frames[0];
+            }
+        }
+
+        public int lastFrame
+        {
+            get
+            {
+                return frames[frames.Count - 1];
+            }
+        }
+
+        public int frameCount
+        {
+            get
+            {
+                return frames.Count;
+            }
+        }
+
+        public void Reverse()
+        {
+            frames.Reverse();
+            direction *= -1;
+        }
+
     }
     [Serializable]
     public enum AnimationType
@@ -773,22 +806,37 @@ namespace SDL2Engine
         Loop,
         Once,
         OnceAndHold,
-        PingPong
+        LoopReversed,
+        OnceAndDestroy
     }
 
     public class SpriteRenderer : DrawableRect, ILoadable
     {
+        [JsonIgnore]
         private Texture? texture;
-        private String source = "";
+        [JsonProperty]
+        private string source = "";
+        [JsonIgnore]
         private Rect source_rect = new Rect(0, 0, 1, 1);
+        [JsonProperty]
         private Vec2D spriteSize = new Vec2D(-1, -1);
+        [JsonProperty]
         private int spriteIndex = 0;
+        [JsonProperty]
         private Dictionary<string, AnimationInfo> animations = new Dictionary<string, AnimationInfo>();
+        [JsonProperty]
         private string currentAnimation = "";
+        [JsonProperty]
+        private string previousAnimation = "";
+        [JsonProperty]
         private double animationSpeed = 0.1;
+        [JsonProperty]
         private double lastFrameTime = 0;
+        [JsonProperty]
         private AnimationType animationType = AnimationType.Loop;
+        [JsonProperty]
         private bool flipX = false;
+        [JsonProperty]
         private bool flipY = false;
 
         public void SetSpriteSize(Vec2D size)
@@ -799,14 +847,24 @@ namespace SDL2Engine
 
         public void SetSpriteSize(int width, int height)
         {
+            this._tempSetSpriteByCount = new Vec2D(-1, -1);
             this.spriteSize = new Vec2D(width, height);
             this.rect = new Rect(0, 0, width, height);
         }
 
+        // temporary variable to set sprite size by count before the texture is loaded
+        [JsonIgnore]
+        private Vec2D _tempSetSpriteByCount = new Vec2D(-1, -1);
         public void SetSpriteSizeByCount(int rows, int columns)
         {
-            this.spriteSize = new Vec2D(this.source_rect.w / columns, this.source_rect.h / rows);
-            this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
+            if(!this.IsLoaded())
+            {
+                _tempSetSpriteByCount = new Vec2D(rows, columns);
+            } else
+            {
+                this.spriteSize = new Vec2D(this.source_rect.w / columns, this.source_rect.h / rows);
+                this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
+            }
         }
 
         public void SetSpriteIndex(int index)
@@ -857,8 +915,10 @@ namespace SDL2Engine
 
             if (animations.ContainsKey(name))
             {
+                previousAnimation = currentAnimation;
                 currentAnimation = name;
                 lastFrameTime = Time.time;
+                spriteIndex = animations[name].firstFrame;
             }
         }
 
@@ -905,7 +965,13 @@ namespace SDL2Engine
                 this.source_rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
                 this.rect = this.source_rect * 1;
                 this.AddDefaultSprite();
-                if (this.spriteSize.x == -1)
+                if (_tempSetSpriteByCount.x != -1)
+                {
+                    this.spriteSize = new Vec2D(this.source_rect.w / _tempSetSpriteByCount.y, this.source_rect.h / _tempSetSpriteByCount.x);
+                    this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
+                    this._tempSetSpriteByCount = new Vec2D(-1, -1);
+                }
+                else if (this.spriteSize.x == -1)
                 {
                     this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
                 }
@@ -914,6 +980,8 @@ namespace SDL2Engine
                 {
                     this.SetAnimation("default");
                 }
+
+                this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
             }
         }
 
@@ -957,21 +1025,14 @@ namespace SDL2Engine
                 return;
             }
 
-            var animation = animations[currentAnimation];
-            double time = Time.time;
-            double deltaTime = time - lastFrameTime;
-            int frameIndex = (int)(deltaTime / animation.speed) % animation.frames.Count;
-            int frame = animation.frames[frameIndex];
-            this.spriteIndex = frame;
 
-            var spriteSize = this.spriteSize;
             int framesPerRow = (int)(source_rect.w / spriteSize.x);
-            int x = frame % framesPerRow;
-            int y = frame / framesPerRow;
+            int x = spriteIndex % framesPerRow;
+            int y = spriteIndex / framesPerRow;
 
-            this.source_rect = new Rect(x * spriteSize.x, y * spriteSize.y, spriteSize.x, spriteSize.y);
+            var temp_dest_rect = new Rect(x * spriteSize.x, y * spriteSize.y, spriteSize.x, spriteSize.y);
 
-            var srcRect = this.source_rect.ToSDLRect();
+            var srcRect = temp_dest_rect.ToSDLRect();
             var dstRect = this.GetDestRect();
 
             double angle = gameObject.transform.rotation;
@@ -988,25 +1049,39 @@ namespace SDL2Engine
 
             SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, flip);
 
-            if (animationType == AnimationType.Once)
+
+            var animation = animations[currentAnimation];
+            double time = Time.time;
+            double deltaTime = time - lastFrameTime;
+            double speed = animation.speed;
+            if (deltaTime > speed)
             {
-                if (frameIndex == animation.frames.Count - 1)
-                {
-                    currentAnimation = "";
-                }
+                // get next frame index from animation
+                spriteIndex += animation.direction;
+                lastFrameTime = time;
             }
-            else if (animationType == AnimationType.OnceAndHold)
+
+            if (this.spriteIndex >= animation.frames.Count)
             {
-                if (frameIndex == animation.frames.Count - 1)
+                switch (animation.type)
                 {
-                    lastFrameTime = time;
-                }
-            }
-            else if (animationType == AnimationType.PingPong)
-            {
-                if (frameIndex == animation.frames.Count - 1)
-                {
-                    animation.frames.Reverse();
+                    case AnimationType.Loop:
+                        this.spriteIndex = animation.firstFrame;
+                        break;
+                    case AnimationType.Once:
+                        this.SetAnimation(previousAnimation);
+                        break;
+                    case AnimationType.OnceAndHold:
+                        this.spriteIndex = animation.lastFrame;
+                        break;
+                    case AnimationType.LoopReversed:
+                        animation.Reverse();
+                        this.spriteIndex = animation.firstFrame;
+                        break;
+                    case AnimationType.OnceAndDestroy:
+                        this.spriteIndex = animation.lastFrame;
+                        gameObject.Destroy();
+                        break;
                 }
             }
 

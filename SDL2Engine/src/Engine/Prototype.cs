@@ -24,7 +24,7 @@ namespace SDL2Engine
         // private GameObject previousState;
 
         [JsonProperty]
-        private List<String> child_prototypes;
+        private List<string> child_prototypes;
 
         public GameObject GameObject { get => gameObject; set => gameObject = value; }
 
@@ -32,14 +32,14 @@ namespace SDL2Engine
         {
             this.name = "";
             this.gameObject = new GameObject(true, "");
-            this.child_prototypes = new List<String>();
+            this.child_prototypes = new List<string>();
         }
 
         public Prototype(string name)
         {
             this.name = name;
             this.gameObject = new GameObject(true, name);
-            this.child_prototypes = new List<String>();
+            this.child_prototypes = new List<string>();
             // this.previousState = gameObject.Clone();
         }
 
@@ -47,7 +47,7 @@ namespace SDL2Engine
         {
             this.name = name;
             this.gameObject = gameObject;
-            this.child_prototypes = new List<String>();
+            this.child_prototypes = new List<string>();
         }
 
         public GameObject Instantiate()

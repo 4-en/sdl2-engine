@@ -22,6 +22,7 @@ The engine is organized into several key classes and components:
 - `Engine`: The main class that initializes SDL2, handles game loops, and manages updates and rendering.
 - `Physics`: Uses different Components like PhysicsBody and Colliders to move GameObjects and solve collisions.
 - `Assets`: Loadable Assets like Textures or Sounds that can be used in Components.
+- `Prototype`: Defines GameObjects with Components that can be instantiated.
 
 ## How to Use
 

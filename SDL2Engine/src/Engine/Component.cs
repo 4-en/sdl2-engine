@@ -515,7 +515,7 @@ namespace SDL2Engine
 
         private Vec2D _scale = new Vec2D(1, 1);
         private Vec2D _localScale = new Vec2D(1, 1);
-        private double _rotation = 0.0;
+        private double _rotation = 0.0; 
         private double _localRotation = 0.0;
 
 

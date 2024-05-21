@@ -167,6 +167,14 @@ namespace SDL2Engine
             return this / Length();
         }
 
+        public Vec2D Rotate(double rotation)
+        {
+            double rad = rotation * Math.PI / 180;
+            double cos = Math.Cos(rad);
+            double sin = Math.Sin(rad);
+            return new Vec2D(x * cos - y * sin, x * sin + y * cos);
+        }
+
         public static bool operator >(Vec2D a, Vec2D b)
         {
             return a.LengthSquared() > b.LengthSquared();

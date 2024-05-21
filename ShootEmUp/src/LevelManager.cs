@@ -37,6 +37,7 @@ namespace ShootEmUp.src
         {
             var level = new Scene("BaseLevel");
             var gameControllerObject = new GameObject("GameController", level);
+            gameControllerObject.AddComponent<GameController>();
 
             return new Tuple<Scene, GameObject>(level, gameControllerObject);
         }

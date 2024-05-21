@@ -18,8 +18,12 @@ namespace ShootEmUp.src
 
             using (var activeScene = scene.Activate())
             {
+                GameObject background = new GameObject("Background");
+                background.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/space_background.jpg");
+                background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
                 GameObject gameTitle = HomeScreenText("Shoot Em Up", gameBounds.x / 2, 300, 200);
                 GameObject startText = HomeScreenText("Start", gameBounds.x / 2, 600, 130);
+                scene.AddGameObject(background);
                 scene.AddGameObject(gameTitle);
                 scene.AddGameObject(startText);
 

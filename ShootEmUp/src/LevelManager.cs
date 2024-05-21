@@ -47,9 +47,6 @@ namespace ShootEmUp.src
             var level = tuple.Item1;
             var gameControllerObject = tuple.Item2;
             
-            // so some level specific stuff here...
-            // for example, add powerup GameObject to level, change speed of ball, idk
-            // you could also create a new GameController script that has different logic for this level
 
             return level;
         }

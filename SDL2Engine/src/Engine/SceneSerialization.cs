@@ -75,9 +75,72 @@ namespace SDL2Engine
             ContractResolver = new EngineContractResolver()
         };
 
+        public static bool SaveObject<T>(T obj, string path)
+        {
+            string json = JsonConvert.SerializeObject(obj, SETTINGS);
+
+            File.WriteAllText(path, json);
+
+            return true;
+        }
+
+        public static T? LoadObject<T>(string path)
+        {
+            if (!File.Exists(path))
+            {
+                return default;
+            }
+
+            string json = File.ReadAllText(path);
+
+            T? obj = JsonConvert.DeserializeObject<T>(json, SETTINGS);
+
+            return obj;
+        }
+
+
+        public static bool SavePrototype(Prototype prototype)
+        {
+            
+            string path = "Assets/Prototypes";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            path += "/" + prototype.GetName() + ".proto";
+
+            return SceneSerialization.SaveObject(prototype, path);
+        }
+
+        public static Prototype? LoadPrototype(string name)
+        {
+            string path = "Assets/Prototypes/" + name + ".proto";
+
+            return SceneSerialization.LoadObject<Prototype>(path);
+        }
+
+        public static bool SaveGameObject(GameObject gameObject)
+        {
+            string path = "Assets/GameObjects";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            path += "/" + gameObject.GetName() + ".go";
+
+            return SceneSerialization.SaveObject(gameObject, path);
+        }
+
+        public static GameObject? LoadGameObject(string name)
+        {
+            string path = "Assets/GameObjects/" + name + ".go";
+
+            return SceneSerialization.LoadObject<GameObject>(path);
+        }
+
+
         public static bool SaveScene(Scene scene)
         {
-            // TODO: Implement this method
 
             // 1. convert to scene data
             SceneData sceneData = new SceneData
@@ -104,10 +167,18 @@ namespace SDL2Engine
 
             return true;
         }
+        /*
+         * Loads a game object that has a prototype name
+         */
+        private static GameObject LoadFromPrototype(GameObject gameObject)
+        {
+
+            // TODO: Implement this method
+            return gameObject;
+        }
 
         public static Scene? LoadScene(string name)
         {
-            // TODO: Implement this method
             // TODO: handle prefab loading
             // maybe create special prefab class that contains name of prefab and
             // separate file with prefab data
@@ -133,6 +204,16 @@ namespace SDL2Engine
             for(int i = 0; i < sceneData.gameObjects.Count; i++)
             {
                 GameObject gameObject = sceneData.gameObjects[i];
+
+                // if gameObject.prototype != null, load prototype
+                // then replace all attributes, children and components that are also in the gameObject
+                // then add the gameObject to the scene
+                if(gameObject.prototype != null)
+                {
+                    gameObject = LoadFromPrototype(gameObject);
+                }
+                
+
                 scene.AddGameObject(gameObject);
             }
 

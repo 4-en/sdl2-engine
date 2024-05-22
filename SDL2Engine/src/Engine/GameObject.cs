@@ -6,6 +6,8 @@ namespace SDL2Engine
     public class GameObject : EngineObject
     {
         [JsonProperty]
+        public string? prototype = null;
+        [JsonProperty]
         public uint layer = 0;
         // Position of the GameObject
         [JsonProperty]

@@ -731,6 +731,14 @@ namespace SDL2Engine
         public AnimationType type;
         public int direction = 1;
 
+        private AnimationInfo()
+        {
+            this.name = "";
+            this.frames = new List<int>();
+            this.speed = 0.1;
+            this.type = AnimationType.Loop;
+        }
+
         public AnimationInfo(string name, int frame, double speed=0.1)
         {
             this.name = name;

@@ -15,6 +15,8 @@ namespace SDL2Engine
      * 
      * To create custom components, inherit from Script instead
      */
+
+    [Serializable]
     public class Component : EngineObject
     {
         [JsonProperty]

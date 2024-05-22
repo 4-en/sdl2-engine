@@ -58,6 +58,24 @@ namespace SDL2Engine.tests
                         gameObject.SetPosition(mouse_world_pos.Value);
                     }
                 }
+
+                if(Input.GetKeyDown(SDL_Keycode.SDLK_s))
+                {
+                    Scene? scene = GetScene();
+                    if(scene != null)
+                    {
+                        SceneSerialization.SaveScene(scene);
+                    }
+                }
+
+                if(Input.GetKeyDown(SDL_Keycode.SDLK_l))
+                {
+                    var scene = SceneSerialization.LoadScene("SerializationTest");
+                    if (scene != null)
+                    {
+                        SceneManager.SetScene(scene);
+                    }
+                }
                 
             }
         }

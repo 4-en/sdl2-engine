@@ -44,10 +44,11 @@ namespace SDL2Engine
                     return prop;
                 }
 
+                /*
                 prop.ShouldSerialize = instance =>
                 {
                     return false;
-                };
+                }; */
 
 
                 return prop;

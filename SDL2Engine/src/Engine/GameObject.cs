@@ -29,6 +29,11 @@ namespace SDL2Engine
         [JsonProperty]
         private bool persistent = false;
 
+        private GameObject()
+        {
+            this.Parent = null;
+        }
+
         public GameObject(string name = "GameObject", Scene? scene = null)
         {
             this.Parent = null;

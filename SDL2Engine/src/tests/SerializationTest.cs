@@ -65,6 +65,9 @@ namespace SDL2Engine.tests
                     if(scene != null)
                     {
                         SceneSerialization.SaveScene(scene);
+                    } else
+                    {
+                        Console.WriteLine("Failed to save scene");
                     }
                 }
 

@@ -44,6 +44,8 @@ namespace SDL2Engine
                     return prop;
                 }
 
+                // TODO: fix previous GetCustomAttribute thats not working correctly
+                // maybe it doesn't work with child classes, or it 's not implemented correctly
                 /*
                 prop.ShouldSerialize = instance =>
                 {

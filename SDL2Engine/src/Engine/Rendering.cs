@@ -1017,7 +1017,7 @@ namespace SDL2Engine
                 }
                 else if (this.spriteSize.x == -1)
                 {
-                    // this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
+                    this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
                 }
                 
                 if(this.currentAnimation == "")
@@ -1044,6 +1044,11 @@ namespace SDL2Engine
 
         // sets the path to the texture without loading it immediately
         public void SetSprite(string path)
+        {
+            this.source = path;
+        }
+
+        public void SetSource(string path)
         {
             this.source = path;
         }

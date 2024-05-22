@@ -4,6 +4,7 @@ using static SDL2.SDL;
 
 using SDL2Engine;
 using SDL2Engine.Utils;
+using SDL2Engine.tests;
 
 namespace SDL2Engine.Testing
 {
@@ -21,7 +22,7 @@ namespace SDL2Engine.Testing
             Console.WriteLine("Starting SDL2 Engine...");
 
             // run test here \/ \/ \/
-
+            SerializationTest.Run();
             
 
             Console.WriteLine("Exiting SDL2 Engine...");

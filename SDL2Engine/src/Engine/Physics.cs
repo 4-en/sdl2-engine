@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,13 +132,21 @@ namespace SDL2Engine
     public class PhysicsBody : Component
     {
         // if true, objects with this component can be moved when colliding with other objects
+        [JsonProperty]
         private bool isMovable = true;
+        [JsonProperty]
         private Vec2D velocity = new Vec2D();
+        [JsonProperty]
         private double angularVelocity = 0.0;
+        [JsonProperty]
         private double mass = 1.0;
+        [JsonProperty]
         private double bounciness = 1.0;
+        [JsonProperty]
         private double friction = 0.0;
+        [JsonProperty]
         private double drag = 0.0;
+        [JsonProperty]
         private bool rotateWithVelocity = false;
 
         public PhysicsBody()
@@ -214,12 +223,15 @@ namespace SDL2Engine
     public class Collider : Component
     {
 
+        [JsonProperty]
         private bool isTrigger = false;
 
         // this is used to keep track of the active collision list
         // before every collision check, the active_index is swapped
         // this is used to call the correct callback functions for collision events
+        [JsonIgnore]
         private uint active_index = 0;
+        [JsonIgnore]
         private List<Collider>[] prevCollisions = { new List<Collider>(), new List<Collider>() };
 
         public void SwapCollisions()
@@ -323,6 +335,7 @@ namespace SDL2Engine
         }
 
         //create a box collider at the position of the game object
+        [JsonProperty]
         public Rect box { get; set; }
 
         //function to get the center position of the box collider
@@ -391,7 +404,9 @@ namespace SDL2Engine
     // a circle collider is a circle that can be used to detect collisions
     public class CircleCollider : Collider
     {
+        [JsonProperty]
         private double radius = 1.0;
+        [JsonProperty]
         public Vec2D center { get; set; }
 
         public CircleCollider(Vec2D center, double radius)
@@ -473,7 +488,9 @@ namespace SDL2Engine
     // an edge collider is a line segment that can be used to detect collisions
     public class EdgeCollider : Collider
     {
+        [JsonProperty]
         private Vec2D start = new Vec2D(0, 0);
+        [JsonProperty]
         private Vec2D end = new Vec2D(1, 1);
 
 

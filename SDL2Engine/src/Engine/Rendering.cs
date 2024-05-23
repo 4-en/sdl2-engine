@@ -6,6 +6,7 @@ namespace SDL2Engine
 {
 
     // Used to calculate origin relative to GameObject position
+    [Serializable]
     public enum AnchorPoint
     {
         TopLeft,
@@ -19,8 +20,10 @@ namespace SDL2Engine
         BottomRight
     }
 
+    [Serializable]
     public struct Color
     {
+        [JsonProperty]
         public UInt32 color;
 
         public byte r
@@ -153,9 +156,11 @@ namespace SDL2Engine
 
     public class Camera2D : Camera
     {
+        [JsonProperty]
         private Vec2D Position { get; set; }
+        [JsonProperty]
         private Vec2D WorldSize { get; set; }
-
+        [JsonProperty]
         public bool keepAspectRatio = true;
 
 
@@ -228,7 +233,7 @@ namespace SDL2Engine
     // these components are called by their GameObjects to draw themselves
     public class Drawable : Component
     {
-
+        [JsonProperty]
         public AnchorPoint anchorPoint = AnchorPoint.Center;
 
         public virtual void Draw(Camera camera)
@@ -256,7 +261,9 @@ namespace SDL2Engine
 
     public class DrawableRect : Drawable
     {
+        [JsonProperty]
         protected Rect rect = new Rect(0, 0, 64, 64);
+        [JsonProperty]
         public Color color = new Color(255, 255, 255, 255);
 
         public override Vec2D GetDrawRoot()
@@ -362,18 +369,31 @@ namespace SDL2Engine
 
     public class TextRenderer : DrawableRect, ILoadable
     {
+        [JsonProperty]
         private string text = "";
+        [JsonProperty]
         private int fontSize = 24;
+        [JsonProperty]
         private string fontPath = "Assets/Fonts/Roboto-Regular.ttf";
+        [JsonProperty]
         private bool updateTexture = true;
+        [JsonProperty]
         private bool updateFont = true;
+        [JsonIgnore]
         private Font? font;
+        [JsonIgnore]
         private IntPtr[]? textures = null;
+        [JsonIgnore]
         private Rect[]? textureRects = null;
+        [JsonProperty]
         private Rect preferredSize = new Rect(0, 0, 0, 0);
+        [JsonIgnore]
         private Rect textTextureSize;
+        [JsonProperty]
         private double borderSize = 0;
+        [JsonProperty]
         private Color backgroundColor = new Color(0,0,0,0);
+        [JsonProperty]
         private Color borderColor = new Color(0, 0, 0, 0);
 
         public void SetBorderSize(double borderSize)
@@ -593,8 +613,9 @@ namespace SDL2Engine
     // Helper class to render text and handle events
     public class TextRenderHelper : Script
     {
-
+        [JsonProperty]
         TextRenderer? textRenderer;
+        [JsonIgnore]
         bool wasHovered = false;
         public override void Start()
         {
@@ -655,8 +676,11 @@ namespace SDL2Engine
 
     public class TextureRenderer : DrawableRect, ILoadable
     {
+        [JsonIgnore]
         private Texture? texture;
+        [JsonIgnore]
         private Rect source_rect = new Rect(0, 0, 1, 1);
+        [JsonProperty]
         public string source = "";
 
         public void SetSource(string source)
@@ -725,10 +749,15 @@ namespace SDL2Engine
     [Serializable]
     public class AnimationInfo
     {
+        [JsonProperty]
         public string name;
+        [JsonProperty]
         public List<int> frames;
+        [JsonProperty]
         public double speed;
+        [JsonProperty]
         public AnimationType type;
+        [JsonProperty]
         public int direction = 1;
 
         private AnimationInfo()
@@ -1163,8 +1192,11 @@ namespace SDL2Engine
 
     public class TextureRendererOld : DrawableRect
     {
+        [JsonIgnore]
         private IntPtr texture_ptr = IntPtr.Zero;
+        [JsonIgnore]
         private Texture? texture;
+        [JsonProperty]
         private string? path = null;
 
         ~TextureRendererOld()
@@ -1245,7 +1277,7 @@ namespace SDL2Engine
 
     public class RotatingSquare : Drawable
     {
-
+        [JsonProperty]
         SDL_Rect rect;
 
         public RotatingSquare()

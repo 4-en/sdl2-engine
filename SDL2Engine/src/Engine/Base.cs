@@ -14,6 +14,8 @@ namespace SDL2Engine
         public void Load();
         public bool IsLoaded();
     }
+
+    [Serializable]
     public struct Vec2D
     {
         public static readonly Vec2D Zero = new(0, 0);
@@ -198,6 +200,7 @@ namespace SDL2Engine
 
     }
 
+    [Serializable]
     public struct Vec3D
     {
         public double x;
@@ -352,6 +355,7 @@ namespace SDL2Engine
      * SDL.SDL_Rect uses int for x, y, w, h
      * We use this struct to store double values
      */
+    [Serializable]
     public struct Rect
     {
         public double x;

@@ -290,7 +290,7 @@ namespace SDL2Engine
 
     public class Script : Component
     {
-
+        [JsonProperty]
         public bool wasEnabled = false;
 
         // Base class for all scripts
@@ -427,7 +427,9 @@ namespace SDL2Engine
 
     public class Transform : Component
     {
+        [JsonProperty]
         private Vec2D _position = new Vec2D();
+        [JsonProperty]
         private Vec2D _localPosition = new Vec2D();
 
         public void UpdateChildren()
@@ -517,9 +519,13 @@ namespace SDL2Engine
             return localPosition;
         }
 
+        [JsonProperty]
         private Vec2D _scale = new Vec2D(1, 1);
+        [JsonProperty]
         private Vec2D _localScale = new Vec2D(1, 1);
-        private double _rotation = 0.0; 
+        [JsonProperty]
+        private double _rotation = 0.0;
+        [JsonProperty]
         private double _localRotation = 0.0;
 
 
@@ -527,10 +533,15 @@ namespace SDL2Engine
 
     public class SoundPlayer : Component, ILoadable
     {
+        [JsonProperty]
         public static double sound_volume = 1.0;
+        [JsonProperty]
         public string source = "";
+        [JsonProperty]
         public double volume = SoundPlayer.sound_volume;
+        [JsonIgnore]
         private Sound? sound = null;
+        [JsonProperty]
         public bool playOnAwake = false;
 
 
@@ -656,10 +667,15 @@ namespace SDL2Engine
 
     public class MusicPlayer : Component, ILoadable
     {
+        [JsonProperty]
         public static double music_volume = 1.0;
+        [JsonProperty]
         public string source = "";
+        [JsonProperty]
         public double volume = MusicPlayer.music_volume;
+        [JsonIgnore]
         private Music? music = null;
+        [JsonProperty]
         public bool playOnAwake = false;
 
         public void SetSource(string source)

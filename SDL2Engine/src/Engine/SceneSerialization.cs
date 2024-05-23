@@ -64,6 +64,7 @@ namespace SDL2Engine
             public int sceneType;
             public Camera mainCamera;
             public List<GameObject> gameObjects;
+            public List<ProtoObject> protoObjects;
         }
 
         private readonly static JsonSerializerSettings SETTINGS = new JsonSerializerSettings
@@ -148,7 +149,8 @@ namespace SDL2Engine
                 name = scene.GetName(),
                 sceneType = (int)scene.GetSceneType(),
                 mainCamera = scene.GetCamera(),
-                gameObjects = scene.GetGameObjects()
+                gameObjects = scene.GetGameObjects(),
+                protoObjects = new List<ProtoObject>()
             };
 
             // 2. prepare path
@@ -201,21 +203,35 @@ namespace SDL2Engine
             scene.SetSceneType((SceneType)sceneData.sceneType);
             // TODO: scene.SetCamera(sceneData.mainCamera);
 
-            for(int i = 0; i < sceneData.gameObjects.Count; i++)
-            {
-                GameObject gameObject = sceneData.gameObjects[i];
-
-                // if gameObject.prototype != null, load prototype
-                // then replace all attributes, children and components that are also in the gameObject
-                // then add the gameObject to the scene
-                if(gameObject.prototype != null)
+            if(sceneData.gameObjects != null)
+                for(int i = 0; i < sceneData.gameObjects.Count; i++)
                 {
-                    gameObject = LoadFromPrototype(gameObject);
-                }
+                    GameObject gameObject = sceneData.gameObjects[i];
+
+                    // if gameObject.prototype != null, load prototype
+                    // then replace all attributes, children and components that are also in the gameObject
+                    // then add the gameObject to the scene
+                    if(gameObject.prototype != null)
+                    {
+                        gameObject = LoadFromPrototype(gameObject);
+                    }
                 
 
-                scene.AddGameObject(gameObject);
-            }
+                    scene.AddGameObject(gameObject);
+                }
+
+            if(sceneData.protoObjects!= null)
+                for(int i = 0; i < sceneData.protoObjects.Count; i++)
+                {
+                    ProtoObject protoObject = sceneData.protoObjects[i];
+                    GameObject? gameObject = protoObject.Instantiate();
+                    if(gameObject == null)
+                    {
+                        continue;
+                    }
+
+                    scene.AddGameObject(gameObject);
+                }
 
             return scene;
 

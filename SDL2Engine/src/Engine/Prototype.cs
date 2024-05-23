@@ -67,6 +67,11 @@ namespace SDL2Engine
             return new_instance;
         }
 
+        public GameObject InstantiateWithoutScene()
+        {
+            return GameObject.Clone();
+        }
+
         // Adds this Prototype to the AssetManager,
         // allowing it be queried by name
         public bool RegisterPrototype()
@@ -92,6 +97,71 @@ namespace SDL2Engine
             // find differences between previous state and current state
             // apply changes to all instances of this prototype
 
+        }
+    }
+
+    [Serializable]
+    public class ProtoObject
+    {
+        public string prototypeName;
+        public Dictionary<string, object> properties = new Dictionary<string, object>();
+
+        private ProtoObject()
+        {
+            this.prototypeName = "";
+        }
+
+        public ProtoObject(string prototypeName)
+        {
+            this.prototypeName = prototypeName;
+        }
+
+        public void AddProperty(string key, object value)
+        {
+            properties.Add(key, value);
+        }
+
+        public GameObject? Instantiate()
+        {
+            Prototype? proto = AssetManager.LoadPrototype(prototypeName).Get();
+            if (proto == null)
+            {
+                return null;
+            }
+
+            GameObject obj = proto.InstantiateWithoutScene();
+
+            // only allow custom properties for now
+
+            // position
+            if (properties.ContainsKey("position"))
+            {
+                // get x and y values (and z if it exists, but it's optional)
+                // obj to list of doubles
+                // Newtonsoft.Json.Linq.JArray -> List<double>
+                var newtonArray = (Newtonsoft.Json.Linq.JArray)properties["position"];
+                List<double>? pos = newtonArray.ToObject<List<double>>();
+                if (pos == null)
+                {
+                    throw new Exception("Invalid value for position property");
+                }
+                int len = pos.Count;
+                switch(len)
+                {
+                    case 2:
+                        obj.SetPosition(new Vec2D(pos[0], pos[1]));
+                        break;
+                    case 3:
+                        obj.SetPosition(new Vec2D(pos[0], pos[1], pos[2]));
+                        break;
+                    default:
+                        throw new Exception("Invalid number of values for position property");
+                }
+            }
+
+            // TODO: add more properties
+
+            return obj;
         }
     }
 }

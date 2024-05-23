@@ -884,8 +884,20 @@ namespace SDL2Engine
         private static Dictionary<string, ProtoHandler> proto_assets = new();
 
 
+        private static string AdjustPath(string path, string default_path)
+        {
+            // check if there is a / or \\ in the path
+            if (path.Contains("/") || path.Contains("\\"))
+            {
+                return path;
+            }
+
+            return default_path + path;
+        }
+
         public static ProtoAsset LoadPrototype(string path)
         {
+            path = AdjustPath(path, "Assets/Prototypes/");
             ProtoHandler? proto = null;
             if (proto_assets.ContainsKey(path))
             {
@@ -903,6 +915,7 @@ namespace SDL2Engine
 
         public static Texture LoadTexture(string path)
         {
+            path = AdjustPath(path, "Assets/Textures/");
             TextureHandler? handler = null;
             if (texture_assets.ContainsKey(path))
             {
@@ -920,6 +933,7 @@ namespace SDL2Engine
 
         public static Sound LoadSound(string path)
         {
+            path = AdjustPath(path, "Assets/Sounds/");
             SoundHandler? handler = null;
             if (sound_assets.ContainsKey(path))
             {
@@ -937,6 +951,7 @@ namespace SDL2Engine
 
         public static Music LoadMusic(string path)
         {
+            path = AdjustPath(path, "Assets/Music/");
             MusicHandler? handler = null;
             if (music_assets.ContainsKey(path))
             {
@@ -954,6 +969,7 @@ namespace SDL2Engine
 
         public static Font LoadFont(string path, int size = -1)
         {
+            path = AdjustPath(path, "Assets/Fonts/");
             if (size != -1)
             {
                 path += "@" + size;
@@ -1015,7 +1031,7 @@ namespace SDL2Engine
         public static bool AddPrototype(Prototype proto)
         {
             string name = proto.GetName();
-            string path = "Assets/Prototypes/" + name;
+            string path = AdjustPath(name, "Assets/Prototypes/");
 
             if (proto_assets.ContainsKey(path))
             {

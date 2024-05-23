@@ -298,6 +298,17 @@ namespace SDL2Engine
 
         private void HandleAddGameObjectComponents(GameObject gameObject)
         {
+            // check if the game object is already in the scene
+            if (gameObject.GetScene() == null)
+            {
+                gameObject.SetScene(this);
+            }
+            else if (gameObject.GetScene() != this)
+            {
+                Console.WriteLine("WARNING: GameObject is in another scene. Make sure to remove the GameObject from the previous scene before adding it to a new scene.");
+                return;
+            }
+
             List<Component> list = gameObject.GetAllComponents();
             for (int i = 0; i < list.Count; i++)
             {
@@ -534,6 +545,12 @@ namespace SDL2Engine
 
         private void HandleAddComponent<T>(T component) where T : Component
         {
+            // add to scene if not already added
+            if (component.GetScene() != this)
+            {
+                component.SetScene(this);
+            }
+
             // Call Awake on the component
             component.Awake();
 

@@ -480,6 +480,25 @@ namespace SDL2Engine
 
     }
 
+    public class ProtoAsset : Asset<Prototype>
+    {
+        private Prototype default_proto = new Prototype("Unknown Prototype");
+
+        public ProtoAsset(AssetHandler<Prototype> handler) : base(handler)
+        {
+        }
+
+        public override Prototype GetDefault()
+        {
+            return default_proto;
+        }
+
+        public GameObject Instantiate()
+        {
+            return Get().Instantiate();
+        }
+    }
+
 
 
     public abstract class AssetHandler<T>
@@ -489,6 +508,15 @@ namespace SDL2Engine
         protected uint refCount = 0;
         protected bool loaded = false;
         protected bool loadFailed = false;
+        protected bool managed = false;
+
+        public AssetHandler(T asset, string path)
+        {
+            this.asset = asset;
+            this.path = path;
+            loaded = true;
+            managed = true;
+        }
 
         public AssetHandler(string path)
         {
@@ -549,6 +577,11 @@ namespace SDL2Engine
 
         public bool UnloadIfUnused()
         {
+            if (managed)
+            {
+                return false;
+            }
+
             if (refCount == 0)
             {
                 UnloadAsset();
@@ -787,6 +820,54 @@ namespace SDL2Engine
         }
     }
 
+    public class ProtoHandler : AssetHandler<Prototype>
+    {
+
+
+
+        public ProtoHandler(string path) : base(path)
+        {
+        }
+
+        public ProtoHandler(Prototype asset, string path) : base(asset, path)
+        {
+        }
+
+        public override bool LoadAsset()
+        {
+            if(loaded)
+                return true;
+
+            if (loadFailed)
+                return false;
+
+            asset = SceneSerialization.LoadPrototype(path);
+            if (asset == null)
+            {
+                Console.WriteLine("ProtoHandler: Failed to load prototype: " + path);
+                loadFailed = true;
+                return false;
+            }
+
+            loaded = true;
+            return true;
+        }
+
+        public override bool UnloadAsset()
+        {
+            if(!loaded)
+                return false;
+
+            if (asset != null)
+            {
+                asset = null;
+                loaded = false;
+                return true;
+            }
+            return false;
+        }
+    }
+
     // Asset manager class
     // This class should be used to load and manage game assets such as textures, sounds, etc.
     // To use an asset, a function should load the game assets with the AssetManager.LoadAsset method
@@ -800,9 +881,41 @@ namespace SDL2Engine
         private static Dictionary<string, SoundHandler> sound_assets = new();
         private static Dictionary<string, MusicHandler> music_assets = new();
         private static Dictionary<string, FontHandler> font_assets = new();
+        private static Dictionary<string, ProtoHandler> proto_assets = new();
+
+
+        private static string AdjustPath(string path, string default_path)
+        {
+            // check if there is a / or \\ in the path
+            if (path.Contains("/") || path.Contains("\\"))
+            {
+                return path;
+            }
+
+            return default_path + path;
+        }
+
+        public static ProtoAsset LoadPrototype(string path)
+        {
+            path = AdjustPath(path, "Assets/Prototypes/");
+            ProtoHandler? proto = null;
+            if (proto_assets.ContainsKey(path))
+            {
+                proto = proto_assets[path];
+            }
+            else
+            {
+                proto = new ProtoHandler(path);
+                proto_assets[path] = proto;
+                // proto.LoadAsset();
+            }
+
+            return new ProtoAsset(proto);
+        }
 
         public static Texture LoadTexture(string path)
         {
+            path = AdjustPath(path, "Assets/Textures/");
             TextureHandler? handler = null;
             if (texture_assets.ContainsKey(path))
             {
@@ -820,6 +933,7 @@ namespace SDL2Engine
 
         public static Sound LoadSound(string path)
         {
+            path = AdjustPath(path, "Assets/Sounds/");
             SoundHandler? handler = null;
             if (sound_assets.ContainsKey(path))
             {
@@ -837,6 +951,7 @@ namespace SDL2Engine
 
         public static Music LoadMusic(string path)
         {
+            path = AdjustPath(path, "Assets/Music/");
             MusicHandler? handler = null;
             if (music_assets.ContainsKey(path))
             {
@@ -854,6 +969,7 @@ namespace SDL2Engine
 
         public static Font LoadFont(string path, int size = -1)
         {
+            path = AdjustPath(path, "Assets/Fonts/");
             if (size != -1)
             {
                 path += "@" + size;
@@ -901,10 +1017,30 @@ namespace SDL2Engine
             {
                 return LoadFont(path) as T ?? throw new Exception("Failed to load font");
             }
+            else if (typeof(T) == typeof(ProtoAsset))
+            {
+                return LoadPrototype(path) as T ?? throw new Exception("Failed to load prototype");
+            }
             else
             {
                 throw new Exception("Unsupported asset type");
             }
+        }
+        
+
+        public static bool AddPrototype(Prototype proto)
+        {
+            string name = proto.GetName();
+            string path = AdjustPath(name, "Assets/Prototypes/");
+
+            if (proto_assets.ContainsKey(path))
+            {
+                return false;
+            }
+
+            ProtoHandler handler = new ProtoHandler(proto, path);
+            proto_assets[path] = handler;
+            return true;
         }
 
         // TODO: implement something that checks for unused assets and unloads them periodically

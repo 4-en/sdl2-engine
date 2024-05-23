@@ -1,23 +1,40 @@
 ﻿using System.Reflection;
+using Newtonsoft.Json;
 
 namespace SDL2Engine
 {
     public class GameObject : EngineObject
     {
+        [JsonProperty]
+        public string? prototype = null;
+        [JsonProperty]
         public uint layer = 0;
         // Position of the GameObject
+        [JsonProperty]
         protected Transform _transform = new Transform();
+        [JsonProperty]
         protected Collider? _collider;
+        [JsonProperty]
         protected PhysicsBody? _physicsBody;
+        [JsonProperty]
         protected Drawable? _drawable;
+        [JsonProperty]
         protected GameObject? Parent { get; set; }
+        [JsonProperty]
         private readonly List<GameObject> children = [];
+        [JsonProperty]
         private readonly List<Component> components = [];
         private static readonly GameObject defaultObject = new("default");
 
         // if true, the object will not be destroyed when the scene is changed and instead will be moved
         // to a buffer of persistent objects where it can be accessed by any scene
+        [JsonProperty]
         private bool persistent = false;
+
+        private GameObject()
+        {
+            this.Parent = null;
+        }
 
         public GameObject(string name = "GameObject", Scene? scene = null)
         {
@@ -36,6 +53,21 @@ namespace SDL2Engine
             this.name = name;
             this.transform.Init(this);
         }
+
+        public GameObject(bool no_scene, string name = "GameObject")
+        {
+            this.Parent = null;
+
+            if (!no_scene)
+            {
+                this.scene = SceneManager.GetActiveScene();
+                this.scene?.AddGameObject(this);
+            }
+
+            this.name = name;
+            this.transform.Init(this);
+        }
+        
 
         public GameObject(GameObject parent, string name = "GameObject")
         {
@@ -86,11 +118,11 @@ namespace SDL2Engine
         }
 
         // creates a deep copy of the GameObject
-        public static GameObject Instantiate(GameObject source)
+        public GameObject Clone()
         {
-
+            var source = this;
             // setups the new object
-            GameObject newObject = new GameObject(source.name, source.scene);
+            GameObject newObject = source.scene == null ? new GameObject(true, source.GetName()) : new GameObject(source.GetName(), source.scene);
             newObject.layer = source.layer;
             newObject.enabled = source.enabled;
 
@@ -101,7 +133,7 @@ namespace SDL2Engine
             newObject.Parent = source.Parent;
 
             // copy all components
-            foreach (Component script in source.components)
+            foreach (Component script in source.GetAllComponents())
             {
                 Type type = script.GetType();
                 // create a new instance of the script
@@ -128,10 +160,10 @@ namespace SDL2Engine
             // copy all children
             foreach (GameObject child in source.children)
             {
-                GameObject newChild = GameObject.Instantiate(child);
+                GameObject newChild = child.Clone();
                 // fix references to new object
-                newChild.Parent = newObject;
-                newObject.children.Add(newChild);
+                newChild.SetParent(null);
+                newObject.AddChild(newChild);
             }
 
             return newObject;

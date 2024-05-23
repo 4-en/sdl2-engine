@@ -8,7 +8,6 @@ namespace Pong
         static void Main(string[] args)
         {
            LevelManager.Start();
-           Console.WriteLine("Hello, World!");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,8 +15,11 @@ namespace SDL2Engine
      * 
      * To create custom components, inherit from Script instead
      */
+
+    [Serializable]
     public class Component : EngineObject
     {
+        [JsonProperty]
         protected GameObject gameObject = GameObject.Default;
 
         public Component()
@@ -37,7 +41,7 @@ namespace SDL2Engine
         }
 
         // copy all members of the component
-        public static T Instantiate<T>(T source, GameObject? gameObject = null) where T : Component, new()
+        public static T Clone<T>(T source, GameObject? gameObject = null) where T : Component, new()
         {
             T newComponent = new T();
 

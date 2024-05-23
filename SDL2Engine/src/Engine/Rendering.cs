@@ -1,7 +1,6 @@
 ﻿using SDL2;
 using static SDL2.SDL;
-using System;
-using System.IO;
+using Newtonsoft.Json;
 
 namespace SDL2Engine
 {
@@ -722,6 +721,444 @@ namespace SDL2Engine
             SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE);
 
         }
+    }
+    [Serializable]
+    public class AnimationInfo
+    {
+        public string name;
+        public List<int> frames;
+        public double speed;
+        public AnimationType type;
+        public int direction = 1;
+
+        private AnimationInfo()
+        {
+            this.name = "";
+            this.frames = new List<int>();
+            this.speed = 0.1;
+            this.type = AnimationType.Loop;
+        }
+
+        public AnimationInfo(string name, int frame, double speed=0.1)
+        {
+            this.name = name;
+            this.frames = new List<int>() { frame };
+            this.speed = speed;
+            this.type = AnimationType.Loop;
+        }
+
+        public AnimationInfo(string name, int firstFrame, int frameCount, double speed=0.1)
+        {
+            this.name = name;
+            this.frames = new List<int>();
+            for (int i = 0; i < frameCount; i++)
+            {
+                this.frames.Add(firstFrame + i);
+            }
+            this.speed = speed;
+            this.type = AnimationType.Loop;
+        }
+
+        public AnimationInfo(string name, List<int> frames, double speed)
+        {
+            this.name = name;
+            this.frames = frames;
+            this.speed = speed;
+            this.type = AnimationType.Loop;
+            this.frames = frames;
+        }
+
+        public AnimationInfo(string name, List<int> frames, double speed, AnimationType type)
+        {
+            this.name = name;
+            this.frames = frames;
+            this.speed = speed;
+            this.type = type;
+            this.frames = frames;
+        }
+
+        public int firstFrame
+        {
+            get
+            {
+                return frames[0];
+            }
+        }
+
+        public int lastFrame
+        {
+            get
+            {
+                return frames[frames.Count - 1];
+            }
+        }
+
+        public int frameCount
+        {
+            get
+            {
+                return frames.Count;
+            }
+        }
+
+        public void Reverse()
+        {
+            direction = -direction;
+            //frames.Reverse();
+        }
+
+    }
+    [Serializable]
+    public enum AnimationType
+    {
+        Loop,
+        Once,
+        OnceAndHold,
+        LoopReversed,
+        OnceAndDestroy
+    }
+
+    /*
+     * This class is used to render sprites from a spritesheet,
+     * as well as animations that can be defined using the AnimationInfo class
+     */
+    public class SpriteRenderer : DrawableRect, ILoadable
+    {
+        [JsonIgnore]
+        private Texture? texture;
+        [JsonProperty]
+        private string source = "";
+        [JsonIgnore]
+        private Rect source_rect = new Rect(0, 0, 1, 1);
+        [JsonProperty]
+        private Vec2D spriteSize = new Vec2D(-1, -1);
+        [JsonProperty]
+        private int spriteIndex = 0;
+        [JsonProperty]
+        private Dictionary<string, AnimationInfo> animations = new Dictionary<string, AnimationInfo>();
+        [JsonProperty]
+        private string currentAnimation = "";
+        [JsonProperty]
+        private string previousAnimation = "";
+        [JsonProperty]
+        private double animationSpeed = 0.1;
+        [JsonProperty]
+        private double lastFrameTime = 0;
+        [JsonProperty]
+        private AnimationType animationType = AnimationType.Loop;
+        [JsonProperty]
+        private bool flipX = false;
+        [JsonProperty]
+        private bool flipY = false;
+        [JsonProperty]
+        private bool customWorldSize = false;
+
+        // Sets the size of individual sprites in the spritesheet
+        // This is used to calculate the correct source rect for the sprite, based on an index
+        public void SetSpriteSize(Vec2D size)
+        {
+            this.spriteSize = size;
+            this.rect = new Rect(0, 0, size.x, size.y);
+        }
+
+        public void SetSpriteSize(int width, int height)
+        {
+            this._tempSetSpriteByCount = new Vec2D(-1, -1);
+            this.spriteSize = new Vec2D(width, height);
+            this.rect = new Rect(0, 0, width, height);
+        }
+
+        // temporary variable to set sprite size by count before the texture is loaded
+        [JsonIgnore]
+        private Vec2D _tempSetSpriteByCount = new Vec2D(-1, -1);
+        public void SetSpriteSizeByCount(int rows, int columns)
+        {
+            if(!this.IsLoaded())
+            {
+                _tempSetSpriteByCount = new Vec2D(rows, columns);
+            } else
+            {
+                this.spriteSize = new Vec2D(this.source_rect.w / columns, this.source_rect.h / rows);
+                this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
+            }
+        }
+
+        // Sets the index of the sprite in the spritesheet
+        public void SetSpriteIndex(int index)
+        {
+            this.spriteIndex = index;
+        }
+
+        // Sets the size of the rendered sprite in world coordinates (camera.WorldSize)
+        public void SetWorldSize(Vec2D size)
+        {
+            customWorldSize = true;
+            this.rect = new Rect(0, 0, size.x, size.y);
+        }
+
+        public void SetWorldSize(int width, int height)
+        {
+            customWorldSize = true;
+            this.rect = new Rect(0, 0, width, height);
+        }
+
+        // Sets the size of the rendered sprite in world coordinates (camera.WorldSize)
+        public void SetSize(Vec2D size)
+        {
+            customWorldSize = true;
+            this.rect = new Rect(0, 0, size.x, size.y);
+        }
+
+        public void SetSize(int width, int height)
+        {
+            customWorldSize = true;
+            this.rect = new Rect(0, 0, width, height);
+        }
+
+        // Flips the sprite horizontally
+        public void SetFlipX(bool flip)
+        {
+            this.flipX = flip;
+        }
+
+        // Flips the sprite vertically
+        public void SetFlipY(bool flip) { this.flipY = flip; }
+
+        // Flips the sprite horizontally and vertically
+        public void SetFlip(bool flipX, bool flipY)
+        {
+            this.flipX = flipX;
+            this.flipY = flipY;
+        }
+
+        // Registers an animation with the given name, starting frame, frame count and speed
+        public void AddAnimation(string name, int frame, int frameCount, double speed=0.1)
+        {
+            animations[name] = new AnimationInfo(name, frame, frameCount, speed);
+        }
+
+        // Registers an animation by using an AnimationInfo object
+        public void AddAnimation(AnimationInfo animation)
+        {
+            animations[animation.name] = animation;
+        }
+
+        // changes the current animation to the animation with the given name
+        public void SetAnimation(string name, AnimationType? type = null)
+        {
+            if (currentAnimation == name)
+            {
+                return;
+            }
+
+            if (animations.ContainsKey(name))
+            {
+                previousAnimation = currentAnimation;
+                currentAnimation = name;
+                lastFrameTime = Time.time;
+                spriteIndex = animations[name].firstFrame;
+                animationType = animations[name].type;
+                animationSpeed = animations[name].speed;
+            }
+
+            if (type != null)
+            {
+                animationType = type.Value;
+            }
+        }
+
+        // changes the current animation to the animation with the given name
+        public void PlayAnimation(string name, AnimationType? type = null)
+        {
+            SetAnimation(name, type);
+        }
+
+        // changes the current animation to the animation with the given name
+        public void Play(string name, AnimationType? type = null)
+        {
+            SetAnimation(name, type);
+        }
+
+        // changes the speed of the current animation
+        public void SetAnimationSpeed(double speed)
+        {
+            this.animationSpeed = speed;
+        }
+
+        // changes the type of the current animation
+        public void SetAnimationType(AnimationType type)
+        {
+            this.animationType = type;
+        }
+
+        // creates a default sprite to show if no custom animation or index was set
+        // if no parameters are given, this is equal to the entire texture/spritesheet
+        private void AddDefaultSprite()
+        {
+
+            var defAnim = new AnimationInfo("default", 0, 1, 1.0);
+            animations["default"] = defAnim;
+
+
+        }
+
+        // loads the texture from the source path
+        public void Load()
+        {
+            if (texture != null)
+            {
+                return;
+            }
+
+            if (source != "")
+            {
+                texture = AssetManager.LoadTexture(source);
+                texture.Load();
+                this.source_rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
+                //this.rect = this.source_rect * 1;
+                this.AddDefaultSprite();
+                if (_tempSetSpriteByCount.x != -1)
+                {
+                    this.spriteSize = new Vec2D(this.source_rect.w / _tempSetSpriteByCount.y, this.source_rect.h / _tempSetSpriteByCount.x);
+                    this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
+                    this._tempSetSpriteByCount = new Vec2D(-1, -1);
+                }
+                else if (this.spriteSize.x == -1)
+                {
+                    this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
+                }
+                
+                if(this.currentAnimation == "")
+                {
+                    this.SetAnimation("default");
+                }
+                if(!customWorldSize)
+                    this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
+            }
+        }
+
+        // loads a texture from the given path
+        public void LoadTexture(string path)
+        {
+            this.source = path;
+            this.Load();
+        }
+
+        // sets the path to the texture without loading it immediately
+        public void SetTexture(string path)
+        {
+            this.source = path;
+        }
+
+        // sets the path to the texture without loading it immediately
+        public void SetSprite(string path)
+        {
+            this.source = path;
+        }
+
+        public void SetSource(string path)
+        {
+            this.source = path;
+        }
+
+        // true if the texture is loaded
+        public bool IsLoaded()
+        {
+            return texture != null && texture.IsLoaded();
+        }
+
+        // draws the sprite
+        public override void Draw(Camera camera)
+        {
+            if (texture == null)
+            {
+                this.Load();
+            }
+
+            if (texture == null)
+            {
+                return;
+            }
+
+            var texture_ptr = texture.Get();
+
+            if (currentAnimation == "")
+            {
+                return;
+            }
+
+
+            int framesPerRow = (int)(source_rect.w / spriteSize.x);
+            int x = spriteIndex % framesPerRow;
+            int y = spriteIndex / framesPerRow;
+
+            var temp_dest_rect = new Rect(x * spriteSize.x, y * spriteSize.y, spriteSize.x, spriteSize.y);
+
+            var srcRect = temp_dest_rect.ToSDLRect();
+            var dstRect = this.GetDestRect();
+
+            double angle = gameObject.transform.rotation;
+
+            var flip = SDL_RendererFlip.SDL_FLIP_NONE;
+            if (flipX)
+            {
+                flip |= SDL_RendererFlip.SDL_FLIP_HORIZONTAL;
+            }
+            if (flipY)
+            {
+                flip |= SDL_RendererFlip.SDL_FLIP_VERTICAL;
+            }
+
+            SDL_RenderCopyEx(Engine.renderer, texture_ptr, ref srcRect, ref dstRect, angle, IntPtr.Zero, flip);
+
+
+            var animation = animations[currentAnimation];
+            double time = Time.time;
+            double deltaTime = time - lastFrameTime;
+            if (deltaTime > animationSpeed)
+            {
+                // get next frame index from animation
+                spriteIndex += animation.direction;
+                lastFrameTime = time;
+            }
+
+            if (this.spriteIndex > animation.lastFrame || this.spriteIndex < animation.firstFrame)
+            {
+                switch (animationType)
+                {
+                    case AnimationType.Loop:
+                        this.spriteIndex = animation.firstFrame;
+                        break;
+                    case AnimationType.Once:
+                        this.SetAnimation(previousAnimation);
+                        break;
+                    case AnimationType.OnceAndHold:
+                        this.spriteIndex = animation.lastFrame;
+                        break;
+                    case AnimationType.LoopReversed:
+                        animation.Reverse();
+                        this.spriteIndex+=animation.direction;
+                        break;
+                    case AnimationType.OnceAndDestroy:
+                        this.spriteIndex = animation.lastFrame;
+                        gameObject.Destroy();
+                        break;
+                }
+            }
+
+        }
+
+        // removes reference to texture and disposes it
+        public override void Dispose()
+        {
+            base.Dispose();
+            if (texture != null)
+            {
+                texture.Dispose();
+                texture = null;
+            }
+        }
+
     }
 
     public class TextureRendererOld : DrawableRect

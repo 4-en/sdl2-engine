@@ -41,6 +41,8 @@ namespace SDL2Engine
             this.gameObject = new GameObject(true, name);
             this.child_prototypes = new List<string>();
             // this.previousState = gameObject.Clone();
+
+            this.RegisterPrototype();
         }
 
         public Prototype(string name, GameObject gameObject)
@@ -48,6 +50,8 @@ namespace SDL2Engine
             this.name = name;
             this.gameObject = gameObject;
             this.child_prototypes = new List<string>();
+
+            this.RegisterPrototype();
         }
 
         public GameObject Instantiate()
@@ -61,6 +65,17 @@ namespace SDL2Engine
                 activeScene.AddGameObject(new_instance);
             }
             return new_instance;
+        }
+
+        // Adds this Prototype to the AssetManager,
+        // allowing it be queried by name
+        public bool RegisterPrototype()
+        {
+            if(this.name == "")
+            {
+                throw new Exception("Prototype name cannot be empty when registering prototype");
+            }
+            return AssetManager.AddPrototype(this);
         }
 
         

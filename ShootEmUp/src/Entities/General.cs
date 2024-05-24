@@ -24,13 +24,13 @@ namespace ShootEmUp.Entities
             Value = value;
         }
 
-        public Damage(double value, GameObject source)
+        public Damage(double value, GameObject? source)
         {
             Value = value;
             Source = source;
         }
 
-        public Damage(double value, GameObject source, Team team)
+        public Damage(double value, GameObject? source, Team team)
         {
             Value = value;
             Source = source;
@@ -42,6 +42,69 @@ namespace ShootEmUp.Entities
         void Damage(Damage damage);
 
         void Heal(double value);
+    }
+
+    public class ProjectileScript : Script
+    {
+        public bool destroyOnCollision = true;
+        public bool destroyOnScreenExit = true;
+        public bool destroyOnLifetimeEnd = true;
+
+        public double lifetime = 5;
+        public double damage = 1;
+        public Team team = Team.Enemy;
+        public GameObject? shooter;
+
+        public override void Update()
+        {
+            if (destroyOnLifetimeEnd)
+            {
+                lifetime -= Time.deltaTime;
+                if (lifetime <= 0)
+                {
+                    Destroy();
+                }
+            }
+            if(!destroyOnScreenExit)
+            {
+                return;
+            }
+            var camera = GetCamera();
+            if(camera == null)
+            {
+                return;
+            }
+
+            var screenPosition = camera.WorldToScreen(gameObject.GetPosition());
+            double tolerance = 250;
+            if (screenPosition.x < -tolerance || screenPosition.x > camera.GetScreenWidth() + tolerance || screenPosition.y < -tolerance || screenPosition.y > camera.GetScreenHeight() + tolerance)
+            {
+                Destroy();
+            }
+
+        }
+
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            var other = collision.GetOther(gameObject);
+
+            if (destroyOnCollision)
+            {
+                var scripts = other.GetComponents<Script>();
+                foreach (var script in scripts)
+                {
+                    if (script is IDamageable damageable)
+                    {
+                        damageable.Damage(new Damage(damage, shooter, team));
+                    }
+                }
+
+                // TODO: Add explosion effect and sound
+                Destroy();
+            }
+        }
+
+
     }
 
 

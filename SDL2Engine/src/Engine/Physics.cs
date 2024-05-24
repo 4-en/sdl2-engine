@@ -308,6 +308,15 @@ namespace SDL2Engine
             this.obj2 = obj2;
             this.collisionPoint = collisionPoint;
         }
+
+        public GameObject GetOther(GameObject obj)
+        {
+            if (obj == obj1)
+            {
+                return obj2;
+            }
+            return obj1;
+        }
     }
 
     // defines a box collider

@@ -150,6 +150,26 @@ namespace SDL2Engine
             return null;
         }
 
+        public double GetScreenWidth()
+        {
+            return GetScreenSize().x;
+        }
+
+        public double GetScreenHeight()
+        {
+            return GetScreenSize().y;
+        }
+
+        public double GetWorldWidth()
+        {
+            return GetWorldSize().x;
+        }
+
+        public double GetWorldHeight()
+        {
+            return GetWorldSize().y;
+        }
+
         public abstract Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D());
         public abstract Rect RectToWorld(Rect rect, Vec2D rootPosition = new Vec2D());
     }

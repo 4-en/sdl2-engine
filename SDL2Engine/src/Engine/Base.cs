@@ -582,6 +582,7 @@ namespace SDL2Engine
         private bool running = false;
         private bool showDebug = false;
         private bool fullscreen = false;
+        private bool showColliders = false;
         private static bool forceAspectRatio = false;
         private static double aspectRatio = 16.0 / 9.0;
         public static UInt32 targetFPS = 500;
@@ -690,8 +691,8 @@ namespace SDL2Engine
 
             Console.WriteLine("Engine initialized");
             Console.WriteLine();
-            Console.WriteLine("Press ESC to quit");
             Console.WriteLine("Press F3 to toggle debug info");
+            Console.WriteLine("Press F4 to toggle collider visibility");
             Console.WriteLine("Press F11 to toggle fullscreen");
             Console.WriteLine();
 
@@ -740,6 +741,9 @@ namespace SDL2Engine
                     break;
                 case SDL.SDL_Keycode.SDLK_F3:
                     showDebug = !showDebug;
+                    break;
+                case SDL.SDL_Keycode.SDLK_F4:
+                    showColliders = !showColliders;
                     break;
                 case SDL.SDL_Keycode.SDLK_F11:
                     fullscreen = !fullscreen;
@@ -924,13 +928,48 @@ namespace SDL2Engine
             }
         }
 
+        private void DrawColliders()
+        {
+
+            // set color to red
+            SDL.SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+
+            foreach (Scene scene in SceneManager.GetScenes())
+            {
+                var camera = scene.GetCamera();
+                if (camera == null)
+                {
+                    continue;
+                }
+                foreach (Collider collider in scene.GetColliders())
+                {
+                    if (collider is BoxCollider boxCollider)
+                    {
+                        var rect = boxCollider.GetCollisionBox();
+                        // to screen
+                        SDL.SDL_Rect sdlRect = camera.RectToScreen(rect).ToSDLRect();
+                        SDL.SDL_RenderDrawRect(renderer, ref sdlRect);
+                    }
+                }
+            }
+
+        }
+
         private void Draw()
         {
             // Clear screen
             SDL.SDL_SetRenderDrawColor(renderer, 0x1F, 0x1F, 0x1F, 0xFF); // Dark gray
             SDL.SDL_RenderClear(renderer);
 
-            SceneManager.DrawScenes();
+            
+
+            if (showColliders)
+            {
+                DrawColliders();
+            } else
+            {
+                SceneManager.DrawScenes();
+            }
 
             if (showDebug)
             {

@@ -490,6 +490,16 @@ namespace SDL2Engine
             return gameObjects;
         }
 
+        public List<Drawable> GetDrawables()
+        {
+            return drawableList;
+        }
+
+        public List<Collider> GetColliders()
+        {
+            return colliderList;
+        }
+
         /*
          * Find a GameObject by name
          * Returns null if no GameObject with the given name was found

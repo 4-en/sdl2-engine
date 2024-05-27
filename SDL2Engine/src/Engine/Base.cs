@@ -943,12 +943,40 @@ namespace SDL2Engine
                 }
                 foreach (Collider collider in scene.GetColliders())
                 {
+                    // TODO: test this
+                    // this is a bit ugly, but since its just the debug mode, we keep it for now
                     if (collider is BoxCollider boxCollider)
                     {
                         var rect = boxCollider.GetCollisionBox();
                         // to screen
                         SDL.SDL_Rect sdlRect = camera.RectToScreen(rect).ToSDLRect();
                         SDL.SDL_RenderDrawRect(renderer, ref sdlRect);
+                    }
+                    else if (collider is CircleCollider circleCollider)
+                    {
+                        var center = circleCollider.GetCollisionCenter();
+                        double radius = circleCollider.GetRadius();
+
+                        // to screen
+                        Vec2D screenCenter = camera.WorldToScreen(center);
+                        double screenRadius = camera.WorldToScreen(radius);
+
+                        // draw the circle
+                        // do this manually for now
+                        // is there no SDL function for this?
+                        // other solution would be to create a texture, but since this is just for debugging, we keep it simple
+                        int resolution = 12;
+                        double angle = 0;
+                        double angleStep = 2 * Math.PI / resolution;
+                        Vec2D lastPoint = new Vec2D(screenCenter.x + screenRadius, screenCenter.y);
+                        for (int i = 0; i < resolution; i++)
+                        {
+                            angle += angleStep;
+                            Vec2D point = new Vec2D(screenCenter.x + screenRadius * Math.Cos(angle), screenCenter.y + screenRadius * Math.Sin(angle));
+                            SDL.SDL_RenderDrawLine(renderer, (int)lastPoint.x, (int)lastPoint.y, (int)point.x, (int)point.y);
+                            lastPoint = point;
+                        }
+
                     }
                 }
             }

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static SDL2.SDL;
+using ShootEmUp.Entities;
+using System.ComponentModel.Design.Serialization;
 
 namespace ShootEmUp.src
 {
@@ -124,6 +126,7 @@ public class KeyboardController : Script
 {
     public int left = (int)SDL_Keycode.SDLK_a;
     public int right = (int)SDL_Keycode.SDLK_d;
+    public int space = (int)SDL_Keycode.SDLK_SPACE;
 
     public override void Start()
     {
@@ -132,8 +135,7 @@ public class KeyboardController : Script
 
     public override void Update()
     {
-       
-
+        
         if (Input.GetKeyPressed(left))
         {
             gameObject.transform.rotation -= 0.5;
@@ -142,7 +144,29 @@ public class KeyboardController : Script
         {
             gameObject.transform.rotation += 0.5;
         }
+        if (Input.GetKeyDown(space))
+        {
+            ShootProjectile();
+
+        }
         //rotate velocity
-        gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(100, 0).Rotate(gameObject.transform.rotation);
+        gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(400, 0).Rotate(gameObject.transform.rotation);
+        
     }
+
+    private void ShootProjectile()
+    {
+        var projectile = new GameObject("Projectile");
+        projectile.AddComponent<ProjectileScript>();
+        //set the position of the projectile to the position of the player
+        //add a small offset to the position of the player to avoid collision with the player  
+        projectile.transform.position = gameObject.transform.position + new Vec2D(100, 0).Rotate(gameObject.transform.rotation);
+        projectile.transform.rotation = gameObject.transform.rotation;
+        var pb = projectile.AddComponent<PhysicsBody>();
+        pb.Velocity = new Vec2D(800, 0).Rotate(gameObject.transform.rotation);
+        projectile.AddComponent<TextureRenderer>().SetSource("Assets/Textures/projectile.png");
+        BoxCollider.FromDrawableRect(projectile);
+    }
+
+   
 }

@@ -134,8 +134,12 @@ namespace SDL2Engine
     public abstract class Camera : Component
     {
         public abstract Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D());
+        public abstract double WorldToScreen(double distance);
+        public abstract Rect WorldToScreen(Rect worldRect);
         public abstract Vec2D GetScreenSize();
         public abstract Vec2D ScreenToWorld(Vec2D screenPosition);
+        public abstract double ScreenToWorld(double distance);
+        public abstract Rect ScreenToWorld(Rect screenRect);
 
         public abstract Vec2D GetWorldSize();
 
@@ -247,6 +251,28 @@ namespace SDL2Engine
             return new Rect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
         }
 
+        // converts a distance in world coordinates to screen coordinates
+        // we assume that the aspect ratio is kept, otherwise this wouldn't work with
+        // just a single distance value
+        public override double WorldToScreen(double distance)
+        {
+            return distance / WorldSize.x * GetScreenSize().x;
+        }
+
+        public override Rect WorldToScreen(Rect worldRect)
+        {
+            return this.RectToScreen(worldRect);
+        }
+
+        public override double ScreenToWorld(double distance)
+        {
+            return distance / GetScreenSize().x * WorldSize.x;
+        }
+
+        public override Rect ScreenToWorld(Rect screenRect)
+        {
+            return this.RectToWorld(screenRect);
+        }
     }
 
     // Base class for all drawable components

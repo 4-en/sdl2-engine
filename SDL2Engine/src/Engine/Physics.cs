@@ -434,6 +434,16 @@ namespace SDL2Engine
             return center + gameObject.GetPosition();
         }
 
+        public double GetRadius()
+        {
+            return radius;
+        }
+
+        public void SetRadius(double radius)
+        {
+            this.radius = radius;
+        }
+
         public void SetCenter(Vec2D center)
         {
             this.center = center;

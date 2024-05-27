@@ -24,6 +24,12 @@ namespace SDL2Engine.tests
 
         public static void Run()
         {
+            Console.WriteLine("Running SerializationTest");
+            Console.WriteLine("Press left mouse button to add a GameObject to the scene");
+            Console.WriteLine("Press s to save the scene to a file");
+            Console.WriteLine("Press l to load the scene from a file");
+            Console.WriteLine("Example: Press left mouse button a few times to add a GameObject, then press s to save the scene.");
+            Console.WriteLine("         Restart the program and press l to load the scene you saved.");
             var scene = CreateScene();
             var engine = new Engine(scene);
             engine.Run();
@@ -38,6 +44,8 @@ namespace SDL2Engine.tests
             {
                 forsenEPrototype = new Prototype("forsenE");
                 var renderer = forsenEPrototype.GameObject.AddComponent<SpriteRenderer>();
+                var circleCollider = forsenEPrototype.GameObject.AddComponent<CircleCollider>();
+                circleCollider.SetRadius(100);
                 renderer.SetSource("Assets/Textures/forsenE.png");
 
                 

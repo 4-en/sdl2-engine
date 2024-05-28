@@ -92,6 +92,18 @@ namespace SDL2Engine.tests
                         SceneManager.SetScene(scene);
                     }
                 }
+
+                // test SceneTemplate
+                if(Input.GetKeyDown(SDL_Keycode.SDLK_t))
+                {
+                    var objects = SceneTemplate.Load("Assets/Templates/test.template");
+                    Console.WriteLine($"Loaded {objects.Count} objects");
+                }
+
+                if(Input.GetKeyDown(SDL_Keycode.SDLK_ESCAPE))
+                {
+                    Engine.Stop();
+                }
                 
             }
         }

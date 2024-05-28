@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Xml;
 
 namespace SDL2Engine
@@ -22,7 +23,16 @@ namespace SDL2Engine
 
         private static IEnumerator<XmlElement> LoadElements(string path)
         {
-            string content = File.ReadAllText(path);
+            string content = "";
+            try
+            {
+                content = File.ReadAllText(path);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error reading file: " + path);
+                Console.WriteLine(e.Message);
+            }
             if (content == null || content == "")
             {
                 yield break;
@@ -118,20 +128,40 @@ namespace SDL2Engine
             }
             attribute = parts[0];
             string otherAttributes = string.Join(".", parts.Skip(1));
-            var property = type.GetProperty(attribute);
-            if (property == null)
+            var field = type.GetField(attribute, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (field == null)
             {
-                Console.WriteLine("Property not found: " + attribute);
                 return;
             }
 
             if (otherAttributes == "")
             {
-                property.SetValue(obj, value);
+                // convert value to the correct type
+                switch (field.FieldType.Name)
+                {
+                    case "Int32":
+                        field.SetValue(obj, int.Parse(value));
+                        break;
+                    case "Single":
+                        field.SetValue(obj, float.Parse(value));
+                        break;
+                    case "Double":
+                        field.SetValue(obj, double.Parse(value));
+                        break;
+                    case "String":
+                        field.SetValue(obj, value);
+                        break;
+                    case "Boolean":
+                        field.SetValue(obj, bool.Parse(value));
+                        break;
+                    default:
+                        Console.WriteLine("Unsupported type: " + field.FieldType.Name);
+                        break;
+                }
             }
             else
             {
-                var subObj = property.GetValue(obj);
+                var subObj = field.GetValue(obj);
                 if (subObj == null)
                 {
                     return;

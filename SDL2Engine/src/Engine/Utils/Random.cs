@@ -61,6 +61,21 @@ namespace SDL2Engine.Rand
             this.seed = seed;
         }
 
+        public static double NextDouble(int seed)
+        {
+            return new StableRandom(seed).NextDouble();
+        }
+
+        public static float NextFloat(int seed)
+        {
+            return new StableRandom(seed).NextFloat();
+        }
+
+        public static int Next(int seed)
+        {
+            return new StableRandom(seed).Next();
+        }
+
         public int Next()
         {
             int combined = Combine(seed, state, -state);

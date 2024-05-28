@@ -59,7 +59,12 @@ namespace SDL2Engine.tests
 
                 if(Input.GetMouseButtonDown(Input.MOUSE_BUTTON_LEFT))
                 {
-                    var gameObject = forsenEPrototype.Instantiate();
+                    var gameObject = Prototype.Instantiate("forsenE");
+                    if(gameObject == null)
+                    {
+                        Console.WriteLine("Failed to instantiate forsenE");
+                        return;
+                    }
                     var mouse_world_pos = GetCamera()?.ScreenToWorld(Input.GetMousePosition());
                     if(mouse_world_pos != null)
                     {

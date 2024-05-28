@@ -54,6 +54,16 @@ namespace SDL2Engine
             this.RegisterPrototype();
         }
 
+        public static GameObject? Instantiate(string prototypeName)
+        {
+            Prototype? proto = AssetManager.LoadPrototype(prototypeName).Get();
+            if (proto == null)
+            {
+                return null;
+            }
+            return proto.Instantiate();
+        }
+
         public GameObject Instantiate()
         {
             var new_instance = GameObject.Clone();

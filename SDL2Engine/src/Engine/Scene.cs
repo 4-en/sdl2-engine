@@ -417,6 +417,16 @@ namespace SDL2Engine
             }
         }
 
+        // Loads GameObjects from a template file and adds them to the scene
+        public List<GameObject> LoadTemplate(string path)
+        {
+            Scene? tempScene = SceneManager.GetActiveScene();
+            SceneManager.SetActiveScene(this);
+            List<GameObject> gameObjects = SceneTemplate.Load(path);
+            SceneManager.SetActiveScene(tempScene);
+            return gameObjects;
+        }
+
         /*
          * Destroy a GameObject, its children, and all of their components
          */

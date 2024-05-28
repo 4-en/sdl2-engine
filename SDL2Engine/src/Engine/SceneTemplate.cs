@@ -17,6 +17,18 @@ namespace SDL2Engine
      *       <Name attribute1="value1" attribute2="value2" ... />
      *       or
      *       <Name attribute1="value1" attribute2="value2" ...>child1 child2 ...</Name>
+     *       
+     * Attributes can either be special defined attributes, like these:
+     *    count: the number of times the GameObject should be created
+     *    x: the x position of the GameObject
+     *    y: the y position of the GameObject
+     *    z: the z position of the GameObject
+     *    xr: the x random position offset of the GameObject (randDouble * xr)
+     *    yr: the y random position offset of the GameObject (randDouble * yr)
+     *    zr: the z random position offset of the GameObject (randDouble * zr)
+     * 
+     * or they can be attributes of the GameObject's components in the format:
+     *    ComponentClassName.attributeName[.subAttributeName]="value"
      */
     public static class SceneTemplate
     {

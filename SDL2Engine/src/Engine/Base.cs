@@ -1061,7 +1061,22 @@ namespace SDL2Engine
                 if (Time.totalDuration < 1.0 / targetFPS)
                 {
                     Time.freeDuration = 1.0 / targetFPS - Time.totalDuration;
-                    SDL.SDL_Delay((uint)(Time.freeDuration * 1000));
+                    // waste cpu cycles until the next frame
+                    double endTime = beforeUpdateSec + 1.0 / targetFPS;
+                    while (temp_double < endTime)
+                    {
+                        int xd;
+                        for(int i = 0; i < 1000; i++)
+                        {
+                            // waste some time
+                            xd = i * i;
+                            xd = i + xd;
+                            xd = xd * ( (123 + xd) / 3);
+
+                        }
+                        temp_double = ticksToSec * Stopwatch.GetTimestamp();
+                    }
+
                 }
 
             }

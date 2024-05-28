@@ -97,7 +97,7 @@ namespace SDL2Engine.tests
                 // test SceneTemplate
                 if(Input.GetKeyDown(SDL_Keycode.SDLK_t))
                 {
-                    var objects = SceneTemplate.Load("Assets/Templates/test.template");
+                    var objects = SceneTemplate.Load("test.template");
                     Console.WriteLine($"Loaded {objects.Count} objects");
                 }
 

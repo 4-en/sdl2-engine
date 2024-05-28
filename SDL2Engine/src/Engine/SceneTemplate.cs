@@ -214,8 +214,22 @@ namespace SDL2Engine
             return gameObject;
         }
 
+        private static string AdjustPath(string path, string default_path)
+        {
+            // check if there is a / or \\ in the path
+            if (path.Contains("/") || path.Contains("\\"))
+            {
+                return path;
+            }
+
+            return default_path + path;
+        }
+
         public static List<GameObject> Load(string path)
         {
+            // adjust path if necessary
+            path = AdjustPath(path, "Assets/Templates/");
+
             List<GameObject> gameObjects = new List<GameObject>();
             var elements = LoadElements(path);
             while (elements.MoveNext())

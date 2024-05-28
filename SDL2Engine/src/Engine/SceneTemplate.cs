@@ -55,7 +55,7 @@ namespace SDL2Engine
             }
         }
 
-        private static void LoadPosition(GameObject gameObject, XmlElement element)
+        private static void LoadPosition(GameObject gameObject, XmlElement element, int elementCount)
         {
             string[] positionAttributes = { "x", "y", "z", "xr", "yr", "zr" };
             // check if any of the position attributes are set
@@ -103,13 +103,13 @@ namespace SDL2Engine
                             pos.z = value;
                             break;
                         case "xr":
-                            pos.x += value * Rand.StableRandom.NextDouble(seed + (int)(pos.x + 5 * pos.y + 7 * pos.z));
+                            pos.x += value * Rand.StableRandom.NextDouble(elementCount + seed + (int)(pos.x + 5 * pos.y + 7 * pos.z));
                             break;
                         case "yr":
-                            pos.y += value * Rand.StableRandom.NextDouble(seed + (int)(5 * pos.x + 7 * pos.y + pos.z));
+                            pos.y += value * Rand.StableRandom.NextDouble(elementCount + seed + (int)(5 * pos.x + 7 * pos.y + pos.z));
                             break;
                         case "zr":
-                            pos.z += value * Rand.StableRandom.NextDouble(seed + (int)(7 * pos.x + pos.y + 5 * pos.z));
+                            pos.z += value * Rand.StableRandom.NextDouble(elementCount + seed + (int)(7 * pos.x + pos.y + 5 * pos.z));
                             break;
                     }
                 }
@@ -170,11 +170,11 @@ namespace SDL2Engine
             }
         }
 
-        private static void LoadAttributes(GameObject gameObject, XmlElement element)
+        private static void LoadAttributes(GameObject gameObject, XmlElement element, int elementCount)
         {
             // handle special attributes here
             // x, y, z:
-            LoadPosition(gameObject, element);
+            LoadPosition(gameObject, element, elementCount);
 
 
             // load attributes in the format of componentName.attributeName[.subAttributeName] = value
@@ -199,7 +199,7 @@ namespace SDL2Engine
 
         }
 
-        private static GameObject? CreateGameObject(XmlElement element)
+        private static GameObject? CreateGameObject(XmlElement element, int elementCount)
         {
             var name = element.Name;
             Prototype? prototype = AssetManager.LoadPrototype(name).Get();
@@ -209,7 +209,7 @@ namespace SDL2Engine
             }
             GameObject gameObject = prototype.Instantiate();
 
-            LoadAttributes(gameObject, element);
+            LoadAttributes(gameObject, element, elementCount);
 
             return gameObject;
         }
@@ -232,14 +232,29 @@ namespace SDL2Engine
 
             List<GameObject> gameObjects = new List<GameObject>();
             var elements = LoadElements(path);
+            int elementCount = 0;
             while (elements.MoveNext())
             {
                 var element = elements.Current;
-                GameObject? gameObject = CreateGameObject(element);
-                if (gameObject != null)
+                int count = 1;
+                // check if the element has a count attribute
+                // used to create multiple instances of the same Prototype
+                if (element.HasAttribute("count"))
                 {
-                    gameObjects.Add(gameObject);
+                    count = int.Parse(element.GetAttribute("count"));
                 }
+
+                for(int i = 0; i < count; i++) {
+                    GameObject? gameObject = CreateGameObject(element, elementCount);
+                    if (gameObject != null)
+                    {
+                        gameObjects.Add(gameObject);
+                    }
+                    elementCount++;
+                }
+                
+
+                // TODO: add support for child elements
             }
             return gameObjects;
         }

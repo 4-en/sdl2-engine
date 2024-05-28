@@ -1,0 +1,4 @@
+<forsenE x="500" y="500" xr="100" yr="100" CircleCollider.radius="100.0" />
+<forsenE x="600" y="600" xr="100" yr="100" CircleCollider.radius="75.0" />
+<forsenE x="700" y="700" xr="100" yr="100" CircleCollider.radius="50.0" />
+<forsenE x="800" y="800" xr="100" yr="100" CircleCollider.radius="25.0" />

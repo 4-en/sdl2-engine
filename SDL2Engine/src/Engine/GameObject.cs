@@ -642,6 +642,19 @@ namespace SDL2Engine
             return this.scene?.FindComponent<T>();
         }
 
+        public Component? GetComponentByClassName(string className)
+        {
+            foreach (Component script in GetAllComponents())
+            {
+                if (script.GetType().Name == className)
+                {
+                    return script;
+                }
+            }
+
+            return null;
+        }
+
         // Gets first component of type T
         public T? GetComponent<T>() where T : Component
         {

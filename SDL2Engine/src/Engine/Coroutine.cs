@@ -9,9 +9,17 @@ namespace SDL2Engine.Coro
 
     // Coroutines system similar to Unity's
     // Use IEnumerator to define a coroutine, with yield return ... for waiting
-    public static class CoroutineManager
+
+    // Every Scene has a CoroutineManager that manages all coroutines that originate from that scene
+    // every frame in the update step, the CoroutineManager will get called and run all scheduled coroutines
+    public class CoroutineManager
     {
-        
+        private TimedQueue<IEnumerator<CoroDelay>> coroutines;
+
+        public CoroutineManager()
+        {
+            coroutines = new TimedQueue<IEnumerator<CoroDelay>>();
+        }
     }
 
     // Used as yield return in coroutines to wait for a certain amount of time

@@ -91,17 +91,14 @@ namespace ShootEmUp.Entities
 
             if (destroyOnCollision)
             {
-                var scripts = other.GetComponents<Script>();
-                foreach (var script in scripts)
-                {
-                    if (script is IDamageable damageable)
-                    {
-                        damageable.Damage(new Damage(damage, shooter, team));
-                    }
-                }
-
                 // TODO: Add explosion effect and sound
                 Destroy();
+            }
+
+            var damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                damageable.Damage(new Damage(damage, shooter, team));
             }
         }
 

@@ -233,6 +233,11 @@ namespace SDL2Engine
             coroutineManager.AddCoroutine(coro);
         }
 
+        public CoroutineManager GetCoroutineManager()
+        {
+            return coroutineManager;
+        }
+
         public void AddGameObject(GameObject gameObject)
         {
             if (gameObject.GetScene() != null && gameObject.GetScene() != this)

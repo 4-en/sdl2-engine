@@ -880,6 +880,7 @@ namespace SDL2Engine
             int totalDrawables = 0;
             int totalScripts = 0;
             int totalColliders = 0;
+            int totalCoros = 0;
             
             foreach (Scene scene in SceneManager.GetScenes())
             {
@@ -887,6 +888,7 @@ namespace SDL2Engine
                 totalDrawables += scene.GetDrawableCount();
                 totalScripts += scene.GetScriptCount();
                 totalColliders += scene.GetColliderCount();
+                totalCoros += scene.GetCoroutineManager().Count();
             }
 
             string[] debugStrings =
@@ -901,6 +903,7 @@ namespace SDL2Engine
                     "Total Drawables: " + totalDrawables.ToString(),
                     "Total Scripts: " + totalScripts.ToString(),
                     "Total Colliders: " + totalColliders.ToString(),
+                    "Total Coroutines: " + totalCoros.ToString(),
                     "Total Scenes: " + totalScenes.ToString()
                 };
 

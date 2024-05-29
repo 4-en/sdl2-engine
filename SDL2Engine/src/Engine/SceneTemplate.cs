@@ -115,13 +115,13 @@ namespace SDL2Engine
                             pos.z = value;
                             break;
                         case "xr":
-                            pos.x += value * Rand.StableRandom.NextDouble(elementCount + seed + (int)(pos.x + 5 * pos.y + 7 * pos.z));
+                            pos.x += value * Rand.StableRandom.Double(elementCount + seed + (int)(pos.x + 5 * pos.y + 7 * pos.z));
                             break;
                         case "yr":
-                            pos.y += value * Rand.StableRandom.NextDouble(elementCount + seed + (int)(5 * pos.x + 7 * pos.y + pos.z));
+                            pos.y += value * Rand.StableRandom.Double(elementCount + seed + (int)(5 * pos.x + 7 * pos.y + pos.z));
                             break;
                         case "zr":
-                            pos.z += value * Rand.StableRandom.NextDouble(elementCount + seed + (int)(7 * pos.x + pos.y + 5 * pos.z));
+                            pos.z += value * Rand.StableRandom.Double(elementCount + seed + (int)(7 * pos.x + pos.y + 5 * pos.z));
                             break;
                     }
                 }

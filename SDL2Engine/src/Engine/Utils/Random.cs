@@ -61,19 +61,29 @@ namespace SDL2Engine.Rand
             this.seed = seed;
         }
 
-        public static double NextDouble(int seed)
+        public static double Double(int seed)
         {
             return new StableRandom(seed).NextDouble();
         }
 
-        public static float NextFloat(int seed)
+        public static float Float(int seed)
         {
             return new StableRandom(seed).NextFloat();
         }
 
-        public static int Next(int seed)
+        public static int Int(int seed)
         {
             return new StableRandom(seed).Next();
+        }
+
+        public static int Int(int seed, int min, int max)
+        {
+            return new StableRandom(seed).Next(min, max);
+        }
+
+        public static bool Bool(int seed, double chance=0.5)
+        {
+            return new StableRandom(seed).NextDouble() < chance;
         }
 
         public int Next()

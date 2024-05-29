@@ -67,6 +67,7 @@ namespace SDL2Engine.Coro
             }
         }
 
+        // handles waiting for a task to complete before continuing the coroutine
         private void HandleTask(IEnumerator coroutine)
         {
             Task task = (Task)coroutine.Current;
@@ -83,7 +84,31 @@ namespace SDL2Engine.Coro
                 task.Wait();
             });
         }
-        
+
+        // Helper method to wait for an IEnumerator to complete
+        private IEnumerator WaitForIEnumerator(IEnumerator coroutine)
+        {
+            // we create a new coroutine that combines the two coroutines
+            // it basically forwards the first coroutine until it's done
+            // and then forwards the second coroutine
+            var awaited_coroutine = coroutine.Current as IEnumerator;
+            
+            if (awaited_coroutine == null)
+            {
+                Console.WriteLine("Error: IEnumerator is null");
+            } else
+            {
+                while (awaited_coroutine.MoveNext())
+                {
+                    yield return awaited_coroutine.Current;
+                }
+            }
+
+            while (coroutine.MoveNext())
+            {
+                yield return coroutine.Current;
+            }
+        }
 
         // handles the return value of a coroutine and schedules it to run again if needed
         private void HandleCoroutine(IEnumerator coroutine)
@@ -116,7 +141,14 @@ namespace SDL2Engine.Coro
                     return;
                 }
 
-                // TODO: implement waiting for IEnumerator
+                if (value is IEnumerator)
+                {
+                    // wait for the coroutine to complete
+                    IEnumerator combined_coroutine = WaitForIEnumerator(coroutine);
+                    HandleCoroutine(combined_coroutine);
+                    return;
+                }
+
                 Console.WriteLine("Unsupported type: " + value.GetType().Name);
                 Console.WriteLine("Scheduling in next frame instead...");
                 double frame2 = (double)(Time.tick + 1);

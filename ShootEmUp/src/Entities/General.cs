@@ -88,6 +88,7 @@ namespace ShootEmUp.Entities
         {
             var other = collision.GetOther(gameObject);
 
+
             if (destroyOnCollision)
             {
                 var scripts = other.GetComponents<Script>();

@@ -145,19 +145,19 @@ namespace SDL2Engine
         // Usefull methods to interact with other components
 
         // Returns the component of type T attached to the same GameObject
-        public T? GetComponent<T>() where T : Component
+        public T? GetComponent<T>()
         {
             return gameObject.GetComponent<T>();
         }
 
         // Returns all components of type T attached to the same GameObject
-        public List<T> GetComponents<T>() where T : Component
+        public List<T> GetComponents<T>()
         {
             return gameObject.GetComponents<T>();
         }
 
         // Returns the component of type T attached to any GameObject in the scene
-        public T? FindComponent<T>() where T : Component
+        public T? FindComponent<T>()
         {
             return gameObject.FindComponent<T>();
         }
@@ -181,7 +181,7 @@ namespace SDL2Engine
         }
 
         // Removes a component of type T from the same GameObject
-        public bool RemoveComponent<T>() where T : Component
+        public bool RemoveComponent<T>()
         {
             return gameObject.RemoveComponent<T>();
         }
@@ -198,7 +198,7 @@ namespace SDL2Engine
         }
         
         // Returns a Component of type T attached to the same GameObject or any of its parents
-        public T? GetComponentInParent<T>() where T : Component
+        public T? GetComponentInParent<T>()
         {
             GameObject? parent = gameObject.GetParent();
             while (parent != null)
@@ -211,13 +211,13 @@ namespace SDL2Engine
                 parent = parent.GetParent();
             }
 
-            return null;
+            return default;
         }
 
         // Returns a Component of type T attached to the same GameObject or any of its children
-        public T? GetComponentInChildren<T>() where T : Component
+        public T? GetComponentInChildren<T>()
         {
-            U? GetComponentInChildrenHelper<U>(GameObject parent) where U : Component
+            U? GetComponentInChildrenHelper<U>(GameObject parent)
             {
                 U? component = parent.GetComponent<U>();
                 if (component != null)
@@ -235,16 +235,16 @@ namespace SDL2Engine
                     }
                 }
 
-                return null;
+                return default;
             }
 
             return GetComponentInChildrenHelper<T>(gameObject);
         }
 
         // Returns all Components of type T attached to the same GameObject or any of its children
-        public List<T> GetComponentsInChildren<T>() where T : Component
+        public List<T> GetComponentsInChildren<T>()
         {
-            List<U> GetComponentsInChildrenHelper<U>(GameObject parent) where U : Component
+            List<U> GetComponentsInChildrenHelper<U>(GameObject parent)
             {
                 List<U> foundComponents = new();
                 List<U> components = parent.GetComponents<U>();
@@ -264,7 +264,7 @@ namespace SDL2Engine
         }
 
         // Returns all Components of type T attached to the same GameObject or any of its parents
-        public List<T> GetComponentsInParent<T>() where T : Component
+        public List<T> GetComponentsInParent<T>()
         {
             List<T> foundComponents = new();
             GameObject? parent = gameObject.GetParent();

@@ -453,6 +453,29 @@ namespace SDL2Engine
             return null;
         }
 
+        // Gets the first child with the specified name
+        public GameObject? GetChild(string name)
+        {
+            foreach (GameObject child in children)
+            {
+                if (child.name == name)
+                {
+                    return child;
+                }
+            }
+
+            foreach (GameObject child in children)
+            {
+                GameObject? found = child.GetChild(name);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
         /*
          * Adds a component to the GameObject
          * Usually used to add a new Component to the GameObject
@@ -520,7 +543,7 @@ namespace SDL2Engine
             return components.Remove(script);
         }
 
-        public bool RemoveComponent<T>() where T : Component
+        public bool RemoveComponent<T>()
         {
             foreach (Component script in components)
             {
@@ -595,7 +618,7 @@ namespace SDL2Engine
             return this.scene?.Find(name);
         }
 
-        public T? FindComponentInChildren<T>() where T : Component
+        public T? FindComponentInChildren<T>()
         {
             foreach (GameObject child in children)
             {
@@ -606,7 +629,7 @@ namespace SDL2Engine
                 }
             }
 
-            return null;
+            return default;
         }
 
         /*
@@ -622,7 +645,7 @@ namespace SDL2Engine
          * 3. Search all GameObjects in the scene
          * 
          */
-        public T? FindComponent<T>() where T : Component
+        public T? FindComponent<T>()
         {
             T? component = GetComponent<T>();
             if (component != null)
@@ -639,7 +662,12 @@ namespace SDL2Engine
 
             // search all GameObjects in the scene
             // this does not search other scenes
-            return this.scene?.FindComponent<T>();
+            if(this.scene == null)
+            {
+                return default;
+            }
+
+            return this.scene.FindComponent<T>();
         }
 
         public Component? GetComponentByClassName(string className)
@@ -655,8 +683,8 @@ namespace SDL2Engine
             return null;
         }
 
-        // Gets first component of type T
-        public T? GetComponent<T>() where T : Component
+        // Gets first component of type T where T is nullable
+        public T? GetComponent<T>()
         {
             // if component is transform, physics body, collider, or drawable, return the field directly
             if (transform is T t_component)
@@ -681,17 +709,17 @@ namespace SDL2Engine
 
             foreach (Component script in components)
             {
-                if (script is T)
+                if (script is T t_script)
                 {
-                    return (T)script;
+                    return t_script;
                 }
             }
 
-            return null;
+            return default;
         }
 
         // Gets all components of type T
-        public List<T> GetComponents<T>() where T : Component
+        public List<T> GetComponents<T>()
         {
             List<T> foundComponents = new List<T>();
             if (transform is T t_component)
@@ -717,9 +745,9 @@ namespace SDL2Engine
 
             foreach (Component component in components)
             {
-                if (component is T)
+                if (component is T temp_component)
                 {
-                    foundComponents.Add((T)component);
+                    foundComponents.Add(temp_component);
                 }
             }
 

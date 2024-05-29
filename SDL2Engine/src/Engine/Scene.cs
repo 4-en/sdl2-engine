@@ -550,9 +550,9 @@ namespace SDL2Engine
             return null;
         }
 
-        public T? FindComponent<T>() where T : Component
+        public T? FindComponent<T>()
         {
-            T? component = null;
+            T? component;
             
             // first check components of root game objects
             foreach (GameObject gameObject in gameObjects)
@@ -573,7 +573,7 @@ namespace SDL2Engine
                     return component;
                 }
             }
-            return null;
+            return default;
         }
 
         private void HandleAddComponent<T>(T component) where T : Component

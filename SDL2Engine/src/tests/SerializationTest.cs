@@ -1,4 +1,6 @@
 ﻿using SDL2;
+using SDL2Engine.Coro;
+using System.Collections;
 using static SDL2.SDL;
 
 namespace SDL2Engine.tests
@@ -29,6 +31,7 @@ namespace SDL2Engine.tests
             Console.WriteLine("Press s to save the scene to a file");
             Console.WriteLine("Press l to load the scene from a file");
             Console.WriteLine("Press t to load a SceneTemplate from a file");
+            Console.WriteLine("Press c to test CoroutineManager");
             Console.WriteLine("Example: Press left mouse button a few times to add a GameObject, then press s to save the scene.");
             Console.WriteLine("         Restart the program and press l to load the scene you saved.");
             var scene = CreateScene();
@@ -51,6 +54,32 @@ namespace SDL2Engine.tests
 
                 
             }
+
+            public IEnumerator TestCoro()
+            {
+                Console.WriteLine("Starting coroutine");
+                yield return 1.0;
+                Console.WriteLine("Coroutine waited 1.0 seconds");
+                yield return 2.0;
+                Console.WriteLine("Coroutine waited 2.0 seconds");
+                yield return null;
+                Console.WriteLine("Coroutine waited 1 frame");
+                yield return 3.0;
+                Console.WriteLine("Coroutine waited 3.0 seconds");
+                var gameObject = Prototype.Instantiate("forsenE");
+                if (gameObject == null)
+                {
+                    Console.WriteLine("Failed to instantiate forsenE");
+                    yield break;
+                }
+                var mouse_world_pos = GetCamera()?.ScreenToWorld(Input.GetMousePosition());
+                if (mouse_world_pos != null)
+                {
+                    gameObject.SetPosition(mouse_world_pos.Value);
+                }
+                yield break;
+            }
+
             public override void Update()
             {
                 if(forsenEPrototype == null)
@@ -104,6 +133,11 @@ namespace SDL2Engine.tests
                 if(Input.GetKeyDown(SDL_Keycode.SDLK_ESCAPE))
                 {
                     Engine.Stop();
+                }
+
+                if(Input.GetKeyDown(SDL_Keycode.SDLK_c))
+                {
+                    StartCoroutine(TestCoro());
                 }
                 
             }

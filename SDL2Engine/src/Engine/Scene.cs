@@ -1,4 +1,5 @@
 ﻿
+using SDL2Engine.Coro;
 using System.Collections;
 
 namespace SDL2Engine
@@ -160,6 +161,8 @@ namespace SDL2Engine
         private HashSet<EngineObject> toAdd = new();
         private List<GameObject> toRemove = new();
 
+        private CoroutineManager coroutineManager = new();
+
         public Scene()
         {
             this.mainCamera = new Camera2D(new Vec2D());
@@ -223,6 +226,11 @@ namespace SDL2Engine
         public Camera GetCamera()
         {
             return mainCamera;
+        }
+
+        public void StartCoroutine(IEnumerator coro)
+        {
+            coroutineManager.AddCoroutine(coro);
         }
 
         public void AddGameObject(GameObject gameObject)
@@ -747,6 +755,9 @@ namespace SDL2Engine
                     script.LateUpdate();
                 }
             }
+
+            // run coroutines
+            coroutineManager.RunScheduledCoroutines();
 
             // remove game objects that are scheduled to be removed
             if (toDestroy.Count() > 0)

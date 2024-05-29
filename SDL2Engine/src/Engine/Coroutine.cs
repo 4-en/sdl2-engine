@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,8 +17,8 @@ namespace SDL2Engine.Coro
     //            this means that the task should not modify any game objects
     //            and should only be used for IO or other non-gameplay tasks that would block the main thread
     // - IEnumerator: wait for the coroutine to complete
-    public interface Coroutine : IEnumerator<object> { }
-    
+    using Coroutine = IEnumerator;
+
 
     // Coroutines system similar to Unity's
     // Use IEnumerator to define a coroutine, with yield return ... for waiting
@@ -63,12 +64,12 @@ namespace SDL2Engine.Coro
         }
 
         // handles the return value of a coroutine and schedules it to run again if needed
-        public void HandleCoroutine(Coroutine coroutine)
+        private void HandleCoroutine(Coroutine coroutine)
         {
             // run the coroutine to the next yield return
             if (coroutine.MoveNext())
             {
-                object value = coroutine.Current;
+                object? value = coroutine.Current;
                 if (value == null)
                 {
                     // continue the coroutine the next frame
@@ -85,7 +86,13 @@ namespace SDL2Engine.Coro
                     timed_coroutines.AddBackwards(frame, coroutine);
                     return;
                 }
-
+                Console.WriteLine("Unsupported type: " + value.GetType().Name);
+                Console.WriteLine("Scheduling in next frame instead...");
+                double frame2 = (double)(Time.tick + 1);
+                frame_coroutines.AddBackwards(frame2, coroutine);
+                return;
+                // TODO: implement Task and IEnumerator handling
+                /*
                 if (value is Task)
                 {
                     // check if task has been started
@@ -102,14 +109,41 @@ namespace SDL2Engine.Coro
 
                     }
                 }
+                */
 
             }
+        }
+        public void AddCoroutine(Coroutine coro)
+        {
+            HandleCoroutine(coro);
         }
 
         // run all coroutines that are scheduled to run this frame
         public void RunScheduledCoroutines()
         {
-            return;
+            double current_time = Time.time;
+            double current_frame = Time.tick - 0.1; // -0.1 to account for floating point errors
+
+            // run timed coroutines
+            Coroutine? nextCoroutine = timed_coroutines.PopBefore(current_time);
+            while (nextCoroutine != null)
+            {
+                HandleCoroutine(nextCoroutine);
+                nextCoroutine = timed_coroutines.PopBefore(current_time);
+            }
+
+            // run frame coroutines
+            nextCoroutine = frame_coroutines.PopBefore(current_frame);
+            while (nextCoroutine != null)
+            {
+                HandleCoroutine(nextCoroutine);
+                nextCoroutine = frame_coroutines.PopBefore(current_frame);
+            }
+        }
+
+        public int Count()
+        {
+            return timed_coroutines.Count() + frame_coroutines.Count();
         }
 
 

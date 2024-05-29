@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using SDL2Engine.Coro;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -112,6 +114,18 @@ namespace SDL2Engine
         public virtual void Awake()
         {
             // Do nothing
+        }
+
+        // This is called to Start Coroutines
+        public void StartCoroutine(IEnumerator coroutine)
+        {
+            Scene? scene = GetScene();
+            if(scene == null)
+            {
+                throw new Exception("Cannot start a coroutine on a component that is not part of a scene");
+            }
+
+            scene.StartCoroutine(coroutine);
         }
 
 

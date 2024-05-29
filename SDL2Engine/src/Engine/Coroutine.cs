@@ -10,8 +10,10 @@ namespace SDL2Engine.Coro
 
     // Coroutines are in the form of IEnumerator
     // To create a coroutine, define a method that returns IEnumerator using yield return
+    // The yield return statement is used to pause the coroutine until some condition is met
     // the coroutine should yield return one of the following:
     // - null: continue the coroutine the next frame
+    // - ulong: wait for the specified number of frames
     // - number: wait time in seconds
     // TODO: implement the following
     // - Task: wait for the task to complete
@@ -19,10 +21,10 @@ namespace SDL2Engine.Coro
     //            this means that the task should not modify any game objects
     //            and should only be used for IO or other non-gameplay tasks that would block the main thread
     // - IEnumerator: wait for the coroutine to complete
+    //   Warning: the awaited coroutine should not be started seperately, it should be yielded from the current coroutine
+    //            without calling StartCoroutine() on it
 
 
-    // Coroutines system similar to Unity's
-    // Use IEnumerator to define a coroutine, with yield return ... for waiting
 
     // Every Scene has a CoroutineManager that manages all coroutines that originate from that scene
     // every frame in the update step, the CoroutineManager will get called and run all scheduled coroutines
@@ -122,6 +124,13 @@ namespace SDL2Engine.Coro
                     // continue the coroutine the next frame
                     // to double, since TimedQueue uses doubles
                     double frame = (double)(Time.tick + 1);
+                    frame_coroutines.AddBackwards(frame, coroutine);
+                    return;
+                }
+
+                if(value is ulong wait_frames)
+                {
+                    double frame = (double)(Time.tick + wait_frames);
                     frame_coroutines.AddBackwards(frame, coroutine);
                     return;
                 }

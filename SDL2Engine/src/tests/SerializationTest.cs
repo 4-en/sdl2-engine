@@ -72,8 +72,8 @@ namespace SDL2Engine.tests
                 Console.WriteLine("Starting coroutine");
                 yield return 1.0;
                 Console.WriteLine("Coroutine waited 1.0 seconds");
-                yield return 2.0;
-                Console.WriteLine("Coroutine waited 2.0 seconds");
+                yield return 1000ul;
+                Console.WriteLine("Coroutine waited 1000 frames");
                 yield return null;
                 Console.WriteLine("Coroutine waited 1 frame");
                 yield return 3.0;

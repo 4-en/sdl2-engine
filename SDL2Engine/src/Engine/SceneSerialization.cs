@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace SDL2Engine
 {
-    internal class SceneSerialization
+    public class SceneSerialization
     {
 
         public class EngineContractResolver : DefaultContractResolver

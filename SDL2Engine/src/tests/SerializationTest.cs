@@ -61,7 +61,7 @@ namespace SDL2Engine.tests
                 var renderer = forsenEPrototype.GameObject.AddComponent<SpriteRenderer>();
                 var circleCollider = forsenEPrototype.GameObject.AddComponent<CircleCollider>();
                 circleCollider.SetRadius(100);
-                renderer.SetSource("Assets/Textures/forsenE.png");
+                renderer.SetSource("forsenE.png");
                 forsenEPrototype.GameObject.AddComponent<TestScript>();
 
 

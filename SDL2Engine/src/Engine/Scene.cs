@@ -178,6 +178,19 @@ namespace SDL2Engine
             this.name = name;
         }
 
+        public static Scene FromTemplate(string name, string path)
+        {
+            Scene scene = new(string.IsNullOrEmpty(name) ? "Unnamed Scene" : name);
+            scene.LoadTemplate(path);
+            return scene;
+        }
+
+        public static Scene? Load(string name)
+        {
+            Scene? scene = SceneSerialization.LoadScene(name);
+            return scene;
+        }
+
         public SceneType GetSceneType()
         {
             return sceneType;

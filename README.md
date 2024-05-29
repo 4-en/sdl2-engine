@@ -17,12 +17,13 @@ The engine is organized into several key classes and components:
 - `Scene`: Represents a collection of GameObjects that make up a game scene.
 - `Camera` and `Camera2D`: Abstract and concrete classes for handling the camera's view and projection in the game world.
 - `Drawable`: An abstract class that drawable components inherit from to render graphics.
-- `RotatingSquare`: An example drawable component that renders a rotating square.
 - `Input`: A static class to handle user input such as keyboard and mouse events.
+- `Time`: A static class that handles time related variables like time since start, deltaTime or tick count.
 - `Engine`: The main class that initializes SDL2, handles game loops, and manages updates and rendering.
 - `Physics`: Uses different Components like PhysicsBody and Colliders to move GameObjects and solve collisions.
 - `Assets`: Loadable Assets like Textures or Sounds that can be used in Components.
 - `Prototype`: Defines GameObjects with Components that can be instantiated.
+- `Coroutine`: Functions to start coroutines from custom scripts.
 
 ## How to Use
 

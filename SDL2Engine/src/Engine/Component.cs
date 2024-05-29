@@ -128,6 +128,19 @@ namespace SDL2Engine
             scene.StartCoroutine(coroutine);
         }
 
+        // Runs a function after a delay as a coroutine
+        // this guarantees that the function will be run in the update loop
+        // and on the main thread
+        public void Delay(double seconds, Action action)
+        {
+            IEnumerator DelayedAction()
+            {
+                yield return seconds;
+                action();
+            }
+            StartCoroutine(DelayedAction());
+        }
+
 
         // Usefull methods to interact with other components
 

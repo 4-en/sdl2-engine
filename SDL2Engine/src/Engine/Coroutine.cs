@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 namespace SDL2Engine.Coro
 {
 
-    // alias for IEnumerator<object> to make it easier to read
-    // the coroutine should return one of the following:
+    // Coroutines are in the form of IEnumerator
+    // To create a coroutine, define a method that returns IEnumerator using yield return
+    // the coroutine should yield return one of the following:
     // - null: continue the coroutine the next frame
     // - number: wait time in seconds
+    // TODO: implement the following
     // - Task: wait for the task to complete
     //   Warning: tasks are run in a separate thread pool, not during the update step
     //            this means that the task should not modify any game objects

@@ -30,11 +30,14 @@ namespace SDL2Engine.Coro
     {
         private TimedQueue<IEnumerator> timed_coroutines;
         private TimedQueue<IEnumerator> frame_coroutines;
+        private List<IEnumerator> finished_task_coroutines;
+        private int unfinished_coroutines = 0;
 
         public CoroutineManager()
         {
             this.timed_coroutines = new TimedQueue<IEnumerator>();
             this.frame_coroutines = new TimedQueue<IEnumerator>();
+            this.finished_task_coroutines = new List<IEnumerator>();
         }
 
         // checks if the value is a numeric type
@@ -64,6 +67,24 @@ namespace SDL2Engine.Coro
             }
         }
 
+        private void HandleTask(IEnumerator coroutine)
+        {
+            Task task = (Task)coroutine.Current;
+            // wait for the task to complete
+            task.ContinueWith((t) =>
+            {
+                // schedule the coroutine to continue the next frame
+                this.finished_task_coroutines.Add(coroutine);
+            });
+
+            unfinished_coroutines++;
+            Task.Run(() =>
+            {
+                task.Wait();
+            });
+        }
+        
+
         // handles the return value of a coroutine and schedules it to run again if needed
         private void HandleCoroutine(IEnumerator coroutine)
         {
@@ -87,30 +108,20 @@ namespace SDL2Engine.Coro
                     timed_coroutines.AddBackwards(frame, coroutine);
                     return;
                 }
+                
+                
+                if (value is Task)
+                {
+                    HandleTask(coroutine);
+                    return;
+                }
+
+                // TODO: implement waiting for IEnumerator
                 Console.WriteLine("Unsupported type: " + value.GetType().Name);
                 Console.WriteLine("Scheduling in next frame instead...");
                 double frame2 = (double)(Time.tick + 1);
                 frame_coroutines.AddBackwards(frame2, coroutine);
                 return;
-                // TODO: implement Task and IEnumerator handling
-                /*
-                if (value is Task)
-                {
-                    // check if task has been started
-                    Task task = (Task)value;
-                    switch(task.Status)
-                    {
-                        case TaskStatus.Created:
-                            task.Start();
-                            break;
-                         case TaskStatus.RanToCompletion:
-                            break;
-                        
-
-
-                    }
-                }
-                */
 
             }
         }
@@ -140,11 +151,21 @@ namespace SDL2Engine.Coro
                 HandleCoroutine(nextCoroutine);
                 nextCoroutine = frame_coroutines.PopBefore(current_frame);
             }
+
+            // run finished task coroutines
+            var finished_coroutines = this.finished_task_coroutines;
+            this.finished_task_coroutines = new List<IEnumerator>();
+            foreach (var coroutine in finished_coroutines)
+            {
+                HandleCoroutine(coroutine);
+                unfinished_coroutines--;
+            }
+
         }
 
         public int Count()
         {
-            return timed_coroutines.Count() + frame_coroutines.Count();
+            return timed_coroutines.Count() + frame_coroutines.Count() + unfinished_coroutines;
         }
 
 

@@ -153,6 +153,23 @@ namespace SDL2Engine.tests
                     StartCoroutine(TestCoro());
                 }
 
+                if (Input.GetKeyDown(SDL_Keycode.SDLK_j))
+                {
+                    // try to send a async request
+                    string url = "https://v2.jokeapi.dev/joke/Any?format=txt";
+                    StartCoroutine(TestRequest(url));
+                }   
+
+            }
+
+            private IEnumerator TestRequest(string url)
+            {
+                var client = new HttpClient();
+                Task<string> task = client.GetStringAsync(url);
+                yield return task;
+                Console.WriteLine("Received joke. Waiting for good timing...");
+                yield return 2.0;
+                Console.WriteLine(task.Result);
             }
         }
     }

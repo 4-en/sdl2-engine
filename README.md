@@ -24,6 +24,7 @@ The engine is organized into several key classes and components:
 - `Assets`: Loadable Assets like Textures or Sounds that can be used in Components.
 - `Prototype`: Defines GameObjects with Components that can be instantiated.
 - `Coroutine`: Functions to start coroutines from custom scripts.
+- `SceneSerialization`: Functions to save/load Scenes to/from files, including state of GameObjects and Components.
 
 ## How to Use
 

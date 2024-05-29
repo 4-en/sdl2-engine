@@ -7,6 +7,18 @@ using System.Threading.Tasks;
 namespace SDL2Engine.Coro
 {
 
+    // alias for IEnumerator<object> to make it easier to read
+    // the coroutine should return one of the following:
+    // - null: continue the coroutine the next frame
+    // - number: wait time in seconds
+    // - Task: wait for the task to complete
+    //   Warning: tasks are run in a separate thread pool, not during the update step
+    //            this means that the task should not modify any game objects
+    //            and should only be used for IO or other non-gameplay tasks that would block the main thread
+    // - IEnumerator: wait for the coroutine to complete
+    public interface Coroutine : IEnumerator<object> { }
+    
+
     // Coroutines system similar to Unity's
     // Use IEnumerator to define a coroutine, with yield return ... for waiting
 
@@ -14,52 +26,90 @@ namespace SDL2Engine.Coro
     // every frame in the update step, the CoroutineManager will get called and run all scheduled coroutines
     public class CoroutineManager
     {
-        private TimedQueue<IEnumerator<CoroDelay>> coroutines;
+        private TimedQueue<Coroutine> timed_coroutines;
+        private TimedQueue<Coroutine> frame_coroutines;
 
         public CoroutineManager()
         {
-            coroutines = new TimedQueue<IEnumerator<CoroDelay>>();
-        }
-    }
-
-    // Used as yield return in coroutines to wait for a certain amount of time
-    // or until a condition is met
-    public class CoroDelay
-    {
-        private double _expectedTime;
-        private bool _conditionMet;
-        private double _startTime;
-
-
-        private CoroDelay() {
-            _expectedTime = 0;
-            _conditionMet = false;
-            _startTime = 0;
+            this.timed_coroutines = new TimedQueue<Coroutine>();
+            this.frame_coroutines = new TimedQueue<Coroutine>();
         }
 
-        public static CoroDelay Frames(int frames)
+        // checks if the value is a numeric type
+        private static bool IsNumericType(object value)
         {
-            CoroDelay delay = new CoroDelay();
-            delay._expectedTime = Time.time + Time.GetFPS() * frames;
-            delay._startTime = Time.time;
-            return delay;
+            if (value == null)
+            {
+                return false;
+            }
+
+            switch (Type.GetTypeCode(value.GetType()))
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
-        public static CoroDelay Seconds(double seconds)
+        // handles the return value of a coroutine and schedules it to run again if needed
+        public void HandleCoroutine(Coroutine coroutine)
         {
-            CoroDelay delay = new CoroDelay();
-            delay._expectedTime = Time.time + seconds;
-            delay._startTime = Time.time;
-            return delay;
+            // run the coroutine to the next yield return
+            if (coroutine.MoveNext())
+            {
+                object value = coroutine.Current;
+                if (value == null)
+                {
+                    // continue the coroutine the next frame
+                    // to double, since TimedQueue uses doubles
+                    double frame = (double)(Time.tick + 1);
+                    frame_coroutines.AddBackwards(frame, coroutine);
+                    return;
+                }
+
+                if (IsNumericType(value))
+                {
+                    // wait for the specified time
+                    double frame = (Time.time + (double)value);
+                    timed_coroutines.AddBackwards(frame, coroutine);
+                    return;
+                }
+
+                if (value is Task)
+                {
+                    // check if task has been started
+                    Task task = (Task)value;
+                    switch(task.Status)
+                    {
+                        case TaskStatus.Created:
+                            task.Start();
+                            break;
+                         case TaskStatus.RanToCompletion:
+                            break;
+                        
+
+
+                    }
+                }
+
+            }
         }
 
-        public static CoroDelay Until(Func<bool> condition)
+        // run all coroutines that are scheduled to run this frame
+        public void RunScheduledCoroutines()
         {
-            CoroDelay delay = new CoroDelay();
-            delay._conditionMet = false;
-            delay._startTime = Time.time;
-            delay._expectedTime = Time.time;
-            return delay;
+            return;
         }
 
 

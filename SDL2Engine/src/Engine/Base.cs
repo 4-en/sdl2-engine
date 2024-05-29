@@ -619,6 +619,17 @@ namespace SDL2Engine
             }
         }
 
+        public Engine(string gameName)
+        {
+            if (instance != null)
+            {
+                throw new Exception("Engine instance already exists");
+            }
+
+            Engine.gameName = gameName;
+            instance = this;
+        }
+
         private void Init()
         {
             // Initialize SDL2

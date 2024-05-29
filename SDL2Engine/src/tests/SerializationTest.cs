@@ -16,6 +16,17 @@ namespace SDL2Engine.tests
     internal class SerializationTest
     {
 
+        public class TestScript : Script
+        {
+            public override void Start()
+            {
+                Delay(2.0, () =>
+                {
+                    this.gameObject.Destroy();
+                });
+            }
+        }
+
         public static Scene CreateScene()
         {
             Scene scene = new Scene("SerializationTest");
@@ -51,8 +62,9 @@ namespace SDL2Engine.tests
                 var circleCollider = forsenEPrototype.GameObject.AddComponent<CircleCollider>();
                 circleCollider.SetRadius(100);
                 renderer.SetSource("Assets/Textures/forsenE.png");
+                forsenEPrototype.GameObject.AddComponent<TestScript>();
 
-                
+
             }
 
             public IEnumerator TestCoro()
@@ -82,39 +94,40 @@ namespace SDL2Engine.tests
 
             public override void Update()
             {
-                if(forsenEPrototype == null)
+                if (forsenEPrototype == null)
                 {
                     return;
                 }
 
-                if(Input.GetMouseButtonDown(Input.MOUSE_BUTTON_LEFT))
+                if (Input.GetMouseButtonDown(Input.MOUSE_BUTTON_LEFT))
                 {
                     var gameObject = Prototype.Instantiate("forsenE");
-                    if(gameObject == null)
+                    if (gameObject == null)
                     {
                         Console.WriteLine("Failed to instantiate forsenE");
                         return;
                     }
                     var mouse_world_pos = GetCamera()?.ScreenToWorld(Input.GetMousePosition());
-                    if(mouse_world_pos != null)
+                    if (mouse_world_pos != null)
                     {
                         gameObject.SetPosition(mouse_world_pos.Value);
                     }
                 }
 
-                if(Input.GetKeyDown(SDL_Keycode.SDLK_s))
+                if (Input.GetKeyDown(SDL_Keycode.SDLK_s))
                 {
                     Scene? scene = GetScene();
-                    if(scene != null)
+                    if (scene != null)
                     {
                         SceneSerialization.SaveScene(scene);
-                    } else
+                    }
+                    else
                     {
                         Console.WriteLine("Failed to save scene");
                     }
                 }
 
-                if(Input.GetKeyDown(SDL_Keycode.SDLK_l))
+                if (Input.GetKeyDown(SDL_Keycode.SDLK_l))
                 {
                     var scene = SceneSerialization.LoadScene("SerializationTest");
                     if (scene != null)
@@ -124,25 +137,25 @@ namespace SDL2Engine.tests
                 }
 
                 // test SceneTemplate
-                if(Input.GetKeyDown(SDL_Keycode.SDLK_t))
+                if (Input.GetKeyDown(SDL_Keycode.SDLK_t))
                 {
                     var objects = SceneTemplate.Load("test.template");
                     Console.WriteLine($"Loaded {objects.Count} objects");
                 }
 
-                if(Input.GetKeyDown(SDL_Keycode.SDLK_ESCAPE))
+                if (Input.GetKeyDown(SDL_Keycode.SDLK_ESCAPE))
                 {
                     Engine.Stop();
                 }
 
-                if(Input.GetKeyDown(SDL_Keycode.SDLK_c))
+                if (Input.GetKeyDown(SDL_Keycode.SDLK_c))
                 {
                     StartCoroutine(TestCoro());
                 }
-                
+
             }
         }
     }
 
-    
+
 }

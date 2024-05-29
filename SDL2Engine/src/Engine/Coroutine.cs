@@ -17,7 +17,6 @@ namespace SDL2Engine.Coro
     //            this means that the task should not modify any game objects
     //            and should only be used for IO or other non-gameplay tasks that would block the main thread
     // - IEnumerator: wait for the coroutine to complete
-    using Coroutine = IEnumerator;
 
 
     // Coroutines system similar to Unity's
@@ -27,13 +26,13 @@ namespace SDL2Engine.Coro
     // every frame in the update step, the CoroutineManager will get called and run all scheduled coroutines
     public class CoroutineManager
     {
-        private TimedQueue<Coroutine> timed_coroutines;
-        private TimedQueue<Coroutine> frame_coroutines;
+        private TimedQueue<IEnumerator> timed_coroutines;
+        private TimedQueue<IEnumerator> frame_coroutines;
 
         public CoroutineManager()
         {
-            this.timed_coroutines = new TimedQueue<Coroutine>();
-            this.frame_coroutines = new TimedQueue<Coroutine>();
+            this.timed_coroutines = new TimedQueue<IEnumerator>();
+            this.frame_coroutines = new TimedQueue<IEnumerator>();
         }
 
         // checks if the value is a numeric type
@@ -64,7 +63,7 @@ namespace SDL2Engine.Coro
         }
 
         // handles the return value of a coroutine and schedules it to run again if needed
-        private void HandleCoroutine(Coroutine coroutine)
+        private void HandleCoroutine(IEnumerator coroutine)
         {
             // run the coroutine to the next yield return
             if (coroutine.MoveNext())
@@ -113,7 +112,7 @@ namespace SDL2Engine.Coro
 
             }
         }
-        public void AddCoroutine(Coroutine coro)
+        public void AddCoroutine(IEnumerator coro)
         {
             HandleCoroutine(coro);
         }
@@ -125,7 +124,7 @@ namespace SDL2Engine.Coro
             double current_frame = Time.tick - 0.1; // -0.1 to account for floating point errors
 
             // run timed coroutines
-            Coroutine? nextCoroutine = timed_coroutines.PopBefore(current_time);
+            IEnumerator? nextCoroutine = timed_coroutines.PopBefore(current_time);
             while (nextCoroutine != null)
             {
                 HandleCoroutine(nextCoroutine);

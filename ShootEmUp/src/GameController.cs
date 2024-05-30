@@ -1,13 +1,6 @@
-﻿using SDL2Engine.Utils;
-using SDL2Engine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SDL2Engine;
 using static SDL2.SDL;
 using ShootEmUp.Entities;
-using System.ComponentModel.Design.Serialization;
 
 namespace ShootEmUp
 {

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static SDL2.SDL;
 
-namespace ShootEmUp.src
+namespace ShootEmUp
 {
     public static class UI
     {

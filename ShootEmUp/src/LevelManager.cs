@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShootEmUp.src
+namespace ShootEmUp
 {
     public static partial class LevelManager
     {
@@ -15,7 +15,7 @@ namespace ShootEmUp.src
         public static void Start()
         {
             LoadHomeScreen();
-            var engine = new Engine(null, "PongPongPong");
+            var engine = new Engine(null, "ShootEmUp");
             engine.Run();
         }
 

@@ -19,6 +19,7 @@ The engine is organized into several key classes and components:
 - `Drawable`: An abstract class that drawable components inherit from to render graphics.
 - `TextureRenderer`: A simple renderer that can be used to render image textures.
 - `SpriteRenderer`: A renderer that supports sprite maps and different animations.
+- `TextRenderer`: A simple renderer to draw text, background and a border.
 - `Input`: A static class to handle user input such as keyboard and mouse events.
 - `Time`: A static class that handles time related variables like time since start, deltaTime or tick count.
 - `Engine`: The main class that initializes SDL2, handles game loops, and manages updates and rendering.

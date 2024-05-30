@@ -93,7 +93,15 @@ namespace SDL2Engine
             return AssetManager.AddPrototype(this);
         }
 
-        
+        public T AddComponent<T>() where T : Component, new()
+        {
+            return gameObject.AddComponent<T>();
+        }
+
+        public GameObject AddChild(GameObject child)
+        {
+            return gameObject.AddChild(child);
+        }
 
         public string GetName()
         {

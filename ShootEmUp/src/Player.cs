@@ -70,6 +70,7 @@ namespace ShootEmUp
         public int up = (int)SDL_Keycode.SDLK_w;
         public int down = (int)SDL_Keycode.SDLK_s;
         public int space = (int)SDL_Keycode.SDLK_SPACE;
+        public int enter = (int)SDL_Keycode.SDLK_RETURN;
 
         
 
@@ -93,28 +94,7 @@ namespace ShootEmUp
             }
             if (Input.GetKeyDown(space))
             {
-                //ShootProjectile();
-                if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship1.png") {
-                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship2.png");
-                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship2.png";
-                }else if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship2.png")
-                {
-                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship3.png");
-                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship3.png";
-                }else if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship3.png")
-                {
-                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship4.png");
-                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship4.png";
-                }else if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship4.png")
-                {
-                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship5.png");
-                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship5.png";
-                }else if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship5.png")
-                {
-                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship1.png");
-                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship1.png";
-                }
-
+                gameObject.AddComponent<Projectile>();
             }
             if (Input.GetKeyPressed(up))
             {
@@ -124,24 +104,41 @@ namespace ShootEmUp
             {
                 Player.speed = Player.speed > 0 && Player.speed > Player.minSpeed ? Player.speed - Player.acceleration : Player.speed;
             }
+            if (Input.GetKeyDown(enter))
+            {
+                if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship1.png")
+                {
+                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship2.png");
+                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship2.png";
+                }
+                else if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship2.png")
+                {
+                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship3.png");
+                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship3.png";
+                }
+                else if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship3.png")
+                {
+                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship4.png");
+                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship4.png";
+                }
+                else if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship4.png")
+                {
+                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship5.png");
+                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship5.png";
+                }
+                else if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship5.png")
+                {
+                    gameObject.GetComponent<TextureRenderer>().SetSource("Assets/Textures/spaceships/spaceship1.png");
+                    Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship1.png";
+                }
+            }
             //rotate velocity
             gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(Player.speed, 0).Rotate(gameObject.transform.rotation);
 
         }
-        /*
-        private void ShootProjectile()
-        {
-            var projectile = new GameObject("Projectile");
-            projectile.AddComponent<ProjectileScript>();
-            //set the position of the projectile to the position of the player
-            //add a small offset to the position of the player to avoid collision with the player  
-            projectile.transform.position = gameObject.transform.position + new Vec2D(100, 0).Rotate(gameObject.transform.rotation);
-            projectile.transform.rotation = gameObject.transform.rotation;
-            var pb = projectile.AddComponent<PhysicsBody>();
-            pb.Velocity = new Vec2D(800, 0).Rotate(gameObject.transform.rotation);
-            projectile.AddComponent<TextureRenderer>().SetSource("Assets/Textures/projectile.png");
-            BoxCollider.FromDrawableRect(projectile);
-        }*/
+        
+       
+
     }
 
     public class CameraFollow : Script
@@ -154,4 +151,35 @@ namespace ShootEmUp
             camera?.SetPosition(gameObject.transform.position-gameBounds/2);
         }
     }
- }
+
+    public class Projectile : Script
+    {
+        public override void Start()
+        {
+            var projectile = new GameObject("Projectile");
+            projectile.AddComponent<ProjectileScript>();
+            //set the position of the projectile to the position of the player
+            //add a small offset to the position of the player to avoid collision with the player  
+            projectile.transform.position = gameObject.transform.position + new Vec2D(70, 0).Rotate(gameObject.transform.rotation);
+            projectile.transform.rotation = gameObject.transform.rotation;
+            var pb = projectile.AddComponent<PhysicsBody>();
+            pb.Velocity = new Vec2D(800, 0).Rotate(gameObject.transform.rotation);
+            var spriteRenderer = projectile.AddComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.SetTexture("Assets/Textures/projectile_sprite_sheet.png");
+                spriteRenderer.SetSpriteSize(400, 400);
+                spriteRenderer.SetSize(60, 60);
+                spriteRenderer.AddAnimation(new AnimationInfo("idle", 0, 4, 0.075));
+                spriteRenderer.PlayAnimation("idle");
+                spriteRenderer.SetAnimationType(AnimationType.LoopReversed);
+            }
+            BoxCollider.FromDrawableRect(projectile);
+        }
+
+        public override void Update()
+        {
+           
+        }
+    }
+}

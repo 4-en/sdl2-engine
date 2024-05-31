@@ -125,20 +125,10 @@ namespace ShootEmUp
     {
         Vec2D gameBounds = new Vec2D(1920, 1080);
 
-        public override void Start()
-        {
-
-        }
-
         public override void Update()
         {
-
             var camera = GetCamera() as Camera2D;
-            camera.SetPosition(gameObject.transform.position-gameBounds/2);
-            //log camera position
-            Console.WriteLine(camera.GetPosition());
-            Console.WriteLine(gameObject.transform.position);
-
-        }
+            camera?.SetPosition(gameObject.transform.position-gameBounds/2);
         }
     }
+ }

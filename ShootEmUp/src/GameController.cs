@@ -31,6 +31,16 @@ namespace ShootEmUp
 
             gameBounds = GetCamera()?.GetWorldSize() ?? new Vec2D(1920, 1080);
 
+
+            // create the player with Player class
+            var player = new GameObject("Player");
+            player.AddComponent<Player>();
+
+            //background image
+            var background = new GameObject("Background");
+            background.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/grid.jpg");
+            background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
+
             //Time Counter
             timeText = Component.CreateWithGameObject<TextRenderer>("TimeCounter").Item2;
             timeText.color = new Color(255, 255, 255, 205);
@@ -39,9 +49,8 @@ namespace ShootEmUp
             timeText.GetGameObject().SetPosition(new Vec2D(gameBounds.x - 300, 25));
 
 
-            // create the player with Player class
-            var player = new GameObject("Player");
-            player.AddComponent<Player>();
+            
+            
             
 
 

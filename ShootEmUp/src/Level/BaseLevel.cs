@@ -229,6 +229,8 @@ namespace ShootEmUp.Level
                 return;
             }
 
+            levelTimer += Time.deltaTime;
+
             // Check if the current wave is completed
             if (Enemies.Count == 0)
             {

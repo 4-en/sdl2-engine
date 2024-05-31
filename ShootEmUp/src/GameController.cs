@@ -39,15 +39,10 @@ namespace ShootEmUp
             timeText.GetGameObject().SetPosition(new Vec2D(gameBounds.x - 300, 25));
 
 
-            // create the player
+            // create the player with Player class
             var player = new GameObject("Player");
-            var texture = player.AddComponent<TextureRenderer>();
-            texture?.SetSource("Assets/Textures/change_direction_powerup.png");
-            BoxCollider.FromDrawableRect(player);
-            player.AddComponent<KeyboardController>();
-            player.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
-            var pb = player.AddComponent<PhysicsBody>();
-            pb.Velocity = new Vec2D(100, 0);
+            player.AddComponent<Player>();
+            
 
 
         }
@@ -107,51 +102,5 @@ namespace ShootEmUp
 
 }
 
-public class KeyboardController : Script
-{
-    public int left = (int)SDL_Keycode.SDLK_a;
-    public int right = (int)SDL_Keycode.SDLK_d;
-    public int space = (int)SDL_Keycode.SDLK_SPACE;
-
-    public override void Start()
-    {
-
-    }
-
-    public override void Update()
-    {
-
-        if (Input.GetKeyPressed(left))
-        {
-            gameObject.transform.rotation -= 0.5;
-        }
-        if (Input.GetKeyPressed(right))
-        {
-            gameObject.transform.rotation += 0.5;
-        }
-        if (Input.GetKeyDown(space))
-        {
-            ShootProjectile();
-
-        }
-        //rotate velocity
-        gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(400, 0).Rotate(gameObject.transform.rotation);
-
-    }
-
-    private void ShootProjectile()
-    {
-        var projectile = new GameObject("Projectile");
-        projectile.AddComponent<ProjectileScript>();
-        //set the position of the projectile to the position of the player
-        //add a small offset to the position of the player to avoid collision with the player  
-        projectile.transform.position = gameObject.transform.position + new Vec2D(100, 0).Rotate(gameObject.transform.rotation);
-        projectile.transform.rotation = gameObject.transform.rotation;
-        var pb = projectile.AddComponent<PhysicsBody>();
-        pb.Velocity = new Vec2D(800, 0).Rotate(gameObject.transform.rotation);
-        projectile.AddComponent<TextureRenderer>().SetSource("Assets/Textures/projectile.png");
-        BoxCollider.FromDrawableRect(projectile);
-    }
 
 
-}

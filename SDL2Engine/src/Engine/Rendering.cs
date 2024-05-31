@@ -199,6 +199,11 @@ namespace SDL2Engine
             this.Position = position;
         }
 
+        public Vec2D GetPosition()
+        {
+            return this.Position;
+        }
+
         public override Vec2D GetWorldSize()
         {
             return WorldSize;

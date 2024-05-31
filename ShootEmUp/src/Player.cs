@@ -43,6 +43,7 @@ namespace ShootEmUp
         public override void Start()
         {
             var player = new GameObject("Player");
+            player.AddComponent<CameraFollow>();
             var texture = player.AddComponent<TextureRenderer>();
             texture?.SetSource("Assets/Textures/change_direction_powerup.png");
             BoxCollider.FromDrawableRect(player);
@@ -51,7 +52,10 @@ namespace ShootEmUp
             var pb = player.AddComponent<PhysicsBody>();
             pb.Velocity = new Vec2D(100, 0);
         }
-        public override void Update() { }
+        public override void Update() {
+            
+            
+        }
            
             
     }
@@ -76,7 +80,6 @@ namespace ShootEmUp
         public override void Update()
         {
 
-           
             if (Input.GetKeyPressed(left))
             {
                 gameObject.transform.rotation -= Player.rotationSpeed;
@@ -117,4 +120,25 @@ namespace ShootEmUp
             BoxCollider.FromDrawableRect(projectile);
         }*/
     }
+
+    public class CameraFollow : Script
+    {
+        Vec2D gameBounds = new Vec2D(1920, 1080);
+
+        public override void Start()
+        {
+
+        }
+
+        public override void Update()
+        {
+
+            var camera = GetCamera() as Camera2D;
+            camera.SetPosition(gameObject.transform.position-gameBounds/2);
+            //log camera position
+            Console.WriteLine(camera.GetPosition());
+            Console.WriteLine(gameObject.transform.position);
+
+        }
+        }
     }

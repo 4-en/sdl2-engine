@@ -62,7 +62,7 @@ namespace ShootEmUp.Entities
                 lifetime -= Time.deltaTime;
                 if (lifetime <= 0)
                 {
-                    Destroy();
+                    gameObject.Destroy();
                 }
             }
             if(!destroyOnScreenExit)
@@ -79,7 +79,7 @@ namespace ShootEmUp.Entities
             double tolerance = 250;
             if (screenPosition.x < -tolerance || screenPosition.x > camera.GetScreenWidth() + tolerance || screenPosition.y < -tolerance || screenPosition.y > camera.GetScreenHeight() + tolerance)
             {
-                Destroy();
+                gameObject.Destroy();
             }
 
         }
@@ -92,7 +92,7 @@ namespace ShootEmUp.Entities
             if (destroyOnCollision)
             {
                 // TODO: Add explosion effect and sound
-                Destroy();
+                gameObject.Destroy();
             }
 
             var damageable = other.GetComponent<IDamageable>();

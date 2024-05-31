@@ -1,4 +1,5 @@
 ﻿using SDL2Engine;
+using static SDL2.SDL;
 
 namespace ShootEmUp.Level
 {
@@ -69,6 +70,9 @@ namespace ShootEmUp.Level
         private LinkedList<GameObject> Enemies = new LinkedList<GameObject>();
         private GameObject? Player;
 
+        private int score = 0;
+        private int money = 0;
+
 
         public void SetupLevel(int levelID, EnemyWave[] waves)
         {
@@ -113,6 +117,24 @@ namespace ShootEmUp.Level
             }
 
             return wave;
+        }
+
+        public void AddScore(int points)
+        {
+            score += points;
+            if (score < 0)
+            {
+                score = 0;
+            }
+        }
+
+        public void AddMoney(int amount)
+        {
+            money += amount;
+            if (money < 0)
+            {
+                money = 0;
+            }
         }
 
         private void NextWave()
@@ -181,6 +203,15 @@ namespace ShootEmUp.Level
             this.Pause();
             // End the level as a success
             // ...
+        }
+
+        private void HandleInput()
+        {
+            // Check for pause input
+            if (Input.GetKeyDown(SDL_Keycode.SDLK_ESCAPE))
+            {
+                Pause();
+            }
         }
 
         public override void Update()

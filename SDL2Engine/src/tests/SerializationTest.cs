@@ -20,6 +20,7 @@ namespace SDL2Engine.tests
         {
             public override void Start()
             {
+                
                 Delay(2.0, () =>
                 {
                     this.gameObject.Destroy();

@@ -20,6 +20,8 @@ namespace SDL2Engine.Coro
     //   Warning: tasks are run in a separate thread pool, not during the update step
     //            this means that the task should not modify any game objects
     //            and should only be used for IO or other non-gameplay tasks that would block the main thread
+    // - Action: same as Task
+    // - Func<object?>: same as Task
     // - IEnumerator: wait for the coroutine to complete
     //   Warning: the awaited coroutine should not be started seperately, it should be yielded from the current coroutine
     //            without calling StartCoroutine() on it
@@ -69,6 +71,25 @@ namespace SDL2Engine.Coro
             }
         }
 
+        private static bool IsCallableNoParams(object value)
+        {
+
+            var type = value.GetType();
+            var method = type.GetMethod("Invoke");
+            if (method == null)
+            {
+                return false;
+            }
+
+            var parameters = method.GetParameters();
+            if (parameters.Length != 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         // handles waiting for a task to complete before continuing the coroutine
         private void HandleTask(IEnumerator coroutine)
         {
@@ -85,6 +106,52 @@ namespace SDL2Engine.Coro
             {
                 task.Wait();
             });
+        }
+
+        private void HandleCallableNoParams(IEnumerator coroutine)
+        {
+            // Handles either an action or a function that takes no parameters
+            // wrap callable in a task
+            Action? action = coroutine.Current as Action;
+            if (action != null)
+            {
+                Task task = new Task(action);
+                task.ContinueWith((t) =>
+                {
+                    // schedule the coroutine to continue the next frame
+                    this.finished_task_coroutines.Add(coroutine);
+                });
+
+                unfinished_coroutines++;
+                Task.Run(() =>
+                {
+                    task.Wait();
+                });
+                return;
+            }
+
+            // if it 's a function, wrap it in a task
+            Func<object?>? function = coroutine.Current as Func<object?>;
+            if (function != null)
+            {
+                Task<object?> task = new Task<object?>(function);
+                task.ContinueWith((t) =>
+                {
+                    // schedule the coroutine to continue the next frame
+                    this.finished_task_coroutines.Add(coroutine);
+                });
+
+                unfinished_coroutines++;
+                Task.Run(() =>
+                {
+                    task.Wait();
+                });
+                return;
+            }
+
+            Console.WriteLine("Unsupported type: " + coroutine.Current.GetType().Name);
+
+            
         }
 
         // Helper method to wait for an IEnumerator to complete
@@ -149,6 +216,15 @@ namespace SDL2Engine.Coro
                     HandleTask(coroutine);
                     return;
                 }
+
+                if (IsCallableNoParams(value))
+                {
+                    // wrap the callable in a task
+                    HandleCallableNoParams(coroutine);
+                    return;
+
+                }
+
 
                 if (value is IEnumerator)
                 {

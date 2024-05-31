@@ -73,6 +73,8 @@ namespace ShootEmUp.Level
         private int score = 0;
         private int money = 0;
 
+        private GameObject? escapeMenu = null;
+
 
         public void SetupLevel(int levelID, EnemyWave[] waves)
         {
@@ -208,9 +210,28 @@ namespace ShootEmUp.Level
         private void HandleInput()
         {
             // Check for pause input
-            if (Input.GetKeyDown(SDL_Keycode.SDLK_ESCAPE))
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_ESCAPE))
             {
-                Pause();
+                if (this.escapeMenu != null)
+                {
+                    this.escapeMenu.Destroy();
+                    this.escapeMenu = null;
+                }
+                else
+                {
+                    var stopState = !!paused;
+                    var escapemenu = UI.EscapeMenu("Paused", () =>
+                    {
+
+                        this.paused = stopState;
+                        GetScene()?.SetPhysics(true);
+                        this.escapeMenu = null;
+                        return true;
+                    });
+
+                    this.escapeMenu = escapemenu;
+                    this.Pause();
+                }
             }
         }
 

@@ -3,14 +3,14 @@
 namespace ShootEmUp.Level
 {
     /*
-     * A struct that represents an enemy wave. An enemy wave is a group of enemies that spawn at the same time.
+     * A class that represents an enemy wave. An enemy wave is a group of enemies that spawn at the same time.
      * The struct contains the name of a template file that contains the enemy wave, 
      * the maximum time that the player has to defeat the wave, and the number of times that the wave will spawn.
      * 
      * If the time runs out before the player defeats the wave, the next wave will spawn.
      * If the player clears the wave before the time runs out, the next wave will spawn.
      */
-    public struct EnemyWave
+    public class EnemyWave
     {
         // the name of the file that contains the enemy wave
         public string Name = "";
@@ -92,6 +92,29 @@ namespace ShootEmUp.Level
             // Start the first wave
         }
 
+        private EnemyWave? GetWave(int waveIndex)
+        {
+
+            if (currentWave >= maxWaveCount)
+            {
+                return null;
+            }
+
+            EnemyWave wave = new EnemyWave();
+            int waveCount = 0;
+            for (int i = 0; i < Waves.Length; i++)
+            {
+                wave = Waves[i];
+                waveCount += wave.Count;
+                if (currentWave < waveCount)
+                {
+                    break;
+                }
+            }
+
+            return wave;
+        }
+
         private void NextWave()
         {
             currentWave++;
@@ -101,16 +124,10 @@ namespace ShootEmUp.Level
             }
 
             // Spawn the next wave
-            EnemyWave wave = new EnemyWave();
-            int waveCount = 0;
-            for(int i = 0; i < Waves.Length; i++)
+            var wave = GetWave(currentWave);
+            if (wave == null)
             {
-                wave = Waves[i];
-                waveCount += wave.Count;
-                if (currentWave < waveCount)
-                {
-                    break;
-                }
+                return;
             }
 
             // Set the timer for the wave
@@ -137,13 +154,80 @@ namespace ShootEmUp.Level
         private bool LevelCompleted()
         {
             // Check if all waves have been completed
-            return currentWave >= Waves.Length;
+            return currentWave >= maxWaveCount;
+        }
+
+        private void Pause()
+        {
+            paused = true;
+            GetScene()?.SetPhysics(false);
+        }
+
+        private void Unpause()
+        {
+            paused = false;
+            GetScene()?.SetPhysics(true);
+        }
+
+        private void OnFail()
+        {
+            this.Pause();
+            // End the level as a failure
+            // ...
+        }
+
+        private void OnWin()
+        {
+            this.Pause();
+            // End the level as a success
+            // ...
         }
 
         public override void Update()
         {
-            // Check for win/lose conditions
-            // Update game loop
+            if(this.paused)
+            {
+                return;
+            }
+
+            // Check if the level is completed
+            if (LevelCompleted())
+            {
+                // End the level
+                // ...
+                return;
+            }
+
+            // Check if the current wave is completed
+            if (Enemies.Count == 0)
+            {
+                NextWave();
+            }
+
+            // check if the wave timer has run out
+            var wave = GetWave(currentWave);
+            if (wave != null)
+            {
+                if (Time.time - waveStartTime > wave.MaxTime)
+                {
+                    NextWave();
+                }
+            }
+
+            // check if the player is dead
+            // check for player health
+            /*
+             * if (Player.GetHealth() <= 0) {
+             *    OnFail();
+             * }
+             */
+
+            // check if the player has completed the level
+            if (LevelCompleted())
+            {
+                OnWin();
+            }
+
         }
     }
 }

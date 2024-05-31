@@ -36,6 +36,7 @@ namespace SDL2Engine.Coro
         private TimedQueue<IEnumerator> frame_coroutines;
         private List<IEnumerator> finished_task_coroutines;
         private int unfinished_coroutines = 0;
+        private int max_coroutines_per_frame = 1000;
 
         public CoroutineManager()
         {
@@ -250,6 +251,7 @@ namespace SDL2Engine.Coro
         // run all coroutines that are scheduled to run this frame
         public void RunScheduledCoroutines()
         {
+            int completed_coroutines = 0;
             double current_time = Time.time;
             double current_frame = Time.tick - 0.1; // -0.1 to account for floating point errors
 
@@ -259,6 +261,12 @@ namespace SDL2Engine.Coro
             {
                 HandleCoroutine(nextCoroutine);
                 nextCoroutine = timed_coroutines.PopBefore(current_time);
+
+                completed_coroutines++;
+                if (completed_coroutines >= max_coroutines_per_frame)
+                {
+                    return;
+                }
             }
 
             // run frame coroutines
@@ -267,6 +275,12 @@ namespace SDL2Engine.Coro
             {
                 HandleCoroutine(nextCoroutine);
                 nextCoroutine = frame_coroutines.PopBefore(current_frame);
+
+                completed_coroutines++;
+                if (completed_coroutines >= max_coroutines_per_frame)
+                {
+                    return;
+                }
             }
 
             // run finished task coroutines
@@ -276,6 +290,8 @@ namespace SDL2Engine.Coro
             {
                 HandleCoroutine(coroutine);
                 unfinished_coroutines--;
+
+                // TODO: add a limit to the number of coroutines that can run in a single frame
             }
 
         }

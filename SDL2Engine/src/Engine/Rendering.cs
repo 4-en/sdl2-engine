@@ -131,17 +131,53 @@ namespace SDL2Engine
         // maybe this is not necessary for now, but keep in mind if performance is an issue
     }
 
-    public abstract class Camera : Component
-    {
-        public abstract Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D());
-        public abstract double WorldToScreen(double distance);
-        public abstract Rect WorldToScreen(Rect worldRect);
-        public abstract Vec2D GetScreenSize();
-        public abstract Vec2D ScreenToWorld(Vec2D screenPosition);
-        public abstract double ScreenToWorld(double distance);
-        public abstract Rect ScreenToWorld(Rect screenRect);
 
-        public abstract Vec2D GetWorldSize();
+    public class Camera : Component
+    {
+        [JsonProperty]
+        private Vec2D Position { get; set; }
+        [JsonProperty]
+        private Vec2D WorldSize { get; set; }
+        [JsonProperty]
+        public bool keepAspectRatio = true;
+
+        [JsonIgnore]
+        private Camera? fixedCamera = null;
+
+        private static Camera backupCamera = new Camera();
+
+        public Camera Fixed
+        {
+            get
+            {
+                if (fixedCamera == null)
+                {
+                    fixedCamera = new Camera();
+                    fixedCamera.WorldSize = this.WorldSize;
+                    fixedCamera.keepAspectRatio = this.keepAspectRatio;
+                }
+                return fixedCamera;
+            }
+        }
+
+        public Camera()
+        {
+            this.Position = new Vec2D();
+            this.WorldSize = new Vec2D(1920, 1080);
+        }
+
+
+        public Camera(Vec2D position = new Vec2D())
+        {
+            this.Position = position;
+            this.WorldSize = new Vec2D(1920, 1080);
+        }
+
+        public static Camera GetBackupCamera()
+        {
+            return backupCamera;
+        }
+
 
         public static Camera? GetCamera(GameObject gameObject)
         {
@@ -174,26 +210,6 @@ namespace SDL2Engine
             return GetWorldSize().y;
         }
 
-        public abstract Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D());
-        public abstract Rect RectToWorld(Rect rect, Vec2D rootPosition = new Vec2D());
-    }
-
-    public class Camera2D : Camera
-    {
-        [JsonProperty]
-        private Vec2D Position { get; set; }
-        [JsonProperty]
-        private Vec2D WorldSize { get; set; }
-        [JsonProperty]
-        public bool keepAspectRatio = true;
-
-
-        public Camera2D(Vec2D position = new Vec2D())
-        {
-            this.Position = position;
-            this.WorldSize = new Vec2D(1920, 1080);
-        }
-
         public void SetPosition(Vec2D position)
         {
             this.Position = position;
@@ -204,12 +220,12 @@ namespace SDL2Engine
             return this.Position;
         }
 
-        public override Vec2D GetWorldSize()
+        public Vec2D GetWorldSize()
         {
             return WorldSize;
         }
 
-        public override Vec2D GetScreenSize()
+        public Vec2D GetScreenSize()
         {
             if (keepAspectRatio)
             {
@@ -230,26 +246,26 @@ namespace SDL2Engine
             return new Vec2D(Engine.windowWidth, Engine.windowHeight);
         }
 
-        public override Vec2D ScreenToWorld(Vec2D screenPosition)
+        public Vec2D ScreenToWorld(Vec2D screenPosition)
         {
             Vec2D screenSize = GetScreenSize();
             return new Vec2D(screenPosition.x / screenSize.x * WorldSize.x + Position.x, screenPosition.y / screenSize.y * WorldSize.y + Position.y);
         }
 
-        public override Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D())
+        public Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D())
         {
             Vec2D screenSize = GetScreenSize();
             return new Vec2D((worldPosition.x + rootPosition.x-Position.x) / WorldSize.x * screenSize.x, (worldPosition.y + rootPosition.y-Position.y) / WorldSize.y * screenSize.y);
         }
 
-        public override Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D())
+        public Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D())
         {
             Vec2D topLeft = WorldToScreen(rect.GetTopLeft(), rootPosition);
             Vec2D bottomRight = WorldToScreen(rect.GetBottomRight(), rootPosition);
             return new Rect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
         }
 
-        public override Rect RectToWorld(Rect rect, Vec2D rootPosition = new Vec2D())
+        public Rect RectToWorld(Rect rect, Vec2D rootPosition = new Vec2D())
         {
             Vec2D topLeft = ScreenToWorld(rect.GetTopLeft());
             Vec2D bottomRight = ScreenToWorld(rect.GetBottomRight());
@@ -259,22 +275,22 @@ namespace SDL2Engine
         // converts a distance in world coordinates to screen coordinates
         // we assume that the aspect ratio is kept, otherwise this wouldn't work with
         // just a single distance value
-        public override double WorldToScreen(double distance)
+        public double WorldToScreen(double distance)
         {
             return distance / WorldSize.x * GetScreenSize().x;
         }
 
-        public override Rect WorldToScreen(Rect worldRect)
+        public Rect WorldToScreen(Rect worldRect)
         {
             return this.RectToScreen(worldRect);
         }
 
-        public override double ScreenToWorld(double distance)
+        public double ScreenToWorld(double distance)
         {
             return distance / GetScreenSize().x * WorldSize.x;
         }
 
-        public override Rect ScreenToWorld(Rect screenRect)
+        public Rect ScreenToWorld(Rect screenRect)
         {
             return this.RectToWorld(screenRect);
         }
@@ -286,6 +302,8 @@ namespace SDL2Engine
     {
         [JsonProperty]
         public AnchorPoint anchorPoint = AnchorPoint.Center;
+        [JsonProperty]
+        public bool relativeToCamera = true;
 
         public virtual void Draw(Camera camera)
         {
@@ -302,7 +320,7 @@ namespace SDL2Engine
             Camera? camera = GetCamera();
             if (camera != null)
             {
-                return camera.WorldToScreen(goRoot);
+                return this.relativeToCamera ? camera.WorldToScreen(goRoot) : camera.Fixed.WorldToScreen(goRoot);
             }
 
             return goRoot;
@@ -320,7 +338,10 @@ namespace SDL2Engine
         public override Vec2D GetDrawRoot()
         {
             Vec2D localCenter = GetRect().GetTopLeft();
-            return scene?.GetCamera().WorldToScreen(localCenter, gameObject.GetPosition()) ?? localCenter + gameObject.GetPosition();
+            //return scene?.GetCamera().WorldToScreen(localCenter, gameObject.GetPosition()) ?? localCenter + gameObject.GetPosition();
+            Camera cam = this.relativeToCamera ? GetCamera() : GetCamera().Fixed;
+            return cam.WorldToScreen(localCenter, gameObject.GetPosition());
+
         }
 
         public void SetRect(Rect rect)
@@ -367,22 +388,13 @@ namespace SDL2Engine
         }
         public SDL.SDL_Rect GetDestRect(Rect? custom_rect = null)
         {
-            var scene = gameObject.GetScene();
-            Camera? camera = scene?.GetCamera();
-            if (camera != null)
-            {
-                return camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition()).ToSDLRect();
-            } else
-            {
-                Console.WriteLine("Camera not found");
-                return rect.ToSDLRect();
-            }
+            return GetScreenRect(custom_rect).ToSDLRect();
         }
 
         // get the rect in world coordinates
         public Rect GetWorldRect(Rect? custom_rect = null)
         {
-            return custom_rect ?? GetRect() + gameObject.GetPosition();
+            return (custom_rect ?? GetRect()) + gameObject.GetPosition();
         }
 
         public Rect GetScreenRect(Rect? custom_rect = null)
@@ -391,7 +403,13 @@ namespace SDL2Engine
             Camera? camera = scene?.GetCamera();
             if (camera != null)
             {
-                return camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
+                Rect cam_rect = camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
+                if(relativeToCamera)
+                {
+                    return cam_rect;
+                }
+                return camera.Fixed.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
+
             }
             return GetRect(custom_rect);
         }
@@ -446,6 +464,11 @@ namespace SDL2Engine
         private Color backgroundColor = new Color(0,0,0,0);
         [JsonProperty]
         private Color borderColor = new Color(0, 0, 0, 0);
+
+        public TextRenderer()
+        {
+            this.relativeToCamera = false;
+        }
 
         public void SetBorderSize(double borderSize)
         {

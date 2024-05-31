@@ -187,14 +187,14 @@ namespace SDL2Engine
         }
 
         // Returns the main camera of the scene
-        public Camera? GetCamera()
+        public Camera GetCamera()
         {
             var scene = gameObject.GetScene();
             if (scene != null)
             {
                 return scene.GetCamera();
             }
-            return null;
+            return Camera.GetBackupCamera();
         }
         
         // Returns a Component of type T attached to the same GameObject or any of its parents
@@ -423,6 +423,12 @@ namespace SDL2Engine
         }
 
         public virtual void OnCollisionExit(CollisionPair collision)
+        {
+            // Do nothing
+        }
+
+        // This method is called before the collision is resolved
+        public virtual void OnPreCollision(CollisionPair collision)
         {
             // Do nothing
         }

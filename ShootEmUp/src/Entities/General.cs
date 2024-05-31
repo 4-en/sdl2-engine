@@ -63,7 +63,8 @@ namespace ShootEmUp.Entities
                 lifetime -= Time.deltaTime;
                 if (lifetime <= 0)
                 {
-                    //gameObject.Destroy();
+
+                    gameObject.Destroy();
                 }
             }
             if(!destroyOnScreenExit)
@@ -80,7 +81,7 @@ namespace ShootEmUp.Entities
             double tolerance = 250;
             if (screenPosition.x < -tolerance || screenPosition.x > camera.GetScreenWidth() + tolerance || screenPosition.y < -tolerance || screenPosition.y > camera.GetScreenHeight() + tolerance)
             {
-                //gameObject.Destroy();
+                gameObject.Destroy();
             }
 
         }

@@ -151,7 +151,7 @@ namespace ShootEmUp
 
         public override void Update()
         {
-            var camera = GetCamera() as Camera2D;
+            var camera = GetCamera() as Camera;
             camera?.SetPosition(gameObject.transform.position-gameBounds/2);
         }
     }

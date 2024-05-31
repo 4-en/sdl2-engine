@@ -1087,7 +1087,7 @@ namespace SDL2Engine
         {
             if (texture != null)
             {
-                return;
+                //return;
             }
 
             if (source != "")
@@ -1138,7 +1138,11 @@ namespace SDL2Engine
 
         public void SetSource(string path)
         {
-            this.source = path;
+            if (this.source != path)
+            {
+                this.source = path;
+                Load();
+            }
         }
 
         // true if the texture is loaded

@@ -1,5 +1,6 @@
 ﻿using SDL2Engine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -62,7 +63,7 @@ namespace ShootEmUp.Entities
                 lifetime -= Time.deltaTime;
                 if (lifetime <= 0)
                 {
-                    Destroy();
+                    //gameObject.Destroy();
                 }
             }
             if(!destroyOnScreenExit)
@@ -79,7 +80,7 @@ namespace ShootEmUp.Entities
             double tolerance = 250;
             if (screenPosition.x < -tolerance || screenPosition.x > camera.GetScreenWidth() + tolerance || screenPosition.y < -tolerance || screenPosition.y > camera.GetScreenHeight() + tolerance)
             {
-                Destroy();
+                //gameObject.Destroy();
             }
 
         }
@@ -87,12 +88,14 @@ namespace ShootEmUp.Entities
         public override void OnCollisionEnter(CollisionPair collision)
         {
             var other = collision.GetOther(gameObject);
+            gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(0, 0);
+            gameObject.GetComponent<SpriteRenderer>().SetSource("Assets/Textures/projectile_explosion_sprite_sheet.png");
 
 
             if (destroyOnCollision)
             {
                 // TODO: Add explosion effect and sound
-                Destroy();
+                StartCoroutine(DestroyAfterTime(0.5));
             }
 
             var damageable = other.GetComponent<IDamageable>();
@@ -102,8 +105,14 @@ namespace ShootEmUp.Entities
             }
         }
 
-
+        public IEnumerator DestroyAfterTime(double delay)
+        {
+            Console.WriteLine("Starting coroutine");
+            yield return delay;
+            gameObject.Destroy();
+            yield break;
+        }
     }
 
-
+    
 }

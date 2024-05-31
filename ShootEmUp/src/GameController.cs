@@ -48,10 +48,25 @@ namespace ShootEmUp
             timeText.anchorPoint = AnchorPoint.TopLeft;
             timeText.GetGameObject().SetPosition(new Vec2D(gameBounds.x - 300, 25));
 
+            // collision test object
+            var obstacle = new GameObject("Obstacle");
+            var pb = obstacle.AddComponent<PhysicsBody>();
+            pb.IsMovable = false;
+            var bc = obstacle.AddComponent<BoxCollider>();
+            var texture = obstacle.AddComponent<TextureRenderer>();
+            texture?.SetSource("Assets/Textures/forsenE.png");
+            obstacle.transform.position = new Vec2D(400,500);
+            pb.Velocity= new Vec2D(1, 1);
+            pb.IsMovable = true;
+
 
             
             
-            
+
+
+
+
+
 
 
         }

@@ -165,7 +165,7 @@ namespace SDL2Engine
 
         public Scene()
         {
-            this.mainCamera = new Camera2D(new Vec2D());
+            this.mainCamera = new Camera(new Vec2D());
         }
         public Scene(Camera camera)
         {
@@ -174,7 +174,7 @@ namespace SDL2Engine
 
         public Scene(string name)
         {
-            this.mainCamera = new Camera2D(new Vec2D());
+            this.mainCamera = new Camera(new Vec2D());
             this.name = name;
         }
 

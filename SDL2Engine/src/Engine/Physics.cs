@@ -301,6 +301,7 @@ namespace SDL2Engine
         public GameObject obj1;
         public GameObject obj2;
         public Vec2D collisionPoint;
+        private bool cancelled = false;
 
         public CollisionPair(GameObject obj1, GameObject obj2, Vec2D collisionPoint)
         {
@@ -316,6 +317,16 @@ namespace SDL2Engine
                 return obj2;
             }
             return obj1;
+        }
+
+        public void Cancel()
+        {
+            cancelled = true;
+        }
+
+        public bool IsCancelled()
+        {
+            return cancelled;
         }
     }
 
@@ -819,6 +830,8 @@ namespace SDL2Engine
         {
             foreach (var collision in collisions)
             {
+                if (collision.IsCancelled()) continue;
+
                 var obj1 = collision.obj1;
                 var obj2 = collision.obj2;
                 var collisionPoint = collision.collisionPoint;
@@ -945,6 +958,31 @@ namespace SDL2Engine
         }
         */
 
+        private static void NotifyPreResolveCollisions(List<CollisionPair> collisions)
+        {
+            foreach (var pair in collisions)
+            {
+                GameObject obj1 = pair.obj1;
+                GameObject obj2 = pair.obj2;
+
+                Collider? collider1 = obj1.GetComponent<Collider>();
+                Collider? collider2 = obj2.GetComponent<Collider>();
+
+                if (collider1 == null || collider2 == null) continue;
+
+                List<Script> obj1Scripts = obj1.GetComponents<Script>();
+                List<Script> obj2Scripts = obj2.GetComponents<Script>();
+
+                foreach (var script in obj1Scripts)
+                {
+                    script.OnPreCollision(pair);
+                }
+                foreach (var script in obj2Scripts)
+                {
+                    script.OnPreCollision(pair);
+                }
+            }
+        }
 
 
         // after all collisions are resolved, notify objects that a collision has occured
@@ -1017,6 +1055,9 @@ namespace SDL2Engine
 
             // Check for collisions
             List<CollisionPair> collisions = CheckCollisions(gameObjects);
+
+            // Notify objects before resolving collisions
+            NotifyPreResolveCollisions(collisions);
 
             // Resolve collisions
             ResolveCollisions(collisions);

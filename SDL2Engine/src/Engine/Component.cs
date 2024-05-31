@@ -427,6 +427,12 @@ namespace SDL2Engine
             // Do nothing
         }
 
+        // This method is called before the collision is resolved
+        public virtual void OnPreCollision(CollisionPair collision)
+        {
+            // Do nothing
+        }
+
 
         public Transform transform
         {

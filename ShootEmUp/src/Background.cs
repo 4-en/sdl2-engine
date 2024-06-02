@@ -40,26 +40,36 @@ namespace ShootEmUp
                 }
             }
         }
+        bool loaded = false;
 
         public override void Update()
         {
-            var camera = GetCamera() as Camera;
-
-            if (camera == null || prototype == null) return;
-
-            Vec2D cameraPosition = camera.GetPosition();
-
-            foreach (var (background, originalPosition) in prototype)
+            if (loaded == false)
             {
-                if (background != null)
-                {
-                    // Berechne die neue Position des Hintergrundobjekts relativ zur Kameraposition
-                    float xOffset = (float)(originalPosition.x - (gameBounds.x / 2));
-                    float yOffset = (float)(originalPosition.y - (gameBounds.y / 2));
+                loaded = true;
+                var camera = GetCamera() as Camera;
 
-                    // Setze die Position relativ zur Kameraposition
-                    background.transform.position = new Vec2D((cameraPosition.x / 1.5) + xOffset, (cameraPosition.y / 1.5) + yOffset);
+                if (camera == null || prototype == null) return;
+
+                Vec2D cameraPosition2 = camera.GetPosition();
+
+                int roundedCameraX = (int)Math.Ceiling(cameraPosition2.x);
+                int roundedCameraY = (int)Math.Ceiling(cameraPosition2.y);
+                Vec2D cameraPosition = new Vec2D(roundedCameraX, roundedCameraY);
+
+                foreach (var (background, originalPosition) in prototype)
+                {
+                    if (background != null)
+                    {
+                        // Berechne die neue Position des Hintergrundobjekts relativ zur Kameraposition
+                        float xOffset = (int)(originalPosition.x - (gameBounds.x / 2));
+                        float yOffset = (int)(originalPosition.y - (gameBounds.y / 2));
+
+                        // Setze die Position relativ zur Kameraposition
+                        background.transform.position = new Vec2D((cameraPosition.x / 1.5) + xOffset, (cameraPosition.y / 1.5) + yOffset);
+                    }
                 }
+                loaded = false;
             }
         }
 

@@ -15,6 +15,7 @@
     <Content Include="Assets\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Remove="Assets\Textures\asteroids\asteroid1.png" />
     <None Remove="Assets\Textures\grid.jpg" />
     <None Remove="Assets\Textures\projectile_explosion_sprite_sheet.png" />
     <None Remove="Assets\Textures\projectile_sprite_sheet.png" />

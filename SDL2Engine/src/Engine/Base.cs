@@ -501,6 +501,11 @@ namespace SDL2Engine
             return (uint)random.Next();
         }
 
+        public uint GetUID()
+        {
+            return uid;
+        }
+
         /* This basically removes the object from the scene
          * The object will be destroyed in the next frame
          * 

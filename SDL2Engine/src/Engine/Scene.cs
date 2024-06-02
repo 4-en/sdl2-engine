@@ -626,11 +626,10 @@ namespace SDL2Engine
         {
             public int Compare(Drawable? a, Drawable? b)
             {
-                if (a == null || b == null)
-                {
-                    return 0;
-                }
-                return a.GetGameObject().GetPosition().z.CompareTo(b.GetGameObject().GetPosition().z);
+                int zA = a?.z_index ?? 0;
+                int zB = b?.z_index ?? 0;
+
+                return zB - zA;
             }
         }
 

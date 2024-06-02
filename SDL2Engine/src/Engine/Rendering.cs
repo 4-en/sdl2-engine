@@ -304,6 +304,8 @@ namespace SDL2Engine
         public AnchorPoint anchorPoint = AnchorPoint.Center;
         [JsonProperty]
         public bool relativeToCamera = true;
+        [JsonProperty]
+        public int z_index = 0;
 
         public virtual void Draw(Camera camera)
         {
@@ -325,6 +327,11 @@ namespace SDL2Engine
 
             return goRoot;
 
+        }
+
+        public void SetZIndex(int z_index)
+        {
+            this.z_index = z_index;
         }
     }
 

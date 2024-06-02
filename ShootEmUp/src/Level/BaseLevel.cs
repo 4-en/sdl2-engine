@@ -95,8 +95,10 @@ namespace ShootEmUp.Level
 
             //background image
             var background = new GameObject("Background");
-            background.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/grid.jpg");
-            background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2, 999);
+            var bg_renderer = background.AddComponent<TextureRenderer>();
+            bg_renderer?.SetSource("Assets/Textures/grid.jpg");
+            bg_renderer?.SetZIndex(999);
+            background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
             
 
             // collision test object

@@ -1160,8 +1160,11 @@ namespace SDL2Engine
         // loads a texture from the given path
         public void LoadTexture(string path)
         {
-            this.source = path;
-            this.Load();
+            if (this.source != path)
+            {
+                this.source = path;
+                Load();
+            }
         }
 
         // sets the path to the texture without loading it immediately
@@ -1176,13 +1179,10 @@ namespace SDL2Engine
             this.source = path;
         }
 
+        // sets the path to the texture without loading it immediately
         public void SetSource(string path)
         {
-            if (this.source != path)
-            {
-                this.source = path;
-                Load();
-            }
+            this.source = path;
         }
 
         // true if the texture is loaded

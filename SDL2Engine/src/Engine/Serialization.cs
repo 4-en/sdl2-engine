@@ -88,7 +88,7 @@ namespace SDL2Engine
             Type type = o.GetType();
 
             // get object variables
-            var variables = type.GetFields(); 
+            var variables = type.GetFields( System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
 
             // create a new file
@@ -120,9 +120,11 @@ namespace SDL2Engine
             T obj = new T();
 
             Type type = obj.GetType();
-            var fields = type.GetFields();
+            var fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
             string[] lines = json.Split('\n');
+
+            int non_empty_lines = 0;
 
             foreach (var line in lines)
             {
@@ -131,6 +133,12 @@ namespace SDL2Engine
                     continue;
                 }
                 string[] parts = line.Split(':');
+                if (parts.Length != 2)
+                {
+                    Console.WriteLine("Error parsing line: " + line);
+                    continue;
+                }
+                non_empty_lines++;
                 string fieldName = parts[0].Trim();
                 string fieldValue = parts[1].Trim();
 
@@ -141,6 +149,11 @@ namespace SDL2Engine
                         field.SetValue(obj, Convert.ChangeType(fieldValue, field.FieldType));
                     }
                 }
+            }
+
+            if (non_empty_lines == 0)
+            {
+                return null;
             }
 
             return obj;

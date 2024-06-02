@@ -19,6 +19,8 @@ namespace ShootEmUp
             var engine = new Engine(null, "ShootEmUp");
             engine.Init();
             LoadPrototypes.Load();
+            var playerData = PlayerData.Instance;
+            Console.WriteLine($"Loaded player data - Score: {playerData.TotalScore}, Level: {playerData.LevelProgress}, Money: {playerData.Money}");
             engine.Run();
         }
 

@@ -77,7 +77,7 @@ namespace ShootEmUp
             health -= damage.Value;
             if (health <= 0)
             {
-                Destroy();
+                gameObject.Destroy();
             }
         }
 

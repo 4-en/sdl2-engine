@@ -113,6 +113,16 @@ namespace SDL2Engine
             return a.color == b.color;
         }
 
+        public override bool Equals(object? obj)
+        {
+            return obj is Color other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public static bool operator !=(Color a, Color b)
         {
             return a.color != b.color;

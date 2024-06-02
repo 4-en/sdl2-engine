@@ -90,7 +90,7 @@ namespace ShootEmUp.Entities
         {
             var other = collision.GetOther(gameObject);
             gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(0, 0);
-            gameObject.GetComponent<SpriteRenderer>().SetSource("Assets/Textures/projectile_explosion_sprite_sheet.png");
+            gameObject.GetComponent<SpriteRenderer>()?.SetSource("Assets/Textures/projectile_explosion_sprite_sheet.png");
 
 
             if (destroyOnCollision)

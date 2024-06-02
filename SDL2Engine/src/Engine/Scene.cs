@@ -644,6 +644,12 @@ namespace SDL2Engine
             }
         }
 
+        private int lastVisibleObjects = 0;
+        public int GetLastVisibleDrawables()
+        {
+            return lastVisibleObjects;
+        }
+
         // Iterate through all Drawable components and call their Draw method using the main camera defined in the scene
         public void Draw()
         {
@@ -670,10 +676,14 @@ namespace SDL2Engine
             visibleWorld.w += 200;
             visibleWorld.h += 200;
 
+            lastVisibleObjects = 0;
             foreach (Drawable drawable in drawableList)
             {
                 if (drawable.IsEnabled() && drawable.IsVisible(visibleWorld))
+                {
                     drawable.Draw(mainCamera);
+                    lastVisibleObjects++;
+                }
             }
         }
 

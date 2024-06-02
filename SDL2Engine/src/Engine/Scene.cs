@@ -151,6 +151,7 @@ namespace SDL2Engine
 
         private List<GameObject> gameObjects = new();
 
+        private bool sortDrawables = false;
         private List<Drawable> drawableList = new();
         private List<Collider> colliderList = new();
         private List<Script> scripts = new();
@@ -604,6 +605,7 @@ namespace SDL2Engine
             switch (component)
             {
                 case Drawable drawable:
+                    sortDrawables = true;
                     drawableList.Add(drawable);
                     break;
                 case Collider collider:
@@ -620,6 +622,17 @@ namespace SDL2Engine
         {
             this.doPhysics = doPhysics;
         }
+        private class DrawableComparer : IComparer<Drawable>
+        {
+            public int Compare(Drawable? a, Drawable? b)
+            {
+                if (a == null || b == null)
+                {
+                    return 0;
+                }
+                return a.GetGameObject().GetPosition().z.CompareTo(b.GetGameObject().GetPosition().z);
+            }
+        }
 
         // Iterate through all Drawable components and call their Draw method using the main camera defined in the scene
         public void Draw()
@@ -629,6 +642,13 @@ namespace SDL2Engine
             // also use occlusion- and frustum culling (at least frustum culling)
             // aaalso, sort objects of the same depth by their texture, so gpu can batch draw calls
             // the sorting should not be done every frame, but only when a drawable is added or removed (and then only once before rendering)
+
+            if (sortDrawables)
+            {
+                drawableList.Sort(new DrawableComparer());
+                sortDrawables = false;
+            }
+
             foreach (Drawable drawable in drawableList)
             {
                 if (drawable.IsEnabled())

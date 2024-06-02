@@ -630,8 +630,15 @@ namespace SDL2Engine
             instance = this;
         }
 
-        private void Init()
+        private bool wasInit = false;
+        public void Init()
         {
+            if (wasInit)
+            {
+                return;
+            }
+            wasInit = true;
+
             // Initialize SDL2
             if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) < 0)
             {

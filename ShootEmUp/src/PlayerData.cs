@@ -10,6 +10,7 @@ namespace ShootEmUp
 
         private static PlayerData? instance;
 
+        // Returns the instance of the PlayerData class
         public static PlayerData Instance
         {
             get
@@ -21,7 +22,8 @@ namespace ShootEmUp
                 return instance;
             }
         }
-
+        
+        // Don't create instances of this class directly - use the Instance property
         public PlayerData()
         {
             // Initialize the data

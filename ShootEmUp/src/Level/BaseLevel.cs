@@ -96,7 +96,8 @@ namespace ShootEmUp.Level
             //background image
             var background = new GameObject("Background");
             background.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/grid.jpg");
-            background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
+            background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2, 999);
+            
 
             // collision test object
             var obstacle = new GameObject("Obstacle");
@@ -108,11 +109,18 @@ namespace ShootEmUp.Level
             pb.Velocity = new Vec2D(1, 1);
             pb.IsMovable = true;
 
+
             //asteroid
             var asteroid = new GameObject("Asteroid");
             var asteroidComponent = asteroid.AddComponent<Asteroid>();
             asteroidComponent.position = new Vec2D(1000, 200);
             asteroidComponent.velocity = new Vec2D(-50, 10);
+
+            //asteroid
+            var asteroid2 = new GameObject("Asteroid");
+            var asteroidComponent2 = asteroid2.AddComponent<Asteroid>();
+            asteroidComponent2.position = new Vec2D(1200, 200);
+            asteroidComponent2.velocity = new Vec2D(-50, 10);
         }
 
         public override void Start()
@@ -192,7 +200,6 @@ namespace ShootEmUp.Level
             {
                 return;
             }
-
             // Set the timer for the wave
             waveStartTime = Time.time;
 
@@ -211,6 +218,8 @@ namespace ShootEmUp.Level
             {
                 Enemies.AddLast(enemy);
             }
+
+            Console.WriteLine("Wave " + currentWave + " started");
 
         }
 

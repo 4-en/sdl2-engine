@@ -17,6 +17,8 @@ namespace ShootEmUp
         {
             LoadHomeScreen();
             var engine = new Engine(null, "ShootEmUp");
+            engine.Init();
+            LoadPrototypes.Load();
             engine.Run();
         }
 

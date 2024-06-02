@@ -93,13 +93,10 @@ namespace ShootEmUp.Level
             var player = new GameObject("Player");
             player.AddComponent<Player>();
 
-            //background image
-            var background = new GameObject("Background");
-            var bg_renderer = background.AddComponent<TextureRenderer>();
-            bg_renderer?.SetSource("Assets/Textures/grid.jpg");
-            bg_renderer?.SetZIndex(999);
-            background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
-            
+
+            // create the Background
+            var background = new GameObject("Player");
+            background.AddComponent<Background>();
 
             // collision test object
             var obstacle = new GameObject("Obstacle");
@@ -127,7 +124,7 @@ namespace ShootEmUp.Level
 
         public override void Start()
         {
-            if(!was_setup)
+            if (!was_setup)
             {
                 Console.WriteLine("Level was not setup properly. Exiting...");
                 Console.WriteLine("Please call SetupLevel() before starting the level.");
@@ -287,7 +284,7 @@ namespace ShootEmUp.Level
 
         public override void Update()
         {
-            if(this.paused)
+            if (this.paused)
             {
                 return;
             }

@@ -51,7 +51,6 @@ namespace ShootEmUp
             // collision test object
             var obstacle = new GameObject("Obstacle");
             var pb = obstacle.AddComponent<PhysicsBody>();
-            pb.IsMovable = false;
             var bc = obstacle.AddComponent<BoxCollider>();
             var texture = obstacle.AddComponent<TextureRenderer>();
             texture?.SetSource("Assets/Textures/forsenE.png");
@@ -61,20 +60,11 @@ namespace ShootEmUp
 
             //asteroid
             var asteroid = new GameObject("Asteroid");
-            asteroid.AddComponent<Asteroid>();
-            var asteroidComponent = asteroid.GetComponent<Asteroid>();
+            var asteroidComponent = asteroid.AddComponent<Asteroid>();
             asteroidComponent.position = new Vec2D(1000, 200);
             asteroidComponent.velocity = new Vec2D(-50, 10);
             
             
-
-
-
-
-
-
-
-
         }
 
         public override void Update()

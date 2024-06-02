@@ -16,6 +16,7 @@ namespace ShootEmUp
             // Load all needed prototypes here by calling functions that create Prototype classes
             LoadExamplePrototype();
             LoadForsenEPrototype();
+            BaseEnemy.CreateBasePrototype();
         }
 
         private static void LoadExamplePrototype()

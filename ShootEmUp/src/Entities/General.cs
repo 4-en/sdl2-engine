@@ -43,6 +43,12 @@ namespace ShootEmUp.Entities
         void Damage(Damage damage);
 
         void Heal(double value);
+
+        double GetHealth();
+        double GetMaxHealth();
+
+        void SetHealth(double value);
+        void SetMaxHealth(double value);
     }
 
     public class ProjectileScript : Script

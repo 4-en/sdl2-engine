@@ -50,16 +50,16 @@ namespace ShootEmUp
        
         public override void Start()
         {
-            var player = new GameObject("Player");
-            var texture = player.AddComponent<TextureRenderer>();
+            
+            var texture = AddComponent<TextureRenderer>();
             texture.SetSource(spaceshipTexture);
 
 
-            player.AddComponent<CameraFollow>();
-            BoxCollider.FromDrawableRect(player);
-            player.AddComponent<KeyboardController>();
-            player.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
-            var pb = player.AddComponent<PhysicsBody>();
+            AddComponent<CameraFollow>();
+            BoxCollider.FromDrawableRect(gameObject);
+            AddComponent<KeyboardController>();
+            gameObject.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
+            var pb = AddComponent<PhysicsBody>();
             pb.Velocity = new Vec2D(Player.speed, 0);
         }
         public override void Update() {

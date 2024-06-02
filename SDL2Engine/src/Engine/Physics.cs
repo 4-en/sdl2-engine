@@ -187,16 +187,36 @@ namespace SDL2Engine
             set { velocity = value; }
         }
 
+        public void SetVelocity(double x, double y)
+        {
+            velocity = new Vec2D(x, y);
+        }
+
+        public void SetVelocity(Vec2D velocity)
+        {
+            this.velocity = velocity;
+        }
+
         public double AngularVelocity
         {
             get { return angularVelocity; }
             set { angularVelocity = value; }
         }
 
+        public void SetAngularVelocity(double angularVelocity)
+        {
+            this.angularVelocity = angularVelocity;
+        }
+
         public double Mass
         {
             get { return mass; }
             set { mass = value; }
+        }
+
+        public void SetMass(double mass)
+        {
+            this.mass = mass;
         }
 
         public double Bounciness
@@ -680,6 +700,13 @@ namespace SDL2Engine
                 {
                     physicsBody.Velocity = new Vec2D(0, 0);
                     vel_magnitude_squared = 0;
+                } else
+                {
+                    if (physicsBody.RotateWithVelocity)
+                    {
+                        // assuming textures are facing up by default
+                        t.rotation = Math.Atan2(physicsBody.Velocity.y, physicsBody.Velocity.x) * 180 / Math.PI + 90;
+                    }
                 }
 
                 // Apply friction and drag
@@ -721,11 +748,7 @@ namespace SDL2Engine
                     physicsBody.Velocity += dragForce / physicsBody.Mass * deltaTime;
                 }
                 
-                if(physicsBody.RotateWithVelocity)
-                {
-                    t.rotation = Math.Atan2(physicsBody.Velocity.y, physicsBody.Velocity.x);
-                }
-
+                
 
             }
         }

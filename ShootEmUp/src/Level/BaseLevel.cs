@@ -75,16 +75,55 @@ namespace ShootEmUp.Level
 
         private GameObject? escapeMenu = null;
 
-
+        private bool was_setup = false;
         public void SetupLevel(int levelID, EnemyWave[] waves)
         {
             LevelID = levelID;
             Waves = waves;
             currentWave = -1;
+            was_setup = true;
+        }
+
+        private void CreatePlayer()
+        {
+            var gameBounds = GetCamera()?.GetWorldSize() ?? new Vec2D(1920, 1080);
+
+
+            // create the player with Player class
+            var player = new GameObject("Player");
+            player.AddComponent<Player>();
+
+            //background image
+            var background = new GameObject("Background");
+            background.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/grid.jpg");
+            background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
+
+            // collision test object
+            var obstacle = new GameObject("Obstacle");
+            var pb = obstacle.AddComponent<PhysicsBody>();
+            var bc = obstacle.AddComponent<BoxCollider>();
+            var texture = obstacle.AddComponent<TextureRenderer>();
+            texture?.SetSource("Assets/Textures/forsenE.png");
+            obstacle.transform.position = new Vec2D(400, 500);
+            pb.Velocity = new Vec2D(1, 1);
+            pb.IsMovable = true;
+
+            //asteroid
+            var asteroid = new GameObject("Asteroid");
+            var asteroidComponent = asteroid.AddComponent<Asteroid>();
+            asteroidComponent.position = new Vec2D(1000, 200);
+            asteroidComponent.velocity = new Vec2D(-50, 10);
         }
 
         public override void Start()
         {
+            if(!was_setup)
+            {
+                Console.WriteLine("Level was not setup properly. Exiting...");
+                Console.WriteLine("Please call SetupLevel() before starting the level.");
+                return;
+            }
+
             // count the total number of waves
             maxWaveCount = 0;
             foreach (EnemyWave wave in Waves)
@@ -92,8 +131,8 @@ namespace ShootEmUp.Level
                 maxWaveCount += wave.Count;
             }
 
-            // Create the player here
-            // ...
+            // Create the player
+            CreatePlayer();
 
             // Start the first wave
         }

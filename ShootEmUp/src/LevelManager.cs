@@ -1,4 +1,5 @@
 ﻿using SDL2Engine;
+using ShootEmUp.Level;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,21 +34,26 @@ namespace ShootEmUp
 
         }
 
-        public static Tuple<Scene, GameObject> CreateBaseLevel()
+        public static Scene CreateBaseLevel()
         {
-            var level = new Scene("BaseLevel");
-            var gameControllerObject = new GameObject("GameController", level);
-            gameControllerObject.AddComponent<GameController>();
+            var level = new Scene("TestLevel");
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level").Item2;
+                levelScript.SetupLevel(
+                    0,
+                    [
+                        new EnemyWave("test.template", 60, 3)
+                    ]
+                );
+            }
 
-            return new Tuple<Scene, GameObject>(level, gameControllerObject);
+            return level;
         }
 
         public static Scene CreateLevel1()
         {
-            var tuple = CreateBaseLevel();
-            var level = tuple.Item1;
-            var gameControllerObject = tuple.Item2;
-            
+            var level = CreateBaseLevel();
 
             return level;
         }

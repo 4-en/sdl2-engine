@@ -329,6 +329,11 @@ namespace SDL2Engine
 
         }
 
+        public virtual bool IsVisible(Rect worldRect)
+        {
+            return worldRect.Contains(gameObject.GetPosition());
+        }
+
         public void SetZIndex(int z_index)
         {
             this.z_index = z_index;
@@ -349,6 +354,11 @@ namespace SDL2Engine
             Camera cam = this.relativeToCamera ? GetCamera() : GetCamera().Fixed;
             return cam.WorldToScreen(localCenter, gameObject.GetPosition());
 
+        }
+
+        public override bool IsVisible(Rect worldRect)
+        {
+            return worldRect.Intersects(this.GetWorldRect());
         }
 
         public void SetRect(Rect rect)

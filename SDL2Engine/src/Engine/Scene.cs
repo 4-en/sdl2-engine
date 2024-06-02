@@ -629,7 +629,18 @@ namespace SDL2Engine
                 int zA = a?.z_index ?? 0;
                 int zB = b?.z_index ?? 0;
 
-                return zB - zA;
+                if (zA < zB)
+                {
+                    return 1;
+                }
+                else if (zA > zB)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return (a?.GetCreationOrder() ?? 0u).CompareTo(b?.GetCreationOrder());
+                }
             }
         }
 
@@ -647,10 +658,21 @@ namespace SDL2Engine
                 drawableList.Sort(new DrawableComparer());
                 sortDrawables = false;
             }
+            var camPos = mainCamera.GetPosition();
+            var camSize = mainCamera.GetWorldSize();
+            Rect visibleWorld = new Rect(camPos.x, camPos.y, camSize.x, camSize.y);
+
+
+            // add some tolerance to the visible world
+            // this is to prevent flickering when objects are just outside the camera
+            visibleWorld.x -= 100;
+            visibleWorld.y -= 100;
+            visibleWorld.w += 200;
+            visibleWorld.h += 200;
 
             foreach (Drawable drawable in drawableList)
             {
-                if (drawable.IsEnabled())
+                if (drawable.IsEnabled() && drawable.IsVisible(visibleWorld))
                     drawable.Draw(mainCamera);
             }
         }

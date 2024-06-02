@@ -451,6 +451,14 @@ namespace SDL2Engine
     public class EngineObject : IDisposable
     {
         protected static Random random = new Random(DateTime.Now.Millisecond);
+        private static uint createdObjects = 0;
+        private static uint GetOrder()
+        {
+            return createdObjects++;
+        }
+
+        [JsonIgnore]
+        private uint creationOrder = GetOrder();
 
         [JsonProperty]
         protected string name = "unnamed";
@@ -504,6 +512,11 @@ namespace SDL2Engine
         public uint GetUID()
         {
             return uid;
+        }
+
+        public uint GetCreationOrder()
+        {
+            return creationOrder;
         }
 
         /* This basically removes the object from the scene

@@ -21,7 +21,7 @@ namespace ShootEmUp
         public static int acceleration;
         public static double rotationSpeed;
         public static int projectileSpeed;
-        public int health;
+        public static int health;
         public static int damage;
         public int fireRate;
         public int fireRange;
@@ -34,13 +34,13 @@ namespace ShootEmUp
 
             spaceshipTexture = "Assets/Textures/spaceships/spaceship5.png";
             speed = 400;
-            maxSpeed = 1000;
+            maxSpeed = 800 + PlayerData.Instance.SpeedUpgradeLevel * 100;
             minSpeed = 25;
             acceleration = 1;
             rotationSpeed = 0.5;
             projectileSpeed = 800;
-            health = 100;
-            damage = 10;
+            health = 1000 + PlayerData.Instance.HealthUpgradeLevel * 200;
+            damage = 50 + PlayerData.Instance.DamageUpgradeLevel * 10;
             fireRate = 10;
             fireRange = 10;
             shield = 10;
@@ -90,7 +90,6 @@ namespace ShootEmUp
 
         public override void Update()
         {
-
             if (Input.GetKeyPressed(left))
             {
                 gameObject.transform.rotation -= Player.rotationSpeed;

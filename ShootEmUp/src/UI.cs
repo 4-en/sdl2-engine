@@ -76,10 +76,12 @@ namespace ShootEmUp
         {
             //test values
             var playerData = PlayerData.Instance;
-            playerData.SpeedUpgradeLevel = 2;
-            playerData.DamageUpgradeLevel = 1;
+            /*
+            playerData.SpeedUpgradeLevel = 0;
+            playerData.DamageUpgradeLevel = 0;
             playerData.HealthUpgradeLevel = 0;
-            playerData.Money = 100;
+            playerData.Money = 10000;
+            playerData.TotalScore = 500;*/
             var playerMoney = playerData.Money;
             var speedUpgrade = playerData.SpeedUpgradeLevel;
             var damageUpgrade = playerData.DamageUpgradeLevel;
@@ -87,19 +89,12 @@ namespace ShootEmUp
 
 
 
-            var menu = new GameObject("EscapeMenu");
+            var menu = new GameObject("ShopMenu");
             menu.SetPosition(new Vec2D(1920 / 2, 400));
 
-            var background = Component.CreateWithGameObject<FilledRect>("ShopMenuBackground");
-            background.Item2.SetRect(new Rect(0, 0, 1920, 1080));
-            background.Item2.color = (new Color(0, 0, 0, 200));
-            background.Item2.anchorPoint = AnchorPoint.TopLeft;
-            background.Item1.SetPosition(new Vec2D(0, 0));
-            menu.AddChild(background.Item1);
-
-            var titleTextTuple = Component.CreateWithGameObject<TextRenderer>("EscapeMenuTitle");
+            var titleTextTuple = Component.CreateWithGameObject<TextRenderer>("ShopMenuTitle");
             var titleText = titleTextTuple.Item2;
-            titleTextTuple.Item1.SetPosition(new Vec2D(0, -200));
+            titleTextTuple.Item1.SetPosition(new Vec2D(0, -250));
             titleText.SetFontSize(78);
             titleText.SetText(title);
             titleText.SetPreferredSize(new Rect(0, 0, 500, 200));
@@ -111,7 +106,7 @@ namespace ShootEmUp
             //money indicator at the top left
             var moneyTextTuple = Component.CreateWithGameObject<TextRenderer>("MoneyText");
             var moneyText = moneyTextTuple.Item2;
-            moneyTextTuple.Item1.SetPosition(new Vec2D(-700, -200));
+            moneyTextTuple.Item1.SetPosition(new Vec2D(-900, -250));
             moneyText.SetFontSize(78);
             moneyText.SetText("Balance    " + playerMoney);
             moneyText.SetPreferredSize(new Rect(0, 0, 500, 200));
@@ -119,26 +114,26 @@ namespace ShootEmUp
             moneyText.anchorPoint = AnchorPoint.CenterLeft;
             menu.AddChild(moneyTextTuple.Item1);
 
+            //highscore indicator at the top right
+            var highscoreTextTuple = Component.CreateWithGameObject<TextRenderer>("HighscoreText");
+            var highscoreText = highscoreTextTuple.Item2;
+            highscoreTextTuple.Item1.SetPosition(new Vec2D(900, -250));
+            highscoreText.SetFontSize(78);
+            highscoreText.SetText("Highscore    " + playerData.TotalScore);
+            highscoreText.SetPreferredSize(new Rect(0, 0, 500, 200));
+            highscoreText.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            highscoreText.anchorPoint = AnchorPoint.CenterRight;
+            menu.AddChild(highscoreTextTuple.Item1);
 
 
-            ShopItem(menu, "Speed", new Vec2D(-500, 200),PlayerData.Instance.SpeedUpgradeLevel);
 
-            ShopItem(menu, "Damage", new Vec2D(0, 200),PlayerData.Instance.DamageUpgradeLevel);
+            ShopItem(menu, "Speed", new Vec2D(-500, 100),PlayerData.Instance.SpeedUpgradeLevel);
 
-            ShopItem(menu, "Health", new Vec2D(500, 200),PlayerData.Instance.HealthUpgradeLevel);
+            ShopItem(menu, "Damage", new Vec2D(0, 100),PlayerData.Instance.DamageUpgradeLevel);
 
-            menu.AddComponent<EscapeListener>().OnEscape = () =>
-            {
-                menu.Destroy();
-                onContinue?.Invoke();
-                return true;
-            };
-            menu.AddComponent<ShopKeyListener>().OnKeyP = () =>
-            {
-                menu.Destroy();
-                onContinue?.Invoke();
-                return true;
-            };
+            ShopItem(menu, "Health", new Vec2D(500, 100),PlayerData.Instance.HealthUpgradeLevel);
+
+            
 
             return menu;
         }
@@ -231,15 +226,28 @@ namespace ShootEmUp
             {
                 if (title.Equals("Speed"))
                 {
-                    PlayerData.Instance.SpeedUpgradeLevel++;
+                    if (PlayerData.Instance.SpeedUpgradeLevel < 5 && PlayerData.Instance.Money >= 1000)
+                    {
+                        PlayerData.Instance.Money -= 1000;
+                        PlayerData.Instance.SpeedUpgradeLevel++;
+                    }
                 }else if (title.Equals("Damage"))
                 {
-                    PlayerData.Instance.DamageUpgradeLevel++;
+                    if(PlayerData.Instance.DamageUpgradeLevel < 5 && PlayerData.Instance.Money >= 1000)
+                    {
+                        PlayerData.Instance.Money -= 1000;
+                        PlayerData.Instance.DamageUpgradeLevel++;
+                    }
                 }else if(title.Equals("Health"))
                 {
-                    PlayerData.Instance.HealthUpgradeLevel++;
+                    if (PlayerData.Instance.HealthUpgradeLevel < 5 && PlayerData.Instance.Money >= 1000)
+                    {
+                        PlayerData.Instance.Money -= 1000;
+                        PlayerData.Instance.HealthUpgradeLevel++;
+                    }
                 }
                 Console.WriteLine("Speed: " + PlayerData.Instance.SpeedUpgradeLevel+", Damage: "+PlayerData.Instance.DamageUpgradeLevel+", Health: "+PlayerData.Instance.HealthUpgradeLevel);
+                LevelManager.LoadShop();
                 return true;
             }, new Rect(0, 0, 400, 75), Color.White, 44);
             var upgradeButton = upgradeButtonTuple.Item1;

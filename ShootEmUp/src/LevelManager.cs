@@ -1,5 +1,6 @@
 ﻿using SDL2Engine;
 using ShootEmUp.Level;
+using ShootEmUp.src;
 
 namespace ShootEmUp
 {
@@ -21,6 +22,7 @@ namespace ShootEmUp
 
 
         private static Scene? homeScreen;
+        private static Scene? shop;
         private static Scene? level;
         private static int levelIndex = 0;
 
@@ -31,6 +33,12 @@ namespace ShootEmUp
             homeScreen = CreateHomeScreen();
             SceneManager.SetScene(homeScreen);
 
+        }
+
+        public static void LoadShop()
+        {
+            shop = CreateShop();
+            SceneManager.SetScene(shop);
         }
 
         public static Scene CreateBaseLevel()
@@ -64,6 +72,13 @@ namespace ShootEmUp
             var homeScreen = HomeScreen.CreateScene();
 
             return homeScreen;
+        }
+
+        public static Scene CreateShop()
+        {
+            var shop = Shop.CreateScene();
+
+            return shop;
         }
     }
 

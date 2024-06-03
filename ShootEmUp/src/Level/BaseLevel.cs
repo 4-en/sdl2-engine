@@ -1,4 +1,5 @@
 ﻿using SDL2Engine;
+using ShootEmUp.src;
 using static SDL2.SDL;
 
 namespace ShootEmUp.Level
@@ -288,31 +289,7 @@ namespace ShootEmUp.Level
             }
             if (Input.GetKeyDown((int)SDL_Keycode.SDLK_p))
             {
-                if (this.shopMenu != null)
-                {
-                    this.shopMenu.Destroy();
-                    this.shopMenu = null;
-                }
-                else if(this.escapeMenu != null)
-                {
-                    this.escapeMenu.Destroy();
-                    this.escapeMenu = null;
-                }
-                else
-                {
-                    var stopState = !!paused;
-                    var shopmenu = UI.ShopMenu("Shop", () =>
-                    {
-
-                        this.paused = stopState;
-                        GetScene()?.SetPhysics(true);
-                        this.shopMenu = null;
-                        return true;
-                    });
-
-                    this.shopMenu = shopmenu;
-                    this.Pause();
-                }
+                SceneManager.SetScene(Shop.CreateScene());
             }
         }
 

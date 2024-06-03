@@ -23,9 +23,11 @@ namespace ShootEmUp
                 background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
                 GameObject gameTitle = HomeScreenText("Shoot Em Up", gameBounds.x / 2, 300, 200);
                 GameObject startText = HomeScreenText("Start", gameBounds.x / 2, 600, 130);
+                GameObject shopText = HomeScreenText("Shop", gameBounds.x / 2, 800, 130);
                 scene.AddGameObject(background);
                 scene.AddGameObject(gameTitle);
                 scene.AddGameObject(startText);
+                scene.AddGameObject(shopText);
 
                 
             }
@@ -96,6 +98,10 @@ namespace ShootEmUp
                     if (gameObject.GetName().Equals("Start"))
                     {
                         SceneManager.SetScene(LevelManager.CreateLevel1());
+                    }
+                    if(gameObject.GetName().Equals("Shop"))
+                    {
+                        LevelManager.LoadShop();
                     }
                 }
 

@@ -26,12 +26,12 @@ namespace ShootEmUp
         public int fireRate;
         public int fireRange;
         public int shield;
-        
-        
-       
+
+
+
         public Player()
         {
-            
+
             spaceshipTexture = "Assets/Textures/spaceships/spaceship5.png";
             speed = 400;
             maxSpeed = 1000;
@@ -44,13 +44,13 @@ namespace ShootEmUp
             fireRate = 10;
             fireRange = 10;
             shield = 10;
-            
+
         }
 
-       
+
         public override void Start()
         {
-            
+
             var texture = AddComponent<TextureRenderer>();
             texture.SetSource(spaceshipTexture);
 
@@ -62,11 +62,12 @@ namespace ShootEmUp
             var pb = AddComponent<PhysicsBody>();
             //pb.Velocity = new Vec2D(Player.speed, 0);
         }
-        public override void Update() {
-            
+        public override void Update()
+        {
+
         }
-           
-            
+
+
     }
 
     public class KeyboardController : Script
@@ -78,13 +79,13 @@ namespace ShootEmUp
         public int space = (int)SDL_Keycode.SDLK_SPACE;
         public int enter = (int)SDL_Keycode.SDLK_RETURN;
 
-        
+
 
 
 
         public override void Start()
         {
-            
+
         }
 
         public override void Update()
@@ -146,21 +147,51 @@ namespace ShootEmUp
             }
 
         }
-        
-       
+
+
 
     }
 
     public class CameraFollow : Script
     {
+        // The size of the game window
         Vec2D gameBounds = new Vec2D(1920, 1080);
+
+        // The size of the world in which the camera should follow the player
+        protected Vec2D WorldSize = new Vec2D(2500, 2500);
 
         public override void Update()
         {
+
             var camera = GetCamera() as Camera;
-            camera?.SetPosition(gameObject.transform.position-gameBounds/2);
+
+            // Get the current position of the camera and the player
+            Vec2D cameraPosition = camera.GetPosition();
+            Vec2D playerPosition = gameObject.GetPosition();
+            //Console.WriteLine(cameraPosition.ToString());
+
+            // Calculate the new camera position
+            Vec2D newCameraPosition = cameraPosition;
+
+            // Update the camera position on the X-axis if the player is within the world bounds on the X-axis
+            if (playerPosition.x >= 0 && playerPosition.x <= WorldSize.x)
+            {
+                newCameraPosition.x = playerPosition.x - gameBounds.x / 2;
+            }
+
+            // Update the camera position on the Y-axis if the player is within the world bounds on the Y-axis
+            if (playerPosition.y >= 0 && playerPosition.y <= WorldSize.y)
+            {
+                newCameraPosition.y = playerPosition.y - gameBounds.y / 2;
+            }
+
+            // Set the new camera position
+            camera?.SetPosition(newCameraPosition);
         }
     }
+
+
+
 
     public class Projectile : Script
     {
@@ -185,7 +216,7 @@ namespace ShootEmUp
                 spriteRenderer.SetAnimationType(AnimationType.LoopReversed);
             }
             BoxCollider.FromDrawableRect(projectile);
-            
+
         }
     }
 }

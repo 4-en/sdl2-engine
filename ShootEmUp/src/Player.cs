@@ -164,7 +164,6 @@ namespace ShootEmUp
             double healthBarWidth = currentHealth / maxHealth * width;
             var healthIndicator = healthBarBackground.GetComponent<TextRenderer>();
             healthIndicator?.SetRect(new Rect(0, 0, healthBarWidth, height));
-            Console.WriteLine(healthBarWidth);
 
             //update the text
             var text = healthBarText.GetComponent<TextRenderer>();

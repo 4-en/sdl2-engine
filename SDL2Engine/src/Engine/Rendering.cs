@@ -827,6 +827,15 @@ namespace SDL2Engine
             this.Load();
         }
 
+        public override bool IsVisible(Rect worldRect)
+        {
+            if (!this.relativeToCamera)
+            {
+                return true;
+            }
+            return base.IsVisible(worldRect);
+        }
+
         public override void Draw(Camera camera)
         {
             // not sure if this should be necessary

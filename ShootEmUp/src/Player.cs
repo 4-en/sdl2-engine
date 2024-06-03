@@ -1,11 +1,14 @@
-﻿using SDL2Engine;
+﻿using SDL2;
+using SDL2Engine;
 using ShootEmUp.Entities;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static SDL2.SDL;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ShootEmUp
 {
@@ -21,7 +24,8 @@ namespace ShootEmUp
         public static int acceleration;
         public static double rotationSpeed;
         public static int projectileSpeed;
-        public static int health;
+        public static int maxHealth;
+        public static int currentHealth;
         public static int damage;
         public int fireRate;
         public int fireRange;
@@ -39,7 +43,8 @@ namespace ShootEmUp
             acceleration = 1;
             rotationSpeed = 0.5;
             projectileSpeed = 800;
-            health = 1000 + PlayerData.Instance.HealthUpgradeLevel * 200;
+            maxHealth = 1000 + PlayerData.Instance.HealthUpgradeLevel * 200;
+            currentHealth = maxHealth;
             damage = 50 + PlayerData.Instance.DamageUpgradeLevel * 10;
             fireRate = 10;
             fireRange = 10;
@@ -57,10 +62,11 @@ namespace ShootEmUp
 
             AddComponent<CameraFollow>();
             BoxCollider.FromDrawableRect(gameObject);
-            AddComponent<KeyboardController>();
+            AddComponent<KeyboardController>(); 
+            AddComponent<HealthBar>();
+            AddComponent<HealthReducer>();
             gameObject.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
             var pb = AddComponent<PhysicsBody>();
-            //pb.Velocity = new Vec2D(Player.speed, 0);
         }
         public override void Update()
         {
@@ -68,6 +74,103 @@ namespace ShootEmUp
         }
 
 
+    }
+
+    internal class HealthReducer : Script
+    {
+        public override void Update()
+        {
+           //key inputs
+           if (Input.GetKeyPressed((int)SDL_Keycode.SDLK_1))
+            {
+                if (Player.currentHealth > 0)
+                {
+
+                    Player.currentHealth -= 1;
+                }
+            }
+            if (Input.GetKeyPressed((int)SDL_Keycode.SDLK_2))
+            {
+                if (Player.currentHealth < Player.maxHealth)
+                {
+                    Player.currentHealth += 1;
+                }
+            }
+            
+        }
+    }
+
+    internal class HealthBar : Script
+    {
+        GameObject healthBarBackground = new GameObject("HealthBarBackground");
+        GameObject healthBarBorder = new GameObject("HealthBarBorder");
+        GameObject healthBarText = new GameObject("HealthBarText");
+        int width = 300;
+        int height = 60;
+
+
+        public override void Start()
+        {
+
+            
+            healthBarBackground.transform.position = new Vec2D(100, 100);
+            var healthIndicator = healthBarBackground.AddComponent<TextRenderer>();
+            healthIndicator.anchorPoint = AnchorPoint.CenterLeft;
+            healthIndicator.SetPreferredSize(new Rect(0,0,width,height));
+            healthIndicator.SetColor(SDL2Engine.Color.Green);
+            healthIndicator.SetBackgroundColor(new SDL2Engine.Color(255, 0, 0, 255));
+
+
+
+            var border = healthBarBorder.AddComponent<TextRenderer>();
+            var textRenderHelper = healthBarBorder.AddComponent<TextRenderHelper>();
+            healthBarBorder.transform.position = new Vec2D(100, 100);
+            border.anchorPoint = AnchorPoint.CenterLeft;
+            border.SetPreferredSize(new Rect(0,0,width,height));
+            border.SetBorderSize(2);
+            border.SetBorderColor(SDL2Engine.Color.Black);
+
+            var text = healthBarText.AddComponent<TextRenderer>();
+            healthBarText.transform.position = new Vec2D(100 + width / 2, 100);
+            text.anchorPoint = AnchorPoint.Center;
+            text.SetText(Player.currentHealth.ToString());
+            text.SetColor(SDL2Engine.Color.White);
+            text.SetFontSize(38);
+            text.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+
+            var titleText = new GameObject("TitleText");
+            var text2 = titleText.AddComponent<TextRenderer>();
+            titleText.transform.position = new Vec2D(100 + width / 2, 50);
+            text2.anchorPoint = AnchorPoint.Center;
+            text2.SetText("Health");
+            text2.SetColor(SDL2Engine.Color.Red);
+            text2.SetFontSize(50);
+            text2.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+
+            
+            var heart = new GameObject("Heart");
+            var heartTexture = heart.AddComponent<TextureRenderer>();
+            heartTexture.relativeToCamera = false;
+            heartTexture.SetSource("Assets/Textures/health.png");
+            heartTexture.IsVisible(new Rect(4000, 4000));
+            heart.transform.position = new Vec2D(110, 95);
+
+        }
+
+        public override void Update()
+        {
+            double currentHealth = Player.currentHealth;
+            double maxHealth = Player.maxHealth;
+            double healthBarWidth = currentHealth / maxHealth * width;
+            var healthIndicator = healthBarBackground.GetComponent<TextRenderer>();
+            healthIndicator?.SetRect(new Rect(0, 0, healthBarWidth, height));
+            Console.WriteLine(healthBarWidth);
+
+            //update the text
+            var text = healthBarText.GetComponent<TextRenderer>();
+            text?.SetText(Player.currentHealth.ToString());
+
+        }
     }
 
     public class KeyboardController : Script

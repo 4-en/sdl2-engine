@@ -624,6 +624,11 @@ namespace SDL2Engine
             this.updateTexture = false;
         }
 
+        public override bool IsVisible(Rect worldRect)
+        {
+            return true;
+        }
+
         public override void Draw(Camera camera)
         {
             // Render Text

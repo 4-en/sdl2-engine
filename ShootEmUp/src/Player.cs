@@ -60,7 +60,7 @@ namespace ShootEmUp
             AddComponent<KeyboardController>();
             gameObject.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
             var pb = AddComponent<PhysicsBody>();
-            pb.Velocity = new Vec2D(Player.speed, 0);
+            //pb.Velocity = new Vec2D(Player.speed, 0);
         }
         public override void Update() {
             
@@ -170,10 +170,10 @@ namespace ShootEmUp
             projectile.AddComponent<ProjectileScript>();
             //set the position of the projectile to the position of the player
             //add a small offset to the position of the player to avoid collision with the player  
-            projectile.transform.position = gameObject.transform.position + new Vec2D(75 + Player.speed/10, 0).Rotate(gameObject.transform.rotation);
+            projectile.transform.position = gameObject.transform.position + new Vec2D(100, 0).Rotate(gameObject.transform.rotation);
             projectile.transform.rotation = gameObject.transform.rotation;
             var pb = projectile.AddComponent<PhysicsBody>();
-            pb.Velocity = new Vec2D(Player.projectileSpeed, 0).Rotate(gameObject.transform.rotation);
+            pb.Velocity = new Vec2D(Player.speed + Player.projectileSpeed, 0).Rotate(gameObject.transform.rotation);
             var spriteRenderer = projectile.AddComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {

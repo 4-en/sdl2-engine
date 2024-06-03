@@ -74,6 +74,7 @@ namespace ShootEmUp.Level
         private int money = 0;
 
         private GameObject? escapeMenu = null;
+        private GameObject? shopMenu = null;
 
         private bool was_setup = false;
         public void SetupLevel(int levelID, EnemyWave[] waves)
@@ -264,6 +265,11 @@ namespace ShootEmUp.Level
                     this.escapeMenu.Destroy();
                     this.escapeMenu = null;
                 }
+                else if(this.shopMenu != null)
+                { 
+                    this.shopMenu.Destroy();
+                    this.shopMenu = null;
+                }
                 else
                 {
                     var stopState = !!paused;
@@ -280,11 +286,40 @@ namespace ShootEmUp.Level
                     this.Pause();
                 }
             }
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_p))
+            {
+                if (this.shopMenu != null)
+                {
+                    this.shopMenu.Destroy();
+                    this.shopMenu = null;
+                }
+                else if(this.escapeMenu != null)
+                {
+                    this.escapeMenu.Destroy();
+                    this.escapeMenu = null;
+                }
+                else
+                {
+                    var stopState = !!paused;
+                    var shopmenu = UI.ShopMenu("Shop", () =>
+                    {
+
+                        this.paused = stopState;
+                        GetScene()?.SetPhysics(true);
+                        this.shopMenu = null;
+                        return true;
+                    });
+
+                    this.shopMenu = shopmenu;
+                    this.Pause();
+                }
+            }
         }
 
         public override void Update()
         {
-            if (this.paused)
+            HandleInput();
+            if(this.paused)
             {
                 return;
             }

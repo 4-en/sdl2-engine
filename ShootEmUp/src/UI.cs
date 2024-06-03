@@ -61,8 +61,192 @@ namespace ShootEmUp
                 onContinue?.Invoke();
                 return true;
             };
+            menu.AddComponent<ShopKeyListener>().OnKeyP = () =>
+            {
+                menu.Destroy();
+                onContinue?.Invoke();
+                return true;
+            };
 
             return menu;
+        }
+
+        //shop menu
+        public static GameObject ShopMenu(string title = "Shop", Func<bool>? onContinue = null)
+        {
+            //test values
+            var playerData = PlayerData.Instance;
+            playerData.SpeedUpgradeLevel = 2;
+            playerData.DamageUpgradeLevel = 1;
+            playerData.HealthUpgradeLevel = 0;
+            playerData.Money = 100;
+            var playerMoney = playerData.Money;
+            var speedUpgrade = playerData.SpeedUpgradeLevel;
+            var damageUpgrade = playerData.DamageUpgradeLevel;
+            var healthUpgrade = playerData.HealthUpgradeLevel;
+
+
+
+            var menu = new GameObject("EscapeMenu");
+            menu.SetPosition(new Vec2D(1920 / 2, 400));
+
+            var background = Component.CreateWithGameObject<FilledRect>("ShopMenuBackground");
+            background.Item2.SetRect(new Rect(0, 0, 1920, 1080));
+            background.Item2.color = (new Color(0, 0, 0, 200));
+            background.Item2.anchorPoint = AnchorPoint.TopLeft;
+            background.Item1.SetPosition(new Vec2D(0, 0));
+            menu.AddChild(background.Item1);
+
+            var titleTextTuple = Component.CreateWithGameObject<TextRenderer>("EscapeMenuTitle");
+            var titleText = titleTextTuple.Item2;
+            titleTextTuple.Item1.SetPosition(new Vec2D(0, -200));
+            titleText.SetFontSize(78);
+            titleText.SetText(title);
+            titleText.SetPreferredSize(new Rect(0, 0, 500, 200));
+            titleText.anchorPoint = AnchorPoint.Center;
+            titleText.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            menu.AddChild(titleTextTuple.Item1);
+
+
+            //money indicator at the top left
+            var moneyTextTuple = Component.CreateWithGameObject<TextRenderer>("MoneyText");
+            var moneyText = moneyTextTuple.Item2;
+            moneyTextTuple.Item1.SetPosition(new Vec2D(-700, -200));
+            moneyText.SetFontSize(78);
+            moneyText.SetText("Balance    " + playerMoney);
+            moneyText.SetPreferredSize(new Rect(0, 0, 500, 200));
+            moneyText.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            moneyText.anchorPoint = AnchorPoint.CenterLeft;
+            menu.AddChild(moneyTextTuple.Item1);
+
+
+
+            ShopItem(menu, "Speed", new Vec2D(-500, 200),PlayerData.Instance.SpeedUpgradeLevel);
+
+            ShopItem(menu, "Damage", new Vec2D(0, 200),PlayerData.Instance.DamageUpgradeLevel);
+
+            ShopItem(menu, "Health", new Vec2D(500, 200),PlayerData.Instance.HealthUpgradeLevel);
+
+            menu.AddComponent<EscapeListener>().OnEscape = () =>
+            {
+                menu.Destroy();
+                onContinue?.Invoke();
+                return true;
+            };
+            menu.AddComponent<ShopKeyListener>().OnKeyP = () =>
+            {
+                menu.Destroy();
+                onContinue?.Invoke();
+                return true;
+            };
+
+            return menu;
+        }
+
+        private static void ShopItem(GameObject menu, String title, Vec2D position, int upgradeLvl)
+        {
+            
+
+            var titleTextTuple = Component.CreateWithGameObject<TextRenderer>("EscapeMenuTitle");
+            var titleText = titleTextTuple.Item2;
+            titleText.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            titleTextTuple.Item1.SetPosition(position);
+            titleText.SetFontSize(64);
+            titleText.SetText(title);
+            titleText.SetPreferredSize(new Rect(0, 0, 500, 200));
+            titleText.anchorPoint = AnchorPoint.Center;
+            menu.AddChild(titleTextTuple.Item1);
+
+            
+
+            //5 buttons without text which identify the level of the upgrade
+
+            var firstUpgradeTuple = Button("", () =>
+            {
+                return true;
+            }, new Rect(0, 0, 75, 75), Color.White, 44);
+            var firstUpgradeButton = firstUpgradeTuple.Item1; 
+            firstUpgradeButton.SetLocalPosition(position + new Vec2D(-160,75));
+            firstUpgradeButton.RemoveComponent<TextRenderHelper>();
+            if (upgradeLvl>=1)
+            {
+                firstUpgradeButton.GetComponent<TextRenderer>()?.SetBackgroundColor(new Color(0, 255, 0, 100));
+            }
+            menu.AddChild(firstUpgradeButton);
+
+            var secondUpgradeTuple = Button("", () =>
+            {
+                return true;
+            }, new Rect(0, 0, 75, 75), Color.White, 44);
+            var secondUpgradeButton = secondUpgradeTuple.Item1;
+            secondUpgradeButton.SetLocalPosition(position + new Vec2D(-79, 75));
+            secondUpgradeButton.RemoveComponent<TextRenderHelper>();
+            if (upgradeLvl>=2)
+            {
+                  secondUpgradeButton.GetComponent<TextRenderer>()?.SetBackgroundColor(new Color(0, 255, 0, 100));
+            }
+            menu.AddChild(secondUpgradeButton);
+
+            var thirdUpgradeTuple = Button("", () =>
+            {
+                return true;
+            }, new Rect(0, 0, 75, 75), Color.White, 44);
+            var thirdUpgradeButton = thirdUpgradeTuple.Item1;
+            thirdUpgradeButton.SetLocalPosition(position + new Vec2D(2, 75));
+            thirdUpgradeButton.RemoveComponent<TextRenderHelper>();
+            if(upgradeLvl >= 3)
+            {
+                thirdUpgradeButton.GetComponent<TextRenderer>()?.SetBackgroundColor(new Color(0, 255, 0, 100));
+            }
+            menu.AddChild(thirdUpgradeButton);
+
+            var fourthUpgradeTuple = Button("", () =>
+            {
+                return true;
+            }, new Rect(0, 0, 75, 75), Color.White, 44);
+            var fourthUpgradeButton = fourthUpgradeTuple.Item1;
+            fourthUpgradeButton.SetLocalPosition(position + new Vec2D(83, 75));
+            fourthUpgradeButton.RemoveComponent<TextRenderHelper>();
+            if (upgradeLvl >= 4)
+            {
+                fourthUpgradeButton.GetComponent<TextRenderer>()?.SetBackgroundColor(new Color(0, 255, 0, 100));
+            }
+            menu.AddChild(fourthUpgradeButton);
+
+            var fifthUpgradeTuple = Button("", () =>
+            {
+                return true;
+            }, new Rect(0, 0, 75, 75), Color.White, 44);
+            var fifthUpgradeButton = fifthUpgradeTuple.Item1;
+            fifthUpgradeButton.SetLocalPosition(position+ new Vec2D(164, 75));
+            fifthUpgradeButton.RemoveComponent<TextRenderHelper>();
+            if(upgradeLvl >= 5)
+            {
+                fifthUpgradeButton.GetComponent<TextRenderer>()?.SetBackgroundColor(new Color(0, 255, 0, 100));
+            }
+            menu.AddChild(fifthUpgradeButton);
+
+            //upgrade button
+            var upgradeButtonTuple = Button("1000$", () =>
+            {
+                if (title.Equals("Speed"))
+                {
+                    PlayerData.Instance.SpeedUpgradeLevel++;
+                }else if (title.Equals("Damage"))
+                {
+                    PlayerData.Instance.DamageUpgradeLevel++;
+                }else if(title.Equals("Health"))
+                {
+                    PlayerData.Instance.HealthUpgradeLevel++;
+                }
+                Console.WriteLine("Speed: " + PlayerData.Instance.SpeedUpgradeLevel+", Damage: "+PlayerData.Instance.DamageUpgradeLevel+", Health: "+PlayerData.Instance.HealthUpgradeLevel);
+                return true;
+            }, new Rect(0, 0, 400, 75), Color.White, 44);
+            var upgradeButton = upgradeButtonTuple.Item1;
+            upgradeButton.SetLocalPosition(position+new Vec2D(2, 160));
+            menu.AddChild(upgradeButton);
+
+
         }
 
         class EscapeListener : Script
@@ -81,6 +265,21 @@ namespace ShootEmUp
             }
         }
 
+        class ShopKeyListener : Script
+        {
+
+            public Func<bool>? OnKeyP { get; set; }
+            public override void Update()
+            {
+                if (Input.GetKeyDown(SDL_Keycode.SDLK_p))
+                {
+                    if (OnKeyP != null)
+                    {
+                        OnKeyP.Invoke();
+                    }
+                }
+            }
+        }
 
         public static Tuple<GameObject, TextRenderer, TextRenderHelper> Button(
            string text,
@@ -120,5 +319,8 @@ namespace ShootEmUp
             return new Tuple<GameObject, TextRenderer, TextRenderHelper>(button, textRenderer, textRenderHelper);
 
         }
+
+
     }
+
 }

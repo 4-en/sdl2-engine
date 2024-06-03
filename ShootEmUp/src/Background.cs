@@ -8,56 +8,9 @@ namespace ShootEmUp
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
         public int BgTileSize = 1024;
         private List<(GameObject background, Vec2D originalPosition)>? prototype = new List<(GameObject, Vec2D)>();
-        private GameObject? backgrounds;
 
         public override void Start()
         {
-            var backgroundss = new GameObject("Player");
-            backgroundss.AddComponent<Backgrounds>();
-            backgrounds = backgroundss;
-        }
-        bool loaded = false;
-        public override void Update()
-        {
-            if (loaded == false)
-            {
-                loaded = true;
-                var camera = GetCamera() as Camera;
-
-                if (camera == null || prototype == null) return;
-
-                Vec2D cameraPosition2 = camera.GetPosition();
-
-                int roundedCameraX = (int)Math.Ceiling(cameraPosition2.x);
-                int roundedCameraY = (int)Math.Ceiling(cameraPosition2.y);
-                Vec2D cameraPosition = new Vec2D(roundedCameraX, roundedCameraY);
-
-                if (backgrounds != null)
-                {
-                    Vec2D backgroundsPosition = backgrounds.GetPosition();
-                    // Berechne die neue Position des Hintergrundobjekts relativ zur Kameraposition
-                    float xOffset = (int)(backgroundsPosition.x - (gameBounds.x / 2));
-                    float yOffset = (int)(backgroundsPosition.y - (gameBounds.y / 2));
-
-                    // Setze die Position relativ zur Kameraposition
-                    backgrounds.transform.position = new Vec2D((cameraPosition.x / 1.5) + xOffset, (cameraPosition.y / 1.5) + yOffset);
-                }
-
-                loaded = false;
-            }
-        }
-    }
-    public class Backgrounds : Script
-    {
-        protected Vec2D gameBounds = new Vec2D(1920, 1080);
-
-        public int BgTileSize = 1024;
-        private List<(GameObject background, Vec2D originalPosition)>? prototype = new List<(GameObject, Vec2D)>();
-
-        public override void Start()
-        {
-            var backgrounds = new GameObject("Player");
-            backgrounds.AddComponent<Backgrounds>();
             int rows = 3; // Anzahl der Reihen
             int columns = 4; // Anzahl der Spalten
             float spacing = BgTileSize - 1; // Abstand zwischen den Objekten bzw. PNG-Größe
@@ -87,6 +40,40 @@ namespace ShootEmUp
                 }
             }
         }
+        bool loaded = false;
+
+        public override void Update()
+        {
+            if (loaded == false)
+            {
+                loaded = true;
+                var camera = GetCamera() as Camera;
+
+                if (camera == null || prototype == null) return;
+
+                Vec2D cameraPosition2 = camera.GetPosition();
+
+                int roundedCameraX = (int)Math.Ceiling(cameraPosition2.x);
+                int roundedCameraY = (int)Math.Ceiling(cameraPosition2.y);
+                Vec2D cameraPosition = new Vec2D(roundedCameraX, roundedCameraY);
+
+                foreach (var (background, originalPosition) in prototype)
+                {
+                    if (background != null)
+                    {
+                        // Berechne die neue Position des Hintergrundobjekts relativ zur Kameraposition
+                        float xOffset = (int)(originalPosition.x - (gameBounds.x / 2));
+                        float yOffset = (int)(originalPosition.y - (gameBounds.y / 2));
+
+                        // Setze die Position relativ zur Kameraposition
+                        background.transform.position = new Vec2D((cameraPosition.x / 1.5) + xOffset, (cameraPosition.y / 1.5) + yOffset);
+                    }
+                }
+                loaded = false;
+            }
+        }
+
+
     }
 }
 

@@ -6,7 +6,7 @@ namespace ShootEmUp
     internal class Background : Script
     {
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
-        public int BgTileSize = 1024;
+        public int BgTileSize = 1500;
         private List<(GameObject background, Vec2D originalPosition)>? prototype = new List<(GameObject, Vec2D)>();
 
         public override void Start()

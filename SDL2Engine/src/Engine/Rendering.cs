@@ -1,6 +1,6 @@
-﻿using SDL2;
+﻿using Newtonsoft.Json;
+using SDL2;
 using static SDL2.SDL;
-using Newtonsoft.Json;
 
 namespace SDL2Engine
 {
@@ -219,6 +219,52 @@ namespace SDL2Engine
         {
             return GetWorldSize().y;
         }
+        bool shouldFollowX = true; // Initialer Zustand, Kamera folgt dem Spieler auf der X-Achse
+        bool shouldFollowY = true; // Initialer Zustand, Kamera folgt dem Spieler auf der Y-Achse
+
+        public void SetPosition2(Vec2D position)
+        {
+            double newX = this.Position.x;
+            double newY = this.Position.y;
+
+            if (shouldFollowX)
+            {
+                newX = position.x;
+            }
+
+            if (shouldFollowY)
+            {
+                newY = position.y;
+            }
+
+            this.Position = new Vec2D(newX, newY);
+        }
+
+        public void UpdateCameraPositionToPlayer(Vec2D playerPosition, Vec2D gameBounds, Vec2D bordersSize)
+        {
+            double distanceFromCenterX = Math.Abs(playerPosition.x - (gameBounds.x / 2));
+            double distanceFromCenterY = Math.Abs(playerPosition.y - (gameBounds.y / 2));
+
+            if (distanceFromCenterX > bordersSize.x)
+            {
+                shouldFollowX = false; // Hört auf, dem Spieler auf der X-Achse zu folgen
+            }
+            else if (distanceFromCenterX < bordersSize.x)
+            {
+                shouldFollowX = true; // Beginnt wieder, dem Spieler auf der X-Achse zu folgen
+            }
+
+            if (distanceFromCenterY > bordersSize.y)
+            {
+                shouldFollowY = false; // Hört auf, dem Spieler auf der Y-Achse zu folgen
+            }
+            else if (distanceFromCenterY < bordersSize.y)
+            {
+                shouldFollowY = true; // Beginnt wieder, dem Spieler auf der Y-Achse zu folgen
+            }
+
+            SetPosition2(playerPosition - gameBounds / 2);
+        }
 
         public void SetPosition(Vec2D position)
         {
@@ -265,7 +311,7 @@ namespace SDL2Engine
         public Vec2D WorldToScreen(Vec2D worldPosition, Vec2D rootPosition = new Vec2D())
         {
             Vec2D screenSize = GetScreenSize();
-            return new Vec2D((worldPosition.x + rootPosition.x-Position.x) / WorldSize.x * screenSize.x, (worldPosition.y + rootPosition.y-Position.y) / WorldSize.y * screenSize.y);
+            return new Vec2D((worldPosition.x + rootPosition.x - Position.x) / WorldSize.x * screenSize.x, (worldPosition.y + rootPosition.y - Position.y) / WorldSize.y * screenSize.y);
         }
 
         public Rect RectToScreen(Rect rect, Vec2D rootPosition = new Vec2D())
@@ -384,7 +430,7 @@ namespace SDL2Engine
             Vec2D size = custom_rect?.GetSize() ?? rect.GetSize();
             Vec2D position = custom_rect?.GetTopLeft() ?? rect.GetTopLeft();
 
-            switch(this.anchorPoint)
+            switch (this.anchorPoint)
             {
                 case AnchorPoint.Center:
                     position = new Vec2D(-size.x / 2, -size.y / 2) + position;
@@ -431,7 +477,7 @@ namespace SDL2Engine
             if (camera != null)
             {
                 Rect cam_rect = camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
-                if(relativeToCamera)
+                if (relativeToCamera)
                 {
                     return cam_rect;
                 }
@@ -488,7 +534,7 @@ namespace SDL2Engine
         [JsonProperty]
         private double borderSize = 0;
         [JsonProperty]
-        private Color backgroundColor = new Color(0,0,0,0);
+        private Color backgroundColor = new Color(0, 0, 0, 0);
         [JsonProperty]
         private Color borderColor = new Color(0, 0, 0, 0);
 
@@ -584,14 +630,14 @@ namespace SDL2Engine
 
         private void CreateTextTexture()
         {
-            if(!IsLoaded() || this.font == null || this.updateFont)
+            if (!IsLoaded() || this.font == null || this.updateFont)
             {
                 LoadFont();
             }
 
             if (textures != null)
             {
-                foreach(var texture in textures)
+                foreach (var texture in textures)
                 {
                     if (texture != IntPtr.Zero)
                     {
@@ -650,7 +696,7 @@ namespace SDL2Engine
                 SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
                 SDL_RenderFillRect(renderer, ref bg_rect);
             }
-            
+
 
             // draw the texture
             for (int i = 0; i < textures.Length; i++)
@@ -659,14 +705,14 @@ namespace SDL2Engine
                 var out_rect = textureRects[i];
                 out_rect.y += i * (out_rect.h + 10);
                 var dst_rect = GetDestRect(out_rect);
-                
+
                 SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dst_rect);
             }
 
             if (borderSize > 0 && borderColor.a > 0)
             {
                 SDL_SetRenderDrawColor(renderer, borderColor.r, borderColor.g, borderColor.b, borderColor.a);
-                
+
                 // draw lines around bg_rect as fill rect
                 var lineTop = new SDL_Rect() { x = bg_rect.x, y = bg_rect.y, w = bg_rect.w, h = (int)borderSize };
                 var lineBottom = new SDL_Rect() { x = bg_rect.x, y = bg_rect.y + bg_rect.h - (int)borderSize, w = bg_rect.w, h = (int)borderSize };
@@ -680,7 +726,7 @@ namespace SDL2Engine
                 SDL_RenderFillRect(renderer, ref lineRight);
 
             }
-            
+
         }
 
         public override void Dispose()
@@ -696,7 +742,7 @@ namespace SDL2Engine
                     }
                 }
             }
-            
+
 
             if (font != null)
             {
@@ -739,7 +785,7 @@ namespace SDL2Engine
                 return;
             }
 
-            
+
             Rect rect = textRenderer.GetScreenRect();
             bool hovered = SDL2Engine.Utils.MouseHelper.IsRectHovered(rect);
             bool clicked = SDL2Engine.Utils.MouseHelper.IsRectClicked(rect);
@@ -761,7 +807,7 @@ namespace SDL2Engine
                 OnLeave?.Invoke(this, textRenderer);
             }
 
-            
+
         }
 
 
@@ -794,7 +840,7 @@ namespace SDL2Engine
             this.source = source;
             if (texture != null)
             {
-                
+
                 texture.Dispose();
                 texture = null;
             }
@@ -840,7 +886,8 @@ namespace SDL2Engine
         {
             // not sure if this should be necessary
             // maybe it should be assumed that the texture is loaded
-            if (texture == null) {
+            if (texture == null)
+            {
                 this.Load();
 
                 if (texture == null)
@@ -850,7 +897,7 @@ namespace SDL2Engine
             }
 
             var texture_ptr = texture.Get();
-            
+
 
             var srcRect = this.source_rect.ToSDLRect();
             var dstRect = this.GetDestRect();
@@ -883,7 +930,7 @@ namespace SDL2Engine
             this.type = AnimationType.Loop;
         }
 
-        public AnimationInfo(string name, int frame, double speed=0.1)
+        public AnimationInfo(string name, int frame, double speed = 0.1)
         {
             this.name = name;
             this.frames = new List<int>() { frame };
@@ -891,7 +938,7 @@ namespace SDL2Engine
             this.type = AnimationType.Loop;
         }
 
-        public AnimationInfo(string name, int firstFrame, int frameCount, double speed=0.1)
+        public AnimationInfo(string name, int firstFrame, int frameCount, double speed = 0.1)
         {
             this.name = name;
             this.frames = new List<int>();
@@ -1017,10 +1064,11 @@ namespace SDL2Engine
         private Vec2D _tempSetSpriteByCount = new Vec2D(-1, -1);
         public void SetSpriteSizeByCount(int rows, int columns)
         {
-            if(!this.IsLoaded())
+            if (!this.IsLoaded())
             {
                 _tempSetSpriteByCount = new Vec2D(rows, columns);
-            } else
+            }
+            else
             {
                 this.spriteSize = new Vec2D(this.source_rect.w / columns, this.source_rect.h / rows);
                 this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
@@ -1076,7 +1124,7 @@ namespace SDL2Engine
         }
 
         // Registers an animation with the given name, starting frame, frame count and speed
-        public void AddAnimation(string name, int frame, int frameCount, double speed=0.1)
+        public void AddAnimation(string name, int frame, int frameCount, double speed = 0.1)
         {
             animations[name] = new AnimationInfo(name, frame, frameCount, speed);
         }
@@ -1171,12 +1219,12 @@ namespace SDL2Engine
                 {
                     this.spriteSize = new Vec2D(this.source_rect.w, this.source_rect.h);
                 }
-                
-                if(this.currentAnimation == "")
+
+                if (this.currentAnimation == "")
                 {
                     this.SetAnimation("default");
                 }
-                if(!customWorldSize)
+                if (!customWorldSize)
                     this.rect = new Rect(0, 0, this.spriteSize.x, this.spriteSize.y);
             }
         }
@@ -1285,7 +1333,7 @@ namespace SDL2Engine
                         break;
                     case AnimationType.LoopReversed:
                         animation.Reverse();
-                        this.spriteIndex+=animation.direction;
+                        this.spriteIndex += animation.direction;
                         break;
                     case AnimationType.OnceAndDestroy:
                         this.spriteIndex = animation.lastFrame;
@@ -1380,7 +1428,7 @@ namespace SDL2Engine
                     return;
                 }
             }
-            
+
             var srcRect = rect.ToSDLRect();
             var dstRect = this.GetDestRect();
 
@@ -1465,7 +1513,7 @@ namespace SDL2Engine
             SDL_RenderDrawRect(renderer, ref rect);
             */
 
-            
+
         }
     }
 }

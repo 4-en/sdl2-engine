@@ -17,6 +17,7 @@ namespace ShootEmUp
             LoadExamplePrototype();
             LoadForsenEPrototype();
             BaseEnemy.CreateBasePrototype();
+            StaticEnemy.CreateStaticEnemyPrototype();
         }
 
         private static void LoadExamplePrototype()
@@ -40,5 +41,6 @@ namespace ShootEmUp
             circleCollider.SetRadius(100);
             renderer.SetSource("forsenE.png");
         }
+
     }
 }

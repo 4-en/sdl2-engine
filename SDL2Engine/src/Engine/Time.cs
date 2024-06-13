@@ -22,6 +22,8 @@ namespace SDL2Engine
         public static double totalDuration = 0;
         public static double freeDuration = 0;
 
+        public static double staticEnemyShootTime = 0;
+
         public static int GetFPS()
         {
             return lastFps;

@@ -249,7 +249,6 @@ namespace ShootEmUp
                         PlayerData.Instance.HealthUpgradeLevel++;
                     }
                 }
-                Console.WriteLine("Speed: " + PlayerData.Instance.SpeedUpgradeLevel+", Damage: "+PlayerData.Instance.DamageUpgradeLevel+", Health: "+PlayerData.Instance.HealthUpgradeLevel);
                 LevelManager.LoadShop();
                 return true;
             }, new Rect(0, 0, 400, 75), Color.White, 44);

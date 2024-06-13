@@ -122,7 +122,6 @@ namespace ShootEmUp
             {
                 PlayerData.Instance.TotalScore -= 100;
             }
-            Console.WriteLine(PlayerData.Instance.TotalScore);
         }
     }
 

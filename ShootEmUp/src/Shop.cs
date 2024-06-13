@@ -17,7 +17,6 @@ namespace ShootEmUp.src
             using (var activeScene = scene.Activate())
             {
                 Vec2D gameBounds = new Vec2D(1920, 1080);
-                Console.WriteLine("Shop Screen");
                 GameObject background = new GameObject("Background");
                 background.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/space_background.jpg");
                 background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);

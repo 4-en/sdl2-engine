@@ -28,6 +28,7 @@ namespace ShootEmUp
         public static int maxHealth;
         public static int currentHealth;
         public static int damage;
+        public static int displayedHighscore;
         public int fireRate;
         public int fireRange;
         public int shield;
@@ -47,6 +48,7 @@ namespace ShootEmUp
             maxHealth = 1000 + PlayerData.Instance.HealthUpgradeLevel * 200;
             currentHealth = maxHealth;
             damage = 50 + PlayerData.Instance.DamageUpgradeLevel * 10;
+            displayedHighscore = 0;
             fireRate = 10;
             fireRange = 10;
             shield = 10;
@@ -67,7 +69,9 @@ namespace ShootEmUp
             BoxCollider.FromDrawableRect(gameObject);
             AddComponent<KeyboardController>();
             AddComponent<HealthBar>();
+            AddComponent<HighScore>();
             AddComponent<HealthReducer>();
+            AddComponent<HighscoreUpdater>();
             gameObject.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
             var pb = AddComponent<PhysicsBody>();
 
@@ -104,6 +108,65 @@ namespace ShootEmUp
 
         }
     }
+
+    internal class HighscoreUpdater : Script
+    {
+        public override void Update()
+        {
+            //key inputs
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_3))
+            {
+                PlayerData.Instance.TotalScore += 100;
+            }
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_4))
+            {
+                PlayerData.Instance.TotalScore -= 100;
+            }
+            Console.WriteLine(PlayerData.Instance.TotalScore);
+        }
+    }
+
+    internal class HighScore : Script
+    {
+        
+        GameObject highscoreText = new GameObject("HighscoreText");
+
+
+        public override void Start()
+        {
+
+            //set player highscore
+            Player.displayedHighscore = PlayerData.Instance.TotalScore;
+
+
+            var text = highscoreText.AddComponent<TextRenderer>();
+            highscoreText.transform.position = new Vec2D(1920 / 2, 100);
+            text.anchorPoint = AnchorPoint.Center;
+            text.SetText(PlayerData.Instance.TotalScore.ToString());
+            text.SetColor(SDL2Engine.Color.White);
+            text.SetFontSize(60);
+            text.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+
+        }
+
+        public override void Update()
+        {
+
+           if (Player.displayedHighscore < PlayerData.Instance.TotalScore)
+            {
+                Player.displayedHighscore += 1;
+            }else if (Player.displayedHighscore > PlayerData.Instance.TotalScore)
+            {
+                Player.displayedHighscore -= 1;
+            }
+
+           //update highscoreText
+           var text = highscoreText.GetComponent<TextRenderer>();
+            text?.SetText(Player.displayedHighscore.ToString());
+
+        }
+    }
+
 
     internal class HealthBar : Script
     {

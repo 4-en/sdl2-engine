@@ -1,7 +1,7 @@
 ﻿using SDL2Engine;
 using ShootEmUp.Entities;
 
-namespace ShootEmUp.src.Entities
+namespace ShootEmUp.Entities
 {
     public class HealthBarRenderer : DrawableRect
     {
@@ -11,7 +11,8 @@ namespace ShootEmUp.src.Entities
 
         public HealthBarRenderer()
         {
-            this.rect = new Rect(0, 0, 100, 10);
+            this.rect = new Rect(0, 0, 140, 14);
+            this.z_index = -100;
         }
 
         public override void Draw(Camera camera)
@@ -20,12 +21,14 @@ namespace ShootEmUp.src.Entities
             var bg_rect = GetScreenRect();
             var sdl_bg_rect = bg_rect.ToSDLRect();
             var sdl_bg_color = bg_color.ToSDLColor();
+            SDL2.SDL.SDL_SetRenderDrawColor(Engine.renderer, sdl_bg_color.r, sdl_bg_color.g, sdl_bg_color.b, sdl_bg_color.a);   
             SDL2.SDL.SDL_RenderFillRect(Engine.renderer, ref sdl_bg_rect);
             // get the part of the health bar that represents the health
             var fg_rect = bg_rect;
             fg_rect.w = (int)(bg_rect.w * health);
             var sdl_fg_rect = fg_rect.ToSDLRect();
             var sdl_fg_color = fg_color.ToSDLColor();
+            SDL2.SDL.SDL_SetRenderDrawColor(Engine.renderer, sdl_fg_color.r, sdl_fg_color.g, sdl_fg_color.b, sdl_fg_color.a);
             SDL2.SDL.SDL_RenderFillRect(Engine.renderer, ref sdl_fg_rect);
 
         }

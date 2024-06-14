@@ -69,7 +69,7 @@ namespace ShootEmUp.Level
         private double levelTimer = 0;
         private bool paused = false;
         private LinkedList<GameObject> Enemies = new LinkedList<GameObject>();
-        private GameObject? Player;
+        private GameObject? player;
 
         private int score = 0;
         private int money = 0;
@@ -92,12 +92,11 @@ namespace ShootEmUp.Level
 
 
             // create the player with Player class
-            var player = new GameObject("Player");
-            player.AddComponent<Player>();
+            var player = Player.CreatePlayer();
 
 
             // create the Background
-            var background = new GameObject("Player");
+            var background = new GameObject("BackgroundObject");
             background.AddComponent<Background>();
 
             // collision test object

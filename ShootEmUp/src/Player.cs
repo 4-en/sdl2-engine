@@ -14,7 +14,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ShootEmUp
 {
-    internal class Player : Script
+    public class Player : Script, IDamageable
     {
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
 
@@ -82,7 +82,43 @@ namespace ShootEmUp
 
         }
 
+        public static GameObject CreatePlayer()
+        {
+            var player = new GameObject("Player");
+            player.AddComponent<Player>();
+            ShootEmUp.Entities.HealthBar.AddTo(player, -100);
+            return player;
+        }
 
+        public void Damage(Damage damage)
+        {
+            return;
+        }
+
+        public void Heal(double value)
+        {
+            return;
+        }
+
+        public double GetHealth()
+        {
+            return 50;
+        }
+
+        public double GetMaxHealth()
+        {
+            return 100;
+        }
+
+        public void SetHealth(double value)
+        {
+            return;
+        }
+
+        public void SetMaxHealth(double value)
+        {
+            return;
+        }
     }
 
     

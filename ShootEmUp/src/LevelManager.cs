@@ -52,6 +52,8 @@ namespace ShootEmUp
         {
             // TODO: Implement end run screen
             var playerData = PlayerData.Instance;
+            var endScene = EndScreen.CreateScene();
+            SceneManager.SetScene(endScene);
         }
 
 

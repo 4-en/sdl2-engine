@@ -249,6 +249,7 @@ namespace ShootEmUp.Level
             this.Pause();
             // End the level as a failure
             // ...
+            LevelManager.EndRun(false);
         }
 
         private void OnWin()

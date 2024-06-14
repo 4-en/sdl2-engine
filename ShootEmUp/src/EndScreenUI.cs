@@ -9,6 +9,24 @@ using static SDL2.SDL;
 
 namespace ShootEmUp
 {
+
+    public static class EndScreen
+    {
+        public static Scene CreateScene()
+        {
+            var scene = new Scene("End Screen");
+            
+
+            using (scene.Activate())
+            {
+                GameObject highscore = new GameObject("Highscore");
+                highscore.AddComponent<HighscoreScript>();
+            }
+
+            return scene;
+        }
+    }
+
     public enum HighscoreState
     {
         None,
@@ -70,7 +88,7 @@ namespace ShootEmUp
             helper.OnClick += (object? _, TextRenderer _) =>
             {
                 Destroy(gameObject);
-                //gameController?.ResetGame();
+                SceneManager.SetScene(LevelManager.CreateLevel1());
             };
             helper.OnHover += (object? _, TextRenderer _) =>
             {
@@ -90,7 +108,7 @@ namespace ShootEmUp
             menuButton.Item2.anchorPoint = AnchorPoint.Center;
             menuButton.Item2.SetPreferredSize(new Rect(200, 100));
             menuButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
-            menuButton.Item1.SetLocalPosition(new Vec2D(250, 450));
+            menuButton.Item1.SetLocalPosition(new Vec2D(250, 300));
             menuButton.Item2.SetBorderSize(2);
             menuButton.Item2.SetBorderColor(new Color(255, 255, 255, 255));
             var menuHelper = menuButton.Item1.AddComponent<TextRenderHelper>();
@@ -109,39 +127,6 @@ namespace ShootEmUp
             {
                 menuButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
             };
-
-            var levelButton = Component.CreateWithGameObject<TextRenderer>("LevelButton");
-            gameObject.AddChild(levelButton.Item1);
-            levelButton.Item2.color = new Color(255, 255, 255, 205);
-            levelButton.Item2.SetFontSize(50);
-            levelButton.Item2.SetText("Level");
-            levelButton.Item2.anchorPoint = AnchorPoint.Center;
-            levelButton.Item2.SetPreferredSize(new Rect(200, 100));
-            levelButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
-            levelButton.Item1.SetLocalPosition(new Vec2D(250, 300));
-            levelButton.Item2.SetBorderSize(2);
-            levelButton.Item2.SetBorderColor(new Color(255, 255, 255, 255));
-            var levelHelper = levelButton.Item1.AddComponent<TextRenderHelper>();
-            levelHelper.OnClick += (object? _, TextRenderer _) =>
-            {
-                Destroy(gameObject);
-                LevelManager.LoadHomeScreen();
-            };
-
-            levelHelper.OnHover += (object? _, TextRenderer _) =>
-            {
-                levelButton.Item2.SetBackgroundColor(new Color(123, 0, 0, 150));
-            };
-
-            levelHelper.OnLeave += (object? _, TextRenderer _) =>
-            {
-                levelButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
-            };
-
-
-            //gameObject.SetPosition(new Vec2D(1920 / 2, 100));
-
-            //SetHighscores(GetHighscores());
         }
 
         private List<Tuple<string, string>> GetHighscores()

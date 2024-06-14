@@ -1,4 +1,5 @@
 ﻿using SDL2Engine;
+using ShootEmUp.Entities;
 
 namespace ShootEmUp
 {

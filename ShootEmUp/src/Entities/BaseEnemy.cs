@@ -23,6 +23,8 @@ namespace ShootEmUp
             var body = prototype.AddComponent<PhysicsBody>();
             body.RotateWithVelocity = true;
 
+            HealthBar.AddTo(prototype.GameObject, -100);
+
             return prototype;
         }
 

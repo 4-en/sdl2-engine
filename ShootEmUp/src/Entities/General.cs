@@ -118,10 +118,15 @@ namespace ShootEmUp.Entities
             {
                 return;
             }
-            hasCollided = true;
 
             var other = collision.GetOther(gameObject);
             if (other.GetName().Equals("ShieldPowerUp")) return;
+
+            var damageable = other.GetComponent<IDamageable>();
+            if (damageable == null)
+            {
+                return;
+            }
 
             if (physicsBody != null)
             {
@@ -131,6 +136,7 @@ namespace ShootEmUp.Entities
             gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet.png");
 
 
+            hasCollided = true;
 
             if (destroyOnCollision)
             {
@@ -138,11 +144,7 @@ namespace ShootEmUp.Entities
                 StartCoroutine(DestroyAfterTime(0.5));
             }
 
-            var damageable = other.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
-                damageable.Damage(new Damage(damage, shooter, team));
-            }
+            damageable.Damage(new Damage(damage, shooter, team));
         }
 
         public IEnumerator DestroyAfterTime(double delay)

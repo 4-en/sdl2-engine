@@ -1,6 +1,7 @@
 ﻿using SDL2Engine;
 using static SDL2.SDL;
 using ShootEmUp.Entities;
+using ShootEmUp.src.Entities;
 
 namespace ShootEmUp
 {

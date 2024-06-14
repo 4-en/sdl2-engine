@@ -18,6 +18,7 @@ namespace ShootEmUp
             LoadForsenEPrototype();
             BaseEnemy.CreateBasePrototype();
             StaticEnemy.CreateStaticEnemyPrototype();
+            Asteroid.CreateAsteroidPrototype();
         }
 
         private static void LoadExamplePrototype()

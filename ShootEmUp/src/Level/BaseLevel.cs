@@ -1,5 +1,6 @@
 ﻿using SDL2Engine;
 using ShootEmUp.src;
+using ShootEmUp.src.Entities;
 using static SDL2.SDL;
 
 namespace ShootEmUp.Level

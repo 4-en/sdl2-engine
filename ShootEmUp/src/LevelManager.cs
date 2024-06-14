@@ -41,6 +41,13 @@ namespace ShootEmUp
             SceneManager.SetScene(level);
         }
 
+        public static void LoadTutorial()
+        {
+            // TODO: Implement tutorial level
+            level = CreateBaseLevel();
+            SceneManager.SetScene(level);
+        }
+
         public static void ResetLevel()
         {
             levelIndex = 0;

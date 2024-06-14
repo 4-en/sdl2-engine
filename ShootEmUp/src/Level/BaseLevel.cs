@@ -70,6 +70,7 @@ namespace ShootEmUp.Level
         private bool paused = false;
         private LinkedList<GameObject> Enemies = new LinkedList<GameObject>();
         private GameObject? player;
+        private Player? playerScript;
         private Vec2D worldSize = new Vec2D(2500, 2500);
 
         private int score = 0;
@@ -94,6 +95,7 @@ namespace ShootEmUp.Level
 
             // create the player with Player class
             player = Player.CreatePlayer();
+            playerScript = player?.GetComponent<Player>();
 
 
             // create the Background
@@ -388,11 +390,9 @@ namespace ShootEmUp.Level
 
             // check if the player is dead
             // check for player health
-            /*
-             * if (Player.GetHealth() <= 0) {
-             *    OnFail();
-             * }
-             */
+             if ((playerScript?.GetHealth() ?? -1) <= 0) {
+                OnFail();
+             }
 
             // check if the player has completed the level
             if (LevelCompleted())

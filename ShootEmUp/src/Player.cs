@@ -163,8 +163,8 @@ namespace ShootEmUp
             text.anchorPoint = AnchorPoint.CenterRight;
             text.SetText(PlayerData.Instance.Money.ToString());
             text.SetColor(SDL2Engine.Color.White);
-            text.SetFontSize(60);
-            text.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            text.SetFontSize(48);
+            text.SetFontPath("Assets/Fonts/PressStartRegular.ttf");
 
         }
 
@@ -182,7 +182,7 @@ namespace ShootEmUp
 
             //update moneyIndicator
             var text = moneyIndicator.GetComponent<TextRenderer>();
-            text?.SetText(Player.displayedMoney.ToString()+" $");
+            text?.SetText(Player.displayedMoney.ToString()+"$");
 
         }
     }
@@ -205,8 +205,8 @@ namespace ShootEmUp
             text.anchorPoint = AnchorPoint.Center;
             text.SetText(PlayerData.Instance.TotalScore.ToString());
             text.SetColor(SDL2Engine.Color.White);
-            text.SetFontSize(60);
-            text.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            text.SetFontSize(48);
+            text.SetFontPath("Assets/Fonts/PressStartRegular.ttf");
 
         }
 
@@ -242,7 +242,7 @@ namespace ShootEmUp
         {
 
 
-            healthBarBackground.transform.position = new Vec2D(100, 100);
+            healthBarBackground.transform.position = new Vec2D(100, 1080 - 100);
             var healthIndicator = healthBarBackground.AddComponent<TextRenderer>();
             healthIndicator.anchorPoint = AnchorPoint.CenterLeft;
             healthIndicator.SetPreferredSize(new Rect(0, 0, width, height));
@@ -253,14 +253,14 @@ namespace ShootEmUp
 
             var border = healthBarBorder.AddComponent<TextRenderer>();
             var textRenderHelper = healthBarBorder.AddComponent<TextRenderHelper>();
-            healthBarBorder.transform.position = new Vec2D(100, 100);
+            healthBarBorder.transform.position = new Vec2D(100, 1080 - 100);
             border.anchorPoint = AnchorPoint.CenterLeft;
             border.SetPreferredSize(new Rect(0, 0, width, height));
             border.SetBorderSize(2);
             border.SetBorderColor(SDL2Engine.Color.Black);
 
             var text = healthBarText.AddComponent<TextRenderer>();
-            healthBarText.transform.position = new Vec2D(100 + width / 2, 100);
+            healthBarText.transform.position = new Vec2D(100 + width / 2, 1080 - 100);
             text.anchorPoint = AnchorPoint.Center;
             text.SetText(Player.currentHealth.ToString());
             text.SetColor(SDL2Engine.Color.White);
@@ -269,7 +269,7 @@ namespace ShootEmUp
 
             var titleText = new GameObject("TitleText");
             var text2 = titleText.AddComponent<TextRenderer>();
-            titleText.transform.position = new Vec2D(100 + width / 2, 50);
+            titleText.transform.position = new Vec2D(100 + width / 2, 1080 - 150);
             text2.anchorPoint = AnchorPoint.Center;
             text2.SetText("Health");
             text2.SetColor(SDL2Engine.Color.Red);
@@ -282,7 +282,7 @@ namespace ShootEmUp
             heartTexture.relativeToCamera = false;
             heartTexture.SetSource("Assets/Textures/health.png");
             heartTexture.IsVisible(new Rect(4000, 4000));
-            heart.transform.position = new Vec2D(110, 95);
+            heart.transform.position = new Vec2D(110, 1080 - 100);
 
         }
 

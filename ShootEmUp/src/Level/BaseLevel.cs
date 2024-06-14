@@ -1,5 +1,6 @@
 ﻿using SDL2Engine;
 using ShootEmUp.src;
+using System.Diagnostics.Tracing;
 using static SDL2.SDL;
 
 namespace ShootEmUp.Level
@@ -72,6 +73,7 @@ namespace ShootEmUp.Level
         private GameObject? player;
         private Player? playerScript;
         private Vec2D worldSize = new Vec2D(2500, 2500);
+        private EventListener<EnemyKilledEvent>? eventListener = null;
 
         private int score = 0;
         private int money = 0;
@@ -145,7 +147,24 @@ namespace ShootEmUp.Level
             // Create the player
             CreatePlayer();
 
+            // Add the event listener for enemy killed events
+            eventListener = EventBus.AddListener<EnemyKilledEvent>((eventData) =>
+            {
+                AddScore((int)eventData.enemy.GetPoints());
+                AddMoney((int)eventData.enemy.GetPoints());
+
+                Console.WriteLine("Enemy killed: " + eventData.enemy);
+            });
+
             // Start the first wave
+        }
+
+        public override void OnDestroy()
+        {
+            if (eventListener != null)
+            {
+                EventBus.RemoveListener(eventListener);
+            }
         }
 
         private EnemyWave? GetWave(int waveIndex)
@@ -178,6 +197,9 @@ namespace ShootEmUp.Level
             {
                 score = 0;
             }
+
+            PlayerData.Instance.TotalScore += points;
+            PlayerData.Instance.Money += points;
         }
 
         public void AddMoney(int amount)

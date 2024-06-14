@@ -961,7 +961,13 @@ namespace SDL2Engine
 
             for (int i = 0; i < toRemove.Count; i++)
             {
-                scenes.Remove(toRemove[i]);
+                bool wasRemoved = scenes.Remove(toRemove[i]);
+
+                if(wasRemoved)
+                {
+                    toRemove[i].Dispose();
+                }
+
                 if (activeScene == toRemove[i])
                 {
                     activeScene = null;

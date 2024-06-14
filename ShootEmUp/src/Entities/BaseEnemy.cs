@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace ShootEmUp
 {
+
     public class BaseEnemy : Script, IDamageable
     {
         public static Prototype CreateBasePrototype()
@@ -29,6 +30,14 @@ namespace ShootEmUp
         }
 
         private GameObject? player;
+        [JsonProperty]
+        public double speed = 500.0;
+        [JsonProperty]
+        private double health = 10;
+        [JsonProperty]
+        private double maxHealth = 10;
+        [JsonProperty]
+        private double points = 10;
         public override void Start()
         {
             // set direction
@@ -39,8 +48,6 @@ namespace ShootEmUp
             player = Find("Player");
         }
 
-        [JsonProperty]
-        public double speed = 500.0;
         public override void Update()
         {
 
@@ -70,17 +77,21 @@ namespace ShootEmUp
             GetComponent<PhysicsBody>()?.SetVelocity(direction * speed);
         }
 
-        [JsonProperty]
-        private double health = 10;
-        [JsonProperty]
-        private double maxHealth = 10;
+        private void OnHealthChange()
+        {
+            // check if health is <= 0
+            if (GetHealth() <= 0)
+            {
+                EventBus.Dispatch(new EnemyKilledEvent(this));
+                gameObject.Destroy();
+            }
+
+        }
+
         public void Damage(Damage damage)
         {
             health -= damage.Value;
-            if (health <= 0)
-            {
-                gameObject.Destroy();
-            }
+            OnHealthChange();
         }
 
         public void Heal(double value)
@@ -90,6 +101,7 @@ namespace ShootEmUp
             {
                 health = maxHealth;
             }
+            OnHealthChange();
         }
 
         public double GetHealth()
@@ -105,6 +117,7 @@ namespace ShootEmUp
         public void SetHealth(double value)
         {
             this.health = value;
+            OnHealthChange();
         }
 
         public void SetMaxHealth(double value)
@@ -121,6 +134,17 @@ namespace ShootEmUp
             {
                 maxHealth = value;
             }
+            OnHealthChange();
+        }
+
+        public double GetPoints()
+        {
+            return points;
+        }
+
+        public void SetPoints(double value)
+        {
+            points = value;
         }
     }
 }

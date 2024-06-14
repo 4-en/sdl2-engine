@@ -206,7 +206,8 @@ namespace ShootEmUp
             GameObject healthBarText = new GameObject("HealthBarText");
             int width = 300;
             int height = 60;
-
+            
+            public static SDL2Engine.Color backgroundColor = new SDL2Engine.Color(255, 0, 0, 255);
 
             public override void Start()
             {
@@ -217,7 +218,7 @@ namespace ShootEmUp
                 healthIndicator.anchorPoint = AnchorPoint.CenterLeft;
                 healthIndicator.SetPreferredSize(new Rect(0, 0, width, height));
                 healthIndicator.SetColor(SDL2Engine.Color.Green);
-                healthIndicator.SetBackgroundColor(new SDL2Engine.Color(255, 0, 0, 255));
+                healthIndicator.SetBackgroundColor(backgroundColor);
 
 
 
@@ -263,10 +264,12 @@ namespace ShootEmUp
                 double healthBarWidth = currentHealth / maxHealth * width;
                 var healthIndicator = healthBarBackground.GetComponent<TextRenderer>();
                 healthIndicator?.SetRect(new Rect(0, 0, healthBarWidth, height));
+                healthIndicator?.SetBackgroundColor(backgroundColor);
 
                 //update the text
                 var text = healthBarText.GetComponent<TextRenderer>();
                 text?.SetText(Player.currentHealth.ToString());
+
 
             }
         }

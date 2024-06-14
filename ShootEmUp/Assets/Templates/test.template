@@ -4,3 +4,5 @@
 <forsenE x="800" y="800" xr="100" yr="100" CircleCollider.radius="25.0" />
 <BaseEnemy x="300" y="300" xr="400" yr="400" count="5" />
 <StaticEnemy x="100" y="100" xr="400" yr="400" count="1" />
+<Asteroid x="1200" y="300" xr="400" yr="400" count="1" />
+<ShieldPowerUp x="1400" y="150" xr="0" yr="0" count="1" />

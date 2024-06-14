@@ -1,4 +1,5 @@
 ﻿using SDL2Engine;
+using ShootEmUp.src.Entities;
 
 namespace ShootEmUp
 {
@@ -19,6 +20,7 @@ namespace ShootEmUp
             BaseEnemy.CreateBasePrototype();
             StaticEnemy.CreateStaticEnemyPrototype();
             Asteroid.CreateAsteroidPrototype();
+            ShieldPowerUp.CreateShieldPowerUpPrototype();
         }
 
         private static void LoadExamplePrototype()

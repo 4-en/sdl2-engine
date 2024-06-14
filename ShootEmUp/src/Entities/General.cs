@@ -94,7 +94,12 @@ namespace ShootEmUp.Entities
 
         public override void OnCollisionEnter(CollisionPair collision)
         {
+            
             var other = collision.GetOther(gameObject);
+
+            if (other.GetName().Equals("ShieldPowerUp")) return;
+
+
             gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(0, 0);
             //gameObject.GetComponent<SpriteRenderer>()?.SetSource("Assets/Textures/projectile_explosion_sprite_sheet.png");
             gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet.png");

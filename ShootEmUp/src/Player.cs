@@ -26,8 +26,8 @@ namespace ShootEmUp
         public static int acceleration;
         public static double rotationSpeed;
         public static int projectileSpeed;
-        public static int maxHealth;
-        public static int currentHealth;
+        public static double maxHealth;
+        public static double currentHealth;
         public static int damage;
         public static int displayedHighscore;
         public static int displayedMoney;
@@ -92,32 +92,53 @@ namespace ShootEmUp
 
         public void Damage(Damage damage)
         {
-            return;
+            currentHealth -= damage.Value;
         }
 
         public void Heal(double value)
         {
-            return;
+            currentHealth += value;
+            if(currentHealth > maxHealth)
+            {
+                currentHealth = maxHealth;
+            }
         }
 
         public double GetHealth()
         {
-            return 50;
+            return currentHealth;
         }
 
         public double GetMaxHealth()
         {
-            return 100;
+            return maxHealth;
         }
 
         public void SetHealth(double value)
         {
-            return;
+            currentHealth = value;
+            if(currentHealth > maxHealth)
+            {
+                currentHealth = maxHealth;
+            }
         }
 
         public void SetMaxHealth(double value)
         {
-            return;
+            if(currentHealth >= maxHealth)
+            {
+                maxHealth = value;
+                currentHealth = value;
+            }
+            else
+            {
+                maxHealth = value;
+            }
+
+            if(currentHealth > maxHealth)
+            {
+                currentHealth = maxHealth;
+            }
         }
     }
 

@@ -26,6 +26,27 @@ namespace ShootEmUp
         private static Scene? level;
         private static int levelIndex = 0;
 
+        public static void LoadNextLevel()
+        {
+            levelIndex++;
+            switch (levelIndex)
+            {
+                case 1:
+                    level = CreateLevel1();
+                    break;
+                default:
+                    level = CreateBaseLevel();
+                    break;
+            }
+            SceneManager.SetScene(level);
+        }
+
+        public static void ResetLevel()
+        {
+            levelIndex = 0;
+            LoadNextLevel();
+        }
+
 
         public static void LoadHomeScreen()
         {

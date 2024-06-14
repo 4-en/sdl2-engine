@@ -71,9 +71,9 @@ namespace ShootEmUp
         }
 
         [JsonProperty]
-        private double health = 100;
+        private double health = 10;
         [JsonProperty]
-        private double maxHealth = 100;
+        private double maxHealth = 10;
         public void Damage(Damage damage)
         {
             health -= damage.Value;

@@ -58,9 +58,28 @@ namespace ShootEmUp.Entities
         public bool destroyOnLifetimeEnd = true;
 
         public double lifetime = 5;
-        public double damage = 1;
+        public double damage = 100;
         public Team team = Team.Enemy;
         public GameObject? shooter;
+        private Collider? collider = null;
+        private PhysicsBody? physicsBody = null;
+        private bool hasCollided = false;
+
+
+        public override void Start()
+        {
+            collider = gameObject.GetComponent<Collider>();
+            if (collider != null)
+            {
+                collider.IsTrigger = true;
+            }
+
+            physicsBody = gameObject.GetComponent<PhysicsBody>();
+            if (physicsBody != null)
+            {
+                // physicsBody.RotateWithVelocity = true;
+            }
+        }
 
         public override void Update()
         {
@@ -94,13 +113,20 @@ namespace ShootEmUp.Entities
 
         public override void OnCollisionEnter(CollisionPair collision)
         {
-            
-            var other = collision.GetOther(gameObject);
 
+            if (hasCollided)
+            {
+                return;
+            }
+            hasCollided = true;
+
+            var other = collision.GetOther(gameObject);
             if (other.GetName().Equals("ShieldPowerUp")) return;
 
-
-            gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(0, 0);
+            if (physicsBody != null)
+            {
+                physicsBody.Velocity = Vec2D.Zero;
+            }
             //gameObject.GetComponent<SpriteRenderer>()?.SetSource("Assets/Textures/projectile_explosion_sprite_sheet.png");
             gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet.png");
 

@@ -14,7 +14,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ShootEmUp
 {
-    internal class Player : Script
+    public class Player : Script, IDamageable
     {
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
 
@@ -26,8 +26,8 @@ namespace ShootEmUp
         public static int acceleration;
         public static double rotationSpeed;
         public static int projectileSpeed;
-        public static int maxHealth;
-        public static int currentHealth;
+        public static double maxHealth;
+        public static double currentHealth;
         public static int damage;
         public static int displayedHighscore;
         public static int displayedMoney;
@@ -82,7 +82,64 @@ namespace ShootEmUp
 
         }
 
+        public static GameObject CreatePlayer()
+        {
+            var player = new GameObject("Player");
+            player.AddComponent<Player>();
+            ShootEmUp.Entities.HealthBar.AddTo(player, -100);
+            return player;
+        }
 
+        public void Damage(Damage damage)
+        {
+            currentHealth -= damage.Value;
+        }
+
+        public void Heal(double value)
+        {
+            currentHealth += value;
+            if(currentHealth > maxHealth)
+            {
+                currentHealth = maxHealth;
+            }
+        }
+
+        public double GetHealth()
+        {
+            return currentHealth;
+        }
+
+        public double GetMaxHealth()
+        {
+            return maxHealth;
+        }
+
+        public void SetHealth(double value)
+        {
+            currentHealth = value;
+            if(currentHealth > maxHealth)
+            {
+                currentHealth = maxHealth;
+            }
+        }
+
+        public void SetMaxHealth(double value)
+        {
+            if(currentHealth >= maxHealth)
+            {
+                maxHealth = value;
+                currentHealth = value;
+            }
+            else
+            {
+                maxHealth = value;
+            }
+
+            if(currentHealth > maxHealth)
+            {
+                currentHealth = maxHealth;
+            }
+        }
     }
 
     

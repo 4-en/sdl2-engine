@@ -69,7 +69,9 @@ namespace ShootEmUp.Level
         private double levelTimer = 0;
         private bool paused = false;
         private LinkedList<GameObject> Enemies = new LinkedList<GameObject>();
-        private GameObject? Player;
+        private GameObject? player;
+        private Player? playerScript;
+        private Vec2D worldSize = new Vec2D(2500, 2500);
 
         private int score = 0;
         private int money = 0;
@@ -92,12 +94,12 @@ namespace ShootEmUp.Level
 
 
             // create the player with Player class
-            var player = new GameObject("Player");
-            player.AddComponent<Player>();
+            player = Player.CreatePlayer();
+            playerScript = player?.GetComponent<Player>();
 
 
             // create the Background
-            var background = new GameObject("Player");
+            var background = new GameObject("BackgroundObject");
             background.AddComponent<Background>();
 
             // collision test object
@@ -293,6 +295,61 @@ namespace ShootEmUp.Level
             }
         }
 
+        private void RepositionEntities()
+        {
+            // if position is out of bounds, reposition the entity with modulo
+            var gameBounds = worldSize;
+
+            double minX = -gameBounds.x;
+            double minY = -gameBounds.y;
+            double maxX = gameBounds.x;
+            double maxY = gameBounds.y;
+
+            foreach (GameObject enemy in Enemies)
+            {
+                var position = enemy.GetPosition();
+                if (position.x < minX)
+                {
+                    position.x = maxX;
+                }
+                if (position.x > maxX)
+                {
+                    position.x = minX;
+                }
+                if (position.y < minY)
+                {
+                    position.y = maxY;
+                }
+                if (position.y > maxY)
+                {
+                    position.y = minY;
+                }
+                enemy.transform.position = position;
+            }
+
+            if (player != null)
+            {
+                var position = player.GetPosition();
+                if (position.x < minX)
+                {
+                    position.x = maxX;
+                }
+                if (position.x > maxX)
+                {
+                    position.x = minX;
+                }
+                if (position.y < minY)
+                {
+                    position.y = maxY;
+                }
+                if (position.y > maxY)
+                {
+                    position.y = minY;
+                }
+                player.transform.position = position;
+            }
+        }
+
         public override void Update()
         {
             HandleInput();
@@ -327,13 +384,15 @@ namespace ShootEmUp.Level
                 }
             }
 
+            // Reposition entities that are out of bounds
+            // TODO: reanable if needed?
+            // RepositionEntities();
+
             // check if the player is dead
             // check for player health
-            /*
-             * if (Player.GetHealth() <= 0) {
-             *    OnFail();
-             * }
-             */
+             if ((playerScript?.GetHealth() ?? -1) <= 0) {
+                OnFail();
+             }
 
             // check if the player has completed the level
             if (LevelCompleted())

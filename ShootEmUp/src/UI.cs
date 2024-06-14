@@ -19,11 +19,13 @@ namespace ShootEmUp
             menu.SetPosition(new Vec2D(1920 / 2, 400));
 
             var background = Component.CreateWithGameObject<FilledRect>("EscapeMenuBackground");
-            background.Item2.SetRect(new Rect(0, 0, 1920, 1080));
+            background.Item2.SetRect(new Rect(0, 0, 4*1920, 4*1080));
             background.Item2.color = (new Color(0, 0, 0, 200));
             background.Item2.anchorPoint = AnchorPoint.TopLeft;
             menu.AddChild(background.Item1);
-            background.Item1.SetPosition(new Vec2D(0, 0));
+            background.Item1.SetPosition(new Vec2D(-2*1920, -2*1080));
+            background.Item2.relativeToCamera = false;
+            background.Item2.z_index = -100;
 
             var titleTextTuple = Component.CreateWithGameObject<TextRenderer>("EscapeMenuTitle");
             var titleText = titleTextTuple.Item2;
@@ -43,15 +45,18 @@ namespace ShootEmUp
 
             var button1 = button1Tuple.Item1;
             button1.SetLocalPosition(new Vec2D(0, -50));
+            button1Tuple.Item2.z_index= -200;
             menu.AddChild(button1);
 
             var button2Tuple = Button("Main Menu", () => { LevelManager.LoadHomeScreen(); return true; }, new Rect(0, 0, 350, 150), Color.White, 44);
             var button2 = button2Tuple.Item1;
             button2.SetLocalPosition(new Vec2D(0, 150));
+            button2Tuple.Item2.z_index = -200;
             menu.AddChild(button2);
 
             var button3Tuple = Button("Quit", () => { Engine.Stop(); return true; }, new Rect(0, 0, 350, 150), Color.White, 44);
             var button3 = button3Tuple.Item1;
+            button3Tuple.Item2.z_index = -200;
             button3.SetLocalPosition(new Vec2D(0, 350));
             menu.AddChild(button3);
 

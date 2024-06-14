@@ -29,6 +29,7 @@ namespace ShootEmUp
         public static int currentHealth;
         public static int damage;
         public static int displayedHighscore;
+        public static int displayedMoney;
         public int fireRate;
         public int fireRange;
         public int shield;
@@ -49,6 +50,7 @@ namespace ShootEmUp
             currentHealth = maxHealth;
             damage = 50 + PlayerData.Instance.DamageUpgradeLevel * 10;
             displayedHighscore = 0;
+            displayedMoney = 0;
             fireRate = 10;
             fireRange = 10;
             shield = 10;
@@ -70,8 +72,10 @@ namespace ShootEmUp
             AddComponent<KeyboardController>();
             AddComponent<HealthBar>();
             AddComponent<HighScore>();
+            AddComponent<MoneyIndicator>();
             AddComponent<HealthReducer>();
             AddComponent<HighscoreUpdater>();
+            AddComponent<MoneyUpdater>();
             gameObject.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
             var pb = AddComponent<PhysicsBody>();
 
@@ -122,6 +126,64 @@ namespace ShootEmUp
             {
                 PlayerData.Instance.TotalScore -= 100;
             }
+        }
+    }
+
+    internal class MoneyUpdater : Script
+    {
+        public override void Update()
+        {
+            //key inputs
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_5))
+            {
+                PlayerData.Instance.Money += 100;
+            }
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_6))
+            {
+                PlayerData.Instance.Money -= 100;
+            }
+        }
+    }
+
+    internal class MoneyIndicator : Script
+    {
+
+        GameObject moneyIndicator = new GameObject("HighscoreText");
+
+
+        public override void Start()
+        {
+
+            //set player highscore
+            Player.displayedHighscore = PlayerData.Instance.TotalScore;
+
+
+            var text = moneyIndicator.AddComponent<TextRenderer>();
+            moneyIndicator.transform.position = new Vec2D(1920 -100, 100);
+            text.anchorPoint = AnchorPoint.CenterRight;
+            text.SetText(PlayerData.Instance.Money.ToString());
+            text.SetColor(SDL2Engine.Color.White);
+            text.SetFontSize(60);
+            text.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+
+        }
+
+        public override void Update()
+        {
+
+            if (Player.displayedMoney < PlayerData.Instance.Money)
+            {
+                Player.displayedMoney += 1;
+            }
+            else if (Player.displayedMoney > PlayerData.Instance.Money)
+            {
+                Player.displayedMoney -= 1;
+            }
+
+            //update moneyIndicator
+            var text = moneyIndicator.GetComponent<TextRenderer>();
+            text?.SetText(Player.displayedMoney.ToString()+" $");
+
         }
     }
 

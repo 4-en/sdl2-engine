@@ -36,6 +36,12 @@ namespace SDL2Engine
     public static class EventBus
     {
 
+        /*
+         * A better implementation would be to have seperate EventBuses for each Scene.
+         * Then, the events could be collected and dispatched in the Update method of the Scene.
+         * It would also separate the events for different scenes, which could cause some unexpected behavior.
+         */
+
         private static Dictionary<Type, object> listeners = new Dictionary<Type, object>();
 
         public static EventListener<T> AddListener<T>(Action<T> action, Func<T, bool>? filter = null) where T : class

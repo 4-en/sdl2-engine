@@ -48,10 +48,10 @@ namespace ShootEmUp
             SceneManager.SetScene(level);
         }
 
-        public static void ResetLevel()
+        public static void EndRun(bool win)
         {
-            levelIndex = 0;
-            LoadNextLevel();
+            // TODO: Implement end run screen
+            var playerData = PlayerData.Instance;
         }
 
 

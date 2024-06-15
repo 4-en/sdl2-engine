@@ -59,6 +59,8 @@ namespace ShootEmUp.Level
      */
     public class BaseLevel : Script
     {
+        public static BaseLevel? Instance = null;
+
         public int LevelID = 0;
         // An array of enemy waves that will spawn in the level
         // This should be changed by inheriting classes to define the level's enemy waves,
@@ -86,6 +88,18 @@ namespace ShootEmUp.Level
         private GameObject? shopMenu = null;
 
         private bool was_setup = false;
+
+        public BaseLevel()
+        {
+            if(Instance == null)
+            {
+                Instance = this;
+            } else
+            {
+                Console.WriteLine("Warning: Multiple instances of BaseLevel created.");
+            }
+        }
+
         public void SetupLevel(int levelID, EnemyWave[] waves, double duration = 60)
         {
             LevelID = levelID;
@@ -188,6 +202,11 @@ namespace ShootEmUp.Level
             if (eventListener != null)
             {
                 EventBus.RemoveListener(eventListener);
+            }
+
+            if (BaseLevel.Instance == this)
+            {
+                BaseLevel.Instance = null;
             }
         }
 

@@ -64,6 +64,7 @@ namespace ShootEmUp.Entities
         private Collider? collider = null;
         private PhysicsBody? physicsBody = null;
         private bool hasCollided = false;
+        private ulong collisionFrame = 0;
 
 
         public override void Start()
@@ -114,7 +115,7 @@ namespace ShootEmUp.Entities
         public override void OnCollisionEnter(CollisionPair collision)
         {
 
-            if (hasCollided)
+            if (hasCollided && collisionFrame != Time.tick)
             {
                 return;
             }
@@ -142,6 +143,7 @@ namespace ShootEmUp.Entities
 
 
             hasCollided = true;
+            collisionFrame = Time.tick;
 
             if (destroyOnCollision)
             {
@@ -150,6 +152,10 @@ namespace ShootEmUp.Entities
             }
 
             damageable.Damage(new Damage(damage, shooter, team));
+
+            Vec2D random_offset = new Vec2D(random.NextDouble() * 100 - 50, random.NextDouble() * 100 - 50);
+
+            GameText.CreateAt(other.GetPosition() + random_offset, damage.ToString(), 2, 52, new Color(255, 0, 0, 255));
         }
 
         public IEnumerator DestroyAfterTime(double delay)

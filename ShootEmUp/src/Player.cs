@@ -64,7 +64,7 @@ namespace ShootEmUp
 
             var texture = AddComponent<TextureRenderer>();
             texture.SetSource(spaceshipTexture);
-            texture.SetZIndex(-10);
+            texture.SetZIndex(-1);
 
 
             AddComponent<CameraFollow>();

@@ -29,6 +29,17 @@ namespace ShootEmUp
             // Initialize the data
         }
 
+        public void Reset()
+        {
+            total_score = 0;
+            level_progress = 0;
+            money = 0;
+            health_upgrade_level = 0;
+            damage_upgrade_level = 0;
+            speed_upgrade_level = 0;
+            fire_rate_upgrade_level = 0;
+        }
+
         private int total_score = 0;
         public int TotalScore
         {

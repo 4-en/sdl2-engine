@@ -97,7 +97,7 @@ namespace ShootEmUp
                 {
                     if (gameObject.GetName().Equals("Start"))
                     {
-                        SceneManager.SetScene(LevelManager.CreateLevel1());
+                        LevelManager.StartNewRun();
                     }
                     if(gameObject.GetName().Equals("Shop"))
                     {

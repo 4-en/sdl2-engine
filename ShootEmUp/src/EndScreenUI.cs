@@ -88,7 +88,7 @@ namespace ShootEmUp
             helper.OnClick += (object? _, TextRenderer _) =>
             {
                 Destroy(gameObject);
-                SceneManager.SetScene(LevelManager.CreateLevel1());
+                LevelManager.StartNewRun();
             };
             helper.OnHover += (object? _, TextRenderer _) =>
             {

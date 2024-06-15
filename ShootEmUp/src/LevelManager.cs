@@ -34,11 +34,30 @@ namespace ShootEmUp
                 case 1:
                     level = CreateLevel1();
                     break;
-                default:
-                    level = CreateBaseLevel();
+                case 2:
+                    level = CreateLevel2();
                     break;
+                case 3:
+                    level = CreateLevel3();
+                    break;
+                case 4:
+                    level = CreateLevel4();
+                    break;
+                case 5:
+                    level = CreateLevel5();
+                    break;
+                default:
+                    EndRun(true);
+                    return;
             }
             SceneManager.SetScene(level);
+        }
+
+        public static void StartNewRun()
+        {
+            levelIndex = 0;
+            PlayerData.Instance.Reset();
+            LoadNextLevel();
         }
 
         public static void LoadTutorial()
@@ -81,7 +100,8 @@ namespace ShootEmUp
                     0,
                     [
                         new EnemyWave("test.template", 60, 3)
-                    ]
+                    ],
+                    10
                 );
             }
 
@@ -95,7 +115,35 @@ namespace ShootEmUp
             return level;
         }
 
-      
+        public static Scene CreateLevel2()
+        {
+            var level = CreateBaseLevel();
+
+            return level;
+        }
+
+        public static Scene CreateLevel3()
+        {
+            var level = CreateBaseLevel();
+
+            return level;
+        }
+
+        public static Scene CreateLevel4()
+        {
+            var level = CreateBaseLevel();
+
+            return level;
+        }
+
+        public static Scene CreateLevel5()
+        {
+            var level = CreateBaseLevel();
+
+            return level;
+        }
+
+
 
         private static Scene CreateHomeScreen()
         {

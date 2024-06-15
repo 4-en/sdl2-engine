@@ -303,7 +303,7 @@ namespace ShootEmUp.Level
         {
             this.Pause();
             // End the level as a success
-            // ...
+            LevelManager.LoadShop();
         }
 
         private void HandleInput()

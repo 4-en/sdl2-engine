@@ -138,7 +138,7 @@ namespace ShootEmUp
 
             ShopItem(menu, "Health", new Vec2D(500, 100),PlayerData.Instance.HealthUpgradeLevel);
 
-            var continueButtonTuple = Button("Continue", () => { LevelManager.LoadHomeScreen(); return true; }, new Rect(0, 0, 300, 100), Color.White, 44);
+            var continueButtonTuple = Button("Continue", () => { LevelManager.LoadNextLevel(); return true; }, new Rect(0, 0, 300, 100), Color.White, 44);
             var continueButton = continueButtonTuple.Item1;
             continueButton.SetLocalPosition(new Vec2D(750, 575));
             menu.AddChild(continueButton);

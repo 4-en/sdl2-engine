@@ -74,4 +74,67 @@ namespace ShootEmUp.Entities
             spawned.transform.position = gameObject.transform.position;
         }
     }
+
+    public class EdgeSpawner : Spawner
+    {
+        public Rect field = new Rect(-2500, -2500, 5000, 5000);
+
+        protected override void Spawn()
+        {
+            if (prototype == null)
+            {
+                return;
+            }
+
+            var spawned = prototype.Instantiate();
+
+            int side = random.Next(4);
+
+            double tolerance = 100;
+            double x = 0;
+            double y = 0;
+
+            double xVel = 0;
+            double yVel = 0;
+
+            switch(side)
+            {
+                case 0:
+                    x = field.x - tolerance;
+                    y = random.Next((int)field.y, (int)(field.y + field.h));
+                    
+                    xVel = random.Next(50, 100);
+                    yVel = random.Next(-50, 50);
+                    break;
+                case 1:
+                    x = field.x + field.w + tolerance;
+                    y = random.Next((int)field.y, (int)(field.y + field.h));
+
+                    xVel = random.Next(-100, -50);
+                    yVel = random.Next(-50, 50);
+                    break;
+                case 2:
+                    x = random.Next((int)field.x, (int)(field.x + field.w));
+                    y = field.y - tolerance;
+
+                    xVel = random.Next(-50, 50);
+                    yVel = random.Next(50, 100);
+                    break;
+                case 3:
+                    x = random.Next((int)field.x, (int)(field.x + field.w));
+                    y = field.y + field.h + tolerance;
+
+                    xVel = random.Next(-50, 50);
+                    yVel = random.Next(-100, -50);
+                    break;
+                default:
+                    break;
+            }
+
+            spawned.transform.position = new Vec2D(x, y);
+            spawned.GetComponent<PhysicsBody>()?.SetVelocity(new Vec2D(xVel, yVel));
+
+
+        }
+    }
 }

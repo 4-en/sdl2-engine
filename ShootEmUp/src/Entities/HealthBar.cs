@@ -38,7 +38,7 @@ namespace ShootEmUp.Entities
     {
         private IDamageable? target;
         private HealthBarRenderer? renderer;
-        private double animationSpeed = 0.1;
+        private double animationSpeed = 0.001;
         private double currentHealth = 1.0;
         private double targetHealth = 1.0;
 
@@ -68,7 +68,7 @@ namespace ShootEmUp.Entities
             targetHealth = target.GetHealth() / target.GetMaxHealth();
             if (currentHealth != targetHealth)
             {
-                currentHealth = Math.Min(targetHealth, currentHealth + animationSpeed * Time.deltaTime);
+                currentHealth = Math.Min(targetHealth, currentHealth + animationSpeed * Time.deltaTime * target.GetMaxHealth());
                 renderer.health = currentHealth;
             }
         }

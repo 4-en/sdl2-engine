@@ -137,4 +137,40 @@ namespace ShootEmUp.Entities
 
         }
     }
+
+    public class RectSpawner : Spawner
+    {
+        public Rect spawnArea = new Rect(0, 0, 100, 100);
+        public Rect directionArea = new Rect(0, 0, 100, 100);
+        public double minSpeed = 50;
+        public double maxSpeed = 100;
+
+        protected override void Spawn()
+        {
+            if (prototype == null)
+            {
+                return;
+            }
+
+            var spawned = prototype.Instantiate();
+
+            double x = random.Next((int)spawnArea.x, (int)(spawnArea.x + spawnArea.w));
+            double y = random.Next((int)spawnArea.y, (int)(spawnArea.y + spawnArea.h));
+
+            spawned.transform.position = new Vec2D(x, y);
+
+            Rect direction = spawnArea;
+            if(directionArea.w > 0 || directionArea.h > 0)
+            {
+                direction = directionArea;
+            }
+
+            double xVel = random.Next((int)direction.x, (int)(direction.x + direction.w)) - x;
+            double yVel = random.Next((int)direction.y, (int)(direction.y + direction.h)) - y;
+
+            double speed = random.Next((int)minSpeed, (int)maxSpeed);
+
+            spawned.GetComponent<PhysicsBody>()?.SetVelocity(new Vec2D(xVel, yVel).Normalize() * speed);
+        }
+    }
 }

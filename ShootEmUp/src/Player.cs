@@ -148,6 +148,11 @@ namespace ShootEmUp
                 currentHealth = maxHealth;
             }
         }
+
+        public Team GetTeam()
+        {
+            return Team.Player;
+        }
     }
 
 

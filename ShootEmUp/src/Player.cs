@@ -63,11 +63,14 @@ namespace ShootEmUp
 
         public override void Start()
         {
+            var fireDrive = new GameObject("FireDrive");
+            fireDrive.AddComponent<FireDrive>();
+
+
 
             var texture = AddComponent<TextureRenderer>();
             texture.SetSource(spaceshipTexture);
             texture.SetZIndex(-1);
-
 
             AddComponent<CameraFollow>();
 
@@ -81,7 +84,6 @@ namespace ShootEmUp
         }
         public override void Update()
         {
-
         }
 
         public static GameObject CreatePlayer()
@@ -99,7 +101,7 @@ namespace ShootEmUp
                 Player.hasShield = false;
                 return;
             }
-            
+
             currentHealth -= damage.Value;
         }
 
@@ -313,7 +315,7 @@ namespace ShootEmUp
             var obstacle2 = new GameObject("Obstacle");
             var pb2 = obstacle2.AddComponent<PhysicsBody>();
             var bc2 = obstacle2.AddComponent<BoxCollider>();
-           
+
             bc2.UpdateColliderSize(5000, 300);
             obstacle2.transform.position = new Vec2D(-2500, 2500);
 
@@ -347,6 +349,34 @@ namespace ShootEmUp
             }
             BoxCollider.FromDrawableRect(projectile);
 
+        }
+    }
+
+    public class FireDrive : Script
+    {
+        public override void Start()
+        {
+
+            var sprite = AddComponent<SpriteRenderer>();
+            sprite.SetTexture("Assets/Textures/fire_sprite.png");
+            sprite.SetSpriteSize(215, 300);
+            sprite.SetSize(90, 90);
+            sprite.AddAnimation(new AnimationInfo("fire", 0, 12, 0.075));
+            sprite.PlayAnimation("fire");
+            sprite.SetAnimationType(AnimationType.LoopReversed);
+            sprite.SetZIndex(1);
+        }
+
+
+        public override void Update()
+        {
+            //follow player
+            var player = Find("Player");
+            if (player != null)
+            {
+                gameObject.transform.position = player.transform.position - new Vec2D(70,0).Rotate(player.transform.rotation);
+                gameObject.transform.rotation = player.transform.rotation-90;
+            }
         }
     }
 }

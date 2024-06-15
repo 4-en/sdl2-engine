@@ -19,6 +19,7 @@
     <None Remove="Assets\Textures\asteroids\asteroid1.png" />
     <None Remove="Assets\Textures\background\Blue01.png" />
     <None Remove="Assets\Textures\enemy5.png" />
+    <None Remove="Assets\Textures\fire_sprite.png" />
     <None Remove="Assets\Textures\grid.jpg" />
     <None Remove="Assets\Textures\health.png" />
     <None Remove="Assets\Textures\powerups\Armor_Bonus.png" />

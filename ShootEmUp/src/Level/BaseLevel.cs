@@ -185,7 +185,7 @@ namespace ShootEmUp.Level
             topCenterText.SetFontPath("Assets/Fonts/PressStartRegular.ttf");
             topCenterText.anchorPoint = AnchorPoint.Center;
             topCenter.SetPosition(new Vec2D(GetCamera().GetVisibleWidth() / 2, 100));
-            topCenterText.SetText($"{duration}s");
+            topCenterText.SetText($"{(int)duration}s");
         }
 
         private int CalculateCombo(int points)
@@ -427,8 +427,7 @@ namespace ShootEmUp.Level
             }
         }
 
-        private int lastLog = 0;
-        private int lastDuration = 0;
+        private int lastDuration = 999999;
 
         public override void Update()
         {
@@ -436,13 +435,6 @@ namespace ShootEmUp.Level
             if(this.paused)
             {
                 return;
-            }
-
-            int time = (int)Time.time;
-            if (time != lastLog)
-            {
-                lastLog = time;
-                Console.WriteLine($"Player Position: {player?.GetPosition()}");
             }
 
             // Check if the level is completed
@@ -456,7 +448,7 @@ namespace ShootEmUp.Level
             levelTimer += Time.deltaTime;
             duration -= Time.deltaTime;
             int intDuration = (int)duration;
-            if (intDuration != lastDuration)
+            if (intDuration != lastDuration && intDuration >= 0)
             {
                 lastDuration = intDuration;
                 topCenterText?.GetGameObject().SetPosition(new Vec2D(GetCamera().GetVisibleWidth() / 2, 100));

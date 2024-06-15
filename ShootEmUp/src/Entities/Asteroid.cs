@@ -55,7 +55,7 @@ namespace ShootEmUp
         {
             asteroidTexture = "Assets/Textures/asteroids/asteroid1.png";
             xSpeed = 0;
-            ySpeed = 50;
+            ySpeed = 0;
         }
 
 
@@ -79,6 +79,12 @@ namespace ShootEmUp
         }
         public override void Update()
         {
+            //set velocity
+            var pb = GetComponent<PhysicsBody>();
+            if (pb != null)
+            {
+                pb.Velocity = new Vec2D(xSpeed,ySpeed);
+            }
         }
 
 

@@ -54,8 +54,6 @@ namespace ShootEmUp.src.Entities
             {
                 Destroy(this.gameObject);
                 Console.WriteLine("Health PowerUp Collected");
-                Console.WriteLine(Player.currentHealth);
-                Console.WriteLine(Player.maxHealth);
                 Player.currentHealth = Player.maxHealth;
 
             }

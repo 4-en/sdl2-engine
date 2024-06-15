@@ -114,7 +114,7 @@ namespace ShootEmUp.Level
             pb.Velocity = new Vec2D(1, 1);
             pb.IsMovable = true;
 
-
+            /*
             //asteroid
             var asteroid = new GameObject("Asteroid");
             var asteroidComponent = asteroid.AddComponent<Asteroid>();
@@ -126,6 +126,7 @@ namespace ShootEmUp.Level
             var asteroidComponent2 = asteroid2.AddComponent<Asteroid>();
             asteroidComponent2.position = new Vec2D(1200, 200);
             asteroidComponent2.velocity = new Vec2D(-50, 10);
+            */
         }
 
         public override void Start()

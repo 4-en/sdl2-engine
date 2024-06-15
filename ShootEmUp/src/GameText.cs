@@ -11,6 +11,7 @@ namespace ShootEmUp
     {
         public double duration = 2;
         public double timeAlive = 0;
+        public Vec2D velocity = new Vec2D(0, -50);
 
         public GameText()
         {
@@ -26,6 +27,8 @@ namespace ShootEmUp
             {
                 gameObject.Destroy();
             }
+
+            gameObject.transform.Move(velocity * Time.deltaTime);
         }
 
         public static GameObject CreateAt(Vec2D position, string text, double duration=2, int fontSize=24, Color? color = null)

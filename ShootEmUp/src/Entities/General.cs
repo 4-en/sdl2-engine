@@ -49,6 +49,40 @@ namespace ShootEmUp.Entities
 
         void SetHealth(double value);
         void SetMaxHealth(double value);
+
+        Team GetTeam()
+        {
+            return Team.Enemy;
+        }
+    }
+
+    public class Damager : Script
+    {
+        public double damage = 300;
+        public Team team = Team.Enemy;
+        public bool destroyOnCollision = true;
+
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            var other = collision.GetOther(gameObject);
+            var damageable = other.GetComponent<IDamageable>();
+            if (damageable == null)
+            {
+                return;
+            }
+
+            if (damageable.GetTeam() == team)
+            {
+                return;
+            }
+
+            damageable.Damage(new Damage(damage, gameObject, team));
+
+            if (destroyOnCollision)
+            {
+                gameObject.Destroy();
+            }
+        }
     }
 
     public class ProjectileScript : Script

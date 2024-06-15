@@ -72,7 +72,7 @@ namespace ShootEmUp
             BoxCollider.FromDrawableRect(gameObject);
             AddComponent<KeyboardController>();
             AddComponent<UserInterface>();
-            gameObject.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
+            gameObject.transform.position = new Vec2D(0, 0);
             var pb = AddComponent<PhysicsBody>();
 
 
@@ -139,6 +139,11 @@ namespace ShootEmUp
             {
                 currentHealth = maxHealth;
             }
+        }
+
+        public Team GetTeam()
+        {
+            return Team.Player;
         }
     }
 

@@ -75,8 +75,13 @@ namespace ShootEmUp.Level
         private LinkedList<GameObject> Enemies = new LinkedList<GameObject>();
         private GameObject? player;
         private Player? playerScript;
-        private Vec2D worldSize = new Vec2D(2500, 2500);
         private EventListener<EnemyKilledEvent>? eventListener = null;
+
+        private static Vec2D worldSize = new Vec2D(2500, 2500);
+        public static Vec2D WorldSize
+        {
+            get { return worldSize; }
+        }
 
         private int score = 0;
         private int money = 0;
@@ -91,10 +96,11 @@ namespace ShootEmUp.Level
 
         public BaseLevel()
         {
-            if(Instance == null)
+            if (Instance == null)
             {
                 Instance = this;
-            } else
+            }
+            else
             {
                 Console.WriteLine("Warning: Multiple instances of BaseLevel created.");
             }
@@ -335,8 +341,8 @@ namespace ShootEmUp.Level
                     this.escapeMenu.Destroy();
                     this.escapeMenu = null;
                 }
-                else if(this.shopMenu != null)
-                { 
+                else if (this.shopMenu != null)
+                {
                     this.shopMenu.Destroy();
                     this.shopMenu = null;
                 }
@@ -422,7 +428,7 @@ namespace ShootEmUp.Level
         public override void Update()
         {
             HandleInput();
-            if(this.paused)
+            if (this.paused)
             {
                 return;
             }
@@ -467,9 +473,10 @@ namespace ShootEmUp.Level
 
             // check if the player is dead
             // check for player health
-             if ((playerScript?.GetHealth() ?? -1) <= 0) {
+            if ((playerScript?.GetHealth() ?? -1) <= 0)
+            {
                 OnFail();
-             }
+            }
 
 
         }

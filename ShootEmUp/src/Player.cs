@@ -1,6 +1,7 @@
 ﻿using SDL2;
 using SDL2Engine;
 using ShootEmUp.Entities;
+using ShootEmUp.Level;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
@@ -247,7 +248,7 @@ namespace ShootEmUp
         Vec2D gameBounds = new Vec2D(1920, 1080);
 
         // The size of the world in which the camera should follow the player
-        protected Vec2D WorldSize = new Vec2D(2500, 2500);
+        protected Vec2D WorldSize = BaseLevel.WorldSize;
 
 
         public override void Update()

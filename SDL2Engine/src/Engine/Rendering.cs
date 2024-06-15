@@ -260,8 +260,8 @@ namespace SDL2Engine
 
         public Vec2D GetVisibleSize()
         {
-            
-            if(keepAspectRatio)
+
+            if (keepAspectRatio)
             {
                 double aspectRatio = WorldSize.x / WorldSize.y;
                 double windowAspectRatio = (double)Engine.windowWidth / (double)Engine.windowHeight;
@@ -274,7 +274,7 @@ namespace SDL2Engine
                 {
                     return new Vec2D(WorldSize.x * (windowAspectRatio / aspectRatio), WorldSize.y);
                 }
-                
+
 
             }
 
@@ -1031,6 +1031,8 @@ namespace SDL2Engine
         [JsonProperty]
         private bool flipY = false;
         [JsonProperty]
+        private double rotationAngle = 0.0;
+        [JsonProperty]
         private bool customWorldSize = false;
 
         // Sets the size of individual sprites in the spritesheet
@@ -1110,6 +1112,10 @@ namespace SDL2Engine
         {
             this.flipX = flipX;
             this.flipY = flipY;
+        }
+        public void SetRotationAngle(double angle)
+        {
+            this.rotationAngle = angle;
         }
 
         // Registers an animation with the given name, starting frame, frame count and speed
@@ -1287,7 +1293,7 @@ namespace SDL2Engine
             var srcRect = temp_dest_rect.ToSDLRect();
             var dstRect = this.GetDestRect();
 
-            double angle = gameObject.transform.rotation;
+            double angle = gameObject.transform.rotation + rotationAngle; // Berechnung des Gesamtwinkels
 
             var flip = SDL_RendererFlip.SDL_FLIP_NONE;
             if (flipX)

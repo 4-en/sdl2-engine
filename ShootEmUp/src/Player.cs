@@ -31,6 +31,7 @@ namespace ShootEmUp
         public static int damage;
         public static int displayedHighscore;
         public static int displayedMoney;
+        public static bool hasShield;
         public int fireRate;
         public int fireRange;
         public int shield;
@@ -52,6 +53,7 @@ namespace ShootEmUp
             damage = 50 + PlayerData.Instance.DamageUpgradeLevel * 10;
             displayedHighscore = 0;
             displayedMoney = 0;
+            hasShield = false;
             fireRate = 10;
             fireRange = 10;
             shield = 10;
@@ -92,6 +94,12 @@ namespace ShootEmUp
 
         public void Damage(Damage damage)
         {
+            if (Player.hasShield)
+            {
+                Player.hasShield = false;
+                return;
+            }
+            
             currentHealth -= damage.Value;
         }
 
@@ -168,6 +176,7 @@ namespace ShootEmUp
             if (Input.GetKeyPressed(left))
             {
                 gameObject.transform.rotation -= Player.rotationSpeed;
+
             }
             if (Input.GetKeyPressed(right))
             {
@@ -219,7 +228,6 @@ namespace ShootEmUp
             {
                 physicsBody.Velocity = new Vec2D(Player.speed, 0).Rotate(gameObject.transform.rotation);
             }
-
         }
 
 

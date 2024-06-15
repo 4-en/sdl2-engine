@@ -21,6 +21,7 @@ namespace ShootEmUp
                 collider.IsTrigger = true;
             }
             prototype.AddComponent<BaseEnemy>();
+            prototype.AddComponent<Damager>();
             var body = prototype.AddComponent<PhysicsBody>();
             body.RotateWithVelocity = true;
 

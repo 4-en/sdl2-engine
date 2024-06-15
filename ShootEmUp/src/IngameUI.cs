@@ -22,6 +22,7 @@ namespace ShootEmUp
                 AddComponent<HighscoreUpdater>();
                 AddComponent<MoneyUpdater>();
                 AddComponent<WaveIndicator>();
+                AddComponent<ShieldTexture>();
 
             }
         }
@@ -121,6 +122,41 @@ namespace ShootEmUp
                 var text = moneyIndicator.GetComponent<TextRenderer>();
                 text?.SetText(Player.displayedMoney.ToString() + "$");
                 moneyIndicator.transform.position = new Vec2D(GetCamera().GetVisibleWidth() - 100, 100);
+
+            }
+        }
+
+        internal class ShieldTexture : Script
+        {
+
+            GameObject shield = new GameObject("Shield");
+
+
+            public override void Start()
+            {
+
+                var sprite = shield.AddComponent<SpriteRenderer>();
+                sprite.SetTexture("Assets/Textures/powerups/blue_circle.png");
+                sprite.SetWorldSize(200, 200);
+
+            }
+
+            public override void Update()
+            {
+                var sprite = shield.GetComponent<SpriteRenderer>();
+                if (Player.hasShield)
+                {
+                    sprite?.SetWorldSize(150, 150);
+                }
+                else
+                {
+                    sprite?.SetWorldSize(0, 0);
+                }
+                var player = Find("Player");
+                if (player != null)
+                {
+                    shield.transform.position = player.transform.position;
+                }
 
             }
         }
@@ -285,6 +321,13 @@ namespace ShootEmUp
                 titleText.transform.position = new Vec2D(100 + width / 2, camera.GetVisibleHeight() - 150);
                 heart.transform.position = new Vec2D(110, camera.GetVisibleHeight() - 100);
 
+                if (Player.hasShield)
+                {
+                    HealthBar.backgroundColor = new SDL2Engine.Color(0, 0, 255, 255);
+                }
+                else {       
+                    HealthBar.backgroundColor = new SDL2Engine.Color(255, 0, 0, 255);
+                }
 
             }
         }

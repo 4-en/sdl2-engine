@@ -155,7 +155,6 @@ namespace ShootEmUp.Entities
             }
 
             var other = collision.GetOther(gameObject);
-            if (other.GetName().Equals("ShieldPowerUp")) return;
 
             var damageable = other.GetComponent<IDamageable>();
             if (damageable == null)

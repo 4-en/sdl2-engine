@@ -53,7 +53,7 @@ namespace ShootEmUp.src.Entities
             {
                 Destroy(this.gameObject);
                 Console.WriteLine("Shield PowerUp Collected");
-                HealthBar.backgroundColor = new SDL2Engine.Color(0, 0, 255, 255);
+                Player.hasShield = true;
 
             }
         }

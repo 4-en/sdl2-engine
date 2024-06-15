@@ -34,6 +34,7 @@
     <None Remove="Assets\Textures\powerups\Rockets_Bonus.png" />
     <None Remove="Assets\Textures\projectile_explosion_sprite_sheet.png" />
     <None Remove="Assets\Textures\projectile_sprite_sheet.png" />
+    <None Remove="Assets\Textures\spaceships\spaceship6.png" />
     <None Update="SDL2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

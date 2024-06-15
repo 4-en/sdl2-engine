@@ -178,6 +178,11 @@ namespace SDL2Engine
             return new Vec2D(x * cos - y * sin, x * sin + y * cos);
         }
 
+        public double getRotation()
+        {
+            return Math.Atan2(y, x) * 180 / Math.PI;
+        }
+
         public static bool operator >(Vec2D a, Vec2D b)
         {
             return a.LengthSquared() > b.LengthSquared();

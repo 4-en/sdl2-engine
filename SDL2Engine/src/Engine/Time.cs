@@ -23,6 +23,7 @@ namespace SDL2Engine
         public static double freeDuration = 0;
 
         public static double staticEnemyShootTime = 0;
+        public static double sinusEnemyTime = 0;
 
         public static int GetFPS()
         {

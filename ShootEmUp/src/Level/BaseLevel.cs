@@ -417,12 +417,21 @@ namespace ShootEmUp.Level
             }
         }
 
+        private int lastLog = 0;
+
         public override void Update()
         {
             HandleInput();
             if(this.paused)
             {
                 return;
+            }
+
+            int time = (int)Time.time;
+            if (time != lastLog)
+            {
+                lastLog = time;
+                Console.WriteLine($"Player Position: {player?.GetPosition()}");
             }
 
             // Check if the level is completed

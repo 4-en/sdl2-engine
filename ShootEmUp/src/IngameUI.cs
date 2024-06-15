@@ -17,7 +17,7 @@ namespace ShootEmUp
             {
                 AddComponent<HealthBar>();
                 AddComponent<HighScore>();
-                AddComponent<MoneyIndicator>();
+                //AddComponent<MoneyIndicator>();
                 AddComponent<HealthReducer>();
                 AddComponent<HighscoreUpdater>();
                 AddComponent<MoneyUpdater>();
@@ -172,7 +172,7 @@ namespace ShootEmUp
 
                 var text = highscoreText.AddComponent<TextRenderer>();
                 
-                highscoreText.transform.position = new Vec2D(GetCamera().GetVisibleWidth() / 2, 100);
+                highscoreText.transform.position = new Vec2D(GetCamera().GetVisibleWidth() - 100, 100);
                 text.anchorPoint = AnchorPoint.Center;
                 text.SetText(PlayerData.Instance.TotalScore.ToString());
                 text.SetColor(SDL2Engine.Color.White);
@@ -197,7 +197,7 @@ namespace ShootEmUp
                 var text = highscoreText.GetComponent<TextRenderer>();
                 text?.SetText(Player.displayedHighscore.ToString());
 
-                highscoreText.transform.position = new Vec2D(GetCamera().GetVisibleWidth() / 2, 100);
+                highscoreText.transform.position = new Vec2D(GetCamera().GetVisibleWidth() - 100, 100);
 
             }
         }

@@ -1,11 +1,5 @@
-﻿using Newtonsoft.Json;
-using SDL2Engine;
+﻿using SDL2Engine;
 using ShootEmUp.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ShootEmUp
 {

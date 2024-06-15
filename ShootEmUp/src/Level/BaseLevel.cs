@@ -68,6 +68,7 @@ namespace ShootEmUp.Level
         private int maxWaveCount = 0;
         private double waveStartTime = 0;
         private double levelTimer = 0;
+        private double duration = 60;
         private bool paused = false;
         private LinkedList<GameObject> Enemies = new LinkedList<GameObject>();
         private GameObject? player;
@@ -78,16 +79,20 @@ namespace ShootEmUp.Level
         private int score = 0;
         private int money = 0;
 
+        private int combo = 0;
+        private double lastKillTime = 0;
+
         private GameObject? escapeMenu = null;
         private GameObject? shopMenu = null;
 
         private bool was_setup = false;
-        public void SetupLevel(int levelID, EnemyWave[] waves)
+        public void SetupLevel(int levelID, EnemyWave[] waves, double duration = 60)
         {
             LevelID = levelID;
             Waves = waves;
             currentWave = -1;
             was_setup = true;
+            this.duration = duration;
         }
 
         private void CreatePlayer()
@@ -151,13 +156,31 @@ namespace ShootEmUp.Level
             // Add the event listener for enemy killed events
             eventListener = EventBus.AddListener<EnemyKilledEvent>((eventData) =>
             {
-                AddScore((int)eventData.enemy.GetPoints());
-                AddMoney((int)eventData.enemy.GetPoints());
-
-                Console.WriteLine("Enemy killed: " + eventData.enemy);
+                int points = CalculateCombo((int)eventData.enemy.GetPoints());
+                AddScore(points);
+                AddMoney(points);
             });
 
             // Start the first wave
+        }
+
+        private int CalculateCombo(int points)
+        {
+            if (Time.time - lastKillTime < 2)
+            {
+                combo++;
+            }
+            else
+            {
+                combo = 0;
+            }
+
+            lastKillTime = Time.time;
+            double multiplier = Math.Min(1 + combo, 10);
+            int bonus = combo;
+            points = (int)(points * multiplier) + bonus;
+            // Console.WriteLine("Combo: " + combo + " Multiplier: " + multiplier + " Bonus: " + bonus);
+            return points;
         }
 
         public override void OnDestroy()
@@ -252,7 +275,8 @@ namespace ShootEmUp.Level
         private bool LevelCompleted()
         {
             // Check if all waves have been completed
-            return currentWave >= maxWaveCount;
+            //return currentWave >= maxWaveCount;
+            return duration <= 0;
         }
 
         private void Pause()
@@ -386,11 +410,12 @@ namespace ShootEmUp.Level
             if (LevelCompleted())
             {
                 // End the level
-                // ...
+                OnWin();
                 return;
             }
 
             levelTimer += Time.deltaTime;
+            duration -= Time.deltaTime;
 
             // Check if the current wave is completed
             if (Enemies.Count == 0)
@@ -418,11 +443,6 @@ namespace ShootEmUp.Level
                 OnFail();
              }
 
-            // check if the player has completed the level
-            if (LevelCompleted())
-            {
-                OnWin();
-            }
 
         }
     }

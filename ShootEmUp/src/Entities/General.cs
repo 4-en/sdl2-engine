@@ -128,6 +128,11 @@ namespace ShootEmUp.Entities
                 return;
             }
 
+            if(shooter == other)
+            {
+                return;
+            }
+
             if (physicsBody != null)
             {
                 physicsBody.Velocity = Vec2D.Zero;

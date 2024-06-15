@@ -308,8 +308,9 @@ namespace ShootEmUp
             var obstacle2 = new GameObject("Obstacle");
             var pb2 = obstacle2.AddComponent<PhysicsBody>();
             var bc2 = obstacle2.AddComponent<BoxCollider>();
-            bc2.UpdateColliderSize(40, 300);
-            obstacle2.transform.position = new Vec2D((gameBounds.x / 2) + 1500, 500);
+           
+            bc2.UpdateColliderSize(5000, 300);
+            obstacle2.transform.position = new Vec2D(-2500, 2500);
 
         }
     }

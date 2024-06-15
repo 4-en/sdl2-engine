@@ -72,7 +72,7 @@ namespace ShootEmUp
             BoxCollider.FromDrawableRect(gameObject);
             AddComponent<KeyboardController>();
             AddComponent<UserInterface>();
-            gameObject.transform.position = new Vec2D(0, 0);
+            gameObject.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
             var pb = AddComponent<PhysicsBody>();
 
 
@@ -98,7 +98,7 @@ namespace ShootEmUp
         public void Heal(double value)
         {
             currentHealth += value;
-            if(currentHealth > maxHealth)
+            if (currentHealth > maxHealth)
             {
                 currentHealth = maxHealth;
             }
@@ -117,7 +117,7 @@ namespace ShootEmUp
         public void SetHealth(double value)
         {
             currentHealth = value;
-            if(currentHealth > maxHealth)
+            if (currentHealth > maxHealth)
             {
                 currentHealth = maxHealth;
             }
@@ -125,7 +125,7 @@ namespace ShootEmUp
 
         public void SetMaxHealth(double value)
         {
-            if(currentHealth >= maxHealth)
+            if (currentHealth >= maxHealth)
             {
                 maxHealth = value;
                 currentHealth = value;
@@ -135,19 +135,14 @@ namespace ShootEmUp
                 maxHealth = value;
             }
 
-            if(currentHealth > maxHealth)
+            if (currentHealth > maxHealth)
             {
                 currentHealth = maxHealth;
             }
         }
-
-        public Team GetTeam()
-        {
-            return Team.Player;
-        }
     }
 
-    
+
 
     public class KeyboardController : Script
     {
@@ -260,7 +255,7 @@ namespace ShootEmUp
         private void UpdateCameraPositionToPlayer(Vec2D playerPosition, Vec2D gameBounds, Vec2D bordersSize)
         {
             var camera = GetCamera();
-            
+
             double camHalfWidth = camera.GetVisibleWidth() / 2;
             double camHalfHeight = camera.GetVisibleHeight() / 2;
 
@@ -290,25 +285,25 @@ namespace ShootEmUp
                 y = maxY;
             }
 
-            camera.SetPosition(new Vec2D(x-camHalfWidth, y-camHalfHeight));
+            camera.SetPosition(new Vec2D(x - camHalfWidth, y - camHalfHeight));
         }
-        //public override void Start()
-        //{
-        //    // collision test object
-        //    var obstacle = new GameObject("Obstacle");
-        //    var pb = obstacle.AddComponent<PhysicsBody>();
-        //    var bc = obstacle.AddComponent<BoxCollider>();
-        //    bc.UpdateColliderSize(40, 40);
-        //    obstacle.transform.position = new Vec2D((gameBounds.x / 2) - 290, 500);
+        public override void Start()
+        {
+            //// collision test object
+            //var obstacle = new GameObject("Obstacle");
+            //var pb = obstacle.AddComponent<PhysicsBody>();
+            //var bc = obstacle.AddComponent<BoxCollider>();
+            //bc.UpdateColliderSize(40, 40);
+            //obstacle.transform.position = new Vec2D((gameBounds.x / 2) - 290, 500);
 
-        //    // collision test object
-        //    var obstacle2 = new GameObject("Obstacle");
-        //    var pb2 = obstacle2.AddComponent<PhysicsBody>();
-        //    var bc2 = obstacle2.AddComponent<BoxCollider>();
-        //    bc2.UpdateColliderSize(40, 40);
-        //    obstacle2.transform.position = new Vec2D((gameBounds.x / 2) + 290, 500);
+            // collision test object
+            var obstacle2 = new GameObject("Obstacle");
+            var pb2 = obstacle2.AddComponent<PhysicsBody>();
+            var bc2 = obstacle2.AddComponent<BoxCollider>();
+            bc2.UpdateColliderSize(40, 300);
+            obstacle2.transform.position = new Vec2D((gameBounds.x / 2) + 1500, 500);
 
-        //}
+        }
     }
 
 

@@ -20,7 +20,11 @@ namespace ShootEmUp
             using (scene.Activate())
             {
                 GameObject highscore = new GameObject("Highscore");
-                highscore.AddComponent<HighscoreScript>();
+                var highscoreScript = highscore.AddComponent<HighscoreScript>();
+                var hs = new OnlineHighscores<int>(100, "SpaceShooter");
+                highscoreScript.SetHighscores(hs);
+
+                highscoreScript.AddHighscoreState(PlayerData.Instance.TotalScore);
             }
 
             return scene;

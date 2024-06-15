@@ -1234,6 +1234,11 @@ namespace SDL2Engine
             this.source = path;
         }
 
+        public String GetTexture()
+        {
+            return this.source;
+        }
+
         // sets the path to the texture without loading it immediately
         public void SetSprite(string path)
         {

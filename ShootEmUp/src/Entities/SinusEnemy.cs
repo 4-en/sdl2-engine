@@ -73,7 +73,7 @@ namespace ShootEmUp.src.Entities
                 var spriteRenderer = projectile.AddComponent<SpriteRenderer>();
                 if (spriteRenderer != null)
                 {
-                    spriteRenderer.SetTexture("Assets/Textures/projectile_sprite_sheet.png");
+                    spriteRenderer.SetTexture("Assets/Textures/projectile_sprite_sheet_blue.png");
                     spriteRenderer.SetSpriteSize(400, 400);
                     spriteRenderer.SetSize(60, 60);
                     spriteRenderer.AddAnimation(new AnimationInfo("projectile", 0, 4, 0.075));

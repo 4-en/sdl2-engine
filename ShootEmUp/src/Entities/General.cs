@@ -171,8 +171,17 @@ namespace ShootEmUp.Entities
             {
                 physicsBody.Velocity = Vec2D.Zero;
             }
-            //gameObject.GetComponent<SpriteRenderer>()?.SetSource("Assets/Textures/projectile_explosion_sprite_sheet.png");
-            gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet.png");
+
+            //set explosion texture
+            String currentTexture = gameObject.GetComponent<SpriteRenderer>()?.GetTexture() ?? "";
+            if (currentTexture.Equals("Assets/Textures/projectile_sprite_sheet.png")) {
+                gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet.png");
+            }
+            else
+            {
+
+                gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet_blue.png");
+            }
 
 
             hasCollided = true;

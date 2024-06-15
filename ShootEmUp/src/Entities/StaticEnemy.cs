@@ -42,7 +42,7 @@ namespace ShootEmUp
                 var spriteRendererRight = projectileRight.AddComponent<SpriteRenderer>();
                 if (spriteRendererRight != null)
                 {
-                    spriteRendererRight.SetTexture("Assets/Textures/projectile_sprite_sheet.png");
+                    spriteRendererRight.SetTexture("Assets/Textures/projectile_sprite_sheet_blue.png");
                     spriteRendererRight.SetSpriteSize(400, 400);
                     spriteRendererRight.SetSize(60, 60);
                     spriteRendererRight.AddAnimation(new AnimationInfo("projectile", 0, 4, 0.075));
@@ -55,12 +55,13 @@ namespace ShootEmUp
                 var projectileLeft = new GameObject("Projectile");
                 projectileLeft.AddComponent<ProjectileScript>();
                 projectileLeft.transform.position = gameObject.transform.position + new Vec2D(-135, 0);
+                projectileLeft.transform.rotation = 180;
                 var pbLeft = projectileLeft.AddComponent<PhysicsBody>();
                 pbLeft.Velocity = new Vec2D(-250, 0);
                 var spriteRendererLeft = projectileLeft.AddComponent<SpriteRenderer>();
                 if (spriteRendererLeft != null)
                 {
-                    spriteRendererLeft.SetTexture("Assets/Textures/projectile_sprite_sheet.png");
+                    spriteRendererLeft.SetTexture("Assets/Textures/projectile_sprite_sheet_blue.png");
                     spriteRendererLeft.SetSpriteSize(400, 400);
                     spriteRendererLeft.SetSize(60, 60);
                     spriteRendererLeft.AddAnimation(new AnimationInfo("projectile", 0, 4, 0.075));

@@ -143,6 +143,11 @@ namespace ShootEmUp
             continueButton.SetLocalPosition(new Vec2D(750, 575));
             menu.AddChild(continueButton);
 
+            var mainMenuButtonTuple = Button("Main Menu", () => { LevelManager.LoadHomeScreen(); return true; }, new Rect(0, 0, 300, 100), Color.White, 44);
+            var mainMenuButton = mainMenuButtonTuple.Item1;
+            mainMenuButton.SetLocalPosition(new Vec2D(-750, 575));
+            menu.AddChild(mainMenuButton);
+
             return menu;
         }
 

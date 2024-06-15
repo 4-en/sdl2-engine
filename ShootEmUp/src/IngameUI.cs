@@ -209,7 +209,7 @@ namespace ShootEmUp
                 var text = highscoreText.AddComponent<TextRenderer>();
                 
                 highscoreText.transform.position = new Vec2D(GetCamera().GetVisibleWidth() - 100, 100);
-                text.anchorPoint = AnchorPoint.Center;
+                text.anchorPoint = AnchorPoint.CenterRight;
                 text.SetText(PlayerData.Instance.TotalScore.ToString());
                 text.SetColor(SDL2Engine.Color.White);
                 text.SetFontSize(48);

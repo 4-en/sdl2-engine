@@ -239,17 +239,53 @@ namespace ShootEmUp
         {
 
 
-            var camera = GetCamera() as Camera;
+            var camera = GetCamera();
 
             // Get the current position of the camera and the player
             Vec2D cameraPosition = camera.GetPosition();
             Vec2D playerPosition = gameObject.GetPosition();
 
             // Set the new camera position
-            camera?.UpdateCameraPositionToPlayer(playerPosition, gameBounds, WorldSize);
+            UpdateCameraPositionToPlayer(playerPosition, camera.GetVisibleSize(), WorldSize);
 
 
 
+        }
+
+        private void UpdateCameraPositionToPlayer(Vec2D playerPosition, Vec2D gameBounds, Vec2D bordersSize)
+        {
+            var camera = GetCamera();
+            
+            double camHalfWidth = camera.GetVisibleWidth() / 2;
+            double camHalfHeight = camera.GetVisibleHeight() / 2;
+
+            double x = playerPosition.x;
+            double y = playerPosition.y;
+
+            double minX = camHalfWidth - bordersSize.x;
+            double minY = camHalfHeight - bordersSize.y;
+            double maxX = bordersSize.x - camHalfWidth;
+            double maxY = bordersSize.y - camHalfHeight;
+
+            if (x < minX)
+            {
+                x = minX;
+            }
+            else if (x > maxX)
+            {
+                x = maxX;
+            }
+
+            if (y < minY)
+            {
+                y = minY;
+            }
+            else if (y > maxY)
+            {
+                y = maxY;
+            }
+
+            camera.SetPosition(new Vec2D(x-camHalfWidth, y-camHalfHeight));
         }
         //public override void Start()
         //{

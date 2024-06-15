@@ -222,50 +222,6 @@ namespace SDL2Engine
         bool shouldFollowX = true; // Initialer Zustand, Kamera folgt dem Spieler auf der X-Achse
         bool shouldFollowY = true; // Initialer Zustand, Kamera folgt dem Spieler auf der Y-Achse
 
-        public void SetPosition2(Vec2D position)
-        {
-            double newX = this.Position.x;
-            double newY = this.Position.y;
-
-            if (shouldFollowX)
-            {
-                newX = position.x;
-            }
-
-            if (shouldFollowY)
-            {
-                newY = position.y;
-            }
-
-            this.Position = new Vec2D(newX, newY);
-        }
-
-        public void UpdateCameraPositionToPlayer(Vec2D playerPosition, Vec2D gameBounds, Vec2D bordersSize)
-        {
-            double distanceFromCenterX = Math.Abs(playerPosition.x - (gameBounds.x / 2));
-            double distanceFromCenterY = Math.Abs(playerPosition.y - (gameBounds.y / 2));
-
-            if (distanceFromCenterX > bordersSize.x)
-            {
-                shouldFollowX = false; // Hört auf, dem Spieler auf der X-Achse zu folgen
-            }
-            else if (distanceFromCenterX < bordersSize.x)
-            {
-                shouldFollowX = true; // Beginnt wieder, dem Spieler auf der X-Achse zu folgen
-            }
-
-            if (distanceFromCenterY > bordersSize.y)
-            {
-                shouldFollowY = false; // Hört auf, dem Spieler auf der Y-Achse zu folgen
-            }
-            else if (distanceFromCenterY < bordersSize.y)
-            {
-                shouldFollowY = true; // Beginnt wieder, dem Spieler auf der Y-Achse zu folgen
-            }
-
-            SetPosition2(playerPosition - gameBounds / 2);
-        }
-
         public void SetPosition(Vec2D position)
         {
             this.Position = position;
@@ -300,6 +256,39 @@ namespace SDL2Engine
             }
 
             return new Vec2D(Engine.windowWidth, Engine.windowHeight);
+        }
+
+        public Vec2D GetVisibleSize()
+        {
+            
+            if(keepAspectRatio)
+            {
+                double aspectRatio = WorldSize.x / WorldSize.y;
+                double windowAspectRatio = (double)Engine.windowWidth / (double)Engine.windowHeight;
+
+                if (aspectRatio > windowAspectRatio)
+                {
+                    return new Vec2D(WorldSize.x, WorldSize.y / (windowAspectRatio / aspectRatio));
+                }
+                else
+                {
+                    return new Vec2D(WorldSize.x * (windowAspectRatio / aspectRatio), WorldSize.y);
+                }
+                
+
+            }
+
+            return WorldSize;
+        }
+
+        public double GetVisibleWidth()
+        {
+            return GetVisibleSize().x;
+        }
+
+        public double GetVisibleHeight()
+        {
+            return GetVisibleSize().y;
         }
 
         public Vec2D ScreenToWorld(Vec2D screenPosition)

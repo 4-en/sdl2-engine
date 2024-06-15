@@ -665,7 +665,7 @@ namespace SDL2Engine
                 sortDrawables = false;
             }
             var camPos = mainCamera.GetPosition();
-            var camSize = mainCamera.GetWorldSize();
+            var camSize = mainCamera.GetVisibleSize();
             Rect visibleWorld = new Rect(camPos.x, camPos.y, camSize.x, camSize.y);
 
 

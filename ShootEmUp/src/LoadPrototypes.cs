@@ -22,6 +22,7 @@ namespace ShootEmUp
             StaticEnemy.CreateStaticEnemyPrototype();
             Asteroid.CreateAsteroidPrototype();
             ShieldPowerUp.CreateShieldPowerUpPrototype();
+            HealthPowerUp.CreateHealthPowerUpPrototype();
         }
 
         private static void LoadExamplePrototype()

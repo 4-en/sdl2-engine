@@ -8,13 +8,13 @@ using static ShootEmUp.IngameUI;
 
 namespace ShootEmUp.src.Entities
 {
-    internal class ShieldPowerUp : Script
+    internal class HealthPowerUp : Script
     {
-        public static Prototype CreateShieldPowerUpPrototype()
+        public static Prototype CreateHealthPowerUpPrototype()
         {
-            var prototype = new Prototype("ShieldPowerUp");
+            var prototype = new Prototype("HealthPowerUp");
             var sprite = prototype.AddComponent<SpriteRenderer>();
-            sprite.SetTexture("Assets/Textures/powerups/Armor_Bonus.png");
+            sprite.SetTexture("Assets/Textures/powerups/HP_Bonus.png");
             sprite.SetWorldSize(75, 75);
             var collider = prototype.AddComponent<CircleCollider>();
             if (collider != null)
@@ -23,7 +23,7 @@ namespace ShootEmUp.src.Entities
                 collider.IsTrigger = true;
             }
             prototype.AddComponent<ShieldPowerUp>();
-            prototype.AddComponent<DestroyAndCreateShieldOnCollision>();
+            prototype.AddComponent<DestroyAndHealOnCollision>();
             var body = prototype.AddComponent<PhysicsBody>();
             body.RotateWithVelocity = false;
 
@@ -37,6 +37,7 @@ namespace ShootEmUp.src.Entities
             var body = GetComponent<PhysicsBody>();
             if (body != null)
                 body.Velocity = new Vec2D(0, 1);
+
             player = Find("Player");
         }
 
@@ -44,7 +45,7 @@ namespace ShootEmUp.src.Entities
 
 
 
-    class DestroyAndCreateShieldOnCollision : Script
+    class DestroyAndHealOnCollision : Script
     {
         public override void OnCollisionEnter(CollisionPair collision)
         {
@@ -52,8 +53,10 @@ namespace ShootEmUp.src.Entities
             if (collisionName.Equals("Player"))
             {
                 Destroy(this.gameObject);
-                Console.WriteLine("Shield PowerUp Collected");
-                HealthBar.backgroundColor = new SDL2Engine.Color(0, 0, 255, 255);
+                Console.WriteLine("Health PowerUp Collected");
+                Console.WriteLine(Player.currentHealth);
+                Console.WriteLine(Player.maxHealth);
+                Player.currentHealth = Player.maxHealth;
 
             }
         }

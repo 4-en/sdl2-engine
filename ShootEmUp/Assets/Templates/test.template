@@ -6,3 +6,4 @@
 <StaticEnemy x="100" y="100" xr="400" yr="400" count="1" />
 <Asteroid x="1200" y="300" xr="400" yr="400" count="1" />
 <ShieldPowerUp x="1400" y="150" xr="0" yr="0" count="1" />
+<HealthPowerUp x="1200" y="150" xr="0" yr="0" count="1" />

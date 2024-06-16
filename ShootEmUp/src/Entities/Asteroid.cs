@@ -67,15 +67,7 @@ namespace ShootEmUp
 
         public override void Start()
         {
-            var asteroid = new GameObject("Asteroid");
-            var texture = asteroid.AddComponent<TextureRenderer>();
-            texture.SetSource(asteroidTexture);
-            var pb = asteroid.AddComponent<PhysicsBody>();
-            BoxCollider.FromDrawableRect(asteroid);
-            pb.Velocity = new Vec2D(xSpeed, ySpeed);
-            asteroid.transform.position = position;
-            asteroid.AddComponent<RotationScript>();
-            asteroid.AddComponent<ProjectileScript>();
+            
         }
         public override void Update()
         {

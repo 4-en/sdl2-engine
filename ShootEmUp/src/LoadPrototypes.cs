@@ -1,6 +1,6 @@
 ﻿using SDL2Engine;
-using ShootEmUp.src.Entities;
 using ShootEmUp.Entities;
+using ShootEmUp.src.Entities;
 
 namespace ShootEmUp
 {
@@ -23,6 +23,8 @@ namespace ShootEmUp
             Asteroid.CreateAsteroidPrototype();
             ShieldPowerUp.CreateShieldPowerUpPrototype();
             HealthPowerUp.CreateHealthPowerUpPrototype();
+            BoostPowerUp.CreateBoostPowerUpPrototype();
+            RocketPowerUp.CreateRocketPowerUpPrototype();
             SinusEnemy.CreateSinusEnemyPrototype();
             TargetingShooter.CreatePrototype();
             Bomber.CreatePrototype();

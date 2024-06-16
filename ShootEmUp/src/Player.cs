@@ -248,7 +248,7 @@ namespace ShootEmUp
             // other keybindings
 
             // fire target rocket
-            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_1))
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_q))
             {
                 ShootRocket();
             }
@@ -274,7 +274,7 @@ namespace ShootEmUp
 
             double rotation = gameObject.transform.rotation;
 
-            missile.SetPosition(gameObject.GetPosition() + new Vec2D(rotation/180*double.Pi).Normalize() * 200);
+            missile.SetPosition(gameObject.GetPosition() + new Vec2D(rotation/180*double.Pi).Normalize() * 100);
 
             var missileBody = missile.GetComponent<PhysicsBody>();
             if (missileBody == null)
@@ -294,6 +294,10 @@ namespace ShootEmUp
             }
 
             missileBody.Velocity = new Vec2D(rotation / 180 * double.Pi).Normalize() * 200;
+            if(missileBody.Velocity.Length() == 0)
+            {
+                Console.WriteLine("Missile velocity is 0");
+            }
         }
 
 

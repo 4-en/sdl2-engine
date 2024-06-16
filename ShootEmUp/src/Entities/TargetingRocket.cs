@@ -30,7 +30,7 @@ namespace ShootEmUp.Entities
 
         public GameObject? target = null;
         private bool targetSearchStartet = false;
-        public double rotationSpeed = 100;
+        public double rotationSpeed = 2;
         public double speed = 500;
         private bool directionLocked = false;
 
@@ -47,6 +47,7 @@ namespace ShootEmUp.Entities
             }
 
             var myPos = gameObject.GetPosition();
+  
             var myDir = GetComponent<PhysicsBody>()?.Velocity ?? new Vec2D(0, 0);
             if(myDir.Length() == 0)
             {
@@ -69,6 +70,11 @@ namespace ShootEmUp.Entities
                     continue;
                 }
 
+                if(!(target is BaseEnemy))
+                {
+                    continue;
+                }
+
                 var component = target as Component;
                 if(component == null)
                 {
@@ -78,8 +84,11 @@ namespace ShootEmUp.Entities
                 var targetPos = component.GetGameObject().GetPosition();
 
                 var dir = targetPos - myPos;
-                var angle = myDir.AngleTo(dir);
+                var angle = myDir.GetRotation() - dir.GetRotation();
                 angle = Math.Abs(angle);
+
+                if(angle > 70) continue;
+
                 double dist = dir.Length();
 
                 double targetValue = CalculateTargetValue(angle, dist);
@@ -143,13 +152,18 @@ namespace ShootEmUp.Entities
             var targetDir = targetPos - myPos;
             var targetDistanceSqrt = targetDir.LengthSquared();
 
-            if(targetDistanceSqrt < 100)
+            if(targetDistanceSqrt < 300)
             {
                 target = null;
                 return;
             }
 
-            var myDir = GetComponent<PhysicsBody>()?.Velocity ?? new Vec2D(0, 0);
+            var myDir = new Vec2D(0, 0);
+            var physicsBody = GetComponent<PhysicsBody>();
+            if(physicsBody != null)
+            {
+                myDir = physicsBody.Velocity.Normalize();
+            }
 
             if(myDir.Length() == 0)
             {
@@ -175,7 +189,6 @@ namespace ShootEmUp.Entities
             myDir = myDir.RotateRadians(rotation);
             myDir = myDir.Normalize() * speed;
             
-            var physicsBody = GetComponent<PhysicsBody>();
             if(physicsBody != null)
             {
                 physicsBody.Velocity = myDir;

@@ -46,6 +46,8 @@ namespace ShootEmUp.Entities
         {
             base.Update();
 
+            return;
+
             if(nextMissile <= Time.time)
             {
                 nextMissile = Time.time + missileRate;

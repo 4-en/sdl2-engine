@@ -95,6 +95,7 @@ namespace ShootEmUp.Level
         private GameObject? shopMenu = null;
 
         private bool was_setup = false;
+        private bool player_died = false;
 
         public BaseLevel()
         {
@@ -179,7 +180,7 @@ namespace ShootEmUp.Level
             // Add the event listener for enemy killed events
             eventListener = EventBus.AddListener<EnemyKilledEvent>((eventData) =>
             {
-                int points = CalculateCombo((int)eventData.enemy.GetPoints());
+                int points = CalculateCombo(eventData.enemy.GetPoints());
                 AddScore(points);
                 AddMoney(points);
             });
@@ -338,6 +339,13 @@ namespace ShootEmUp.Level
         private void OnWin()
         {
             this.Pause();
+
+            if(player_died)
+            {
+                OnFail();
+                return;
+            }
+
             // End the level as a success
             LevelManager.LoadShop();
         }
@@ -438,6 +446,12 @@ namespace ShootEmUp.Level
 
         public override void Update()
         {
+
+            if(player_died)
+            {
+                return;
+            }
+
             HandleInput();
             if (this.paused)
             {
@@ -486,7 +500,21 @@ namespace ShootEmUp.Level
             // check for player health
             if ((playerScript?.GetHealth() ?? -1) <= 0)
             {
-                OnFail();
+
+                player_died = true;
+
+                Delay(2, () =>
+                {
+                    OnFail();
+                });
+
+                GameObject? player = playerScript?.GetGameObject();
+                if (player != null)
+                {
+                    player.Destroy();
+
+                    Effects.ExplosionParticles(player.GetPosition(), 200);
+                }
             }
 
 

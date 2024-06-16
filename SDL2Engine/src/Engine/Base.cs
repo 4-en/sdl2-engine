@@ -32,10 +32,22 @@ namespace SDL2Engine
             this.z = z;
         }
 
+        public Vec2D(double angle)
+        {
+            x = Math.Cos(angle);
+            y = Math.Sin(angle);
+            z = 0;
+        }
+
         // to string
         public override string ToString()
         {
             return "(" + x + ", " + y + ")";
+        }
+
+        public double AngleTo(Vec2D other)
+        {
+            return Math.Atan2(other.y - y, other.x - x) * 180 / Math.PI;
         }
 
         public static Vec2D operator +(Vec2D a, Vec2D b)
@@ -170,6 +182,7 @@ namespace SDL2Engine
             return this / Length();
         }
 
+        // Rotate the vector by a given angle in degrees
         public Vec2D Rotate(double rotation)
         {
             double rad = rotation * Math.PI / 180;
@@ -178,9 +191,22 @@ namespace SDL2Engine
             return new Vec2D(x * cos - y * sin, x * sin + y * cos);
         }
 
-        public double getRotation()
+        public Vec2D RotateRadians(double rotation)
+        {
+            double cos = Math.Cos(rotation);
+            double sin = Math.Sin(rotation);
+            return new Vec2D(x * cos - y * sin, x * sin + y * cos);
+        }
+
+        // Get the rotation of the vector in degrees
+        public double GetRotation()
         {
             return Math.Atan2(y, x) * 180 / Math.PI;
+        }
+
+        public double GetRotationRadians()
+        {
+            return Math.Atan2(y, x);
         }
 
         public static bool operator >(Vec2D a, Vec2D b)
@@ -460,6 +486,11 @@ namespace SDL2Engine
         private static uint GetOrder()
         {
             return createdObjects++;
+        }
+
+        public static Random GetRandom()
+        {
+            return random;
         }
 
         [JsonIgnore]

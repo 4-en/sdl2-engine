@@ -162,6 +162,11 @@ namespace SDL2Engine
             return gameObject.FindComponent<T>();
         }
 
+        public List<T> FindComponents<T>()
+        {
+            return gameObject.FindComponents<T>();
+        }
+
         // Returns the GameObject with the given name in the scene
         public GameObject? Find(string name)
         {
@@ -746,7 +751,7 @@ namespace SDL2Engine
             base.Awake();
             if (playOnAwake)
             {
-                Play();
+                Play(-1);
             }
         }
 
@@ -767,6 +772,15 @@ namespace SDL2Engine
         // Playing the music
         public bool Play(int loop = 0)
         {
+
+            if (music == null)
+            {
+                if (source != "")
+                {
+                    Load();
+                }
+            }
+
             if (music != null)
             {
                 var result = music.Play(loop);

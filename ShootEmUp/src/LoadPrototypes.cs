@@ -29,6 +29,7 @@ namespace ShootEmUp
             Spawner.CreatePrototype();
             EdgeSpawner.CreatePrototype();
             Planet.CreatePlanetPrototype();
+            TargetingRocket.CreatePrototype();
         }
 
         private static void LoadExamplePrototype()

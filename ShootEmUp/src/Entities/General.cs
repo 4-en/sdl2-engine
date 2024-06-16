@@ -83,6 +83,9 @@ namespace ShootEmUp.Entities
 
             damageable.Damage(new Damage(damage, gameObject, team));
 
+            Vec2D random_offset = new Vec2D(random.NextDouble() * 100 - 50, random.NextDouble() * 100 - 50);
+            GameText.CreateAt(other.GetPosition() + random_offset, damage.ToString(), 2, 52, new Color(255, 0, 0, 255));
+
             if (destroyOnCollision)
             {
                 gameObject.Destroy();

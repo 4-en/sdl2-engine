@@ -47,6 +47,12 @@ namespace ShootEmUp
                 case 5:
                     level = CreateLevel5();
                     break;
+                case 6:
+                    level = CreateLevel6();
+                    break;
+                case 7:
+                    level = CreateFinalLevel();
+                    break;
                 default:
                     EndRun(true);
                     return;
@@ -184,6 +190,59 @@ namespace ShootEmUp
                         new EnemyWave("JustBombers.template", 20, 3),
                     ],
                     60
+                );
+
+                var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
+                var player = music.Item2;
+
+                player.playOnAwake = true;
+                player.SetSource("Assets/Audio/music1.mp3");
+            }
+
+            return level;
+        }
+
+        public static Scene CreateLevel6()
+        {
+
+            var level = new Scene("Level 6");
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level 6").Item2;
+                levelScript.SetupLevel(
+                    6,
+                    [
+                        new EnemyWave("Level6Start.template", 30, 1),
+                        new EnemyWave("Level6Waves.template", 20, 2),
+                    ],
+                    80
+                );
+
+                var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
+                var player = music.Item2;
+
+                player.playOnAwake = true;
+                player.SetSource("Assets/Audio/music2.mp3");
+            }
+
+            return level;
+
+        }
+
+        public static Scene CreateFinalLevel()
+        {
+            // basically impossible level
+            var level = new Scene("Level 7");
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level 7").Item2;
+                levelScript.SetupLevel(
+                    7,
+                    [
+                        new EnemyWave("Wave3.template", 20, 1),
+                        new EnemyWave("Level6Waves.template", 10, 100),
+                    ],
+                    600
                 );
 
                 var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");

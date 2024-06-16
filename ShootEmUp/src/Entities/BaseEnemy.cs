@@ -13,11 +13,11 @@ namespace ShootEmUp
             var prototype = new Prototype("BaseEnemy");
             var sprite = prototype.AddComponent<SpriteRenderer>();
             sprite.SetTexture("Assets/Textures/spaceshipset32x32/enemy_1.png");
-            sprite.SetWorldSize(200, 200);
+            sprite.SetWorldSize(100, 100);
             var collider = prototype.AddComponent<CircleCollider>();
             if(collider != null)
             {
-                collider.SetRadius(100);
+                collider.SetRadius(50);
                 collider.IsTrigger = true;
             }
             prototype.AddComponent<BaseEnemy>();
@@ -79,18 +79,6 @@ namespace ShootEmUp
                 body.Velocity = body.Velocity.Normalize() * speed;
             }
             
-        }
-
-        private void TrackPlayer()
-        {
-            if (player == null)
-            {
-                return;
-            }
-            var playerPosition = player.GetPosition();
-            var position = gameObject.GetPosition();
-            var direction = (playerPosition - position).Normalize();
-            GetComponent<PhysicsBody>()?.SetVelocity(direction * speed);
         }
 
         private void OnHealthChange()

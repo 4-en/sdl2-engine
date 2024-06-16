@@ -31,7 +31,7 @@ namespace ShootEmUp
             gameObject.transform.Move(velocity * Time.deltaTime);
         }
 
-        public static GameObject CreateAt(Vec2D position, string text, double duration=2, int fontSize=24, Color? color = null)
+        public static GameObject CreateAt(Vec2D position, string text, double duration=2, int fontSize=24, Color? color = null, double speed = 50)
         {
             var textObject = new GameObject(text);
             textObject.transform.position = position;
@@ -41,7 +41,25 @@ namespace ShootEmUp
             textComponent.SetText(text);
             textComponent.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
             textComponent.duration = duration;
+            textComponent.velocity = new Vec2D(0, -speed);
             return textObject;
         }
+
+        public static GameObject CreateFixedAt(Vec2D position, string text, double duration = 2, int fontSize = 24, Color? color = null, double speed = 50, AnchorPoint anchor = AnchorPoint.Center)
+        {
+            var textObject = new GameObject(text);
+            textObject.transform.position = position;
+            var textComponent = textObject.AddComponent<GameText>();
+            textComponent.color = color ?? new Color(255, 255, 255, 255);
+            textComponent.SetFontSize(fontSize);
+            textComponent.SetText(text);
+            textComponent.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            textComponent.duration = duration;
+            textComponent.velocity = new Vec2D(0, -speed);
+            textComponent.relativeToCamera = false;
+            textComponent.anchorPoint = anchor;
+            return textObject;
+        }
+        
     }
 }

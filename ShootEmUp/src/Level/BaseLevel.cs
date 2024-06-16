@@ -181,8 +181,41 @@ namespace ShootEmUp.Level
             eventListener = EventBus.AddListener<EnemyKilledEvent>((eventData) =>
             {
                 int points = CalculateCombo(eventData.enemy.GetPoints());
+                int combo = this.combo - 1;
+
+                // add point effect
+                double right = GetCamera().GetVisibleWidth() - 100;
+                Vec2D position = new Vec2D(right, 600);
+
+                string text = points.ToString();
+
+                switch(combo)
+                {
+                    case 2:
+                        text = "Combo x2";
+                        break;
+                    case 5:
+                        text = "Combo x5";
+                        break;
+                    case 10:
+                        text = "Combo x10";
+                        break;
+
+                }
+
+                int fontSize = 54 + Math.Min(combo, 10) * 5;
+
+                GameText.CreateFixedAt(position, text, 2, fontSize, new SDL2Engine.Color(255, 255, 255, 255), 200, AnchorPoint.BottomRight);
+
                 AddScore(points);
                 AddMoney(points);
+            });
+
+            // add player damage event listener
+            EventBus.AddListener<PlayerDamageEvent>((eventData) =>
+            {
+                // reset combo
+                combo = 0;
             });
 
             // add text renderer

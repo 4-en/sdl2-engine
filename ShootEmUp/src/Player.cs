@@ -15,6 +15,20 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ShootEmUp
 {
+
+    public class PlayerDamageEvent
+    {
+        public Damage Damage { get; set; }
+        public GameObject Player { get; set; }
+
+        public PlayerDamageEvent(Damage damage, GameObject player)
+        {
+            Damage = damage;
+            Player = player;
+        }
+
+    }
+
     public class Player : Script, IDamageable
     {
         protected Vec2D gameBounds = new Vec2D(1920, 1080);
@@ -112,6 +126,8 @@ namespace ShootEmUp
                 Player.hasShield = false;
                 return;
             }
+
+            EventBus.Dispatch(new PlayerDamageEvent(damage, gameObject));
 
             speed = speed / 2;
 

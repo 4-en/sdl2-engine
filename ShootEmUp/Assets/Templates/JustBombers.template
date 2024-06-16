@@ -1,0 +1,2 @@
+<EdgeSpawner EdgeSpawner.PrototypeName="Bomber" EdgeSpawner.spawnRate="1" />
+<Bomber x="000" y="000" xr="4000" yr="4000" count="5" />

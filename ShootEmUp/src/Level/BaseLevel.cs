@@ -514,6 +514,34 @@ namespace ShootEmUp.Level
                 player.transform.position = position;
             }
         }
+        private int lastClear = 0;
+        private void ClearOutOfBounds()
+        {
+            if (Time.time - lastClear < 1)
+            {
+                return;
+            }
+
+            if(scene == null)
+            {
+                return;
+            }
+
+            lastClear = (int)Time.time;
+
+            double minX = -3500;
+            double minY = -3500;
+            double maxX = 3500;
+            double maxY = 3500;
+
+            foreach(GameObject gameObject in scene.GetGameObjects())
+            {
+                if(gameObject.GetPosition().x < minX || gameObject.GetPosition().x > maxX || gameObject.GetPosition().y < minY || gameObject.GetPosition().y > maxY)
+                {
+                    gameObject.Destroy();
+                }
+            }
+        }
 
         private int lastDuration = 999999;
 
@@ -524,6 +552,8 @@ namespace ShootEmUp.Level
             {
                 return;
             }
+
+            ClearOutOfBounds();
 
             HandleInput();
             if (this.paused)

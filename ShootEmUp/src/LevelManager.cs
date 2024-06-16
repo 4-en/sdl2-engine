@@ -93,10 +93,6 @@ namespace ShootEmUp
 
         public static Scene CreateBaseLevel()
         {
-            
-
-
-
             var level = new Scene("TestLevel");
             using (level.Activate())
             {
@@ -121,6 +117,7 @@ namespace ShootEmUp
 
         public static Scene CreateLevel1()
         {
+
 
             var level = new Scene("Level1");
             using (level.Activate())
@@ -177,7 +174,24 @@ namespace ShootEmUp
 
         public static Scene CreateLevel5()
         {
-            var level = CreateBaseLevel();
+            var level = new Scene("Level 5");
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level 5").Item2;
+                levelScript.SetupLevel(
+                    5,
+                    [
+                        new EnemyWave("JustBombers.template", 20, 3),
+                    ],
+                    60
+                );
+
+                var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
+                var player = music.Item2;
+
+                player.playOnAwake = true;
+                player.SetSource("Assets/Audio/music1.mp3");
+            }
 
             return level;
         }

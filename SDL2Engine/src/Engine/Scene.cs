@@ -399,6 +399,9 @@ namespace SDL2Engine
                 case Collider collider:
                     physicsObjects.Remove(collider.GetGameObject());
                     break;
+                case PhysicsBody physicsBody:
+                    physicsObjects.Remove(physicsBody.GetGameObject());
+                    break;
                 case Script script:
                     var success = scripts.Remove(script);
                     if (!success)

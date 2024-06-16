@@ -67,7 +67,6 @@ namespace ShootEmUp
         public static void ExplosionParticles(Vec2D position, int count = 10, Color? color=null, double lifeTime = 1)
         {
 
-
             for (int i = 0; i < count; i++)
             {
                 var particle = new GameObject("ExplosionParticle");

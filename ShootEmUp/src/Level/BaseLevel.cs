@@ -268,8 +268,8 @@ namespace ShootEmUp.Level
         {
             var rocketButton = new GameObject("RocketButton");
             var rocketButtonScript = rocketButton.AddComponent<AbilityButton>();
-            rocketButtonScript.rightOffset = 100;
-            rocketButtonScript.texturePath = "Assets/Textures/projectiles/rocket.png";
+            rocketButtonScript.rightOffset = 250;
+            rocketButtonScript.texturePath = "Assets/Textures/icons/Skillicon3_22.png";
             rocketButtonScript.buttonName = "Q";
             rocketButtonScript.abilityName = "Rocket";
             rocketButtonScript.charges = () =>
@@ -279,8 +279,8 @@ namespace ShootEmUp.Level
 
             var bombButton = new GameObject("BombButton");
             var bombButtonScript = bombButton.AddComponent<AbilityButton>();
-            bombButtonScript.rightOffset = 250;
-            bombButtonScript.texturePath = "Assets/Textures/projectiles/bomb.png";
+            bombButtonScript.rightOffset = 100;
+            bombButtonScript.texturePath = "Assets/Textures/icons/Skillicon3_03.png";
             bombButtonScript.buttonName = "E";
             bombButtonScript.abilityName = "Bomb";
             bombButtonScript.charges = () =>
@@ -291,12 +291,12 @@ namespace ShootEmUp.Level
             var boostButton = new GameObject("BoostButton");
             var boostButtonScript = boostButton.AddComponent<AbilityButton>();
             boostButtonScript.rightOffset = 400;
-            boostButtonScript.texturePath = "Assets/Textures/projectiles/boost.png";
-            boostButtonScript.buttonName = "^";
+            boostButtonScript.texturePath = "Assets/Textures/icons/Skillicon3_02.png";
+            boostButtonScript.buttonName = "/\\";
             boostButtonScript.abilityName = "Boost";
             boostButtonScript.charges = () =>
             {
-                return PlayerData.Instance.BoostCount;
+                return Player.availableboost;
             };
 
         }

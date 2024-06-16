@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static SDL2.SDL;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ShootEmUp
 {
@@ -34,14 +35,16 @@ namespace ShootEmUp
             var textGO = gameObject.CreateChild("Text");
             textRenderer = textGO.AddComponent<TextRenderer>();
             textRenderer.SetText(buttonName);
-            textRenderer.SetFontSize(38);
+            textRenderer.SetFontSize(30);
+            textRenderer.SetFontPath("Assets/Fonts/PressStartRegular.ttf");
             textGO.SetLocalPosition(new Vec2D(-30, 50));
 
             if (charges != null)
             {
                 var chargeGO = gameObject.CreateChild("ChargeText");
                 chargeRenderer = chargeGO.AddComponent<TextRenderer>();
-                chargeRenderer.SetFontSize(38);
+                chargeRenderer.SetFontSize(30);
+                chargeRenderer.SetFontPath("Assets/Fonts/PressStartRegular.ttf");
                 chargeGO.SetLocalPosition(new Vec2D(30, 50));
             }
 

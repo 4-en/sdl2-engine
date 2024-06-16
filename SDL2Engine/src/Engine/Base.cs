@@ -738,7 +738,7 @@ namespace SDL2Engine
             }
 
             // Create window
-            window = SDL.SDL_CreateWindow("SDL2 Engine Test",
+            window = SDL.SDL_CreateWindow(Engine.gameName,
                 SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED,
                 windowWidth, windowHeight, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
             if (window == IntPtr.Zero)

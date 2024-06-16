@@ -102,7 +102,7 @@ namespace ShootEmUp.Entities
 
         SoundPlayer? shotSound = null;
         SoundPlayer? hitSound = null;
-       
+        // SpriteRenderer? spriteExplosionRenderer = null;
 
 
         public override void Start()
@@ -117,7 +117,7 @@ namespace ShootEmUp.Entities
             }
 
 
-            
+
             collider = gameObject.GetComponent<Collider>();
             if (collider != null)
             {
@@ -142,12 +142,12 @@ namespace ShootEmUp.Entities
                     gameObject.Destroy();
                 }
             }
-            if(!destroyOnScreenExit)
+            if (!destroyOnScreenExit)
             {
                 return;
             }
             var camera = GetCamera();
-            if(camera == null)
+            if (camera == null)
             {
                 return;
             }
@@ -163,8 +163,8 @@ namespace ShootEmUp.Entities
 
         public override void OnCollisionEnter(CollisionPair collision)
         {
-            
-            
+
+
 
             if (hasCollided && collisionFrame != Time.tick)
             {
@@ -179,12 +179,12 @@ namespace ShootEmUp.Entities
                 return;
             }
 
-            if(shooter == other)
+            if (shooter == other)
             {
                 return;
             }
 
-            if(damageable.GetTeam() == team)
+            if (damageable.GetTeam() == team)
             {
                 return;
             }
@@ -196,7 +196,8 @@ namespace ShootEmUp.Entities
 
             //set explosion texture
             String currentTexture = gameObject.GetComponent<SpriteRenderer>()?.GetTexture() ?? "";
-            if (currentTexture.Equals("Assets/Textures/projectile_sprite_sheet.png")) {
+            if (currentTexture.Equals("Assets/Textures/projectile_sprite_sheet.png"))
+            {
                 gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet.png");
             }
             else
@@ -211,6 +212,21 @@ namespace ShootEmUp.Entities
                 hitSound?.Load("Assets/Audio/hit.wav");
                 hitSound?.SetVolume(0.2);
                 hitSound?.Play();
+
+                if (!collision.GetOther(gameObject).GetName().Contains("Planet"))
+                {
+                    var fire = new GameObject("ExplosionAnimation");
+                    var sprite = fire.AddComponent<SpriteRenderer>();
+                    sprite.SetTexture("Assets\\Textures\\explosions\\YellowExplosion.png");
+                    sprite.SetSpriteSize(32, 32);
+                    sprite.SetSize(128, 128);
+                    sprite.AddAnimation(new AnimationInfo("fire", 0, 4, 0.075));
+                    sprite.PlayAnimation("fire");
+                    sprite.SetAnimationType(AnimationType.OnceAndDestroy);
+                    sprite.SetZIndex(-10);
+                    fire.SetPosition(other.GetPosition());
+                }
+
             }
 
             hasCollided = true;
@@ -237,5 +253,4 @@ namespace ShootEmUp.Entities
         }
     }
 
-    
 }

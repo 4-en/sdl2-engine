@@ -155,7 +155,6 @@ namespace ShootEmUp.Entities
             spawned.transform.position = new Vec2D(x, y);
             spawned.GetComponent<PhysicsBody>()?.SetVelocity(new Vec2D(xVel, yVel));
 
-            Console.WriteLine("Spawned at: " + x + ", " + y);
 
 
         }

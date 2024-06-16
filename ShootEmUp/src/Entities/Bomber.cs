@@ -29,7 +29,33 @@ namespace ShootEmUp.Entities
 
             HealthBar.AddTo(prototype.GameObject, -80);
 
+            prototype.AddComponent<Bomber>();
+
             return prototype;
+        }
+
+        public double bombInterval = 5;
+        public double bombTimer = 0;
+
+        public override void Start()
+        {
+            base.Start();
+
+            this.SetPoints(100);
+
+            this.SetMaxHealth(500);
+        }
+        public override void Update()
+        {
+            base.Update();
+
+            bombTimer += Time.deltaTime;
+            if (bombTimer >= bombInterval)
+            {
+                bombTimer = 0;
+                var bomb = Bomb.CreateBomb(gameObject.transform.position, Team.Enemy, gameObject, 500, 300, 2, 0.2);
+            }
+
         }
     }
 }

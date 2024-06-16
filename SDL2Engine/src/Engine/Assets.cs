@@ -357,7 +357,7 @@ namespace SDL2Engine
             int sound_channel = SDL2.SDL_mixer.Mix_PlayChannel(-1, sound_ref, loops);
             if (sound_channel == -1)
             {
-                Console.WriteLine("Sound: Failed to play sound: " + handler.GetPath());
+                // Console.WriteLine("Sound: Failed to play sound: " + handler.GetPath());
                 return false;
             }
             this.channel = sound_channel;

@@ -211,8 +211,8 @@ namespace ShootEmUp
             {
                 if(score.Item1 == Environment.UserName && score.Item2 == playerScore)
                 {
-                    nameString += "[ " + score.Item1 + "\n";
-                    scoreString += score.Item2 + " ]\n";
+                    nameString += "> " + score.Item1 + "\n";
+                    scoreString += score.Item2 + " <\n";
                     continue;
                 }
 

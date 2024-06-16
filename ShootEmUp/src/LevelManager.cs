@@ -121,6 +121,7 @@ namespace ShootEmUp
 
         public static Scene CreateLevel1()
         {
+
             var level = new Scene("Level1");
             using (level.Activate())
             {

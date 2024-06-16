@@ -547,6 +547,12 @@ namespace ShootEmUp.Level
                 lastDuration = intDuration;
                 topCenterText?.GetGameObject().SetPosition(new Vec2D(GetCamera().GetVisibleWidth() / 2, 100));
                 topCenterText?.SetText($"{intDuration}s");
+
+                if(intDuration == 10)
+                {
+                    topCenterText?.SetColor(new SDL2Engine.Color(255, 0, 0, 255));
+                    topCenterText?.SetFontSize(64);
+                }
             }
 
             // Check if the current wave is completed

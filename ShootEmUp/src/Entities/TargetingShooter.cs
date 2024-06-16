@@ -75,6 +75,14 @@ namespace ShootEmUp.Entities
                 }
 
                 missileBody.Velocity = body.Velocity.Normalize();
+
+                TargetingRocket? rocket = missile.GetComponent<TargetingRocket>();
+                if(rocket != null)
+                {
+                    rocket.shooter = gameObject;
+                    rocket.team = Team.Enemy;
+                    rocket.damage = 300;
+                }
             }
         }
     }

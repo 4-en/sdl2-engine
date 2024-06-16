@@ -93,6 +93,14 @@ namespace ShootEmUp.Entities
                 
             }
 
+            if(targetObj == null)
+            {
+                yield return 1.0;
+                if(this.scene != null)
+                    StartCoroutine(FindTarget());
+                yield break;
+            }
+
             this.target = targetObj;
 
             yield return 3.0;
@@ -101,11 +109,11 @@ namespace ShootEmUp.Entities
 
         }
 
+
         public override void Start()
         {
             base.Start();
 
-            this.damage = 500;
 
             if (target == null && !targetSearchStartet)
             {
@@ -133,6 +141,14 @@ namespace ShootEmUp.Entities
             var targetPos = target.GetPosition();
 
             var targetDir = targetPos - myPos;
+            var targetDistanceSqrt = targetDir.LengthSquared();
+
+            if(targetDistanceSqrt < 100)
+            {
+                target = null;
+                return;
+            }
+
             var myDir = GetComponent<PhysicsBody>()?.Velocity ?? new Vec2D(0, 0);
 
             if(myDir.Length() == 0)

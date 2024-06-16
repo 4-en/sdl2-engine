@@ -243,6 +243,57 @@ namespace ShootEmUp
             {
                 physicsBody.Velocity = new Vec2D(Player.speed, 0).Rotate(gameObject.transform.rotation);
             }
+
+
+            // other keybindings
+
+            // fire target rocket
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_1))
+            {
+                ShootRocket();
+            }
+        }
+
+        private void ShootRocket()
+        {
+            var missile = Prototype.Instantiate("TargetingRocket");
+
+            var body = GetComponent<PhysicsBody>();
+
+            if (missile == null)
+            {
+                Console.WriteLine("Could not instantiate missile");
+                return;
+            }
+
+            if (body == null)
+            {
+                Console.WriteLine("Could not find physics body");
+                return;
+            }
+
+            double rotation = gameObject.transform.rotation;
+
+            missile.SetPosition(gameObject.GetPosition() + new Vec2D(rotation/180*double.Pi).Normalize() * 200);
+
+            var missileBody = missile.GetComponent<PhysicsBody>();
+            if (missileBody == null)
+            {
+                Console.WriteLine("Could not find missile physics body");
+                return;
+            }
+
+            TargetingRocket? targetingRocket = missile.GetComponent<TargetingRocket>();
+
+            if(targetingRocket != null)
+            {
+                targetingRocket.team = Team.Player;
+                targetingRocket.shooter = gameObject;
+                targetingRocket.speed = body.Velocity.Length() + 200;
+                targetingRocket.damage = PlayerData.Instance.DamageUpgradeLevel * 200 + 200;
+            }
+
+            missileBody.Velocity = new Vec2D(rotation / 180 * double.Pi).Normalize() * 200;
         }
 
 

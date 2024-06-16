@@ -1,5 +1,5 @@
 <EdgeSpawner EdgeSpawner.PrototypeName="Bomber" EdgeSpawner.spawnRate="1" />
-<TargetingShooter x="000" y="000" xr="4000" yr="4000" count="5" />
+<MultiShot x="000" y="000" xr="4000" yr="4000" count="5" />
 <StaticEnemy x="100" y="100" xr="400" yr="400" count="1" />
 <Asteroid x="1200" y="300" xr="400" yr="400" count="1" Asteroid.xSpeed="10" Asteroid.ySpeed="10"/>
 <ShieldPowerUp x="1400" y="150" xr="0" yr="0" count="1" />

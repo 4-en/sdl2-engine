@@ -103,6 +103,12 @@ namespace ShootEmUp
                     ],
                     20
                 );
+
+                var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
+                var player = music.Item2;
+
+                player.playOnAwake = true;
+                player.SetSource("Assets/Audio/music1.mp3");
             }
 
             return level;

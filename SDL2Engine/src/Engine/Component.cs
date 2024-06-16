@@ -751,7 +751,7 @@ namespace SDL2Engine
             base.Awake();
             if (playOnAwake)
             {
-                Play();
+                Play(-1);
             }
         }
 
@@ -772,6 +772,15 @@ namespace SDL2Engine
         // Playing the music
         public bool Play(int loop = 0)
         {
+
+            if (music == null)
+            {
+                if (source != "")
+                {
+                    Load();
+                }
+            }
+
             if (music != null)
             {
                 var result = music.Play(loop);

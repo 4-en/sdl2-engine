@@ -14,8 +14,8 @@ namespace ShootEmUp
         private GameObject Fire = new GameObject();
         public override void Start()
         {
-            int rows = 3; // Anzahl der Reihen
-            int columns = 4; // Anzahl der Spalten
+            int rows = 6; // Anzahl der Reihen
+            int columns = 8; // Anzahl der Spalten
             float spacing = BgTileSize - 1; // Abstand zwischen den Objekten bzw. PNG-Größe
 
 

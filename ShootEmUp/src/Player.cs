@@ -36,8 +36,8 @@ namespace ShootEmUp
         public int fireRate;
         public int fireRange;
         public int shield;
-
-
+        internal static int boostSpeed;
+        internal static int availableboost;
 
         public Player()
         {
@@ -58,6 +58,8 @@ namespace ShootEmUp
             fireRate = 10;
             fireRange = 10;
             shield = 10;
+            availableboost = 2;
+            boostSpeed = 400;
 
         }
 
@@ -105,7 +107,7 @@ namespace ShootEmUp
 
             speed = speed / 2;
 
-            if(speed < minSpeed)
+            if (speed < minSpeed)
             {
                 speed = minSpeed;
             }
@@ -175,9 +177,12 @@ namespace ShootEmUp
         public int down = (int)SDL_Keycode.SDLK_s;
         public int space = (int)SDL_Keycode.SDLK_SPACE;
         public int enter = (int)SDL_Keycode.SDLK_RETURN;
+        public int leftShift = (int)SDL_Keycode.SDLK_LSHIFT;
 
 
-
+        public double boostEndTime = 0;
+        public double boostDecay = 200;
+        public bool isBoosting = false;
 
 
 
@@ -191,7 +196,6 @@ namespace ShootEmUp
             if (Input.GetKeyPressed(left))
             {
                 gameObject.transform.rotation -= Player.rotationSpeed * Time.deltaTime;
-
             }
             if (Input.GetKeyPressed(right))
             {
@@ -209,6 +213,29 @@ namespace ShootEmUp
             {
                 Player.speed = Player.speed > 0 && Player.speed > Player.minSpeed ? Player.speed - Player.acceleration : Player.speed;
             }
+            if (Input.GetKeyDown(leftShift) && !isBoosting && Player.availableboost > 0)
+            {
+                isBoosting = true;
+                boostEndTime = Time.time + 1.0f; // Boost lasts for 1 second
+                Player.speed += Player.boostSpeed;
+                Player.availableboost -= 1; // Decrease available boost count
+                Console.WriteLine("availableboosts " + Player.availableboost);
+            }
+            if (isBoosting && Time.time >= boostEndTime)
+            {
+                // Calculate speed reduction rate per second
+                float speedReductionRate = (float)(boostDecay * Time.deltaTime);
+                // Reduce speed slowly down to maxSpeed
+                Player.speed = (int)Math.Max(Player.maxSpeed, Player.speed - speedReductionRate);
+
+                // Check if speed should be reset to maxSpeed
+                if (Player.speed <= Player.maxSpeed)
+                {
+                    isBoosting = false; // Reset the boost state
+                }
+                //  Console.WriteLine("Current speed: " + Player.speed);
+            }
+
             if (Input.GetKeyDown(enter))
             {
                 if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship1.png")
@@ -237,6 +264,7 @@ namespace ShootEmUp
                     Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship1.png";
                 }
             }
+
             //rotate velocity
             var physicsBody = gameObject.GetComponent<PhysicsBody>();
             if (physicsBody != null)
@@ -320,12 +348,12 @@ namespace ShootEmUp
             //obstacle.transform.position = new Vec2D((gameBounds.x / 2) - 290, 500);
 
             // collision test object
-            var obstacle2 = new GameObject("Obstacle");
-            var pb2 = obstacle2.AddComponent<PhysicsBody>();
-            var bc2 = obstacle2.AddComponent<BoxCollider>();
+            //var obstacle2 = new GameObject("Obstacle");
+            //var pb2 = obstacle2.AddComponent<PhysicsBody>();
+            //var bc2 = obstacle2.AddComponent<BoxCollider>();
 
-            bc2.UpdateColliderSize(5000, 300);
-            obstacle2.transform.position = new Vec2D(-2500, 2500);
+            //bc2.UpdateColliderSize(5000, 300);
+            //obstacle2.transform.position = new Vec2D(-2500, 2w
 
         }
     }
@@ -341,7 +369,7 @@ namespace ShootEmUp
             var projectileScript = projectile.AddComponent<ProjectileScript>();
             projectileScript.team = Team.Player;
             projectileScript.damage = Player.damage;
-            
+
             //set the position of the projectile to the position of the player
             //add a small offset to the position of the player to avoid collision with the player  
             projectile.transform.position = gameObject.transform.position + new Vec2D(100, 0).Rotate(gameObject.transform.rotation);
@@ -385,8 +413,8 @@ namespace ShootEmUp
             var player = Find("Player");
             if (player != null)
             {
-                gameObject.transform.position = player.transform.position - new Vec2D(70,0).Rotate(player.transform.rotation);
-                gameObject.transform.rotation = player.transform.rotation-90;
+                gameObject.transform.position = player.transform.position - new Vec2D(70, 0).Rotate(player.transform.rotation);
+                gameObject.transform.rotation = player.transform.rotation - 90;
             }
         }
     }

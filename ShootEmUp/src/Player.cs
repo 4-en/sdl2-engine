@@ -47,7 +47,7 @@ namespace ShootEmUp
             maxSpeed = 800 + PlayerData.Instance.SpeedUpgradeLevel * 100;
             minSpeed = 25;
             acceleration = 1;
-            rotationSpeed = 0.5;
+            rotationSpeed = 250;
             projectileSpeed = 800;
             maxHealth = 1000 + PlayerData.Instance.HealthUpgradeLevel * 200;
             currentHealth = maxHealth;
@@ -183,12 +183,12 @@ namespace ShootEmUp
         {
             if (Input.GetKeyPressed(left))
             {
-                gameObject.transform.rotation -= Player.rotationSpeed;
+                gameObject.transform.rotation -= Player.rotationSpeed * Time.deltaTime;
 
             }
             if (Input.GetKeyPressed(right))
             {
-                gameObject.transform.rotation += Player.rotationSpeed;
+                gameObject.transform.rotation += Player.rotationSpeed * Time.deltaTime;
             }
             if (Input.GetKeyDown(space))
             {

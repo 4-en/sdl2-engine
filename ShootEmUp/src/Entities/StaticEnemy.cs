@@ -21,8 +21,17 @@ namespace ShootEmUp
             var body = prototype.AddComponent<PhysicsBody>();
             prototype.AddComponent<StaticEnemy>();
             body.RotateWithVelocity = false;
+            prototype.AddComponent<Damager>();
+            //add health bar
+            HealthBar.AddTo(prototype.GameObject, -100);
 
             return prototype;
+        }
+        //set health
+
+        public StaticEnemy()
+        {
+            SetHealth(250);
         }
 
         public override void Update()

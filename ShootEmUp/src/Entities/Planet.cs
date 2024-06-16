@@ -10,7 +10,10 @@ namespace ShootEmUp.Entities
 {
     internal class Planet : BaseEnemy
     {
-
+        public Planet()
+        {
+            SetHealth(500);
+        }
         public static Prototype CreatePlanetPrototype()
         {
             var prototype = new Prototype("Planet");
@@ -38,6 +41,7 @@ namespace ShootEmUp.Entities
 
             return prototype;
         }
+
         //deal damage to player if player collides with planet
         public override void OnCollisionEnter(CollisionPair collision)
         {
@@ -74,7 +78,6 @@ namespace ShootEmUp.Entities
 
         public override void Update()
         {
-
         }
 
 

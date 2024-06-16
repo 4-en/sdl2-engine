@@ -33,3 +33,16 @@
 
 
 <Asteroid x="2400" y="-2400" xr="0" yr="0" count="1" Asteroid.xSpeed="-30" Asteroid.ySpeed="100"/>
+<Asteroid x="2200" y="-1200" xr="0" yr="0" count="1" Asteroid.xSpeed="-130" Asteroid.ySpeed="100"/>
+<Asteroid x="2400" y="-100" xr="0" yr="0" count="1" Asteroid.xSpeed="-80" Asteroid.ySpeed="-100"/>
+<Asteroid x="2300" y="-100" xr="0" yr="0" count="1" Asteroid.xSpeed="-80" Asteroid.ySpeed="10"/>
+<Asteroid x="2200" y="1400" xr="0" yr="0" count="1" Asteroid.xSpeed="-100" Asteroid.ySpeed="-100"/>
+<Asteroid x="1500" y="2400" xr="0" yr="0" count="1" Asteroid.xSpeed="-20" Asteroid.ySpeed="-100"/>
+<Asteroid x="1400" y="2400" xr="0" yr="0" count="1" Asteroid.xSpeed="-120" Asteroid.ySpeed="-80"/>
+<Asteroid x="-200" y="1600" xr="0" yr="0" count="1" Asteroid.xSpeed="20" Asteroid.ySpeed="-110"/>
+<Asteroid x="-400" y="1300" xr="0" yr="0" count="1" Asteroid.xSpeed="30" Asteroid.ySpeed="-80"/>
+<Asteroid x="-500" y="1300" xr="0" yr="0" count="1" Asteroid.xSpeed="-70" Asteroid.ySpeed="-100"/>
+<Asteroid x="-2000" y="800" xr="0" yr="0" count="1" Asteroid.xSpeed="60" Asteroid.ySpeed="-80"/>
+<Asteroid x="-600" y="200" xr="0" yr="0" count="1" Asteroid.xSpeed="-30" Asteroid.ySpeed="60"/>
+<Asteroid x="-600" y="-600" xr="0" yr="0" count="1" Asteroid.xSpeed="60" Asteroid.ySpeed="60"/>
+<Asteroid x="-1400" y="-1300" xr="0" yr="0" count="1" Asteroid.xSpeed="60" Asteroid.ySpeed="-80"/>

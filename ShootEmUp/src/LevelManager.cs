@@ -25,7 +25,7 @@ namespace ShootEmUp
         private static Scene? homeScreen;
         private static Scene? shop;
         private static Scene? level;
-        private static int levelIndex = 0;
+        public static int levelIndex = 0;
 
         public static void LoadNextLevel()
         {
@@ -131,7 +131,7 @@ namespace ShootEmUp
                         new EnemyWave("Wave1.template", 5, 1),
                         new EnemyWave("Wave2.template", 60, 1),
                     ],
-                    20
+                    30
                 );
             }
 
@@ -140,7 +140,22 @@ namespace ShootEmUp
 
         public static Scene CreateLevel2()
         {
-            var level = CreateBaseLevel();
+           
+            var level = new Scene("Level2");
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level").Item2;
+                levelScript.SetupLevel(
+                    0,
+                    [
+                        new EnemyWave("Wave3.template", 15, 1),
+                        new EnemyWave("Wave2.template", 20, 1),
+                        new EnemyWave("Wave4.template", 5, 1),
+                        new EnemyWave("Wave2.template", 20, 1),
+                    ],
+                    60
+                );
+            }
 
             return level;
         }

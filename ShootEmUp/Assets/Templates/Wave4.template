@@ -1,0 +1,10 @@
+
+<SinusEnemy x="3600" y="800" xr="0" yr="0" count="1" SinusEnemy.startingY="800" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="4800" y="800" xr="0" yr="0" count="1" SinusEnemy.startingY="800" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="6000" y="800" xr="0" yr="0" count="1" SinusEnemy.startingY="800" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="7200" y="800" xr="0" yr="0" count="1" SinusEnemy.startingY="800" SinusEnemy.moveRight="false"/>
+
+<SinusEnemy x="3600" y="-800" xr="0" yr="0" count="1" SinusEnemy.startingY="-800" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="4800" y="-800" xr="0" yr="0" count="1" SinusEnemy.startingY="-800" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="6000" y="-800" xr="0" yr="0" count="1" SinusEnemy.startingY="-800" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="7200" y="-800" xr="0" yr="0" count="1" SinusEnemy.startingY="-800" SinusEnemy.moveRight="false"/>

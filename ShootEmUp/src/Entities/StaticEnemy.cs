@@ -82,5 +82,9 @@ namespace ShootEmUp
             }   
 
         }
+
+        public override void Start()
+        {
+        }
     }
 }

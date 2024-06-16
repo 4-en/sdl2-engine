@@ -78,6 +78,9 @@ namespace ShootEmUp.Entities
         public override void Update()
         {
         }
+        public override void Start()
+        {
+        }
 
 
     }

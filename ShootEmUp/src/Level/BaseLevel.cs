@@ -174,6 +174,9 @@ namespace ShootEmUp.Level
                 maxWaveCount += wave.Count;
             }
 
+            // Create buttons
+            CreateButtons();
+
             // Create the player
             CreatePlayer();
 
@@ -259,6 +262,43 @@ namespace ShootEmUp.Level
             {
                 BaseLevel.Instance = null;
             }
+        }
+
+        private void CreateButtons()
+        {
+            var rocketButton = new GameObject("RocketButton");
+            var rocketButtonScript = rocketButton.AddComponent<AbilityButton>();
+            rocketButtonScript.rightOffset = 100;
+            rocketButtonScript.texturePath = "Assets/Textures/projectiles/rocket.png";
+            rocketButtonScript.buttonName = "Q";
+            rocketButtonScript.abilityName = "Rocket";
+            rocketButtonScript.charges = () =>
+            {
+                return PlayerData.Instance.RocketCount;
+            };
+
+            var bombButton = new GameObject("BombButton");
+            var bombButtonScript = bombButton.AddComponent<AbilityButton>();
+            bombButtonScript.rightOffset = 200;
+            bombButtonScript.texturePath = "Assets/Textures/projectiles/bomb.png";
+            bombButtonScript.buttonName = "E";
+            bombButtonScript.abilityName = "Bomb";
+            bombButtonScript.charges = () =>
+            {
+                return PlayerData.Instance.BombCount;
+            };
+
+            var boostButton = new GameObject("BoostButton");
+            var boostButtonScript = boostButton.AddComponent<AbilityButton>();
+            boostButtonScript.rightOffset = 300;
+            boostButtonScript.texturePath = "Assets/Textures/projectiles/boost.png";
+            boostButtonScript.buttonName = "^";
+            boostButtonScript.abilityName = "Boost";
+            boostButtonScript.charges = () =>
+            {
+                return PlayerData.Instance.BoostCount;
+            };
+
         }
 
         private EnemyWave? GetWave(int waveIndex)

@@ -96,6 +96,7 @@ namespace ShootEmUp
             AddComponent<UserInterface>();
             gameObject.transform.position = new Vec2D(0, 0);
             var pb = AddComponent<PhysicsBody>();
+            gameObject.AddComponent<BoarderDamager>();
 
             //camera for level building
             /*
@@ -322,6 +323,13 @@ namespace ShootEmUp
                 return;
             }
 
+            if(PlayerData.Instance.RocketCount <= 0)
+            {
+                return;
+            }
+
+            PlayerData.Instance.RocketCount -= 1;
+
             lastFireTime = Time.time;
 
             var missile = Prototype.Instantiate("TargetingRocket");
@@ -342,7 +350,7 @@ namespace ShootEmUp
 
             double rotation = gameObject.transform.rotation;
 
-            missile.SetPosition(gameObject.GetPosition() + new Vec2D(rotation/180*double.Pi).Normalize() * 100);
+            missile.SetPosition(gameObject.GetPosition() + new Vec2D(rotation / 180 * double.Pi).Normalize() * 100);
 
             var missileBody = missile.GetComponent<PhysicsBody>();
             if (missileBody == null)
@@ -353,7 +361,7 @@ namespace ShootEmUp
 
             TargetingRocket? targetingRocket = missile.GetComponent<TargetingRocket>();
 
-            if(targetingRocket != null)
+            if (targetingRocket != null)
             {
                 targetingRocket.team = Team.Player;
                 targetingRocket.shooter = gameObject;
@@ -362,7 +370,7 @@ namespace ShootEmUp
             }
 
             missileBody.Velocity = new Vec2D(rotation / 180 * double.Pi).Normalize() * 200;
-            if(missileBody.Velocity.Length() == 0)
+            if (missileBody.Velocity.Length() == 0)
             {
                 Console.WriteLine("Missile velocity is 0");
             }

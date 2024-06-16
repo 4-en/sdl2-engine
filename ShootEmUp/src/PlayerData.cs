@@ -38,6 +38,42 @@ namespace ShootEmUp
             damage_upgrade_level = 0;
             speed_upgrade_level = 0;
             fire_rate_upgrade_level = 0;
+            rocket_count = 3;
+            boost_count = 3;
+            bomb_count = 3;
+        }
+
+        private int rocket_count = 3;
+        public int RocketCount
+        {
+            get { return rocket_count; }
+            set
+            {
+                rocket_count = value;
+                Save();
+            }
+        }
+
+        private int boost_count = 3;
+        public int BoostCount
+        {
+            get { return boost_count; }
+            set
+            {
+                boost_count = value;
+                Save();
+            }
+        }
+
+        private int bomb_count = 3;
+        public int BombCount
+        {
+            get { return bomb_count; }
+            set
+            {
+                bomb_count = value;
+                Save();
+            }
         }
 
         private int total_score = 0;

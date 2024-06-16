@@ -8,6 +8,67 @@ using static SDL2.SDL;
 
 namespace ShootEmUp
 {
+
+    public class AbilityButton : Script
+    {
+
+        public string texturePath = "Assets/Textures/abilityButton.png";
+        public string abilityName = "Ability";
+        public string buttonName = "Q";
+        public Func<int>? charges = null;
+        public int rightOffset = 0;
+
+        private SpriteRenderer? spriteRenderer;
+        private TextRenderer? textRenderer;
+        private TextRenderer? chargeRenderer;
+        private DrawableRect? border;
+
+        public override void Start()
+        {
+            var spriteGO = gameObject.CreateChild("Sprite");
+            spriteRenderer = spriteGO.AddComponent<SpriteRenderer>();
+            spriteRenderer.SetTexture(texturePath);
+            spriteRenderer.SetWorldSize(100, 100);
+
+            var textGO = gameObject.CreateChild("Text");
+            textRenderer = textGO.AddComponent<TextRenderer>();
+            textRenderer.SetText(buttonName);
+            textRenderer.SetFontSize(38);
+            textGO.SetLocalPosition(new Vec2D(-30, 50));
+
+            if (charges != null)
+            {
+                var chargeGO = gameObject.CreateChild("ChargeText");
+                chargeRenderer = chargeGO.AddComponent<TextRenderer>();
+                chargeRenderer.SetFontSize(38);
+                chargeGO.SetLocalPosition(new Vec2D(30, 50));
+            }
+
+            var rectGO = gameObject.CreateChild("Border");
+            border = rectGO.AddComponent<FilledRect>();
+            border.color = new Color(155, 055, 055);
+            border.SetRect(new Rect(0, 0, 100, 100));
+            border.z_index = -1;
+
+
+            gameObject.SetPosition(new Vec2D(GetCamera().GetVisibleWidth() - 100 - rightOffset, GetCamera().GetVisibleHeight() - 100));
+
+        }
+
+        public override void Update()
+        {
+            if (spriteRenderer == null || textRenderer == null) return;
+
+            gameObject.SetPosition(new Vec2D(GetCamera().GetVisibleWidth() - 100 - rightOffset, GetCamera().GetVisibleHeight() - 100));
+
+            if (charges != null && chargeRenderer != null)
+            {
+                chargeRenderer.SetText(charges.Invoke().ToString());
+            }
+        }
+            
+
+    }
     internal class IngameUI
     {
         internal class UserInterface : Script

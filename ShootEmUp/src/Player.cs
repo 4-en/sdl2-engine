@@ -322,6 +322,13 @@ namespace ShootEmUp
                 return;
             }
 
+            if(PlayerData.Instance.RocketCount <= 0)
+            {
+                return;
+            }
+
+            PlayerData.Instance.RocketCount -= 1;
+
             lastFireTime = Time.time;
 
             var missile = Prototype.Instantiate("TargetingRocket");

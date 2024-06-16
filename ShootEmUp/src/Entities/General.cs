@@ -164,8 +164,6 @@ namespace ShootEmUp.Entities
         public override void OnCollisionEnter(CollisionPair collision)
         {
 
-
-
             if (hasCollided && collisionFrame != Time.tick)
             {
                 return;

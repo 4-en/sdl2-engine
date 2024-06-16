@@ -18,6 +18,7 @@
     <None Remove="Assets\Fonts\PressStartRegular.ttf" />
     <None Remove="Assets\Textures\asteroids\asteroid1.png" />
     <None Remove="Assets\Textures\background\Blue01.png" />
+    <None Remove="Assets\Textures\blue_fire_sprite.png" />
     <None Remove="Assets\Textures\enemy5.png" />
 
     <None Remove="Assets\Textures\fire_sprite.png" />

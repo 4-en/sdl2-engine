@@ -80,6 +80,11 @@ namespace ShootEmUp.Entities
         }
         public override void Start()
         {
+            var pb = GetComponent<PhysicsBody>();
+            if (pb != null)
+            {
+                pb.Velocity = new Vec2D(1, 0);
+            }
         }
 
 

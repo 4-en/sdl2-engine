@@ -65,6 +65,11 @@ namespace ShootEmUp.Entities
         public override void OnCollisionEnter(CollisionPair collision)
         {
             var other = collision.GetOther(gameObject);
+
+
+            //this.gameObject.GetName().Contains("Projectile");
+
+
             var damageable = other.GetComponent<IDamageable>();
             if (damageable == null)
             {
@@ -81,6 +86,39 @@ namespace ShootEmUp.Entities
             if (destroyOnCollision)
             {
                 gameObject.Destroy();
+            }
+        }
+    }
+    public class BoarderDamager : Script
+    {
+        public double damage = 100;  // Schaden, den die Boarder zufügen
+        private double lastDamageTime = 0;  // Zeit des letzten Schadens
+
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            //  Console.WriteLine(collision.GetOther(gameObject).GetName().Contains("Obstacle"));
+            //   Console.WriteLine(this.gameObject.GetName().Contains("Player"));
+
+            var other = collision.GetOther(gameObject);
+
+            // Überprüfen, ob das andere Objekt ein Hindernis ist und dieses Objekt der Spieler ist
+            if (other.GetName().Contains("Obstacle") && this.gameObject.GetName().Contains("Player"))
+            {
+                var damageable = gameObject.GetComponent<IDamageable>();
+                if (damageable == null)
+                {
+                    return;
+                }
+                double currentTime = Time.time;
+
+                if (damageable.GetTeam() == Team.Player)
+                {
+                    if (currentTime - lastDamageTime >= 0.5)
+                    {
+                        damageable.Damage(new Damage(damage, gameObject, Team.Player));
+                        lastDamageTime = currentTime;
+                    }
+                }
             }
         }
     }

@@ -72,7 +72,7 @@ namespace ShootEmUp
             fireRate = 10;
             fireRange = 10;
             shield = 10;
-            availableboost = 2;
+            availableboost = 3;
             boostSpeed = 400;
 
         }
@@ -333,7 +333,7 @@ namespace ShootEmUp
                 return;
             }
 
-            if(PlayerData.Instance.BombCount <= 0)
+            if (PlayerData.Instance.BombCount <= 0)
             {
                 return;
             }
@@ -346,7 +346,7 @@ namespace ShootEmUp
 
             double damage = 500 + PlayerData.Instance.DamageUpgradeLevel * 500;
 
-            bomb = Bomb.CreateBomb(position, Team.Player, gameObject, damage , 500, 2, 0.5);
+            bomb = Bomb.CreateBomb(position, Team.Player, gameObject, damage, 500, 2, 0.5);
         }
 
         private double lastFireTime = 0;
@@ -358,7 +358,7 @@ namespace ShootEmUp
                 return;
             }
 
-            if(PlayerData.Instance.RocketCount <= 0)
+            if (PlayerData.Instance.RocketCount <= 0)
             {
                 return;
             }

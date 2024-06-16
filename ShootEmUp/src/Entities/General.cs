@@ -100,9 +100,24 @@ namespace ShootEmUp.Entities
         private bool hasCollided = false;
         private ulong collisionFrame = 0;
 
+        SoundPlayer? shotSound = null;
+        SoundPlayer? hitSound = null;
+       
+
 
         public override void Start()
         {
+
+            shotSound = AddComponent<SoundPlayer>();
+            if (team == Team.Player)
+            {
+                shotSound?.Load("Assets/Audio/shot.wav");
+                shotSound?.SetVolume(0.2);
+                shotSound?.Play();
+            }
+
+
+            
             collider = gameObject.GetComponent<Collider>();
             if (collider != null)
             {
@@ -148,6 +163,8 @@ namespace ShootEmUp.Entities
 
         public override void OnCollisionEnter(CollisionPair collision)
         {
+            
+            
 
             if (hasCollided && collisionFrame != Time.tick)
             {
@@ -187,7 +204,15 @@ namespace ShootEmUp.Entities
 
                 gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet_blue.png");
             }
-
+            //play hit sound
+            if (collision.GetOther(gameObject).GetName().Contains("Projectile") || this.gameObject.GetName().Contains("Projectile"))
+            {
+                Console.WriteLine("Projectile collided with projectile");
+                hitSound = AddComponent<SoundPlayer>();
+                hitSound?.Load("Assets/Audio/hit.wav");
+                hitSound?.SetVolume(0.2);
+                hitSound?.Play();
+            }
 
             hasCollided = true;
             collisionFrame = Time.tick;

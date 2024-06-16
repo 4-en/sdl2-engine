@@ -1,6 +1,7 @@
 ﻿using SDL2Engine;
 using ShootEmUp.Level;
 using ShootEmUp.src;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ShootEmUp
 {
@@ -92,6 +93,10 @@ namespace ShootEmUp
 
         public static Scene CreateBaseLevel()
         {
+            
+
+
+
             var level = new Scene("TestLevel");
             using (level.Activate())
             {
@@ -110,7 +115,19 @@ namespace ShootEmUp
 
         public static Scene CreateLevel1()
         {
-            var level = CreateBaseLevel();
+            var level = new Scene("Level1");
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level").Item2;
+                levelScript.SetupLevel(
+                    0,
+                    [
+                        new EnemyWave("Wave1.template", 10, 1),
+                        new EnemyWave("Wave2.template", 60, 1),
+                    ],
+                    20
+                );
+            }
 
             return level;
         }

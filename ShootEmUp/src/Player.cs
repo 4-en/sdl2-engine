@@ -83,6 +83,14 @@ namespace ShootEmUp
             gameObject.transform.position = new Vec2D(0, 0);
             var pb = AddComponent<PhysicsBody>();
 
+            //camera for level building
+            /*
+            var camera = GetCamera();
+            if (camera != null)
+            {
+                camera.WorldSize = new Vec2D(5000, 5000);
+            }*/
+
 
         }
         public override void Update()

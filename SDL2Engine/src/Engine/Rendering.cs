@@ -147,7 +147,7 @@ namespace SDL2Engine
         [JsonProperty]
         private Vec2D Position { get; set; }
         [JsonProperty]
-        private Vec2D WorldSize { get; set; }
+        public Vec2D WorldSize { get; set; }
         [JsonProperty]
         public bool keepAspectRatio = true;
 

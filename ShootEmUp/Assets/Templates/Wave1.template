@@ -1,0 +1,32 @@
+<Planet x="500" y="-500" xr="0" yr="0" count="1"/>
+<Planet x="-1500" y="-800" xr="0" yr="0" count="1"/>
+<Planet x="800" y="1200" xr="0" yr="0" count="1"/>
+<Planet x="0" y="-2200" xr="0" yr="0" count="1"/>
+<Planet x="1500" y="-1800" xr="0" yr="0" count="1"/>
+<Planet x="-1200" y="1800" xr="0" yr="0" count="1"/>
+
+<SinusEnemy x="1666" y="0" xr="0" yr="0" count="1" SinusEnemy.startingY="0"/>
+<SinusEnemy x="-1666" y="0" xr="0" yr="0" count="1" SinusEnemy.startingY="0"/>
+
+<SinusEnemy x="-1666" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+<SinusEnemy x="1666" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+<SinusEnemy x="0" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+
+<SinusEnemy x="-1666" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="1666" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="0" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+
+<StaticEnemy x="500" y="250" xr="0" yr="0" count="1" />
+<StaticEnemy x="-500" y="-250" xr="0" yr="0" count="1" />
+<StaticEnemy x="1500" y="750" xr="0" yr="0" count="1" />
+<StaticEnemy x="-2000" y="850" xr="0" yr="0" count="1" />
+<StaticEnemy x="0" y="2000" xr="0" yr="0" count="1" />
+<StaticEnemy x="-1500" y="-1350" xr="0" yr="0" count="1" />
+<StaticEnemy x="1300" y="-1250" xr="0" yr="0" count="1" />
+<StaticEnemy x="2100" y="-800" xr="0" yr="0" count="1" />
+
+<ShieldPowerUp x="1700" y="-1150" xr="0" yr="0" count="1" />
+<ShieldPowerUp x="0" y="-1750" xr="0" yr="0" count="1" />
+<ShieldPowerUp x="-100" y="1450" xr="0" yr="0" count="1" />
+<HealthPowerUp x="1200" y="150" xr="0" yr="0" count="1" />
+<HealthPowerUp x="-1500" y="650" xr="0" yr="0" count="1" />

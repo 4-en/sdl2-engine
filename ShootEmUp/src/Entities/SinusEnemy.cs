@@ -31,6 +31,7 @@ namespace ShootEmUp.src.Entities
             var body = prototype.AddComponent<PhysicsBody>();
             prototype.AddComponent<SinusEnemy>();
             body.RotateWithVelocity = false;
+
             return prototype;
         }
 

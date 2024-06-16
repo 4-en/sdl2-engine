@@ -6,5 +6,3 @@
 <HealthPowerUp x="1200" y="150" xr="0" yr="0" count="1" />
 <SinusEnemy x="1000" y="-350" xr="0" yr="0" count="1" SinusEnemy.startingY="-350"/>
 <SinusEnemy x="1000" y="-650" xr="0" yr="0" count="1" SinusEnemy.startingY="-650"/>
-<Planet x="500" y="-500" xr="0" yr="0" count="1"/>
-

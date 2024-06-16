@@ -21,7 +21,7 @@ namespace ShootEmUp
         private SpriteRenderer? spriteRenderer;
         private TextRenderer? textRenderer;
         private TextRenderer? chargeRenderer;
-        private DrawableRect? border;
+        // private DrawableRect? border;
 
         public override void Start()
         {
@@ -29,6 +29,7 @@ namespace ShootEmUp
             spriteRenderer = spriteGO.AddComponent<SpriteRenderer>();
             spriteRenderer.SetTexture(texturePath);
             spriteRenderer.SetWorldSize(100, 100);
+            spriteRenderer.relativeToCamera = false;
 
             var textGO = gameObject.CreateChild("Text");
             textRenderer = textGO.AddComponent<TextRenderer>();
@@ -44,11 +45,14 @@ namespace ShootEmUp
                 chargeGO.SetLocalPosition(new Vec2D(30, 50));
             }
 
+            /*
             var rectGO = gameObject.CreateChild("Border");
-            border = rectGO.AddComponent<FilledRect>();
-            border.color = new Color(155, 055, 055);
+            border = rectGO.AddComponent<DrawableRect>();
+            border.color = new Color(255, 255, 255);
             border.SetRect(new Rect(0, 0, 100, 100));
             border.z_index = -1;
+            border.relativeToCamera = false;
+            */
 
 
             gameObject.SetPosition(new Vec2D(GetCamera().GetVisibleWidth() - 100 - rightOffset, GetCamera().GetVisibleHeight() - 100));

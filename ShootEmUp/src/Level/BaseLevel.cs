@@ -279,7 +279,7 @@ namespace ShootEmUp.Level
 
             var bombButton = new GameObject("BombButton");
             var bombButtonScript = bombButton.AddComponent<AbilityButton>();
-            bombButtonScript.rightOffset = 200;
+            bombButtonScript.rightOffset = 250;
             bombButtonScript.texturePath = "Assets/Textures/projectiles/bomb.png";
             bombButtonScript.buttonName = "E";
             bombButtonScript.abilityName = "Bomb";
@@ -290,7 +290,7 @@ namespace ShootEmUp.Level
 
             var boostButton = new GameObject("BoostButton");
             var boostButtonScript = boostButton.AddComponent<AbilityButton>();
-            boostButtonScript.rightOffset = 300;
+            boostButtonScript.rightOffset = 400;
             boostButtonScript.texturePath = "Assets/Textures/projectiles/boost.png";
             boostButtonScript.buttonName = "^";
             boostButtonScript.abilityName = "Boost";

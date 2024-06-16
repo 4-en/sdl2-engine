@@ -381,6 +381,10 @@ namespace SDL2Engine
 
         public virtual bool IsVisible(Rect worldRect)
         {
+            if(!relativeToCamera)
+            {
+                return true;
+            }
             return worldRect.Contains(gameObject.GetPosition());
         }
 
@@ -408,6 +412,10 @@ namespace SDL2Engine
 
         public override bool IsVisible(Rect worldRect)
         {
+            if(!relativeToCamera)
+            {
+                return true;
+            }
             return worldRect.Intersects(this.GetWorldRect());
         }
 

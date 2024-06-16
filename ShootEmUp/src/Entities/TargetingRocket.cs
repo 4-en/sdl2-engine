@@ -30,7 +30,7 @@ namespace ShootEmUp.Entities
 
         public GameObject? target = null;
         private bool targetSearchStartet = false;
-        public double rotationSpeed = 0.5;
+        public double rotationSpeed = 100;
         public double speed = 500;
         private bool directionLocked = false;
 
@@ -58,7 +58,7 @@ namespace ShootEmUp.Entities
             foreach (var target in targets)
             {
                 // only one target calculation per frame to balance performance
-                yield return null;
+                // yield return null;
                 if(target.GetTeam() != targetTeam)
                 {
                     continue;
@@ -125,11 +125,11 @@ namespace ShootEmUp.Entities
 
             if(optimalAngleDiff > 0)
             {
-                rotation = Math.Min(rotation, optimalAngleDiff);
+                rotation = -Math.Min(rotation, optimalAngleDiff);
             }
             else
             {
-                rotation = Math.Max(-rotation, optimalAngleDiff);
+                rotation = -Math.Max(-rotation, optimalAngleDiff);
             }
 
             myDir = myDir.Rotate(rotation);

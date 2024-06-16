@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ShootEmUp.Entities
 {
-    internal class TargetingShooter : BaseEnemy
+    public class TargetingShooter : BaseEnemy
     {
 
         public static Prototype CreatePrototype()
@@ -30,6 +30,51 @@ namespace ShootEmUp.Entities
             HealthBar.AddTo(prototype.GameObject, -70);
 
             return prototype;
+        }
+
+        public override void Start()
+        {
+            base.Start();
+            SetMaxHealth(200);
+            maxSpeed = 200;
+        }
+
+        private double nextMissile = 0;
+        public double missileRate = 2;
+        public override void Update()
+        {
+            base.Update();
+
+            if(nextMissile <= Time.time)
+            {
+                nextMissile = Time.time + missileRate;
+                var missile = Prototype.Instantiate("TargetingRocket");
+
+                var body = GetComponent<PhysicsBody>();
+
+                if(missile == null)
+                {
+                    Console.WriteLine("Could not instantiate missile");
+                    return;
+                }
+
+                if(body == null)
+                {
+                    Console.WriteLine("Could not find physics body");
+                    return;
+                }
+
+                missile.SetPosition(gameObject.GetPosition() + body.Velocity.Normalize() * 300);
+
+                var missileBody = missile.GetComponent<PhysicsBody>();
+                if(missileBody == null)
+                {
+                    Console.WriteLine("Could not find missile physics body");
+                    return;
+                }
+
+                missileBody.Velocity = body.Velocity.Normalize();
+            }
         }
     }
 }

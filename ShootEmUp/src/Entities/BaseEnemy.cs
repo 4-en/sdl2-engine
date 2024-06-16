@@ -46,7 +46,12 @@ namespace ShootEmUp
             // set direction
             var body = GetComponent<PhysicsBody>();
             if (body != null)
-                body.Velocity = new Vec2D(0, 1);
+            {
+                if (body.Velocity == Vec2D.Zero)
+                {
+                    body.Velocity = new Vec2D(random.Next(-1, 1), random.Next(-1, 1)).Normalize() * speed;
+                }
+            }
 
             player = Find("Player");
         }
@@ -56,20 +61,22 @@ namespace ShootEmUp
 
             if (player != null)
             {
-                TrackPlayer();
-                return;
+                //TrackPlayer();
+                //return;
             }
 
-            // move in a circle
-            double angle = (Time.time % 5) / 5 * Math.PI * 2;
+            
             var body = GetComponent<PhysicsBody>();
             if (body != null)
             {
                 if(speed<maxSpeed)
                 {
                     speed += 100 * Time.deltaTime;
+                } else if(speed>maxSpeed)
+                {
+                    speed = maxSpeed;
                 }
-                body.Velocity = new Vec2D(Math.Cos(angle), Math.Sin(angle)) * speed;
+                body.Velocity = body.Velocity.Normalize() * speed;
             }
             
         }

@@ -51,7 +51,7 @@ namespace ShootEmUp
             projectileSpeed = 800;
             maxHealth = 1000 + PlayerData.Instance.HealthUpgradeLevel * 200;
             currentHealth = maxHealth;
-            damage = 50 + PlayerData.Instance.DamageUpgradeLevel * 10;
+            damage = 50 + PlayerData.Instance.DamageUpgradeLevel * 25;
             displayedHighscore = 0;
             displayedMoney = 0;
             hasShield = false;
@@ -333,6 +333,7 @@ namespace ShootEmUp
             var projectile = new GameObject("Projectile");
             var projectileScript = projectile.AddComponent<ProjectileScript>();
             projectileScript.team = Team.Player;
+            projectileScript.damage = Player.damage;
             
             //set the position of the projectile to the position of the player
             //add a small offset to the position of the player to avoid collision with the player  

@@ -25,7 +25,7 @@ namespace ShootEmUp.src
                 {
                     return true;
                 });
-                scene.AddGameObject(shopmenu);
+                // scene.AddGameObject(shopmenu);
             }
            
             

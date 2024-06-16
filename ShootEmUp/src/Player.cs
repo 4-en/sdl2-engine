@@ -103,6 +103,13 @@ namespace ShootEmUp
                 return;
             }
 
+            speed = speed / 2;
+
+            if(speed < minSpeed)
+            {
+                speed = minSpeed;
+            }
+
             currentHealth -= damage.Value;
         }
 

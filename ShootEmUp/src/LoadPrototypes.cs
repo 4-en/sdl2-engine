@@ -24,6 +24,8 @@ namespace ShootEmUp
             ShieldPowerUp.CreateShieldPowerUpPrototype();
             HealthPowerUp.CreateHealthPowerUpPrototype();
             SinusEnemy.CreateSinusEnemyPrototype();
+            TargetingShooter.CreatePrototype();
+            Bomber.CreatePrototype();
         }
 
         private static void LoadExamplePrototype()
@@ -47,6 +49,7 @@ namespace ShootEmUp
             circleCollider.SetRadius(100);
             renderer.SetSource("forsenE.png");
         }
+
 
     }
 }

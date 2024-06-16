@@ -2,6 +2,7 @@
 using ShootEmUp.src;
 using System.Diagnostics.Tracing;
 using static SDL2.SDL;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ShootEmUp.Level
 {
@@ -76,6 +77,7 @@ namespace ShootEmUp.Level
         private GameObject? player;
         private Player? playerScript;
         private EventListener<EnemyKilledEvent>? eventListener = null;
+        private TextRenderer? topCenterText = null;
 
         private static Vec2D worldSize = new Vec2D(2500, 2500);
         public static Vec2D WorldSize
@@ -181,7 +183,15 @@ namespace ShootEmUp.Level
                 AddMoney(points);
             });
 
-            // Start the first wave
+            // add text renderer
+            var topCenter = new GameObject("TopCenterText");
+            topCenterText = topCenter.AddComponent<TextRenderer>();
+            topCenterText.SetColor(SDL2Engine.Color.White);
+            topCenterText.SetFontSize(48);
+            topCenterText.SetFontPath("Assets/Fonts/PressStartRegular.ttf");
+            topCenterText.anchorPoint = AnchorPoint.Center;
+            topCenter.SetPosition(new Vec2D(GetCamera().GetVisibleWidth() / 2, 100));
+            topCenterText.SetText($"{(int)duration}s");
         }
 
         private int CalculateCombo(int points)
@@ -423,7 +433,7 @@ namespace ShootEmUp.Level
             }
         }
 
-        private int lastLog = 0;
+        private int lastDuration = 999999;
 
         public override void Update()
         {
@@ -431,13 +441,6 @@ namespace ShootEmUp.Level
             if (this.paused)
             {
                 return;
-            }
-
-            int time = (int)Time.time;
-            if (time != lastLog)
-            {
-                lastLog = time;
-                Console.WriteLine($"Player Position: {player?.GetPosition()}");
             }
 
             // Check if the level is completed
@@ -450,6 +453,13 @@ namespace ShootEmUp.Level
 
             levelTimer += Time.deltaTime;
             duration -= Time.deltaTime;
+            int intDuration = (int)duration;
+            if (intDuration != lastDuration && intDuration >= 0)
+            {
+                lastDuration = intDuration;
+                topCenterText?.GetGameObject().SetPosition(new Vec2D(GetCamera().GetVisibleWidth() / 2, 100));
+                topCenterText?.SetText($"{intDuration}s");
+            }
 
             // Check if the current wave is completed
             if (Enemies.Count == 0)

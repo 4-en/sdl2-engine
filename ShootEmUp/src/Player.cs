@@ -331,7 +331,9 @@ namespace ShootEmUp
         public override void Start()
         {
             var projectile = new GameObject("Projectile");
-            projectile.AddComponent<ProjectileScript>();
+            var projectileScript = projectile.AddComponent<ProjectileScript>();
+            projectileScript.team = Team.Player;
+            
             //set the position of the projectile to the position of the player
             //add a small offset to the position of the player to avoid collision with the player  
             projectile.transform.position = gameObject.transform.position + new Vec2D(100, 0).Rotate(gameObject.transform.rotation);

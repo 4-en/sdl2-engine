@@ -85,10 +85,43 @@ namespace SDL2Engine
             return true;
         }
 
+        private static Prototype? CreatePrototypeFromScript(string path)
+        {
+            string prototypeName = Path.GetFileNameWithoutExtension(path);
+            string withoutPath = Path.GetFileName(path);
+
+            // check if there is a class with the same name as the file
+            // if there is, create a prototype from it
+
+            Type? type = Type.GetType(withoutPath);
+
+            if (type == null || !type.IsSubclassOf(typeof(Component)))
+            {
+                return null;
+            }
+            
+            Prototype prototype = new Prototype(prototypeName);
+            var component = (Component?)Activator.CreateInstance(type);
+            if (component == null)
+            {
+                return null;
+            }
+
+            prototype.GameObject.AddComponent(component);
+
+            return prototype;
+        }
+
         public static T? LoadObject<T>(string path)
         {
             if (!File.Exists(path))
             {
+
+                if (typeof(T) == typeof(Prototype))
+                {
+                    //return CreatePrototypeFromScript(path) as T;
+                }
+
                 return default;
             }
 

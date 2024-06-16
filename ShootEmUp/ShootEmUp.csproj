@@ -22,6 +22,7 @@
     <None Remove="assets\templates\Wave2.template" />
     <None Remove="assets\templates\Wave3.template" />
     <None Remove="assets\templates\Wave4.template" />
+    <None Remove="Assets\Templates\Wave5.template" />
     <None Remove="Assets\Textures\asteroids\asteroid1.png" />
     <None Remove="Assets\Textures\background\Blue01.png" />
     <None Remove="Assets\Textures\blue_fire_sprite.png" />

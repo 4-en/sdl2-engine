@@ -1,7 +1,45 @@
 ﻿using SDL2Engine;
+using SDL2;
+using static SDL2.SDL;
 
 namespace ShootEmUp.Entities
 {
+
+    public class CircleRenderer : Drawable
+    {
+        public double radius = 100;
+        public Color Color = new Color(255, 255, 255, 255);
+
+        public override void Draw(Camera camera)
+        {
+            int resolution = 36;
+            double screenRadius = camera.WorldToScreen(radius);
+
+            var renderer = Engine.renderer;
+
+            Vec2D screenCenter = GetDrawRoot();
+
+            SDL_SetRenderDrawColor(renderer, Color.r, Color.g, Color.b, Color.a);
+
+            // draw the circle
+            // do this manually for now
+            // is there no SDL function for this?
+            // other solution would be to create a texture, but since this is just for debugging, we keep it simple
+            double angle = 0;
+            double angleStep = 2 * Math.PI / resolution;
+            Vec2D lastPoint = new Vec2D(screenCenter.x + screenRadius, screenCenter.y);
+            for (int i = 0; i < resolution; i++)
+            {
+                angle += angleStep;
+                Vec2D point = new Vec2D(screenCenter.x + screenRadius * Math.Cos(angle), screenCenter.y + screenRadius * Math.Sin(angle));
+                SDL.SDL_RenderDrawLine(renderer, (int)lastPoint.x, (int)lastPoint.y, (int)point.x, (int)point.y);
+                lastPoint = point;
+            }
+
+
+        }
+    }
+
     public class Bomb : Script, IDamageable, IEnemy
     {
         public GameObject? source = null;
@@ -12,6 +50,7 @@ namespace ShootEmUp.Entities
         public double explosionDuration = 0.5;
         private bool exploded = false;
         private SpriteRenderer? sprite;
+        private CircleRenderer? hitboxRenderer;
 
 
         public static Bomb CreateBomb(Vec2D position, Team team, GameObject source, double damage = 250, double radius = 100, double timer = 2, double explosionDuration = 0.5)
@@ -36,6 +75,32 @@ namespace ShootEmUp.Entities
             sprite = gameObject.AddComponent<SpriteRenderer>();
             sprite.SetTexture("Assets/Textures/projectiles/bomb.png");
             sprite.SetWorldSize(50, 50);
+
+            // add hitbox renderer
+            var go = gameObject.CreateChild("Hitbox");
+            hitboxRenderer = go.AddComponent<CircleRenderer>();
+            hitboxRenderer.radius = 1;
+
+            Color color = team == Team.Player ? new Color(255, 255, 255, 255) : new Color(255, 0, 0, 255);
+            hitboxRenderer.Color = color;
+
+            StartCoroutine(UpdateRadius());
+
+        }
+
+        private System.Collections.IEnumerator UpdateRadius()
+        {
+            double time = 0;
+            while (time < timer)
+            {
+                if(hitboxRenderer != null)
+                {
+                    hitboxRenderer.radius = radius * (time / timer);
+                }
+
+                yield return 0.01;
+                time += 0.01;
+            }
         }
 
         public override void Update()
@@ -70,6 +135,10 @@ namespace ShootEmUp.Entities
 
             // delete bomb sprite
             sprite?.Destroy();
+
+            // delete hitbox renderer
+            hitboxRenderer?.GetGameObject().Destroy();
+
 
 
         }

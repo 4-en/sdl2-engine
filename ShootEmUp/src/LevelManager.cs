@@ -136,6 +136,12 @@ namespace ShootEmUp
                     ],
                     30
                 );
+
+                var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
+                var player = music.Item2;
+
+                player.playOnAwake = true;
+                player.SetSource("Assets/Audio/music1.mp3");
             }
 
             return level;
@@ -158,6 +164,12 @@ namespace ShootEmUp
                     ],
                     60
                 );
+
+                var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
+                var player = music.Item2;
+
+                player.playOnAwake = true;
+                player.SetSource("Assets/Audio/music2.mp3");
             }
 
             return level;
@@ -168,9 +180,9 @@ namespace ShootEmUp
             var level = new Scene("Level3");
             using (level.Activate())
             {
-                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level").Item2;
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level 3").Item2;
                 levelScript.SetupLevel(
-                    0,
+                    3,
                     [
                         new EnemyWave("Wave1.template", 15, 1),
                         new EnemyWave("Wave5.template", 20, 1),
@@ -180,6 +192,12 @@ namespace ShootEmUp
                     ],
                     60
                 );
+
+                var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
+                var player = music.Item2;
+
+                player.playOnAwake = true;
+                player.SetSource("Assets/Audio/music1.mp3");
             }
 
             return level;
@@ -187,7 +205,24 @@ namespace ShootEmUp
 
         public static Scene CreateLevel4()
         {
-            var level = CreateBaseLevel();
+            var level = new Scene("Level 4");
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level 4").Item2;
+                levelScript.SetupLevel(
+                    4,
+                    [
+                        new EnemyWave("Level4Setup.template", 60, 1),
+                    ],
+                    80
+                );
+
+                var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
+                var player = music.Item2;
+
+                player.playOnAwake = true;
+                player.SetSource("Assets/Audio/music2.mp3");
+            }
 
             return level;
         }
@@ -203,7 +238,7 @@ namespace ShootEmUp
                     [
                         new EnemyWave("JustBombers.template", 20, 3),
                     ],
-                    60
+                    80
                 );
 
                 var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
@@ -229,7 +264,7 @@ namespace ShootEmUp
                         new EnemyWave("Level6Start.template", 30, 1),
                         new EnemyWave("Level6Waves.template", 20, 2),
                     ],
-                    80
+                    100
                 );
 
                 var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
@@ -263,7 +298,7 @@ namespace ShootEmUp
                 var player = music.Item2;
 
                 player.playOnAwake = true;
-                player.SetSource("Assets/Audio/music1.mp3");
+                player.SetSource("Assets/Audio/music3.mp3");
             }
 
             return level;

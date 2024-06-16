@@ -100,6 +100,8 @@ namespace ShootEmUp
             {
                 EventBus.Dispatch(new EnemyKilledEvent(this));
                 gameObject.Destroy();
+
+                Effects.ExplosionParticles(gameObject.GetPosition(), 100);
             }
 
         }

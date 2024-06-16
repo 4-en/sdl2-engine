@@ -488,6 +488,11 @@ namespace SDL2Engine
             return createdObjects++;
         }
 
+        public static Random GetRandom()
+        {
+            return random;
+        }
+
         [JsonIgnore]
         private uint creationOrder = GetOrder();
 

@@ -153,7 +153,7 @@ namespace SDL2Engine
 
         private bool sortDrawables = false;
         private List<Drawable> drawableList = new();
-        private List<Collider> colliderList = new();
+        private List<GameObject> physicsObjects = new();
         private List<Script> scripts = new();
 
         private List<Script> toStart = new();
@@ -234,7 +234,7 @@ namespace SDL2Engine
 
         public int GetColliderCount()
         {
-            return colliderList.Count;
+            return physicsObjects.Count;
         }
 
         public Camera GetCamera()
@@ -397,7 +397,7 @@ namespace SDL2Engine
                     var succ = drawableList.Remove(drawable);
                     break;
                 case Collider collider:
-                    colliderList.Remove(collider);
+                    physicsObjects.Remove(collider.GetGameObject());
                     break;
                 case Script script:
                     var success = scripts.Remove(script);
@@ -534,7 +534,17 @@ namespace SDL2Engine
 
         public List<Collider> GetColliders()
         {
-            return colliderList;
+            List<Collider> colliders = new List<Collider>();
+            foreach (GameObject gameObject in physicsObjects)
+            {
+                Collider? collider = gameObject.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    colliders.Add(collider);
+                }
+            }
+
+            return colliders;
         }
 
         /*
@@ -630,7 +640,12 @@ namespace SDL2Engine
                     drawableList.Add(drawable);
                     break;
                 case Collider collider:
-                    colliderList.Add(collider);
+                    if (!physicsObjects.Contains(collider.GetGameObject()))
+                        physicsObjects.Add(collider.GetGameObject());
+                    break;
+                case PhysicsBody physicsBody:
+                    if (!physicsObjects.Contains(physicsBody.GetGameObject()))
+                        physicsObjects.Add(physicsBody.GetGameObject());
                     break;
                 case Script script:
                     scripts.Add(script);
@@ -800,14 +815,15 @@ namespace SDL2Engine
             // get all game objects with colliders
             if (doPhysics)
             { 
+                /*
                 List<GameObject> goWithPhysics = new();
-                foreach (Collider collider in colliderList)
+                foreach (Collider collider in physicsObjects)
                 {
                     // TODO: this might cause problems if we add a parent game object and a child game object
                     // maybe fix this later
                     goWithPhysics.Add(collider.GetGameObject());
-                }
-                Physics.UpdatePhysics(goWithPhysics);
+                }*/
+                Physics.UpdatePhysics(physicsObjects);
             }
             
 

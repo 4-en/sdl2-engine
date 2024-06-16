@@ -131,6 +131,7 @@ namespace ShootEmUp
             {
                 menuButton.Item2.SetBackgroundColor(new Color(0, 0, 0, 100));
             };
+
         }
 
         private List<Tuple<string, string>> GetHighscores()
@@ -205,9 +206,16 @@ namespace ShootEmUp
         {
             string nameString = "";
             string scoreString = "";
-
+            string playerScore = PlayerData.Instance.TotalScore.ToString();
             foreach (var score in scores)
             {
+                if(score.Item1 == Environment.UserName && score.Item2 == playerScore)
+                {
+                    nameString += "[ " + score.Item1 + "\n";
+                    scoreString += score.Item2 + " ]\n";
+                    continue;
+                }
+
                 nameString += score.Item1 + "\n";
                 scoreString += score.Item2 + "\n";
             }

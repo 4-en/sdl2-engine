@@ -545,6 +545,20 @@ namespace SDL2Engine
             this.relativeToCamera = false;
         }
 
+        public static TextRenderer Create(Vec2D pos, string text, int fontSize = 24, Color? color = null, string fontPath = "Assets/Fonts/Roboto-Regular.ttf")
+        {
+            
+
+            var textObject = new GameObject(text);
+            textObject.transform.position = pos;
+            var textComponent = textObject.AddComponent<TextRenderer>();
+            textComponent.color = color ?? new Color(255, 255, 255, 255);
+            textComponent.SetFontSize(fontSize);
+            textComponent.SetText(text);
+            textComponent.SetFontPath(fontPath);
+            return textComponent;
+        }
+
         public void SetBorderSize(double borderSize)
         {
             if (this.borderSize == borderSize) return;

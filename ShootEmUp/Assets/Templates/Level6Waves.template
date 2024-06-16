@@ -1,0 +1,5 @@
+<EdgeSpawner EdgeSpawner.PrototypeName="Asteroid" EdgeSpawner.spawnRate="2" />
+<EdgeSpawner EdgeSpawner.PrototypeName="Bomber" EdgeSpawner.spawnRate="5" />
+<EdgeSpawner EdgeSpawner.PrototypeName="TargetingShooter" EdgeSpawner.spawnRate="4" />
+<EdgeSpawner EdgeSpawner.PrototypeName="BaseEnemy" EdgeSpawner.spawnRate="2" />
+<EdgeSpawner EdgeSpawner.PrototypeName="BaseEnemy" EdgeSpawner.spawnRate="2" />

@@ -124,7 +124,6 @@ namespace ShootEmUp
         public static Scene CreateLevel1()
         {
 
-
             var level = new Scene("Level1");
             using (level.Activate())
             {
@@ -232,10 +231,10 @@ namespace ShootEmUp
         public static Scene CreateFinalLevel()
         {
             // basically impossible level
-            var level = new Scene("Level 7");
+            var level = new Scene("Final Level");
             using (level.Activate())
             {
-                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level 7").Item2;
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Final Level").Item2;
                 levelScript.SetupLevel(
                     7,
                     [

@@ -191,6 +191,8 @@ namespace ShootEmUp
         public double boostEndTime = 0;
         public double boostDecay = 200;
         public bool isBoosting = false;
+        public double projectileRate = 0.2;
+        private double lastProjectileTime = 0;
 
 
 
@@ -209,9 +211,14 @@ namespace ShootEmUp
             {
                 gameObject.transform.rotation += Player.rotationSpeed * Time.deltaTime;
             }
-            if (Input.GetKeyDown(space))
+            if (Input.GetKeyPressed(space))
             {
-                gameObject.AddComponent<Projectile>();
+                if (Time.time - lastProjectileTime > projectileRate)
+                {
+                    lastProjectileTime = Time.time;
+
+                    Projectile.CreateAt(gameObject);
+                }
             }
             if (Input.GetKeyPressed(up))
             {
@@ -284,14 +291,23 @@ namespace ShootEmUp
             // other keybindings
 
             // fire target rocket
-            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_q))
+            if (Input.GetKeyPressed(SDL_Keycode.SDLK_q))
             {
                 ShootRocket();
             }
         }
 
+        private double lastFireTime = 0;
         private void ShootRocket()
         {
+
+            if (Time.time - lastFireTime < 1)
+            {
+                return;
+            }
+
+            lastFireTime = Time.time;
+
             var missile = Prototype.Instantiate("TargetingRocket");
 
             var body = GetComponent<PhysicsBody>();
@@ -424,9 +440,9 @@ namespace ShootEmUp
 
 
 
-    public class Projectile : Script
+    public class Projectile
     {
-        public override void Start()
+        public static void CreateAt(GameObject gameObject)
         {
             var projectile = new GameObject("Projectile");
             var projectileScript = projectile.AddComponent<ProjectileScript>();
@@ -450,6 +466,7 @@ namespace ShootEmUp
                 spriteRenderer.SetAnimationType(AnimationType.LoopReversed);
             }
             BoxCollider.FromDrawableRect(projectile);
+
 
         }
     }

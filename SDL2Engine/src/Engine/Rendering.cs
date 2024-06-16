@@ -374,6 +374,11 @@ namespace SDL2Engine
 
         }
 
+        public virtual string TextureBatchingCompareKey()
+        {
+            return "";
+        }
+
         public virtual bool IsVisible(Rect worldRect)
         {
             return worldRect.Contains(gameObject.GetPosition());
@@ -824,6 +829,11 @@ namespace SDL2Engine
         [JsonProperty]
         public string source = "";
 
+        public override string TextureBatchingCompareKey()
+        {
+            return source;
+        }
+
         public void SetSource(string source)
         {
             this.source = source;
@@ -1048,6 +1058,11 @@ namespace SDL2Engine
             this._tempSetSpriteByCount = new Vec2D(-1, -1);
             this.spriteSize = new Vec2D(width, height);
             this.rect = new Rect(0, 0, width, height);
+        }
+
+        public override string TextureBatchingCompareKey()
+        {
+            return source;
         }
 
         // temporary variable to set sprite size by count before the texture is loaded

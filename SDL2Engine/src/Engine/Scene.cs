@@ -675,6 +675,16 @@ namespace SDL2Engine
                 }
                 else
                 {
+                    /*
+                     * TODO: enable optimized sorting for batching later
+                    if(a?.TextureBatchingCompareKey() == b?.TextureBatchingCompareKey())
+                    {
+                        return (a?.GetCreationOrder() ?? 0u).CompareTo(b?.GetCreationOrder());
+                    }
+                    
+                    return (a?.TextureBatchingCompareKey() ?? "x").CompareTo((b?.TextureBatchingCompareKey() ?? "d"));
+                    */
+
                     return (a?.GetCreationOrder() ?? 0u).CompareTo(b?.GetCreationOrder());
                 }
             }

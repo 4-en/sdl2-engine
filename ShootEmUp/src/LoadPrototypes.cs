@@ -28,6 +28,7 @@ namespace ShootEmUp
             Bomber.CreatePrototype();
             Spawner.CreatePrototype();
             EdgeSpawner.CreatePrototype();
+            TargetingRocket.CreatePrototype();
         }
 
         private static void LoadExamplePrototype()

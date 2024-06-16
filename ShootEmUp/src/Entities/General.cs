@@ -91,7 +91,7 @@ namespace ShootEmUp.Entities
         public bool destroyOnScreenExit = true;
         public bool destroyOnLifetimeEnd = true;
 
-        public double lifetime = 5;
+        public double lifetime = 10;
         public double damage = 100;
         public Team team = Team.Enemy;
         public GameObject? shooter;

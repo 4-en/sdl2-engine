@@ -38,6 +38,11 @@ namespace SDL2Engine
             return "(" + x + ", " + y + ")";
         }
 
+        public double AngleTo(Vec2D other)
+        {
+            return Math.Atan2(other.y - y, other.x - x) * 180 / Math.PI;
+        }
+
         public static Vec2D operator +(Vec2D a, Vec2D b)
         {
             return new Vec2D(a.x + b.x, a.y + b.y, a.z);

@@ -590,6 +590,27 @@ namespace SDL2Engine
             return default;
         }
 
+        public List<T> FindComponents<T>()
+        {
+            List<T> components = new();
+            List<T> found;
+
+            // first check components of root game objects
+            foreach (GameObject gameObject in gameObjects)
+            {
+                found = gameObject.GetComponents<T>();
+                components.AddRange(found);
+            }
+
+            // if not found, do a deep search
+            foreach (GameObject gameObject in gameObjects)
+            {
+                found = gameObject.FindComponentsInChildren<T>();
+                components.AddRange(found);
+            }
+            return components;
+        }
+
         private void HandleAddComponent<T>(T component) where T : Component
         {
             // add to scene if not already added

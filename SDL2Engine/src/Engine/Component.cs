@@ -162,6 +162,11 @@ namespace SDL2Engine
             return gameObject.FindComponent<T>();
         }
 
+        public List<T> FindComponents<T>()
+        {
+            return gameObject.FindComponents<T>();
+        }
+
         // Returns the GameObject with the given name in the scene
         public GameObject? Find(string name)
         {

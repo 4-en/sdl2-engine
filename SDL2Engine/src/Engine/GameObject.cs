@@ -632,6 +632,21 @@ namespace SDL2Engine
             return default;
         }
 
+        public List<T> FindComponentsInChildren<T>()
+        {
+            List<T> foundComponents = new List<T>();
+            foreach (GameObject child in children)
+            {
+                List<T> found = child.GetComponents<T>();
+                if (found != null)
+                {
+                    foundComponents.AddRange(found);
+                }
+            }
+
+            return foundComponents;
+        }
+
         /*
          * Finds a component of type T
          * 
@@ -668,6 +683,23 @@ namespace SDL2Engine
             }
 
             return this.scene.FindComponent<T>();
+        }
+
+        public List<T> FindComponents<T>()
+        {
+            List<T> foundComponents = GetComponents<T>();
+            List<T> foundChildren = FindComponentsInChildren<T>();
+            foundComponents.AddRange(foundChildren);
+
+            if (this.scene == null)
+            {
+                return foundComponents;
+            }
+
+            List<T> foundScene = this.scene.FindComponents<T>();
+            foundComponents.AddRange(foundScene);
+
+            return foundComponents;
         }
 
         public Component? GetComponentByClassName(string className)

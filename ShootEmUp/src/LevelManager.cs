@@ -99,9 +99,9 @@ namespace ShootEmUp
                 levelScript.SetupLevel(
                     0,
                     [
-                        new EnemyWave("test.template", 60, 3)
+                        new EnemyWave("test.template", 60, 3),
                     ],
-                    100
+                    10
                 );
             }
 

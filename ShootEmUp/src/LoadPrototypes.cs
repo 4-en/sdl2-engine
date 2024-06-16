@@ -25,6 +25,7 @@ namespace ShootEmUp
             HealthPowerUp.CreateHealthPowerUpPrototype();
             SinusEnemy.CreateSinusEnemyPrototype();
             TargetingShooter.CreatePrototype();
+            Bomber.CreatePrototype();
         }
 
         private static void LoadExamplePrototype()

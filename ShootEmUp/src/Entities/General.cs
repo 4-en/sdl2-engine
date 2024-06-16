@@ -167,6 +167,11 @@ namespace ShootEmUp.Entities
                 return;
             }
 
+            if(damageable.GetTeam() == team)
+            {
+                return;
+            }
+
             if (physicsBody != null)
             {
                 physicsBody.Velocity = Vec2D.Zero;

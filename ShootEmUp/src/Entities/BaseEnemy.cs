@@ -34,6 +34,8 @@ namespace ShootEmUp
         [JsonProperty]
         public double speed = 500.0;
         [JsonProperty]
+        public double maxSpeed = 500.0;
+        [JsonProperty]
         private double health = 10;
         [JsonProperty]
         private double maxHealth = 10;
@@ -62,7 +64,13 @@ namespace ShootEmUp
             double angle = (Time.time % 5) / 5 * Math.PI * 2;
             var body = GetComponent<PhysicsBody>();
             if (body != null)
+            {
+                if(speed<maxSpeed)
+                {
+                    speed += 100 * Time.deltaTime;
+                }
                 body.Velocity = new Vec2D(Math.Cos(angle), Math.Sin(angle)) * speed;
+            }
             
         }
 
@@ -93,6 +101,8 @@ namespace ShootEmUp
         {
             health -= damage.Value;
             OnHealthChange();
+
+            speed = speed * 0.8;
         }
 
         public void Heal(double value)

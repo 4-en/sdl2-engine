@@ -30,3 +30,6 @@
 <ShieldPowerUp x="-100" y="1450" xr="0" yr="0" count="1" />
 <HealthPowerUp x="1200" y="150" xr="0" yr="0" count="1" />
 <HealthPowerUp x="-1500" y="650" xr="0" yr="0" count="1" />
+
+
+<Asteroid x="2400" y="-2400" xr="0" yr="0" count="1" Asteroid.xSpeed="-30" Asteroid.ySpeed="100"/>

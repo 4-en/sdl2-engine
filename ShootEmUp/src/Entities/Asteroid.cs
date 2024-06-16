@@ -86,9 +86,39 @@ namespace ShootEmUp
                 pb.Velocity = new Vec2D(xSpeed,ySpeed);
             }
         }
+        //damage on collision
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            var collisionName = collision.GetOther(this.gameObject).GetName();
+            if (collisionName.Equals("Player"))
+            {
+                Destroy(this.gameObject);
+                Console.WriteLine("Asteroid hit player");
+                Player.currentHealth -= 50;
 
+                var p = Find("Player");
+                var player = p.GetComponent<Player>();
+                var playerPos = gameObject.transform.position;
+                if (player != null)
+                {
+                    playerPos = player.transform.position;
+                }
 
+                Vec2D random_offset = new Vec2D(random.NextDouble() * 100 - 50, random.NextDouble() * 100 - 50);
+                GameText.CreateAt(playerPos + random_offset, "50", 2, 52, new Color(255, 0, 0, 255));
+                OnHealthChange();
+            }
+        }
 
+        private void OnHealthChange()
+        {
+            // check if health is <= 0
+            if (GetHealth() <= 0)
+            {
+                EventBus.Dispatch(new EnemyKilledEvent(this));
+            }
+
+        }
 
     }
 }

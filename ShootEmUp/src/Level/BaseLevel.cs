@@ -132,6 +132,7 @@ namespace ShootEmUp.Level
             background.AddComponent<Background>();
 
             // collision test object
+            /*
             var obstacle = new GameObject("Obstacle");
             var pb = obstacle.AddComponent<PhysicsBody>();
             var bc = obstacle.AddComponent<BoxCollider>();
@@ -139,7 +140,7 @@ namespace ShootEmUp.Level
             texture?.SetSource("Assets/Textures/forsenE.png");
             obstacle.transform.position = new Vec2D(400, 500);
             pb.Velocity = new Vec2D(1, 1);
-            pb.IsMovable = true;
+            pb.IsMovable = true;*/
 
             /*
             //asteroid

@@ -122,7 +122,7 @@ namespace ShootEmUp
                 levelScript.SetupLevel(
                     0,
                     [
-                        new EnemyWave("Wave1.template", 10, 1),
+                        new EnemyWave("Wave1.template", 5, 1),
                         new EnemyWave("Wave2.template", 60, 1),
                     ],
                     20

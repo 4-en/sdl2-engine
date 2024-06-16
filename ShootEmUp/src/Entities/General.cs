@@ -208,12 +208,13 @@ namespace ShootEmUp.Entities
             //play hit sound
             if (collision.GetOther(gameObject).GetName().Contains("Projectile") || this.gameObject.GetName().Contains("Projectile"))
             {
+
                 hitSound = AddComponent<SoundPlayer>();
                 hitSound?.Load("Assets/Audio/hit.wav");
                 hitSound?.SetVolume(0.2);
                 hitSound?.Play();
 
-                if (!collision.GetOther(gameObject).GetName().Contains("Planet"))
+                if (collision.GetOther(gameObject).GetComponent<BaseEnemy>() != null)
                 {
                     var fire = new GameObject("ExplosionAnimation");
                     var sprite = fire.AddComponent<SpriteRenderer>();

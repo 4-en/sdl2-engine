@@ -85,15 +85,20 @@ namespace SDL2Engine
             return true;
         }
 
-        private static Prototype? CreatePrototypeFromScript(string path)
+        /*
+         * Tries to create a prototype from a component class name
+         * 
+         * This should simplify the process of creating prototypes from components
+         */
+        private static Prototype? CreatePrototypeFromComponent(string path)
         {
             string prototypeName = Path.GetFileNameWithoutExtension(path);
-            string withoutPath = Path.GetFileName(path);
 
             // check if there is a class with the same name as the file
             // if there is, create a prototype from it
 
-            Type? type = Type.GetType(withoutPath);
+            Type? type = Type.GetType(prototypeName);
+
 
             if (type == null || !type.IsSubclassOf(typeof(Component)))
             {
@@ -116,10 +121,15 @@ namespace SDL2Engine
         {
             if (!File.Exists(path))
             {
-
+                // Try to create a prototype that is just a Gameobject with a component
                 if (typeof(T) == typeof(Prototype))
                 {
-                    //return CreatePrototypeFromScript(path) as T;
+                    Prototype? proto = CreatePrototypeFromComponent(path);
+                    if (proto != null)
+                    {
+                        return (T)(object)proto;
+                    }
+                    return default;
                 }
 
                 return default;

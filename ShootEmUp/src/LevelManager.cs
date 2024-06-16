@@ -101,7 +101,7 @@ namespace ShootEmUp
                     [
                         new EnemyWave("test.template", 60, 3),
                     ],
-                    10
+                    100
                 );
             }
 

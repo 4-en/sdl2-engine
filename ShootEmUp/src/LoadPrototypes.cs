@@ -26,6 +26,8 @@ namespace ShootEmUp
             SinusEnemy.CreateSinusEnemyPrototype();
             TargetingShooter.CreatePrototype();
             Bomber.CreatePrototype();
+            Spawner.CreatePrototype();
+            EdgeSpawner.CreatePrototype();
         }
 
         private static void LoadExamplePrototype()

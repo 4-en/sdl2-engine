@@ -141,8 +141,14 @@ namespace SDL2Engine
             attribute = parts[0];
             string otherAttributes = string.Join(".", parts.Skip(1));
             var field = type.GetField(attribute, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            while (field == null && type.BaseType != null)
+            {
+                type = type.BaseType;
+                field = type.GetField(attribute, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            }
             if (field == null)
             {
+                Console.WriteLine("Attribute not found: " + attribute);
                 return;
             }
 
@@ -155,10 +161,11 @@ namespace SDL2Engine
                         field.SetValue(obj, int.Parse(value));
                         break;
                     case "Single":
-                        field.SetValue(obj, float.Parse(value));
+                        field.SetValue(obj, float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
                         break;
                     case "Double":
-                        field.SetValue(obj, double.Parse(value));
+                        double doubleValue = double.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
+                        field.SetValue(obj, doubleValue);
                         break;
                     case "String":
                         field.SetValue(obj, value);

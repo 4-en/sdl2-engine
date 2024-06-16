@@ -14,16 +14,29 @@ namespace ShootEmUp.Entities
         public double spawnRate = 1;
         public double spawnTimer = 0;
         public int maxSpawns = -1;
-        public int currentSpawns = 0;
+        public int totalSpawns = 0;
         public double maxTime = -1;
         private double creationTime = 0;
 
-        public Spawner()
+        public static Prototype CreatePrototype()
+        {
+            var prototype = new Prototype("Spawner");
+            prototype.AddComponent<Spawner>();
+            return prototype;
+        }
+
+        public override void Start()
         {
             this.creationTime = Time.time;
 
             if(prototype == null)
             {
+                if(PrototypeName == "")
+                {
+                    Console.WriteLine("Spawner has no prototype name");
+                    gameObject.Destroy();
+                    return;
+                }
                 var protoAsset = AssetManager.LoadPrototype(PrototypeName);
                 if(protoAsset != null)
                 {
@@ -40,7 +53,7 @@ namespace ShootEmUp.Entities
 
         private bool IsDoneSpawning()
         {
-            return maxSpawns != -1 && currentSpawns >= maxSpawns || maxTime != -1 && Time.time - creationTime >= maxTime;
+            return (maxSpawns != -1 && totalSpawns >= maxSpawns) || (maxTime != -1 && Time.time - creationTime >= maxTime);
         }
 
         public override void Update()
@@ -53,10 +66,11 @@ namespace ShootEmUp.Entities
                 return;
             }
 
-            if (spawnTimer >= spawnRate && currentSpawns < maxSpawns)
+            if (spawnTimer >= spawnRate)
             {
+                Console.WriteLine(spawnRate);
                 spawnTimer = 0;
-                currentSpawns++;
+                totalSpawns++;
                 
                 Spawn();
             }
@@ -78,6 +92,13 @@ namespace ShootEmUp.Entities
     public class EdgeSpawner : Spawner
     {
         public Rect field = new Rect(-2500, -2500, 5000, 5000);
+
+        new public static Prototype CreatePrototype()
+        {
+            var prototype = new Prototype("EdgeSpawner");
+            prototype.AddComponent<EdgeSpawner>();
+            return prototype;
+        }
 
         protected override void Spawn()
         {
@@ -133,6 +154,8 @@ namespace ShootEmUp.Entities
 
             spawned.transform.position = new Vec2D(x, y);
             spawned.GetComponent<PhysicsBody>()?.SetVelocity(new Vec2D(xVel, yVel));
+
+            Console.WriteLine("Spawned at: " + x + ", " + y);
 
 
         }

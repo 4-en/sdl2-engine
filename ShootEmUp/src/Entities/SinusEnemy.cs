@@ -35,6 +35,12 @@ namespace ShootEmUp.src.Entities
             return prototype;
         }
 
+        public override void Start()
+        {
+            base.Start();
+            SetPoints(30);
+        }
+
         public override void Update()
         {
             Time.sinusEnemyTime += Time.deltaTime;

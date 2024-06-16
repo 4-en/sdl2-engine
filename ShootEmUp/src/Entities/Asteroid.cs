@@ -89,7 +89,7 @@ namespace ShootEmUp
                 Player.currentHealth -= 50;
 
                 var p = Find("Player");
-                var player = p.GetComponent<Player>();
+                var player = p?.GetComponent<Player>();
                 var playerPos = gameObject.transform.position;
                 if (player != null)
                 {

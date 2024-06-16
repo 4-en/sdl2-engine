@@ -31,6 +31,7 @@ namespace ShootEmUp
         public StaticEnemy()
         {
             SetMaxHealth(250);
+            SetPoints(50);
         }
 
         public override void Update()

@@ -22,7 +22,6 @@ namespace ShootEmUp.Entities
                 collider.SetRadius(80);
                 collider.IsTrigger = true;
             }
-            prototype.AddComponent<TargetingShooter>();
             prototype.AddComponent<Damager>();
             var body = prototype.AddComponent<PhysicsBody>();
             body.RotateWithVelocity = true;
@@ -43,7 +42,9 @@ namespace ShootEmUp.Entities
 
             this.SetPoints(100);
 
-            this.SetMaxHealth(500);
+            
+            this.SetMaxHealth(333);
+            this.SetHealth(333);
         }
         public override void Update()
         {

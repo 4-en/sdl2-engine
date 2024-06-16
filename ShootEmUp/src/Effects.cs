@@ -64,7 +64,7 @@ namespace ShootEmUp
                 }
             }
         }
-        public static void ExplosionParticles(Vec2D position, int count = 10, Color? color=null)
+        public static void ExplosionParticles(Vec2D position, int count = 10, Color? color=null, double lifeTime = 1)
         {
 
 
@@ -79,7 +79,7 @@ namespace ShootEmUp
 
                 var body = particle.AddComponent<PhysicsBody>();
                 body.IsMovable = true;
-                double minVel = 200;
+                double minVel = 350;
                 double maxVel = 500;
                 double vel = EngineObject.GetRandom().NextDouble() * (maxVel - minVel) + minVel;
                 double angle = EngineObject.GetRandom().NextDouble() * Math.PI * 2;
@@ -87,7 +87,8 @@ namespace ShootEmUp
                 body.Velocity = new Vec2D(Math.Cos(angle), Math.Sin(angle)) * vel;
                 body.AngularVelocity = EngineObject.GetRandom().NextDouble() * 720 - 360;
 
-                particle.AddComponent<ExplosionParticle>();
+                var script = particle.AddComponent<ExplosionParticle>();
+                script.lifeTime = lifeTime;
             }
         }
         

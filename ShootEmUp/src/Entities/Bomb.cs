@@ -11,10 +11,31 @@ namespace ShootEmUp.Entities
         public double timer = 2;
         public double explosionDuration = 0.5;
         private bool exploded = false;
+        private SpriteRenderer? sprite;
+
+
+        public static Bomb CreateBomb(Vec2D position, Team team, GameObject source, double damage = 250, double radius = 100, double timer = 2, double explosionDuration = 0.5)
+        {
+            var bombObject = new GameObject("Bomb");
+            bombObject.transform.position = position;
+            var bombComponent = bombObject.AddComponent<Bomb>();
+            bombComponent.team = team;
+            bombComponent.source = source;
+            bombComponent.damage = damage;
+            bombComponent.radius = radius;
+            bombComponent.timer = timer;
+            bombComponent.explosionDuration = explosionDuration;
+            return bombComponent;
+        }
 
         public override void Start()
         {
             Delay(timer, Explode);
+
+            // add bomb sprite
+            sprite = gameObject.AddComponent<SpriteRenderer>();
+            sprite.SetTexture("Assets/Textures/projectiles/bomb.png");
+            sprite.SetWorldSize(50, 50);
         }
 
         public override void Update()
@@ -22,7 +43,7 @@ namespace ShootEmUp.Entities
 
         }
 
-        private void Explode()
+        public void Explode()
         {
             if(exploded)
             {
@@ -38,6 +59,18 @@ namespace ShootEmUp.Entities
 
             gameObject.Destroy(this.explosionDuration);
 
+            Color color = team == Team.Player ? new Color(255, 255, 255, 255) : new Color(255, 0, 0, 255);
+
+            Effects.ExplosionParticles(gameObject.transform.position, 200, color, 3);
+
+            // play explosion sound
+            var sound = gameObject.AddComponent<SoundPlayer>();
+            sound.Load("Assets/Audio/explosion.mp3");
+            sound.playOnAwake = true;
+
+            // delete bomb sprite
+            sprite?.Destroy();
+
 
         }
 
@@ -46,6 +79,11 @@ namespace ShootEmUp.Entities
             var other = collision.GetOther(gameObject);
             var damageable = other.GetComponent<IDamageable>();
             if (damageable == null)
+            {
+                return;
+            }
+
+            if (damageable.GetTeam() == team)
             {
                 return;
             }

@@ -312,6 +312,41 @@ namespace ShootEmUp
             {
                 ShootRocket();
             }
+
+            // bomb
+            if (Input.GetKeyDown(SDL_Keycode.SDLK_e))
+            {
+                DropBomb();
+            }
+        }
+
+        private double lastBombTime = 0;
+        private Bomb? bomb = null;
+        private void DropBomb()
+        {
+            if (Time.time - lastBombTime < 1)
+            {
+                if (bomb != null)
+                {
+                    bomb.Explode();
+                }
+                return;
+            }
+
+            if(PlayerData.Instance.BombCount <= 0)
+            {
+                return;
+            }
+
+            PlayerData.Instance.BombCount -= 1;
+
+            lastBombTime = Time.time;
+
+            var position = gameObject.GetPosition();
+
+            double damage = 500 + PlayerData.Instance.DamageUpgradeLevel * 500;
+
+            bomb = Bomb.CreateBomb(position, Team.Player, gameObject, damage , 500, 2, 0.5);
         }
 
         private double lastFireTime = 0;

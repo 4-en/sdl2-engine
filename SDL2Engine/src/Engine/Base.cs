@@ -191,10 +191,22 @@ namespace SDL2Engine
             return new Vec2D(x * cos - y * sin, x * sin + y * cos);
         }
 
+        public Vec2D RotateRadians(double rotation)
+        {
+            double cos = Math.Cos(rotation);
+            double sin = Math.Sin(rotation);
+            return new Vec2D(x * cos - y * sin, x * sin + y * cos);
+        }
+
         // Get the rotation of the vector in degrees
         public double GetRotation()
         {
             return Math.Atan2(y, x) * 180 / Math.PI;
+        }
+
+        public double GetRotationRadians()
+        {
+            return Math.Atan2(y, x);
         }
 
         public static bool operator >(Vec2D a, Vec2D b)

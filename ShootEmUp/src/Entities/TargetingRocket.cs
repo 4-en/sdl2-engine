@@ -115,6 +115,13 @@ namespace ShootEmUp.Entities
             
         }
 
+        private double NormalizeAngle(double angle)
+        {
+            while (angle > Math.PI) angle -= 2 * Math.PI;
+            while (angle < -Math.PI) angle += 2 * Math.PI;
+            return angle;
+        }
+
         private void AdjustDirection()
         {
             if(target == null || directionLocked)
@@ -130,13 +137,14 @@ namespace ShootEmUp.Entities
 
             if(myDir.Length() == 0)
             {
-                return;
+                myDir = targetDir;
             }
 
             // TODO: sometimes rotation is wrong/opposite
             // fix later
 
-            double optimalRotation = targetDir.GetRotation() - myDir.GetRotation();
+            double optimalRotation = targetDir.Normalize().GetRotationRadians() - myDir.Normalize().GetRotationRadians();
+            optimalRotation = NormalizeAngle(optimalRotation);
             double rotation = rotationSpeed * Time.deltaTime;
 
             if(optimalRotation > 0)
@@ -148,7 +156,7 @@ namespace ShootEmUp.Entities
                 rotation = Math.Max(-rotation, optimalRotation);
             }
 
-            myDir = myDir.Rotate(rotation);
+            myDir = myDir.RotateRadians(rotation);
             myDir = myDir.Normalize() * speed;
             
             var physicsBody = GetComponent<PhysicsBody>();

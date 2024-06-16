@@ -1,7 +1,9 @@
 ﻿using SDL2Engine;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +25,7 @@ namespace ShootEmUp
                 background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
                 GameObject gameTitle = HomeScreenText("Shoot Em Up", gameBounds.x / 2, 300, 200);
                 GameObject startText = HomeScreenText("Start", gameBounds.x / 2, 600, 130);
-                GameObject shopText = HomeScreenText("Shop", gameBounds.x / 2, 800, 130);
+                GameObject shopText = HomeScreenText("Highscores", gameBounds.x / 2, 800, 130);
                 scene.AddGameObject(background);
                 scene.AddGameObject(gameTitle);
                 scene.AddGameObject(startText);
@@ -105,12 +107,42 @@ namespace ShootEmUp
                     {
                         LevelManager.StartNewRun();
                     }
-                    if(gameObject.GetName().Equals("Shop"))
+                    if(gameObject.GetName().Equals("Highscores"))
                     {
-                        LevelManager.LoadShop();
+                        // open url in browser
+                        Console.WriteLine("Opening browser");
+                        OpenUrl("http://api.aiko.lol:25500/view/spaceshooter");
                     }
                 }
 
+            }
+        }
+
+        private void OpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", url);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", url);
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
     }

@@ -42,7 +42,7 @@ namespace ShootEmUp.Entities
 
         private double nextMissile = 0;
         public double missileRate = 2;
-        public int projectileCount = 10;
+        public int projectileCount = 5;
 
         private void ShootProjectile()
         {
@@ -60,7 +60,7 @@ namespace ShootEmUp.Entities
 
             var targetPosition = player.GetPosition();
             var direction = (targetPosition - gameObject.GetPosition()).Normalize();
-            var angle = direction.GetRotation();
+            var angle = direction.GetRotationRadians();
             var startAngle = angle - Math.PI / 6;
             var angleRange = Math.PI / 3;
             var angleStep = angleRange / (projectileCount - 1);

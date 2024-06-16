@@ -12,7 +12,7 @@ namespace ShootEmUp.Entities
     {
         public Planet()
         {
-            SetHealth(500);
+            SetMaxHealth(500);
         }
         public static Prototype CreatePlanetPrototype()
         {

@@ -207,7 +207,6 @@ namespace ShootEmUp.Entities
             //play hit sound
             if (collision.GetOther(gameObject).GetName().Contains("Projectile") || this.gameObject.GetName().Contains("Projectile"))
             {
-                Console.WriteLine("Projectile collided with projectile");
                 hitSound = AddComponent<SoundPlayer>();
                 hitSound?.Load("Assets/Audio/hit.wav");
                 hitSound?.SetVolume(0.2);

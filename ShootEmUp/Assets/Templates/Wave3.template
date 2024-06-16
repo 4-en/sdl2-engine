@@ -1,0 +1,68 @@
+<Planet x="5000" y="-5000" xr="0" yr="0" count="1"/>
+<Planet x="1200" y="-500" xr="0" yr="0" count="1"/>
+<Planet x="-1500" y="-1300" xr="0" yr="0" count="1"/>
+<Planet x="-300" y="-1100" xr="0" yr="0" count="1"/>
+<Planet x="-800" y="400" xr="0" yr="0" count="1"/>
+<Planet x="800" y="1200" xr="0" yr="0" count="1"/>
+<Planet x="-1000" y="-2200" xr="0" yr="0" count="1"/>
+<Planet x="1600" y="-2000" xr="0" yr="0" count="1"/>
+<Planet x="-1200" y="1800" xr="0" yr="0" count="1"/>
+<Planet x="2200" y="2200" xr="0" yr="0" count="1"/>
+<Planet x="1900" y="700" xr="0" yr="0" count="1"/>
+
+<StaticEnemy x="800" y="350" xr="0" yr="0" count="1" />
+<StaticEnemy x="-200" y="-550" xr="0" yr="0" count="1" />
+<StaticEnemy x="1500" y="750" xr="0" yr="0" count="1" />
+<StaticEnemy x="-2000" y="850" xr="0" yr="0" count="1" />
+<StaticEnemy x="0" y="2000" xr="0" yr="0" count="1" />
+<StaticEnemy x="-1500" y="-1350" xr="0" yr="0" count="1" />
+<StaticEnemy x="1300" y="-1250" xr="0" yr="0" count="1" />
+<StaticEnemy x="2100" y="-800" xr="0" yr="0" count="1" />
+<StaticEnemy x="-1400" y="0" xr="0" yr="0" count="1" />
+<StaticEnemy x="2200" y="0" xr="0" yr="0" count="1" />
+<StaticEnemy x="200" y="-1900" xr="0" yr="0" count="1" />
+<StaticEnemy x="-400" y="1600" xr="0" yr="0" count="1" />
+
+<SinusEnemy x="2400" y="0" xr="0" yr="0" count="1" SinusEnemy.startingY="0"/>
+<SinusEnemy x="1200" y="0" xr="0" yr="0" count="1" SinusEnemy.startingY="0"/>
+<SinusEnemy x="-1200" y="0" xr="0" yr="0" count="1" SinusEnemy.startingY="0"/>
+<SinusEnemy x="-2400" y="0" xr="0" yr="0" count="1" SinusEnemy.startingY="0"/>
+<SinusEnemy x="-3600" y="0" xr="0" yr="0" count="1" SinusEnemy.startingY="0"/>
+
+<SinusEnemy x="-4800" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+<SinusEnemy x="-3600" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+<SinusEnemy x="-2400" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+<SinusEnemy x="-1200" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+<SinusEnemy x="0" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+<SinusEnemy x="1200" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+<SinusEnemy x="2400" y="1666" xr="0" yr="0" count="1" SinusEnemy.startingY="1666"/>
+
+<SinusEnemy x="-2400" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="-1200" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="0" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="1200" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="2400" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="3600" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+<SinusEnemy x="4800" y="-1500" xr="0" yr="0" count="1" SinusEnemy.startingY="-1666" SinusEnemy.moveRight="false"/>
+
+<ShieldPowerUp x="1700" y="-1150" xr="0" yr="0" count="1" />
+<ShieldPowerUp x="0" y="-1750" xr="0" yr="0" count="1" />
+<ShieldPowerUp x="-100" y="1450" xr="0" yr="0" count="1" />
+<HealthPowerUp x="1200" y="150" xr="0" yr="0" count="1" />
+<HealthPowerUp x="-1500" y="650" xr="0" yr="0" count="1" />
+
+<Asteroid x="2400" y="-2400" xr="0" yr="0" count="1" Asteroid.xSpeed="-30" Asteroid.ySpeed="100"/>
+<Asteroid x="2200" y="-1200" xr="0" yr="0" count="1" Asteroid.xSpeed="-130" Asteroid.ySpeed="100"/>
+<Asteroid x="2400" y="-100" xr="0" yr="0" count="1" Asteroid.xSpeed="-80" Asteroid.ySpeed="-100"/>
+<Asteroid x="2300" y="-100" xr="0" yr="0" count="1" Asteroid.xSpeed="-80" Asteroid.ySpeed="10"/>
+<Asteroid x="2200" y="1400" xr="0" yr="0" count="1" Asteroid.xSpeed="-100" Asteroid.ySpeed="-100"/>
+<Asteroid x="1500" y="2400" xr="0" yr="0" count="1" Asteroid.xSpeed="-20" Asteroid.ySpeed="-100"/>
+<Asteroid x="1400" y="2400" xr="0" yr="0" count="1" Asteroid.xSpeed="-120" Asteroid.ySpeed="-80"/>
+<Asteroid x="-200" y="1600" xr="0" yr="0" count="1" Asteroid.xSpeed="20" Asteroid.ySpeed="-110"/>
+<Asteroid x="-400" y="1300" xr="0" yr="0" count="1" Asteroid.xSpeed="30" Asteroid.ySpeed="-80"/>
+<Asteroid x="-500" y="1300" xr="0" yr="0" count="1" Asteroid.xSpeed="-70" Asteroid.ySpeed="-100"/>
+<Asteroid x="-2000" y="800" xr="0" yr="0" count="1" Asteroid.xSpeed="60" Asteroid.ySpeed="-80"/>
+<Asteroid x="-600" y="200" xr="0" yr="0" count="1" Asteroid.xSpeed="-30" Asteroid.ySpeed="60"/>
+<Asteroid x="-600" y="-600" xr="0" yr="0" count="1" Asteroid.xSpeed="60" Asteroid.ySpeed="60"/>
+<Asteroid x="-1400" y="-1300" xr="0" yr="0" count="1" Asteroid.xSpeed="60" Asteroid.ySpeed="-80"/>
+<Asteroid x="-2300" y="2300" xr="0" yr="0" count="1" Asteroid.xSpeed="5" Asteroid.ySpeed="-100"/>

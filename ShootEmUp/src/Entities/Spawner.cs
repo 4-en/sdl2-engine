@@ -68,7 +68,6 @@ namespace ShootEmUp.Entities
 
             if (spawnTimer >= spawnRate)
             {
-                Console.WriteLine(spawnRate);
                 spawnTimer = 0;
                 totalSpawns++;
                 

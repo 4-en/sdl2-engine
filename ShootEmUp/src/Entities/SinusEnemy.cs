@@ -55,7 +55,7 @@ namespace ShootEmUp.src.Entities
                 moveRight = true;
             }
 
-            transform.rotation = newVelocity.getRotation();
+            transform.rotation = newVelocity.GetRotation();
 
 
             //shot

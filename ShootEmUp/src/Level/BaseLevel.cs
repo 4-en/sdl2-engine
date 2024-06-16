@@ -178,7 +178,7 @@ namespace ShootEmUp.Level
             // Add the event listener for enemy killed events
             eventListener = EventBus.AddListener<EnemyKilledEvent>((eventData) =>
             {
-                int points = CalculateCombo((int)eventData.enemy.GetPoints());
+                int points = CalculateCombo(eventData.enemy.GetPoints());
                 AddScore(points);
                 AddMoney(points);
             });

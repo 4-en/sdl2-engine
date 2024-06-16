@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace ShootEmUp
 {
 
-    public class BaseEnemy : Script, IDamageable
+    public class BaseEnemy : Script, IDamageable, IEnemy
     {
         public static Prototype CreateBasePrototype()
         {
@@ -155,9 +155,14 @@ namespace ShootEmUp
             OnHealthChange();
         }
 
-        public double GetPoints()
+        public int GetPoints()
         {
-            return points;
+            return (int)points;
+        }
+
+        public Team GetTeam()
+        {
+            return Team.Enemy;
         }
 
         public void SetPoints(double value)

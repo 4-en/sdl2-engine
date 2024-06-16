@@ -35,8 +35,9 @@ namespace ShootEmUp.Entities
         public override void Start()
         {
             base.Start();
-            SetMaxHealth(200);
+            SetMaxHealth(100);
             maxSpeed = 200;
+            this.SetPoints(50);
         }
 
         private double nextMissile = 0;

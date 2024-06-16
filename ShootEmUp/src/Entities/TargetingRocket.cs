@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ShootEmUp.Entities
 {
-    public class TargetingRocket : ProjectileScript
+    public class TargetingRocket : ProjectileScript, IDamageable, IEnemy
     {
 
         public static Prototype CreatePrototype()
@@ -53,7 +53,12 @@ namespace ShootEmUp.Entities
                 myDir = new Vec2D(1, 0);
             }
 
-            double bestAngle = 999;
+            var CalculateTargetValue = (double angle, double dist) =>
+            {
+                return (Math.Abs(angle / 100) + 1) * dist;
+            };
+
+            double bestTargetValue = 999999;
             GameObject? targetObj = null;
             foreach (var target in targets)
             {
@@ -75,10 +80,13 @@ namespace ShootEmUp.Entities
                 var dir = targetPos - myPos;
                 var angle = myDir.AngleTo(dir);
                 angle = Math.Abs(angle);
+                double dist = dir.Length();
 
-                if(angle < bestAngle)
+                double targetValue = CalculateTargetValue(angle, dist);
+
+                if(targetValue < bestTargetValue)
                 {
-                    bestAngle = angle;
+                    bestTargetValue = targetValue;
                     targetObj = component.GetGameObject();
                 }
 
@@ -120,16 +128,24 @@ namespace ShootEmUp.Entities
             var targetDir = targetPos - myPos;
             var myDir = GetComponent<PhysicsBody>()?.Velocity ?? new Vec2D(0, 0);
 
-            double optimalAngleDiff = myDir.AngleTo(targetDir);
+            if(myDir.Length() == 0)
+            {
+                return;
+            }
+
+            // TODO: sometimes rotation is wrong/opposite
+            // fix later
+
+            double optimalRotation = targetDir.GetRotation() - myDir.GetRotation();
             double rotation = rotationSpeed * Time.deltaTime;
 
-            if(optimalAngleDiff > 0)
+            if(optimalRotation > 0)
             {
-                rotation = -Math.Min(rotation, optimalAngleDiff);
+                rotation = Math.Min(rotation, optimalRotation);
             }
             else
             {
-                rotation = -Math.Max(-rotation, optimalAngleDiff);
+                rotation = Math.Max(-rotation, optimalRotation);
             }
 
             myDir = myDir.Rotate(rotation);
@@ -160,5 +176,33 @@ namespace ShootEmUp.Entities
             AdjustDirection();
         }
 
+        public void Damage(Damage damage)
+        {
+            EventBus.Dispatch(new EnemyKilledEvent(this));
+            gameObject.Destroy();
+        }
+
+        public void Heal(double value)
+        {
+            
+        }
+
+        public double GetHealth()
+        {
+            return 1;
+        }
+
+        public double GetMaxHealth()
+        {
+            return 1;
+        }
+
+        public void SetHealth(double value)
+        {
+        }
+
+        public void SetMaxHealth(double value)
+        {
+        }
     }
 }

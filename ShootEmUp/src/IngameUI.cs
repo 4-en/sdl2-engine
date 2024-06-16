@@ -89,7 +89,7 @@ namespace ShootEmUp
                 AddComponent<HealthReducer>();
                 AddComponent<HighscoreUpdater>();
                 AddComponent<MoneyUpdater>();
-                AddComponent<WaveIndicator>();
+                AddComponent<LevelIndicator>();
                 AddComponent<ShieldTexture>();
 
             }
@@ -229,10 +229,10 @@ namespace ShootEmUp
             }
         }
 
-        internal class WaveIndicator : Script
+        internal class LevelIndicator : Script
         {
 
-            GameObject waveIndicator = new GameObject("WaveIndicator");
+            GameObject levelIndicator = new GameObject("levelIndicator");
 
 
             public override void Start()
@@ -242,8 +242,8 @@ namespace ShootEmUp
                 Player.displayedHighscore = PlayerData.Instance.TotalScore;
 
 
-                var text = waveIndicator.AddComponent<TextRenderer>();
-                waveIndicator.transform.position = new Vec2D(100, 100);
+                var text = levelIndicator.AddComponent<TextRenderer>();
+                levelIndicator.transform.position = new Vec2D(100, 100);
                 text.anchorPoint = AnchorPoint.CenterLeft;
                 text.SetText(PlayerData.Instance.LevelProgress.ToString());
                 text.SetColor(SDL2Engine.Color.White);
@@ -254,10 +254,8 @@ namespace ShootEmUp
 
             public override void Update()
             {
-
-                //update moneyIndicator
-                var text = waveIndicator.GetComponent<TextRenderer>();
-                text?.SetText("Wave:" + PlayerData.Instance.LevelProgress.ToString());
+                var text = levelIndicator.GetComponent<TextRenderer>();
+                text?.SetText("Level:" + LevelManager.levelIndex);
             }
         }
 

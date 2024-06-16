@@ -25,7 +25,7 @@ namespace ShootEmUp
         private static Scene? homeScreen;
         private static Scene? shop;
         private static Scene? level;
-        private static int levelIndex = 0;
+        public static int levelIndex = 0;
 
         public static void LoadNextLevel()
         {
@@ -141,7 +141,7 @@ namespace ShootEmUp
         public static Scene CreateLevel2()
         {
            
-            var level = new Scene("Level1");
+            var level = new Scene("Level2");
             using (level.Activate())
             {
                 var levelScript = Component.CreateWithGameObject<BaseLevel>("Level").Item2;

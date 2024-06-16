@@ -142,7 +142,7 @@ namespace ShootEmUp.Entities
 
 
         }
-
+        private List<GameObject> hitGameObjects = new List<GameObject>();
         public override void OnCollisionEnter(CollisionPair collision)
         {
             var other = collision.GetOther(gameObject);
@@ -156,6 +156,13 @@ namespace ShootEmUp.Entities
             {
                 return;
             }
+
+            if(hitGameObjects.Contains(other))
+            {
+                return;
+            }
+
+            hitGameObjects.Add(other);
 
             damageable.Damage(new Damage(damage, gameObject, team));
         }

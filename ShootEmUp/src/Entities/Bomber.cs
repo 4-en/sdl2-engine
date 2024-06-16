@@ -54,7 +54,7 @@ namespace ShootEmUp.Entities
             if (bombTimer >= bombInterval)
             {
                 bombTimer = 0;
-                var bomb = Bomb.CreateBomb(gameObject.transform.position, Team.Enemy, gameObject, 500, 300, 2, 0.2);
+                var bomb = Bomb.CreateBomb(gameObject.transform.position, Team.Enemy, gameObject, 300, 300, 2, 0.2);
             }
 
         }

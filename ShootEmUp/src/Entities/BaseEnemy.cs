@@ -102,8 +102,47 @@ namespace ShootEmUp
                 gameObject.Destroy();
 
                 Effects.ExplosionParticles(gameObject.GetPosition(), 100);
+
+                TrySpawnPowerUp();
             }
 
+        }
+
+        private void TrySpawnPowerUp()
+        {
+            double chance = 0.1 + Math.Min(0.2, points / 400);
+            if (random.NextDouble() < chance)
+            {
+                int powerUpType = random.Next(0, 5);
+
+                GameObject? powerUp = null;
+
+                switch(powerUpType)
+                {
+                    case 0:
+                        powerUp = Prototype.Instantiate("HealthPowerUp");
+                        break;
+                    case 1:
+                        powerUp = Prototype.Instantiate("ShieldPowerUp");
+                        break;
+                    case 2:
+                        powerUp = Prototype.Instantiate("BoostPowerUp");
+                        break;
+                    case 3:
+                        powerUp = Prototype.Instantiate("RocketPowerUp");
+                        break;
+                    case 4:
+                        powerUp = Prototype.Instantiate("BombPowerUp");
+                        break;
+                    default:
+                        break;
+                }
+
+                if (powerUp != null)
+                {
+                    powerUp.transform.position = gameObject.transform.position;
+                }
+            }
         }
 
         public void Damage(Damage damage)

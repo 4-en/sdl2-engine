@@ -25,6 +25,7 @@ namespace ShootEmUp
             HealthPowerUp.CreateHealthPowerUpPrototype();
             BoostPowerUp.CreateBoostPowerUpPrototype();
             RocketPowerUp.CreateRocketPowerUpPrototype();
+            BombPowerUp.CreateBombPowerUpPrototype();
             SinusEnemy.CreateSinusEnemyPrototype();
             TargetingShooter.CreatePrototype();
             Bomber.CreatePrototype();

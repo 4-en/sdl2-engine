@@ -7,7 +7,7 @@ namespace ShootEmUp
 {
     public static partial class LevelManager
     {
-        
+
 
 
         public static void Start()
@@ -99,6 +99,7 @@ namespace ShootEmUp
 
         public static Scene CreateBaseLevel()
         {
+
             var level = new Scene("TestLevel");
             using (level.Activate())
             {
@@ -143,7 +144,7 @@ namespace ShootEmUp
 
         public static Scene CreateLevel2()
         {
-           
+
             var level = new Scene("Level2");
             using (level.Activate())
             {
@@ -165,7 +166,22 @@ namespace ShootEmUp
 
         public static Scene CreateLevel3()
         {
-            var level = CreateBaseLevel();
+            var level = new Scene("Level3");
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<BaseLevel>("Level").Item2;
+                levelScript.SetupLevel(
+                    0,
+                    [
+                        new EnemyWave("Wave1.template", 15, 1),
+                        new EnemyWave("Wave5.template", 20, 1),
+                        new EnemyWave("Wave4.template", 10, 1),
+                        new EnemyWave("Wave2.template", 5, 1),
+
+                    ],
+                    60
+                );
+            }
 
             return level;
         }

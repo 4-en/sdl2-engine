@@ -44,7 +44,7 @@ namespace ShootEmUp
 
             spaceshipTexture = "Assets/Textures/spaceships/spaceship5.png";
             speed = 0;
-            maxSpeed = 800 + PlayerData.Instance.SpeedUpgradeLevel * 100;
+            maxSpeed = 550 + PlayerData.Instance.SpeedUpgradeLevel * 100;
             minSpeed = 25;
             acceleration = 1;
             rotationSpeed = 300;

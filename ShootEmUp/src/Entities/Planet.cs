@@ -56,7 +56,6 @@ namespace ShootEmUp.Entities
                     playerPos = player.transform.position;
                 }
 
-                Console.WriteLine("Player collided with planet");
                 Player.currentHealth -= 1;
                 Vec2D random_offset = new Vec2D(random.NextDouble() * 100 - 50, random.NextDouble() * 100 - 50);
                 GameText.CreateAt(playerPos + random_offset, "1", 2, 52, new Color(255, 0, 0, 255));

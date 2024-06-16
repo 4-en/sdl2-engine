@@ -70,7 +70,7 @@ namespace ShootEmUp.Entities
                     continue;
                 }
 
-                if(!(target is BaseEnemy))
+                if(!(target is BaseEnemy || target is Player))
                 {
                     continue;
                 }
@@ -87,7 +87,7 @@ namespace ShootEmUp.Entities
                 var angle = myDir.GetRotation() - dir.GetRotation();
                 angle = Math.Abs(angle);
 
-                if(angle > 70) continue;
+                if(angle > 200) continue;
 
                 double dist = dir.Length();
 

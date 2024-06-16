@@ -41,7 +41,7 @@ namespace ShootEmUp.Entities
         }
 
         private double nextMissile = 0;
-        public double missileRate = 2;
+        public double missileRate = 4;
         public override void Update()
         {
             base.Update();

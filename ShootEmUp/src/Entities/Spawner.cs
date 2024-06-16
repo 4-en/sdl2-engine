@@ -167,6 +167,13 @@ namespace ShootEmUp.Entities
         public double minSpeed = 50;
         public double maxSpeed = 100;
 
+        new public static Prototype CreatePrototype()
+        {
+            var prototype = new Prototype("RectSpawner");
+            prototype.AddComponent<RectSpawner>();
+            return prototype;
+        }
+
         protected override void Spawn()
         {
             if (prototype == null)

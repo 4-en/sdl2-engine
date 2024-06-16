@@ -270,6 +270,7 @@ namespace ShootEmUp
 
             if (Input.GetKeyDown(enter))
             {
+                /*
                 if (Player.spaceshipTexture == "Assets/Textures/spaceships/spaceship1.png")
                 {
                     gameObject.GetComponent<TextureRenderer>()?.SetSource("Assets/Textures/spaceships/spaceship2.png");
@@ -294,7 +295,7 @@ namespace ShootEmUp
                 {
                     gameObject.GetComponent<TextureRenderer>()?.SetSource("Assets/Textures/spaceships/spaceship1.png");
                     Player.spaceshipTexture = "Assets/Textures/spaceships/spaceship1.png";
-                }
+                }*/
             }
 
             //rotate velocity

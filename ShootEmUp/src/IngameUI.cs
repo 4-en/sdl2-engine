@@ -86,12 +86,13 @@ namespace ShootEmUp
                 AddComponent<HealthBar>();
                 AddComponent<HighScore>();
                 //AddComponent<MoneyIndicator>();
-                AddComponent<HealthReducer>();
-                AddComponent<HighscoreUpdater>();
-                AddComponent<MoneyUpdater>();
                 AddComponent<LevelIndicator>();
                 AddComponent<ShieldTexture>();
 
+                //Components for testing
+                //AddComponent<HighscoreUpdater>();
+                //AddComponent<MoneyUpdater>();
+                //AddComponent<HealthReducer>();
             }
         }
 

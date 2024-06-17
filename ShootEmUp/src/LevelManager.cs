@@ -12,12 +12,19 @@ namespace ShootEmUp
 
         public static void Start()
         {
+
+            Console.WriteLine("Controls: ");
+            Console.WriteLine("WASD to move");
+            Console.WriteLine("Space to shoot");
+            Console.WriteLine("Q to targeting missiles");
+            Console.WriteLine("E to drop bombs");
+            Console.WriteLine("Shift to use speed boost");
+            Console.WriteLine();
+
             LoadHomeScreen();
             var engine = new Engine(null, "ShootEmUp");
             engine.Init();
             LoadPrototypes.Load();
-            var playerData = PlayerData.Instance;
-            Console.WriteLine($"Loaded player data - Score: {playerData.TotalScore}, Level: {playerData.LevelProgress}, Money: {playerData.Money}");
             engine.Run();
         }
 

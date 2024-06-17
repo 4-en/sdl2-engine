@@ -37,15 +37,6 @@ namespace TileBasedGame.src
                 scene.AddGameObject(level3Text);
                 scene.AddGameObject(level4Text);
                 scene.AddGameObject(level5Text);
-
-
-                var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
-                var player = music.Item2;
-                player.playOnAwake = true;
-                player.SetSource("Assets/Audio/home.mp3");
-
-
-
             }
 
             return scene;

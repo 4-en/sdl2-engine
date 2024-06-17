@@ -102,8 +102,7 @@ namespace TileBasedGame.src
 
         private static Scene CreateHomeScreen()
         {
-            //var homeScreen = HomeScreen.CreateScene();
-            var homeScreen = CreateBaseLevel();
+            var homeScreen = HomeScreen.CreateScene();
 
             return homeScreen;
         }

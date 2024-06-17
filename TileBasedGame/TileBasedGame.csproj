@@ -8,11 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDL2Engine\SDL2Engine.csproj" />
+    <None Remove="Assets\Fonts\Arcadeclassic.ttf" />
+    <None Remove="Assets\Textures\space_background.jpg" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Assets\" />
+    <Content Include="Assets\Fonts\Arcadeclassic.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\space_background.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SDL2Engine\SDL2Engine.csproj" />
   </ItemGroup>
 
 </Project>

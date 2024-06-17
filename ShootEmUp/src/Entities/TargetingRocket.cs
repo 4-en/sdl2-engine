@@ -241,5 +241,10 @@ namespace ShootEmUp.Entities
         public void SetMaxHealth(double value)
         {
         }
+
+        public Team GetTeam()
+        {
+            return team;
+        }
     }
 }

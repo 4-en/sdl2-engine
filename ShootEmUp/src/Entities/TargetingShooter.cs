@@ -83,6 +83,7 @@ namespace ShootEmUp.Entities
                     rocket.shooter = gameObject;
                     rocket.team = Team.Enemy;
                     rocket.damage = 300;
+                    rocket.speed = 700;
                 }
             }
         }

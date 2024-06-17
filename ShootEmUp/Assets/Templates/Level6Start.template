@@ -6,7 +6,7 @@
 <Planet x="800" y="1200" xr="0" yr="0" count="1"/>
 <StaticEnemy x="444" y="444" xr="3000" yr="3000" count="6" />
 <EdgeSpawner EdgeSpawner.PrototypeName="Bomber" EdgeSpawner.spawnRate="5" />
-<EdgeSpawner EdgeSpawner.PrototypeName="TargetingShooter" EdgeSpawner.spawnRate="4" />
+<EdgeSpawner EdgeSpawner.PrototypeName="TargetingShooter" EdgeSpawner.spawnRate="5" />
 <EdgeSpawner EdgeSpawner.PrototypeName="BaseEnemy" EdgeSpawner.spawnRate="2" />
 <EdgeSpawner EdgeSpawner.PrototypeName="BaseEnemy" EdgeSpawner.spawnRate="2" />
 <EdgeSpawner EdgeSpawner.PrototypeName="MultiShot" EdgeSpawner.spawnRate="2" />

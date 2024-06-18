@@ -1,0 +1,41 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "test_map.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "Sewer.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 3
+        },
+        "test_map.tmx": {
+            "scale": 2,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 210.5,
+                "y": 258.5
+            }
+        }
+    },
+    "last.imagePath": "C:/Users/Ben/Documents/code/csharp/sdl2-engine/TileBasedGame/Assets/Textures/tilesets",
+    "map.fixedSize": false,
+    "map.height": 16,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "openFiles": [
+        "Sewer.tsx",
+        "test_map.tmx"
+    ],
+    "project": "test.tiled-project",
+    "recentFiles": [
+        "Sewer.tsx",
+        "test_map.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

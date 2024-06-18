@@ -11,6 +11,11 @@ namespace SDL2Engine
 
         private Dictionary<string, List<GameObject>> chunks = new Dictionary<string, List<GameObject>>();
 
+        private int lastChunkX1 = -420420;
+        private int lastChunkY1 = -420420;
+        private int lastChunkX2 = -420420;
+        private int lastChunkY2 = -420420;
+
 
         public ChunkMap()
         {
@@ -65,10 +70,23 @@ namespace SDL2Engine
             int x2 = (int)(bounds.x + bounds.w) / chunkSize;
             int y2 = (int)(bounds.y + bounds.h) / chunkSize;
 
+            if(x1 == lastChunkX1 && y1 == lastChunkY1 && x2 == lastChunkX2 && y2 == lastChunkY2)
+            {
+                yield break;
+            }
+
             for(int x = x1; x <= x2; x++)
             {
+                if(x>=lastChunkX1 && x<=lastChunkX2)
+                {
+                    continue;
+                }
                 for (int y = y1; y <= y2; y++)
                 {
+                    if (y >= lastChunkY1 && y <= lastChunkY2)
+                    {
+                        continue;
+                    }
                     string key = GetChunkKey(x, y);
                     if (chunks.ContainsKey(key))
                     {
@@ -86,6 +104,11 @@ namespace SDL2Engine
                     }
                 }
             }
+
+            lastChunkX1 = x1;
+            lastChunkY1 = y1;
+            lastChunkX2 = x2;
+            lastChunkY2 = y2;
         }
     }
 

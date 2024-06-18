@@ -836,7 +836,16 @@ namespace SDL2Engine
                     // maybe fix this later
                     goWithPhysics.Add(collider.GetGameObject());
                 }*/
-                Physics.UpdatePhysics(physicsObjects);
+
+                // define the physics world
+                // 3* viewport size
+                Rect rect = mainCamera.GetVisibleWorld();
+                rect.x -= rect.w;
+                rect.y -= rect.h;
+                rect.w *= 3;
+                rect.h *= 3;
+
+                Physics.UpdatePhysics(physicsObjects, rect);
             }
             
 

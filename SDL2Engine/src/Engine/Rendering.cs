@@ -291,6 +291,14 @@ namespace SDL2Engine
             return GetVisibleSize().y;
         }
 
+        public Rect GetVisibleWorld()
+        {
+            Vec2D screenSize = GetVisibleSize();
+            Vec2D topLeft = ScreenToWorld(new Vec2D(0, 0));
+            Vec2D bottomRight = ScreenToWorld(screenSize);
+            return new Rect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+        }
+
         public Vec2D ScreenToWorld(Vec2D screenPosition)
         {
             Vec2D screenSize = GetScreenSize();

@@ -18,12 +18,68 @@ namespace SDL2Engine
 
     }
 
+    /*
+     * Used to store multiple QuadTrees in an infinite 2D space
+     * Only areas that have objects in them will have a QuadTree
+     */
+    public class InfiniteQuadTree<T> where T : IBounded
+    {
+        private Dictionary<int, QuadTree<T>> quadTrees = new Dictionary<int, QuadTree<T>>();
+        private const int quadTreeSize = 10000;
+
+        private int GetQuadTreeHash(int x, int y, int quadTreeSize)
+        {
+            int xIndex = x / quadTreeSize;
+            int yIndex = y / quadTreeSize;
+            int primeMultiplier = 10007; // A large prime number
+            return xIndex + yIndex * primeMultiplier;
+        }
+
+        public void Insert(T item)
+        {
+            Rect bounds = item.GetBounds();
+            int x = (int)bounds.x;
+            int y = (int)bounds.y;
+            int hash = GetQuadTreeHash(x, y, quadTreeSize);
+            if (!quadTrees.ContainsKey(hash))
+            {
+                quadTrees[hash] = new QuadTree<T>(new Rect(x, y, quadTreeSize, quadTreeSize));
+            }
+            quadTrees[hash].Insert(item);
+        }
+
+        public List<T> Query(Rect range)
+        {
+            List<T> found = new List<T>();
+            int x = (int)range.x;
+            int y = (int)range.y;
+            int hash = GetQuadTreeHash(x, y, quadTreeSize);
+            if (quadTrees.ContainsKey(hash))
+            {
+                quadTrees[hash].Query(range, found);
+            }
+            return found;
+        }
+
+        public IEnumerator<List<T>> GetPossibleCollisions()
+        {
+            foreach (var quadTree in quadTrees.Values)
+            {
+                var possibleCollisions = quadTree.GetPossibleCollisions();
+                while (possibleCollisions.MoveNext())
+                {
+                    yield return possibleCollisions.Current;
+                }
+            }
+        }
+    }
+
     // A QuadTree is a data structure that is used to store objects in a 2D space
     // It is used to quickly find objects that are close to each other
     // and therefore can be used to optimize collision detection by avoiding checking collisions between objects that are far away from each other
     public class QuadTree<T> where T : IBounded
     {
-        private const int MAX_CAPACITY = 4;
+        private const int MAX_CAPACITY = 16;
         private List<T> items = new List<T>();
         private Rect bounds;
         private QuadTree<T>[]? children = null;
@@ -124,6 +180,30 @@ namespace SDL2Engine
             }
 
             return found;
+        }
+
+        /*
+         * Yield returns List<T> of Ts that are in the same QuadTree node
+         * Use this to compare collisions between objects in the same QuadTree node
+         */
+        public IEnumerator<List<T>> GetPossibleCollisions()
+        {
+            if(!isDivided)
+            {
+                yield return items;
+            }
+            else if(children != null)
+            {
+                foreach(var child in children)
+                {
+                    var possibleCollisions = child.GetPossibleCollisions();
+                    while(possibleCollisions.MoveNext())
+                    {
+                        yield return possibleCollisions.Current;
+                    }
+                }
+            }
+            
         }
     }
 
@@ -240,7 +320,7 @@ namespace SDL2Engine
     }
 
     // defines physical shape of an object and handles collision detection
-    public class Collider : Component
+    public class Collider : Component, IBounded
     {
 
         [JsonProperty]
@@ -312,6 +392,12 @@ namespace SDL2Engine
         public virtual bool CollidesWith(EdgeCollider other)
         {
             return false;
+        }
+
+        public virtual Rect GetBounds()
+        {
+            var pos = gameObject.GetPosition();
+            return new Rect(pos.x, pos.y, 0, 0);
         }
     }
 
@@ -412,6 +498,10 @@ namespace SDL2Engine
             return box + gameObject.GetPosition();
         }
 
+        public override Rect GetBounds()
+        {
+            return GetCollisionBox();
+        }
 
         // Collision between two box colliders
         public override bool CollidesWith(BoxCollider other)
@@ -463,6 +553,12 @@ namespace SDL2Engine
         public Vec2D GetCollisionCenter()
         {
             return center + gameObject.GetPosition();
+        }
+
+        public override Rect GetBounds()
+        {
+            var pos = gameObject.GetPosition();
+            return new Rect(pos.x - radius, pos.y - radius, radius * 2, radius * 2);
         }
 
         public double GetRadius()
@@ -553,6 +649,12 @@ namespace SDL2Engine
         public Vec2D[] GetCornerPoints()
         {
             return [start + gameObject.GetPosition(), end + gameObject.GetPosition()];
+        }
+
+        public override Rect GetBounds()
+        {
+            var pos = gameObject.GetPosition();
+            return new Rect(Math.Min(start.x, end.x) + pos.x, Math.Min(start.y, end.y) + pos.y, Math.Abs(start.x - end.x), Math.Abs(start.y - end.y));
         }
 
         public void SetStart(Vec2D start)
@@ -1071,8 +1173,15 @@ namespace SDL2Engine
          * to check if the object has a collider or physics body, use HasCollider() and HasPhysicsBody() methods
          * to get the collider or physics body of an object, use propterties collider and physicsBody or use generic GetComponent<T>() method
          */
-        public static void UpdatePhysics(List<GameObject> gameObjects)
+        public static void UpdatePhysics(List<GameObject> gameObjects, Rect? bounds = null)
         {
+
+            if(bounds != null)
+            {
+                UpdatePhysicsInArea(gameObjects, bounds.Value);
+                return;
+            }
+
             // Apply physics
             ApplyPhysics(gameObjects);
 
@@ -1087,6 +1196,60 @@ namespace SDL2Engine
 
             // Notify objects of collisions
             NotifyCollisions(collisions);
+        }
+
+
+        private static void UpdatePhysicsInArea(List<GameObject> gameObjects, Rect bounds)
+        {
+            List<GameObject> objectsInBounds = new List<GameObject>();
+
+            foreach (var obj in gameObjects)
+            {
+                if (bounds.Contains(obj.GetPosition()))
+                {
+                    objectsInBounds.Add(obj);
+                }
+            }
+
+            // Apply physics
+            ApplyPhysics(objectsInBounds);
+
+            // seperate using quadtree
+            QuadTree<Collider> quadTree = new QuadTree<Collider>(bounds);
+            foreach (var obj in objectsInBounds)
+            {
+                Collider? collider = obj.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    quadTree.Insert(collider);
+                }
+            }
+
+            // Check for collisions
+            List<CollisionPair> collisions = new List<CollisionPair>();
+            var possibleCollisions = quadTree.GetPossibleCollisions();
+            while (possibleCollisions.MoveNext())
+            {
+                var colliders = possibleCollisions.Current;
+                var gameObjectsInQuadTree = colliders.Select(collider => collider.GetGameObject()).ToList();
+
+                List<CollisionPair> quadPairs = CheckCollisions(gameObjectsInQuadTree);
+                if(quadPairs.Count > 0)
+                {
+                    collisions.AddRange(quadPairs);
+                }
+            }
+
+            // Notify objects before resolving collisions
+            NotifyPreResolveCollisions(collisions);
+
+            // Resolve collisions
+            ResolveCollisions(collisions);
+
+            // Notify objects of collisions
+            NotifyCollisions(collisions);
+
+
         }
 
     }

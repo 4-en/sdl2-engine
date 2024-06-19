@@ -176,7 +176,7 @@ namespace SDL2Engine
                 throw new Exception("Component has to be in the scene to be moved to chunks");
             }
             // remove the scene reference from the component
-            component._clear_scene_dangerously();
+            component._clear_active_scene_dangerously();
 
             // remove the component from the scene
             switch (component)
@@ -223,7 +223,7 @@ namespace SDL2Engine
                 UnloadComponent(component);
             }
 
-            gameObject._clear_scene_dangerously();
+            gameObject._clear_active_scene_dangerously();
             gameObjectsCount--;
         }
 
@@ -233,6 +233,11 @@ namespace SDL2Engine
             if(gameObject.GetScene() != this)
             {
                 throw new Exception("GameObject has to be in the scene to be moved to chunks");
+            }
+
+            if(gameObject.GetActiveScene() != this)
+            {
+                throw new Exception("GameObject has to be active to be moved to chunks");
             }
 
             if(gameObject.GetParent() != null)
@@ -356,6 +361,7 @@ namespace SDL2Engine
 
             toBeUnloaded.Clear();
 
+
             foreach (EngineObject engineObject in toAdd)
             {
                 if (engineObject is GameObject gameObject)
@@ -364,17 +370,22 @@ namespace SDL2Engine
                     // only add the game object if its a root
                     if (parent == null)
                     {
-                        var pos = gameObject.GetPosition();
-                        if(!bounds.Contains(pos))
+                        if (gameObject.GetActiveScene() == null)
                         {
-                            gameObject._clear_scene_dangerously();
-                            this.chunkMap.AddGameObject(gameObject);
-                            continue;
-                        }
+                            var pos = gameObject.GetPosition();
+                            if (!bounds.Contains(pos))
+                            {
+                                this.chunkMap.AddGameObject(gameObject);
+                                continue;
+                            }
 
-                        this.gameObjects.Add(gameObject);
-                        HandleAddGameObjectComponents(gameObject);
-                        //alreadyAdded.Add(gameObject);
+                            this.gameObjects.Add(gameObject);
+                            HandleAddGameObjectComponents(gameObject);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"WARNING: GameObject {gameObject.GetName()} is already in an active scene. This could be caused by adding the GameObject to the scene multiple times, or adding a GameObject that is already in another active scene.");
+                        }
                     }
                     else
                     {
@@ -392,24 +403,9 @@ namespace SDL2Engine
 
                         // we also have to check every parents parent and so on...
                         // this is a bit slow, but it should work for now
-                        bool parentAdded = false;
-                        while (parent != null)
-                        {
-                            if (toAdd.Contains(parent))
-                            {
-                                parentAdded = true;
-                                break;
-                            }
-                            parent = parent.GetParent();
-                        }
 
-                        if (!parentAdded)
+                        if (parent.GetScene() == this && parent.GetActiveScene() == this && gameObject.GetActiveScene() == null)
                         {
-                            if(gameObject.GetDeepParent()?.GetScene() != this)
-                            {
-                                // either the parent is not in the scene or the parent is in the chunk map
-                                continue;
-                            }
                             HandleAddGameObjectComponents(gameObject);
                             //alreadyAdded.Add(gameObject);
                         }
@@ -421,24 +417,10 @@ namespace SDL2Engine
                     // same issue as above with child game objects
                     // we have to make sure the owning game object is not added during the same frame
                     GameObject? componentsGameObject = component.GetGameObject();
-                    bool parentAdded = false;
-                    while (componentsGameObject != null)
-                    {
-                        if (toAdd.Contains(componentsGameObject))
-                        {
-                            parentAdded = true;
-                            break;
-                        }
-                        componentsGameObject = componentsGameObject.GetParent();
-                    }
 
-                    if (!parentAdded)
+
+                    if (componentsGameObject.GetScene() == this && componentsGameObject.GetActiveScene() == this && component.GetActiveScene() == null)
                     {
-                        if (component.GetGameObject().GetDeepParent()?.GetScene() != this)
-                        {
-                            // either the parent is not in the scene or the parent is in the chunk map
-                            continue;
-                        }
                         HandleAddComponent(component);
                     }
                 }

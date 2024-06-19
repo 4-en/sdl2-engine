@@ -412,6 +412,7 @@ namespace SDL2Engine
             }
 
             component._clear_scene_dangerously();
+            component._clear_active_scene_dangerously();
 
 
             switch (component)
@@ -528,6 +529,7 @@ namespace SDL2Engine
             }
 
             gameObject._clear_scene_dangerously();
+            gameObject._clear_active_scene_dangerously();
 
             // if the object is marked as persistent, add it to the persistent list in the scene manager
             if (gameObject.IsPersistent())

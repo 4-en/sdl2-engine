@@ -80,14 +80,16 @@ namespace SDL2Engine
     public class QuadTree<T> where T : IBounded
     {
         private const int MAX_CAPACITY = 16;
+        private int maxDepth = 8;
         private List<T> items = new List<T>();
         private Rect bounds;
         private QuadTree<T>[]? children = null;
         private bool isDivided = false;
 
-        public QuadTree(Rect bounds)
+        public QuadTree(Rect bounds, int maxDepth = 8)
         {
             this.bounds = bounds;
+            this.maxDepth = maxDepth;
         }
 
         public bool Insert(T item)
@@ -98,7 +100,7 @@ namespace SDL2Engine
                 return false;
             }
 
-            if (items.Count < MAX_CAPACITY && !isDivided)
+            if ((items.Count < MAX_CAPACITY && !isDivided) || maxDepth <= 0)
             {
                 items.Add(item);
                 return true;
@@ -134,10 +136,10 @@ namespace SDL2Engine
 
             children = new QuadTree<T>[4]
             {
-            new QuadTree<T>(new Rect(x, y, halfWidth, halfHeight)),
-            new QuadTree<T>(new Rect(x + halfWidth, y, halfWidth, halfHeight)),
-            new QuadTree<T>(new Rect(x, y + halfHeight, halfWidth, halfHeight)),
-            new QuadTree<T>(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight))
+            new QuadTree<T>(new Rect(x, y, halfWidth, halfHeight), maxDepth - 1),
+            new QuadTree<T>(new Rect(x + halfWidth, y, halfWidth, halfHeight), maxDepth - 1),
+            new QuadTree<T>(new Rect(x, y + halfHeight, halfWidth, halfHeight), maxDepth - 1),
+            new QuadTree<T>(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), maxDepth - 1)
             };
             isDivided = true;
 

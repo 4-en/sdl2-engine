@@ -26,10 +26,6 @@ namespace ShootEmUp
                 GameObject gameTitle = HomeScreenText("Shoot Em Up", gameBounds.x / 2, 300, 200);
                 GameObject startText = HomeScreenText("Start", gameBounds.x / 2, 600, 130);
                 GameObject shopText = HomeScreenText("Highscores", gameBounds.x / 2, 800, 130);
-                scene.AddGameObject(background);
-                scene.AddGameObject(gameTitle);
-                scene.AddGameObject(startText);
-                scene.AddGameObject(shopText);
 
                 var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
                 var player = music.Item2;

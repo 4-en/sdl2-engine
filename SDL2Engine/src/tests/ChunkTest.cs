@@ -19,23 +19,9 @@ namespace SDL2Engine.tests
 
             using (scene.Activate())
             {
-                int rows = 100;
-                int cols = OBJECT_COUNT / rows;
-
-                for (int i = 0; i < rows; i++)
-                {
-                    for (int j = 0; j < cols; j++)
-                    {
-                        var gameObject = new GameObject("forsenE");
-                        var renderer = gameObject.AddComponent<SpriteRenderer>();
-                        renderer.SetSource("forsenE.png");
-                        renderer.SetWorldSize(new Vec2D(80, 80));
-                        gameObject.SetPosition(new Vec2D(j * 100, i * 100));
-                        BoxCollider.FromDrawableRect(gameObject);
-                        gameObject.AddComponent<OnHoverDestoyer>();
-
-                    }
-                }
+                
+                var adder = Component.CreateWithGameObject<ObjectAdder>();
+                adder.Item1.KeepInScene = true;
 
                 var t = Component.CreateWithGameObject<CameraMover>();
                 t.Item1.KeepInScene = true;
@@ -77,10 +63,44 @@ namespace SDL2Engine.tests
             }
         }
 
+        public class ObjectAdder : Script
+        {
+            private int alreadyAdded = 0;
+            private int toAdd = ChunkTest.OBJECT_COUNT;
+            private readonly int addsPerFrame = 10;
+            private readonly int objectsPerColumn = 100;
+
+            public override void Update()
+            {
+                if (alreadyAdded >= toAdd)
+                {
+                    gameObject.Destroy();
+                    return;
+                }
+
+                for (int i = 0; i < addsPerFrame; i++)
+                {
+                    var gameObject = new GameObject("forsenE");
+                    var renderer = gameObject.AddComponent<SpriteRenderer>();
+                    renderer.SetSource("forsenE.png");
+                    renderer.SetWorldSize(new Vec2D(80, 80));
+
+                    double xPos = (alreadyAdded % objectsPerColumn) * 100;
+                    double yPos = (alreadyAdded / objectsPerColumn) * 100;
+
+                    gameObject.SetPosition(new Vec2D(xPos, yPos));
+
+                    BoxCollider.FromDrawableRect(gameObject);
+                    gameObject.AddComponent<OnHoverDestoyer>();
+                    alreadyAdded++;
+                }
+            }
+        }
+
         public class CameraMover : Script
         {
             double speed = 1000;
-            double posX = 0;
+            double posX = -1000;
             double endPos = 2000;
             Camera? cam = null;
             public override void Start()
@@ -95,7 +115,7 @@ namespace SDL2Engine.tests
 
                 if (posX > endPos)
                 {
-                    posX = 0;
+                    posX = -1000;
                 }
 
                 cam?.SetPosition(new Vec2D(posX, 0));

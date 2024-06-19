@@ -500,7 +500,10 @@ namespace SDL2Engine
         protected string name = "unnamed";
         [JsonProperty]
         protected bool enabled = true;
+        [JsonIgnore]
         protected Scene? scene = null;
+        [JsonIgnore]
+        protected Scene? activeScene = null;
         [JsonProperty]
         protected uint uid = GetRandomUID();
         protected bool _to_be_destroyed = false;
@@ -616,12 +619,33 @@ namespace SDL2Engine
             return true;
         }
 
+        public Scene? GetActiveScene()
+        {
+            return activeScene;
+        }
+
+        public bool SetActiveScene(Scene? scene)
+        {
+            if(this.scene != null && scene != this.scene)
+            {
+                // If this causes issues, implement something to properly remove/switch scenes
+                throw new Exception("Scene already set for object: " + name);
+            }
+            this.activeScene = scene;
+            return true;
+        }
+
         // this should be called by the scene
         // if not, we could get situations where the object is not properly removed from the scene
         // and then added to another scene
-        internal void _clear_scene_on_destroy()
+        internal void _clear_scene_dangerously()
         {
             scene = null;
+        }
+
+        internal void _clear_active_scene_dangerously()
+        {
+            activeScene = null;
         }
     }
 

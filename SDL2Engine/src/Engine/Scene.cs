@@ -159,7 +159,7 @@ namespace SDL2Engine
         protected List<Script> toStart = new();
 
         protected TimedQueue<EngineObject> toDestroy = new();
-        protected HashSet<EngineObject> toAdd = new();
+        protected LinkedList<EngineObject> toAdd = new();
         protected List<GameObject> toRemove = new();
 
         protected CoroutineManager coroutineManager = new();
@@ -268,7 +268,7 @@ namespace SDL2Engine
             GameObject? parent = gameObject.GetParent();
             if (parent != null && parent.GetScene() != this)
             {
-                if(parent.GetScene() == null)
+                if (parent.GetScene() == null)
                 {
                     // if the parent has no scene, we can assume that it will be added later
                     // in this case, we don't need to add this child to the list as well
@@ -279,7 +279,8 @@ namespace SDL2Engine
                 return;
                 */
                 throw new Exception("GameObject has a parent which is not in this scene");
-            } else if (parent != null)
+            }
+            else if (parent != null)
             {
                 // check if parent is in the toAdd list
                 GameObject? deepParent = parent.GetDeepParent();
@@ -293,7 +294,7 @@ namespace SDL2Engine
 
             }
 
-            this.toAdd.Add(gameObject);
+            this.toAdd.AddLast(gameObject);
             gameObject.SetScene(this);
         }
 
@@ -301,13 +302,13 @@ namespace SDL2Engine
         {
 
             var gameObject = component.GetGameObject();
-            if(gameObject == null || gameObject == GameObject.Default)
+            if (gameObject == null || gameObject == GameObject.Default)
             {
                 Console.WriteLine("WARNING: Component has no GameObject. Make sure to add the component to a GameObject before adding it to a scene.");
                 return;
             }
 
-            if(gameObject.GetScene() == null)
+            if (gameObject.GetScene() == null)
             {
                 // it should be safe to ignore this case, since the game object will be added to the scene later
                 // this should also improve performance a bit, since we don't have to check if the gameObject is in toAdd
@@ -333,11 +334,17 @@ namespace SDL2Engine
                 return;
             }
 
-            this.toAdd.Add(component);
+            this.toAdd.AddLast(component);
         }
 
         protected void HandleAddGameObjectComponents(GameObject gameObject)
         {
+            if(gameObject.GetActiveScene() != null)
+            {
+                Console.WriteLine($"WARNING: GameObject {gameObject.GetName()} is already in an active scene. Make sure to remove the GameObject from the previous scene before adding it to a new scene.");
+                return;
+            }
+
             // check if the game object is already in the scene
             if (gameObject.GetScene() == null)
             {
@@ -348,6 +355,8 @@ namespace SDL2Engine
                 Console.WriteLine("WARNING: GameObject is in another scene. Make sure to remove the GameObject from the previous scene before adding it to a new scene.");
                 return;
             }
+
+            gameObject.SetActiveScene(this);
 
             List<Component> list = gameObject.GetAllComponents();
             for (int i = 0; i < list.Count; i++)
@@ -395,13 +404,14 @@ namespace SDL2Engine
         {
 
             // remove from GameObject
-            if (removeFromGameObject) { 
+            if (removeFromGameObject)
+            {
                 component.GetGameObject().RemoveComponent(component);
                 // since a component without a game object has no further use, we should dispose of its resources
                 component.Dispose();
             }
 
-            component._clear_scene_on_destroy();
+            component._clear_scene_dangerously();
 
 
             switch (component)
@@ -517,7 +527,7 @@ namespace SDL2Engine
                 this.gameObjects.Remove(gameObject);
             }
 
-            gameObject._clear_scene_on_destroy();
+            gameObject._clear_scene_dangerously();
 
             // if the object is marked as persistent, add it to the persistent list in the scene manager
             if (gameObject.IsPersistent())
@@ -527,7 +537,8 @@ namespace SDL2Engine
                 // maybe fix this later :)
                 // maybe non root objects should not be able to be persistent
                 SceneManager.GetPersistentGameObjects().Add(gameObject);
-            } else if (removeFromParent)
+            }
+            else if (removeFromParent)
             {
                 // if it is not persistent, we can dispose of it if this was the original
                 // object Destroy was called on
@@ -535,7 +546,7 @@ namespace SDL2Engine
                 // by calling Dispose recursively on its children and components
                 gameObject.Dispose();
             }
-            
+
         }
 
         public List<GameObject> GetGameObjects()
@@ -577,7 +588,7 @@ namespace SDL2Engine
                     return gameObject;
                 }
             }
-            
+
             // if not found, do a deep search
             foreach (GameObject gameObject in gameObjects)
             {
@@ -593,7 +604,7 @@ namespace SDL2Engine
         public T? FindComponent<T>()
         {
             T? component;
-            
+
             // first check components of root game objects
             foreach (GameObject gameObject in gameObjects)
             {
@@ -639,11 +650,19 @@ namespace SDL2Engine
 
         protected void HandleAddComponent<T>(T component) where T : Component
         {
+            if(component.GetActiveScene() != null)
+            {
+                Console.WriteLine("WARNING: Component is already in an active scene. Make sure to remove the Component from the previous scene before adding it to a new scene.");
+                return;
+            }
+
             // add to scene if not already added
             if (component.GetScene() != this)
             {
                 component.SetScene(this);
             }
+
+            component.SetActiveScene(this);
 
             // Call Awake on the component
             component.Awake();
@@ -716,7 +735,7 @@ namespace SDL2Engine
         private ulong _simBoundsCacheFrame = ulong.MaxValue;
         public Rect GetSimulationBounds()
         {
-            if(Time.tick == _simBoundsCacheFrame)
+            if (Time.tick == _simBoundsCacheFrame)
             {
                 return _simBoundsCache;
             }
@@ -783,7 +802,8 @@ namespace SDL2Engine
             // the disadvantage  of this would be that we would have to keep track of all objects in the scene
             // this list would also change a lot, since we are adding and removing objects all the time
             // when just doing something based on the toAdd list, we probably only have to check a few objects, if any
-            
+
+
 
             foreach (EngineObject engineObject in toAdd)
             {
@@ -793,9 +813,14 @@ namespace SDL2Engine
                     // only add the game object if its a root
                     if (parent == null)
                     {
-                        this.gameObjects.Add(gameObject);
-                        HandleAddGameObjectComponents(gameObject);
-                        //alreadyAdded.Add(gameObject);
+                        if (gameObject.GetActiveScene() == null)
+                        {
+                            this.gameObjects.Add(gameObject);
+                            HandleAddGameObjectComponents(gameObject);
+                        } else
+                        {
+                            Console.WriteLine($"WARNING: GameObject {gameObject.GetName()} is already in an active scene. This could be caused by adding the GameObject to the scene multiple times, or adding a GameObject that is already in another active scene.");
+                        }
                     }
                     else
                     {
@@ -813,42 +838,23 @@ namespace SDL2Engine
 
                         // we also have to check every parents parent and so on...
                         // this is a bit slow, but it should work for now
-                        bool parentAdded = false;
-                        while (parent != null)
-                        {
-                            if (toAdd.Contains(parent))
-                            {
-                                parentAdded = true;
-                                break;
-                            }
-                            parent = parent.GetParent();
-                        }
 
-                        if (!parentAdded)
+                        if (parent.GetScene() == this && parent.GetActiveScene() == this && gameObject.GetActiveScene() == null)
                         {
                             HandleAddGameObjectComponents(gameObject);
                             //alreadyAdded.Add(gameObject);
                         }
                     }
-                    
+
                 }
                 else if (engineObject is Component component)
                 {
                     // same issue as above with child game objects
                     // we have to make sure the owning game object is not added during the same frame
                     GameObject? componentsGameObject = component.GetGameObject();
-                    bool parentAdded = false;
-                    while (componentsGameObject != null)
-                    {
-                        if (toAdd.Contains(componentsGameObject))
-                        {
-                            parentAdded = true;
-                            break;
-                        }
-                        componentsGameObject = componentsGameObject.GetParent();
-                    }
                     
-                    if (!parentAdded)
+
+                    if (componentsGameObject.GetScene() == this && componentsGameObject.GetActiveScene() == this && component.GetActiveScene() == null)
                     {
                         HandleAddComponent(component);
                     }
@@ -859,7 +865,7 @@ namespace SDL2Engine
             // Physics
             // get all game objects with colliders
             if (doPhysics)
-            { 
+            {
                 /*
                 List<GameObject> goWithPhysics = new();
                 foreach (Collider collider in physicsObjects)
@@ -875,7 +881,7 @@ namespace SDL2Engine
 
                 Physics.UpdatePhysics(physicsObjects, rect);
             }
-            
+
 
             // start scripts that are scheduled to be started
             foreach (Script script in toStart)
@@ -970,7 +976,7 @@ namespace SDL2Engine
             // TODO: implement this
             // this should return true if all resources are loaded
             // after this, the scene can be updated and rendered
-          
+
             return true;
         }
 
@@ -978,7 +984,7 @@ namespace SDL2Engine
         {
             // this should only be called when the scene is removed from the scene manager
             // (hopefully) remove all game objects and components and calls their Dispose methods
-            for(int i = gameObjects.Count - 1; i >= 0; i--)
+            for (int i = gameObjects.Count - 1; i >= 0; i--)
             {
                 DeepDestroyGameObject(gameObjects[i]);
             }
@@ -1050,7 +1056,7 @@ namespace SDL2Engine
             {
                 bool wasRemoved = scenes.Remove(toRemove[i]);
 
-                if(wasRemoved)
+                if (wasRemoved)
                 {
                     toRemove[i].Dispose();
                 }

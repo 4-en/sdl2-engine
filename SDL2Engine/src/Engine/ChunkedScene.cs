@@ -13,10 +13,10 @@ namespace SDL2Engine
 
         private Dictionary<string, List<GameObject>> chunks = new Dictionary<string, List<GameObject>>();
 
-        private int lastChunkX1 = -420420;
-        private int lastChunkY1 = -420420;
-        private int lastChunkX2 = -420420;
-        private int lastChunkY2 = -420420;
+        private int lastChunkX1 = int.MinValue;
+        private int lastChunkY1 = int.MinValue;
+        private int lastChunkX2 = int.MinValue;
+        private int lastChunkY2 = int.MinValue;
 
 
         public ChunkMap()
@@ -176,7 +176,7 @@ namespace SDL2Engine
                 throw new Exception("Component has to be in the scene to be moved to chunks");
             }
             // remove the scene reference from the component
-            component._clear_scene_on_destroy();
+            component._clear_scene_dangerously();
 
             // remove the component from the scene
             switch (component)
@@ -223,7 +223,7 @@ namespace SDL2Engine
                 UnloadComponent(component);
             }
 
-            gameObject._clear_scene_on_destroy();
+            gameObject._clear_scene_dangerously();
             gameObjectsCount--;
         }
 
@@ -254,7 +254,8 @@ namespace SDL2Engine
 
         public override void AddGameObject(GameObject gameObject)
         {
-            // TODO: check bounds and either add to chunks or call base.AddGameObject
+            base.AddGameObject(gameObject);
+            return;
 
             // if the GameObject is set to keep in scene, add it to the scene no matter what position it is
             if(gameObject.KeepInScene)
@@ -317,6 +318,8 @@ namespace SDL2Engine
             }
             toBeUnloaded.Clear();
 
+            Console.WriteLine($"Adding {toAddFromChunks.Count} GameObjects from chunks");
+
             // add GameObjects from chunks to the scene
             foreach(GameObject gameObject in toAddFromChunks)
             {
@@ -361,6 +364,14 @@ namespace SDL2Engine
                     // only add the game object if its a root
                     if (parent == null)
                     {
+                        var pos = gameObject.GetPosition();
+                        if(!bounds.Contains(pos))
+                        {
+                            gameObject._clear_scene_dangerously();
+                            this.chunkMap.AddGameObject(gameObject);
+                            continue;
+                        }
+
                         this.gameObjects.Add(gameObject);
                         HandleAddGameObjectComponents(gameObject);
                         //alreadyAdded.Add(gameObject);
@@ -394,6 +405,11 @@ namespace SDL2Engine
 
                         if (!parentAdded)
                         {
+                            if(gameObject.GetDeepParent()?.GetScene() != this)
+                            {
+                                // either the parent is not in the scene or the parent is in the chunk map
+                                continue;
+                            }
                             HandleAddGameObjectComponents(gameObject);
                             //alreadyAdded.Add(gameObject);
                         }
@@ -418,6 +434,11 @@ namespace SDL2Engine
 
                     if (!parentAdded)
                     {
+                        if (component.GetGameObject().GetDeepParent()?.GetScene() != this)
+                        {
+                            // either the parent is not in the scene or the parent is in the chunk map
+                            continue;
+                        }
                         HandleAddComponent(component);
                     }
                 }

@@ -70,7 +70,6 @@ namespace Pong
                 bg_renderer.anchorPoint = AnchorPoint.TopLeft;
                 */
                 
-                scene.AddGameObject(background);
 
                 var text_root = background.CreateChild("TextRoot");
                 text_root.SetPosition(new Vec2D(1920 / 2, 100));

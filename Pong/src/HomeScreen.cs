@@ -27,12 +27,6 @@ namespace Pong.src
                 GameObject level3 = HomeScreenText("Level 3", gameBounds.x / 2, 700, 100);
                 GameObject level4 = HomeScreenText("Level 4", gameBounds.x / 2, 800, 100);
                 GameObject level5 = HomeScreenText("Level 5", gameBounds.x / 2, 900, 100);
-                scene.AddGameObject(gameTitle);
-                scene.AddGameObject(level1);
-                scene.AddGameObject(level2);
-                scene.AddGameObject(level3);
-                scene.AddGameObject(level4);
-                scene.AddGameObject(level5);
 
                 // to player select button in top left
                 var toSelectTuple = UI.Button("Back", () =>
@@ -41,7 +35,6 @@ namespace Pong.src
                     return true;
                 });
 
-                scene.AddGameObject(toSelectTuple.Item1);
                 toSelectTuple.Item1.transform.position = new Vec2D(170, 100);
                 toSelectTuple.Item2.anchorPoint = AnchorPoint.Center;
                 toSelectTuple.Item2.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");

@@ -407,7 +407,7 @@ namespace SDL2Engine
             switch (component)
             {
                 case Drawable drawable:
-                    var succ = drawableList.Remove(drawable);
+                    drawableList.Remove(drawable);
                     break;
                 case Collider collider:
                     physicsObjects.Remove(collider.GetGameObject());

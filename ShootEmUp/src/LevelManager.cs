@@ -131,7 +131,7 @@ namespace ShootEmUp
 
         public static Scene CreateLevel1()
         {
-            var level = new Scene("Level1");
+            var level = new ChunkedScene("Level1");
             using (level.Activate())
             {
                 var levelScript = Component.CreateWithGameObject<BaseLevel>("Level").Item2;

@@ -605,6 +605,7 @@ namespace SDL2Engine
 
         public bool SetScene(Scene? scene)
         {
+
             if (this.scene != null && scene != this.scene)
             {
                 // If this causes issues, implement something to properly remove/switch scenes

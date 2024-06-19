@@ -9,6 +9,7 @@ namespace SDL2Engine
     public class ChunkMap
     {
         private int chunkSize = 128;
+        private int gameObjectCount = 0;
 
         private Dictionary<string, List<GameObject>> chunks = new Dictionary<string, List<GameObject>>();
 
@@ -39,6 +40,8 @@ namespace SDL2Engine
                 chunks[key] = new List<GameObject>();
             }
             chunks[key].Add(gameObject);
+
+            gameObjectCount++;
         }
 
         public void RemoveGameObject(GameObject gameObject)
@@ -51,6 +54,7 @@ namespace SDL2Engine
             if (chunks.ContainsKey(key))
             {
                 chunks[key].Remove(gameObject);
+                gameObjectCount--;
             }
         }
 
@@ -96,8 +100,11 @@ namespace SDL2Engine
                             yield return gameObject;
                         }
 
+                        int removedCount = chunks[key].Count;
                         // clear the chunk
                         chunks[key].Clear();
+
+                        gameObjectCount -= removedCount;
 
                         // remove the chunk
                         chunks.Remove(key);
@@ -111,6 +118,8 @@ namespace SDL2Engine
             lastChunkX2 = x2;
             lastChunkY2 = y2;
         }
+
+        public int Count { get => gameObjectCount;}
     }
 
 
@@ -129,12 +138,73 @@ namespace SDL2Engine
 
         private ChunkMap chunkMap = new ChunkMap();
 
+        public int GetChunkCount()
+        {
+            return chunkMap.Count;
+        }
+
+        private void UnloadComponent(Component component)
+        {
+            if (component.GetScene() != this)
+            {
+                throw new Exception("Component has to be in the scene to be moved to chunks");
+            }
+            // remove the scene reference from the component
+            component._clear_scene_on_destroy();
+
+            // remove the component from the scene
+            switch (component)
+            {
+                case Drawable drawable:
+                    var succ = drawableList.Remove(drawable);
+                    break;
+                case Collider collider:
+                    physicsObjects.Remove(collider.GetGameObject());
+                    break;
+                case PhysicsBody physicsBody:
+                    physicsObjects.Remove(physicsBody.GetGameObject());
+                    break;
+                case Script script:
+                    var success = scripts.Remove(script);
+                    if (!success)
+                    {
+                        // maybe the script was already removed
+                        // dont call OnDestroy again
+                        Console.WriteLine("Script was already removed");
+                        return;
+                    }
+                    // call OnDisable
+                    script.OnDisable();
+                    break;
+            }
+        }
+
+        private void DeepUnload(GameObject gameObject)
+        {
+            if (gameObject.GetScene() != this)
+            {
+                throw new Exception("GameObject has to be in the scene to be moved to chunks");
+            }
+
+            // remove all children
+            foreach (GameObject child in gameObject.GetChildren())
+            {
+                DeepUnload(child);
+            }
+
+            foreach(Component component in gameObject.GetAllComponents())
+            {
+                UnloadComponent(component);
+            }
+
+            gameObject._clear_scene_on_destroy();
+        }
 
         private void MoveToChunks(GameObject gameObject)
         {
-            if(gameObject.GetScene() != null)
+            if(gameObject.GetScene() != this)
             {
-                throw new Exception("GameObject has to be removed from the scene first");
+                throw new Exception("GameObject has to be in the scene to be moved to chunks");
             }
 
             if(gameObject.GetParent() != null)
@@ -142,7 +212,13 @@ namespace SDL2Engine
                 throw new Exception("Only root GameObjects can be moved to chunks");
             }
 
+            // remove the scene reference from the GameObject
+            DeepUnload(gameObject);
+
+            // add the GameObject to the chunk map
             chunkMap.AddGameObject(gameObject);
+
+            
         }
 
         public override void AddGameObject(GameObject gameObject)
@@ -189,8 +265,35 @@ namespace SDL2Engine
             base.AddGameObject(gameObject);
         }
 
+        private double lastBoundsCheck = -1;
+        private double boundsCheckInterval = 0.5;
+
         public override void Update()
         {
+            // get the simulation bounds
+            Rect bounds = GetSimulationBounds();
+            var enumerator = chunkMap.LoadInBounds(bounds);
+            while(enumerator.MoveNext())
+            {
+                AddGameObject(enumerator.Current);
+            }
+
+            if(Time.time - lastBoundsCheck > boundsCheckInterval)
+            {
+                lastBoundsCheck = Time.time;
+
+                // check if any GameObjects are out of bounds
+                // if so, remove them from the scene and add them to the chunk map
+                foreach (GameObject gameObject in gameObjects)
+                {
+                    if (gameObject.GetPosition().x < bounds.x || gameObject.GetPosition().x > bounds.x + bounds.w ||
+                                               gameObject.GetPosition().y < bounds.y || gameObject.GetPosition().y > bounds.y + bounds.h)
+                    {
+                        MoveToChunks(gameObject);
+                    }
+                }
+            }
+
             foreach (EngineObject engineObject in toAdd)
             {
                 if (engineObject is GameObject gameObject)

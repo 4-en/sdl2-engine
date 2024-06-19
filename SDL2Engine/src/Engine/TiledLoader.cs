@@ -1,4 +1,6 @@
-﻿using TiledCSPlus;
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
+using TiledCSPlus;
 
 namespace SDL2Engine
 {
@@ -16,7 +18,8 @@ namespace SDL2Engine
             return default_path + path;
         }
 
-        public static List<GameObject> LoadTMX(string path)
+        [MethodImplAttribute(MethodImplOptions.NoInlining)]
+        public static List<GameObject> LoadTMX(string path, Assembly? callingAssembly=null)
         {
             path = AdjustPath(path, "Assets/Tiled/");
             string rootDir = path.Substring(0, path.LastIndexOf("/") + 1);
@@ -25,6 +28,8 @@ namespace SDL2Engine
             var tileLayers = map.Layers.Where(x => x.Type == TiledLayerType.TileLayer);
 
             var gameObjects = new List<GameObject>();
+
+            callingAssembly ??= Assembly.GetCallingAssembly();
 
             foreach (var layer in tileLayers)
             {
@@ -67,6 +72,33 @@ namespace SDL2Engine
                             renderer.SetRect(new Rect(tileX, tileY, map.TileWidth, map.TileHeight));
 
                             gameObjects.Add(gameObject);
+
+
+                            /*
+                             * This works so far, but seems like a bad solution
+                             * TODO: maybe fix later, probably not :)
+                             */
+                            // try to get Type, first try from calling assembly, then from executing assembly
+                            string componentName = "TileBasedGame.TestScript";
+
+                            Type? componentType = callingAssembly.GetType(componentName);
+                            if(componentType == null)
+                            {
+                                componentType = Assembly.GetExecutingAssembly().GetType(componentName);
+                            }
+
+                            
+                            if(componentType != null)
+                            {
+                                var instance = Activator.CreateInstance(componentType);
+                                if(instance is Component script)
+                                {
+                                    gameObject.AddComponent(script);
+                                }
+                            } else
+                            {
+                                Console.WriteLine("Component not found");
+                            }
                         }
                     }
             }

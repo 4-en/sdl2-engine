@@ -1,6 +1,7 @@
 ﻿
 using SDL2Engine.Coro;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using TiledCS;
 
 namespace SDL2Engine
@@ -204,11 +205,13 @@ namespace SDL2Engine
         }
 
         /* Load Tilemap from .tmx file */
+        [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public List<GameObject> LoadTMX(string path)
         {
             Scene? tempScene = SceneManager.GetActiveScene();
             SceneManager.SetActiveScene(this);
-            List<GameObject> gameObjects = TiledLoader.LoadTMX(path);
+            var callingAsm = System.Reflection.Assembly.GetCallingAssembly();
+            List<GameObject> gameObjects = TiledLoader.LoadTMX(path, callingAsm);
             SceneManager.SetActiveScene(tempScene);
             return gameObjects;
         }

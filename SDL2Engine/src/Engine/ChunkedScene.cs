@@ -323,7 +323,6 @@ namespace SDL2Engine
             }
             toBeUnloaded.Clear();
 
-            Console.WriteLine($"Adding {toAddFromChunks.Count} GameObjects from chunks");
 
             // add GameObjects from chunks to the scene
             foreach(GameObject gameObject in toAddFromChunks)

@@ -22,7 +22,7 @@ namespace SDL2Engine.Testing
             Console.WriteLine("Starting SDL2 Engine...");
 
             // run test here \/ \/ \/
-            SerializationTest.Run();
+            ChunkTest.Run();
             
 
             Console.WriteLine("Exiting SDL2 Engine...");

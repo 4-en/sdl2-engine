@@ -949,7 +949,9 @@ namespace SDL2Engine
             IntPtr fontPtr = font.Get();
 
             int totalScenes = SceneManager.GetScenes().Count;
+            int totalRootObjects = 0;
             int totalObjects = 0;
+            int totalChunkedObjects = 0;
             int totalDrawables = 0;
             int totalVisibleDrawables = 0;
             int totalScripts = 0;
@@ -958,13 +960,21 @@ namespace SDL2Engine
             
             foreach (Scene scene in SceneManager.GetScenes())
             {
+                totalRootObjects += scene.GetGameObjects().Count;
                 totalObjects += scene.GetGameObjectsCount();
                 totalDrawables += scene.GetDrawableCount();
                 totalScripts += scene.GetScriptCount();
                 totalColliders += scene.GetColliderCount();
                 totalCoros += scene.GetCoroutineManager().Count();
                 totalVisibleDrawables += scene.GetLastVisibleDrawables();
+
+                if(scene is ChunkedScene cScene)
+                {
+                    totalChunkedObjects += cScene.GetChunkCount();
+                }
             }
+
+            totalChunkedObjects += totalObjects;
 
             string[] debugStrings =
                 {
@@ -974,7 +984,7 @@ namespace SDL2Engine
                     "Draw Duration: " + (1000*Time.drawDuration).ToString("0.00") + " ms",
                     "Total Duration: " + (1000*Time.totalDuration).ToString("0.00") + " ms",
                     "Free Duration: " + (1000*Time.freeDuration).ToString("0.00") + " ms",
-                    "Total Objects: " + totalObjects.ToString(),
+                    "Total Objects: " + totalRootObjects.ToString() + "/" + totalObjects.ToString() + "/" + totalChunkedObjects.ToString(),
                     "Total Drawables: " + totalVisibleDrawables.ToString() + "/" + totalDrawables.ToString(),
                     "Total Scripts: " + totalScripts.ToString(),
                     "Total Colliders: " + totalColliders.ToString(),

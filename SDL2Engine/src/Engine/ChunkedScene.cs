@@ -77,20 +77,20 @@ namespace SDL2Engine
 
             if(x1 == lastChunkX1 && y1 == lastChunkY1 && x2 == lastChunkX2 && y2 == lastChunkY2)
             {
-                // no change in bounds
+                yield break;
             }
             List<string> clearedChunks = new List<string>();
             for(int x = x1; x <= x2; x++)
             {
                 if(x>=lastChunkX1 && x<=lastChunkX2)
                 {
-                    // continue;
+                    //continue;
                 }
                 for (int y = y1; y <= y2; y++)
                 {
                     if (y >= lastChunkY1 && y <= lastChunkY2)
                     {
-                        // continue;
+                        //continue;
                     }
                     string key = GetChunkKey(x, y);
                     if (chunks.ContainsKey(key))
@@ -224,6 +224,7 @@ namespace SDL2Engine
             }
 
             gameObject._clear_scene_on_destroy();
+            gameObjectsCount--;
         }
 
         private List<GameObject> toBeUnloaded = new List<GameObject>();
@@ -304,12 +305,14 @@ namespace SDL2Engine
         {
             // get the simulation bounds
             Rect bounds = GetSimulationBounds();
-            bounds = chunkMap.FitToChunkGrid(bounds);
+            bounds.x-= 200;
+            bounds.y-= 200;
+            bounds.w+= 400;
+            bounds.h+= 400;
             var enumerator = chunkMap.LoadInBounds(bounds);
             var toAddFromChunks = new List<GameObject>();
             while(enumerator.MoveNext())
             {
-                Console.WriteLine("Adding GameObject from chunk");
                 toAddFromChunks.Add(enumerator.Current);
             }
             toBeUnloaded.Clear();
@@ -328,7 +331,7 @@ namespace SDL2Engine
                 // if so, remove them from the scene and add them to the chunk map
                 foreach (GameObject gameObject in gameObjects)
                 {
-                    if(gameObject.ToBeDestroyed())
+                    if(gameObject.ToBeDestroyed() || gameObject.KeepInScene)
                     {
                         // if the GameObject is already scheduled for destruction, we don't need to move it to chunks
                         // it will get destroyed later in the Update method

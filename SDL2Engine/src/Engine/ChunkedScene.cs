@@ -138,6 +138,17 @@ namespace SDL2Engine
 
         private ChunkMap chunkMap = new ChunkMap();
 
+        public ChunkedScene() : base()
+        {
+        }
+        public ChunkedScene(Camera camera) : base(camera)
+        {
+        }
+
+        public ChunkedScene(string name) : base(name)
+        {
+        }
+
         public int GetChunkCount()
         {
             return chunkMap.Count;

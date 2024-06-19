@@ -1,6 +1,7 @@
 ﻿
 using SDL2Engine.Coro;
 using System.Collections;
+using TiledCS;
 
 namespace SDL2Engine
 {
@@ -200,6 +201,16 @@ namespace SDL2Engine
         public void SetSceneType(SceneType sceneType)
         {
             this.sceneType = sceneType;
+        }
+
+        /* Load Tilemap from .tmx file */
+        public List<GameObject> LoadTMX(string path)
+        {
+            Scene? tempScene = SceneManager.GetActiveScene();
+            SceneManager.SetActiveScene(this);
+            List<GameObject> gameObjects = TiledLoader.LoadTMX(path);
+            SceneManager.SetActiveScene(tempScene);
+            return gameObjects;
         }
 
         public string GetName()

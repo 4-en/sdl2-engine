@@ -20,7 +20,7 @@ namespace ShootEmUp.src
                 GameObject background = new GameObject("Background");
                 background.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/space_background.jpg");
                 background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
-                scene.AddGameObject(background);
+
                 var shopmenu = UI.ShopMenu("Shop", () =>
                 {
                     return true;

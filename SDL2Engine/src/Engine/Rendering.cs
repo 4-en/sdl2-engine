@@ -237,8 +237,15 @@ namespace SDL2Engine
             return WorldSize;
         }
 
+        private Vec2D _screenSizeCache = new Vec2D(0, 0);
+        private ulong _screenSizeCacheFrame = ulong.MaxValue;
         public Vec2D GetScreenSize()
         {
+            if(Time.tick == _screenSizeCacheFrame)
+            {
+                return _screenSizeCache;
+            }
+
             if (keepAspectRatio)
             {
                 double aspectRatio = WorldSize.x / WorldSize.y;
@@ -247,19 +254,32 @@ namespace SDL2Engine
                 // constant scale for both axes
                 if (aspectRatio > windowAspectRatio)
                 {
-                    return new Vec2D(Engine.windowWidth, Engine.windowWidth / aspectRatio);
+                    _screenSizeCache = new Vec2D(Engine.windowWidth, Engine.windowWidth / aspectRatio);
+                    _screenSizeCacheFrame = Time.tick;
+                    return _screenSizeCache;
                 }
                 else
                 {
-                    return new Vec2D(Engine.windowHeight * aspectRatio, Engine.windowHeight);
+                    _screenSizeCache = new Vec2D(Engine.windowHeight * aspectRatio, Engine.windowHeight);
+                    _screenSizeCacheFrame = Time.tick;
+                    return _screenSizeCache;
                 }
             }
 
-            return new Vec2D(Engine.windowWidth, Engine.windowHeight);
+            _screenSizeCache = new Vec2D(Engine.windowWidth, Engine.windowHeight);
+            _screenSizeCacheFrame = Time.tick;
+            return _screenSizeCache;
         }
 
+        private Vec2D _visibleSizeCache = new Vec2D(0, 0);
+        private ulong _visibleSizeCacheFrame = ulong.MaxValue;
         public Vec2D GetVisibleSize()
         {
+
+            if (Time.tick == _visibleSizeCacheFrame)
+            {
+                return _visibleSizeCache;
+            }
 
             if (keepAspectRatio)
             {
@@ -268,19 +288,26 @@ namespace SDL2Engine
 
                 if (aspectRatio > windowAspectRatio)
                 {
-                    return new Vec2D(WorldSize.x, WorldSize.y / (windowAspectRatio / aspectRatio));
+                    _visibleSizeCache = new Vec2D(WorldSize.x, WorldSize.y / (windowAspectRatio / aspectRatio));
+                    _visibleSizeCacheFrame = Time.tick;
+                    return _visibleSizeCache;
                 }
                 else
                 {
-                    return new Vec2D(WorldSize.x * (windowAspectRatio / aspectRatio), WorldSize.y);
+                    _visibleSizeCache = new Vec2D(WorldSize.x * (windowAspectRatio / aspectRatio), WorldSize.y);
+                    _visibleSizeCacheFrame = Time.tick;
+                    return _visibleSizeCache;
                 }
 
 
             }
 
-            return WorldSize;
+            _visibleSizeCache = WorldSize;
+            _visibleSizeCacheFrame = Time.tick;
+            return _visibleSizeCache;
         }
 
+        
         public double GetVisibleWidth()
         {
             return GetVisibleSize().x;
@@ -291,12 +318,21 @@ namespace SDL2Engine
             return GetVisibleSize().y;
         }
 
+        private Rect _visibleWorldCache = new Rect(0, 0, 0, 0);
+        private ulong _visibleWorldCacheFrame = ulong.MaxValue;
         public Rect GetVisibleWorld()
         {
+            if (Time.tick == _visibleWorldCacheFrame)
+            {
+                return _visibleWorldCache;
+            }
             Vec2D screenSize = GetVisibleSize();
             Vec2D topLeft = ScreenToWorld(new Vec2D(0, 0));
             Vec2D bottomRight = ScreenToWorld(screenSize);
-            return new Rect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+
+            _visibleWorldCache = new Rect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+            _visibleWorldCacheFrame = Time.tick;
+            return _visibleWorldCache;
         }
 
         public Vec2D ScreenToWorld(Vec2D screenPosition)

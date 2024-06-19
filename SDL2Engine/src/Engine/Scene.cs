@@ -706,15 +706,24 @@ namespace SDL2Engine
             return lastVisibleObjects;
         }
 
+        private Rect _simBoundsCache = new Rect();
+        private ulong _simBoundsCacheFrame = ulong.MaxValue;
         public Rect GetSimulationBounds()
         {
-            Rect rect = mainCamera.GetVisibleWorld();
-            rect.x -= rect.w;
-            rect.y -= rect.h;
-            rect.w *= 3;
-            rect.h *= 3;
+            if(Time.tick == _simBoundsCacheFrame)
+            {
+                return _simBoundsCache;
+            }
 
-            return rect;
+            _simBoundsCache = mainCamera.GetVisibleWorld();
+            _simBoundsCache.x -= _simBoundsCache.w;
+            _simBoundsCache.y -= _simBoundsCache.h;
+            _simBoundsCache.w *= 3;
+            _simBoundsCache.h *= 3;
+
+            _simBoundsCacheFrame = Time.tick;
+
+            return _simBoundsCache;
         }
 
         // Iterate through all Drawable components and call their Draw method using the main camera defined in the scene

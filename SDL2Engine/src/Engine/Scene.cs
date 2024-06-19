@@ -736,14 +736,13 @@ namespace SDL2Engine
             }
         }
 
-        public void Update()
+        public virtual void Update()
         {
 
             // TODO: optimize this later
-            // (this seems horrible tbh)
             // add game objects that are scheduled to be added
-            //var alreadyAdded = new HashSet<GameObject>();
-            //var get_parent_count = (GameObjects go) => go.GetParent() == null ? 0 : 1 + get_parent_count(go.GetParent());
+            // var alreadyAdded = new HashSet<GameObject>();
+            // var get_parent_count = (GameObjects go) => go.GetParent() == null ? 0 : 1 + get_parent_count(go.GetParent());
             // sort the game objects by their depth, lowest depth first
 
             // another option to solve this would be to keep a seperate list of all engine objects that are already in the scene (HashSet)
@@ -852,7 +851,7 @@ namespace SDL2Engine
             // start scripts that are scheduled to be started
             foreach (Script script in toStart)
             {
-                script.Start();
+                script._Start();
             }
             toStart.Clear();
 

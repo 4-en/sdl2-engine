@@ -324,6 +324,17 @@ namespace SDL2Engine
     {
         [JsonProperty]
         public bool wasEnabled = false;
+        [JsonProperty]
+        private bool wasStarted = false;
+
+        internal void _Start()
+        {
+            if (!wasStarted)
+            {
+                Start();
+                wasStarted = true;
+            }
+        }
 
         // Base class for all scripts
         // These scripts have a few virtual methods that can be overridden for custom functionality

@@ -67,7 +67,7 @@ namespace SDL2Engine.tests
         {
             private int alreadyAdded = 0;
             private int toAdd = ChunkTest.OBJECT_COUNT;
-            private readonly int addsPerFrame = 10;
+            private readonly int addsPerFrame = 20;
             private readonly int objectsPerColumn = 100;
 
             public override void Update()
@@ -85,8 +85,8 @@ namespace SDL2Engine.tests
                     renderer.SetSource("forsenE.png");
                     renderer.SetWorldSize(new Vec2D(80, 80));
 
-                    double xPos = (alreadyAdded % objectsPerColumn) * 100;
-                    double yPos = (alreadyAdded / objectsPerColumn) * 100;
+                    double xPos = (alreadyAdded / objectsPerColumn) * 100;
+                    double yPos = (alreadyAdded % objectsPerColumn) * 100;
 
                     gameObject.SetPosition(new Vec2D(xPos, yPos));
 

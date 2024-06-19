@@ -361,9 +361,14 @@ namespace SDL2Engine
 
             toBeUnloaded.Clear();
 
-
+            int added = 0;
             foreach (EngineObject engineObject in toAdd)
             {
+                if (added >= Scene.MAX_ADDS_PER_FRAME)
+                {
+                    break;
+                }
+                added++;
                 if (engineObject is GameObject gameObject)
                 {
                     GameObject? parent = gameObject.GetParent();
@@ -425,7 +430,21 @@ namespace SDL2Engine
                     }
                 }
             }
-            toAdd.Clear();
+            // remove the added game objects from the toAdd list
+            // make Scene.MAX_ADDS_PER_FRAME + 1 the new first element
+            if (toAdd.Count <= Scene.MAX_ADDS_PER_FRAME)
+            {
+                toAdd.Clear();
+            }
+            else
+            {
+                int removedCount = 0;
+                while (toAdd.Count > 0 && removedCount < Scene.MAX_ADDS_PER_FRAME)
+                {
+                    toAdd.RemoveFirst();
+                    removedCount++;
+                }
+            }
 
             // Physics
             // get all game objects with colliders

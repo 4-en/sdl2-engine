@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TileBasedGame.src
+namespace TileBasedGame
 {
     public static partial class LevelManager
     {

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TileBasedGame.src
+namespace TileBasedGame
 {
     internal class HomeScreen
     {
@@ -30,13 +30,6 @@ namespace TileBasedGame.src
                 GameObject level3Text = HomeScreenText("Level 3", gameBounds.x / 2, 650, 100);
                 GameObject level4Text = HomeScreenText("Level 4", gameBounds.x / 2, 750, 100);
                 GameObject level5Text = HomeScreenText("Level 5", gameBounds.x / 2, 850, 100);
-                scene.AddGameObject(background);
-                scene.AddGameObject(gameTitle);
-                scene.AddGameObject(level1Text);
-                scene.AddGameObject(level2Text);
-                scene.AddGameObject(level3Text);
-                scene.AddGameObject(level4Text);
-                scene.AddGameObject(level5Text);
             }
 
             return scene;

@@ -33,6 +33,7 @@
     <None Remove="Assets\Textures\space_background.jpg" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="TiledCS" Version="3.3.3" />
+    <PackageReference Include="TiledCSPlus" Version="4.2.0" />
     <None Update="SDL2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

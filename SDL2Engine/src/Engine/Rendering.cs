@@ -891,7 +891,7 @@ namespace SDL2Engine
         [JsonIgnore]
         private Texture? texture;
         [JsonIgnore]
-        private Rect source_rect = new Rect(0, 0, 1, 1);
+        private Rect source_rect = new Rect(0, 0, -1, -1);
         [JsonProperty]
         public string source = "";
 
@@ -911,6 +911,16 @@ namespace SDL2Engine
             }
         }
 
+        public void SetSourceRect(Rect rect)
+        {
+            this.source_rect = rect;
+        }
+
+        public Rect GetSourceRect()
+        {
+            return source_rect;
+        }
+
         public bool IsLoaded()
         {
             return texture != null;
@@ -927,8 +937,12 @@ namespace SDL2Engine
             {
                 texture = AssetManager.LoadTexture(source);
                 texture.Load();
-                this.source_rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
-                this.rect = this.source_rect * 1;
+                if(source_rect.w == -1 && source_rect.h == -1)
+                {
+                    source_rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
+                    this.rect = this.source_rect * 1;
+                }
+                
             }
         }
 

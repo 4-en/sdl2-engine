@@ -433,10 +433,10 @@ namespace SDL2Engine
         public SDL.SDL_Rect ToSDLRect()
         {
             SDL.SDL_Rect sdlRect = new SDL.SDL_Rect();
-            sdlRect.x = (int)x;
-            sdlRect.y = (int)y;
-            sdlRect.w = (int)w;
-            sdlRect.h = (int)h;
+            sdlRect.x = (int)Math.Floor(x);
+            sdlRect.y = (int)Math.Floor(y);
+            sdlRect.w = (int)Math.Ceiling(w);
+            sdlRect.h = (int)Math.Ceiling(h);
             return sdlRect;
         }
 

@@ -252,7 +252,7 @@ namespace SDL2Engine
             return coroutineManager;
         }
 
-        public void AddGameObject(GameObject gameObject)
+        public virtual void AddGameObject(GameObject gameObject)
         {
             if (gameObject.GetScene() != null && gameObject.GetScene() != this)
             {
@@ -304,6 +304,7 @@ namespace SDL2Engine
             if(gameObject.GetScene() == null)
             {
                 // it should be safe to ignore this case, since the game object will be added to the scene later
+                // this should also improve performance a bit, since we don't have to check if the gameObject is in toAdd
                 return;
             }
 
@@ -705,6 +706,17 @@ namespace SDL2Engine
             return lastVisibleObjects;
         }
 
+        public Rect GetSimulationBounds()
+        {
+            Rect rect = mainCamera.GetVisibleWorld();
+            rect.x -= rect.w;
+            rect.y -= rect.h;
+            rect.w *= 3;
+            rect.h *= 3;
+
+            return rect;
+        }
+
         // Iterate through all Drawable components and call their Draw method using the main camera defined in the scene
         public void Draw()
         {
@@ -844,11 +856,7 @@ namespace SDL2Engine
 
                 // define the physics world
                 // 3* viewport size
-                Rect rect = mainCamera.GetVisibleWorld();
-                rect.x -= rect.w;
-                rect.y -= rect.h;
-                rect.w *= 3;
-                rect.h *= 3;
+                Rect rect = GetSimulationBounds();
 
                 Physics.UpdatePhysics(physicsObjects, rect);
             }

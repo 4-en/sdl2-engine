@@ -128,7 +128,12 @@ namespace SDL2Engine
 
         private ChunkMap chunkMap = new ChunkMap();
 
-        
-        
+
+        public override void AddGameObject(GameObject gameObject)
+        {
+            // TODO: check bounds and either add to chunks or call base.AddGameObject
+            base.AddGameObject(gameObject);
+        }
+
     }
 }

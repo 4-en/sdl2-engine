@@ -301,7 +301,13 @@ namespace SDL2Engine
                 return;
             }
 
-            if (gameObject.GetScene() != null && gameObject.GetScene() != this)
+            if(gameObject.GetScene() == null)
+            {
+                // it should be safe to ignore this case, since the game object will be added to the scene later
+                return;
+            }
+
+            if (gameObject.GetScene() != this)
             {
                 Console.WriteLine("WARNING: GameObject is in another scene. Make sure to remove the GameObject from the previous scene before adding it to a new scene.");
                 return;

@@ -31,6 +31,21 @@ namespace SDL2Engine
         [JsonProperty]
         private bool persistent = false;
 
+        [JsonProperty]
+        private bool keepInScene = false;
+
+        public bool KeepInScene
+        {
+            get
+            {
+                return keepInScene;
+            }
+            set
+            {
+                keepInScene = value;
+            }
+        }
+
         private GameObject()
         {
             this.Parent = null;

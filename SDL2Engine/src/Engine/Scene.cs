@@ -268,6 +268,12 @@ namespace SDL2Engine
             GameObject? parent = gameObject.GetParent();
             if (parent != null && parent.GetScene() != this)
             {
+                if(parent.GetScene() == null)
+                {
+                    // if the parent has no scene, we can assume that it will be added later
+                    // in this case, we don't need to add this child to the list as well
+                    return;
+                }
                 /*
                 Console.WriteLine("WARNING: GameObject has a parent which is not in this scene. Make sure to add the parent to this scene first.");
                 return;

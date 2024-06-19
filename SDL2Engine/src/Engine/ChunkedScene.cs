@@ -132,6 +132,16 @@ namespace SDL2Engine
         public override void AddGameObject(GameObject gameObject)
         {
             // TODO: check bounds and either add to chunks or call base.AddGameObject
+
+            if(gameObject.KeepInScene)
+            {
+                base.AddGameObject(gameObject);
+                return;
+            }
+
+            // var bounds = this.GetSimulationBounds();
+
+
             base.AddGameObject(gameObject);
         }
 

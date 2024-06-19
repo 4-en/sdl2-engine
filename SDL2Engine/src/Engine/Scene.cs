@@ -18,7 +18,7 @@ namespace SDL2Engine
      * Probably really slow, but it works for now
      * TODO: optimize this later
      */
-    class TimedQueue<T> : IEnumerable<T> where T : class
+    public class TimedQueue<T> : IEnumerable<T> where T : class
     {
         class NodeValue
         {
@@ -140,29 +140,29 @@ namespace SDL2Engine
         }
 
         // TODO: use something like this to limit the number of new objects per frame
-        public static readonly uint MAX_ADDS_PER_FRAME = 1;
+        public static readonly uint MAX_ADDS_PER_FRAME = 100;
 
-        private string name = "Scene";
-        private int gameObjectsCount = 0;
-        private bool doPhysics = true;
+        protected string name = "Scene";
+        protected int gameObjectsCount = 0;
+        protected bool doPhysics = true;
 
-        private Camera mainCamera;
-        private SceneType sceneType = SceneType.GAME;
+        protected Camera mainCamera;
+        protected SceneType sceneType = SceneType.GAME;
 
-        private List<GameObject> gameObjects = new();
+        protected List<GameObject> gameObjects = new();
 
-        private bool sortDrawables = false;
-        private List<Drawable> drawableList = new();
-        private List<GameObject> physicsObjects = new();
-        private List<Script> scripts = new();
+        protected bool sortDrawables = false;
+        protected List<Drawable> drawableList = new();
+        protected List<GameObject> physicsObjects = new();
+        protected List<Script> scripts = new();
 
-        private List<Script> toStart = new();
+        protected List<Script> toStart = new();
 
-        private TimedQueue<EngineObject> toDestroy = new();
-        private HashSet<EngineObject> toAdd = new();
-        private List<GameObject> toRemove = new();
+        protected TimedQueue<EngineObject> toDestroy = new();
+        protected HashSet<EngineObject> toAdd = new();
+        protected List<GameObject> toRemove = new();
 
-        private CoroutineManager coroutineManager = new();
+        protected CoroutineManager coroutineManager = new();
 
         public Scene()
         {
@@ -336,7 +336,7 @@ namespace SDL2Engine
             this.toAdd.Add(component);
         }
 
-        private void HandleAddGameObjectComponents(GameObject gameObject)
+        protected void HandleAddGameObjectComponents(GameObject gameObject)
         {
             // check if the game object is already in the scene
             if (gameObject.GetScene() == null)
@@ -448,7 +448,7 @@ namespace SDL2Engine
             this.toRemove.Add(gameObject);
         }
 
-        private void HandleDestroy(EngineObject engineObject)
+        protected void HandleDestroy(EngineObject engineObject)
         {
             if (engineObject is GameObject gameObject)
             {
@@ -637,7 +637,7 @@ namespace SDL2Engine
             return components;
         }
 
-        private void HandleAddComponent<T>(T component) where T : Component
+        protected void HandleAddComponent<T>(T component) where T : Component
         {
             // add to scene if not already added
             if (component.GetScene() != this)
@@ -674,7 +674,7 @@ namespace SDL2Engine
         {
             this.doPhysics = doPhysics;
         }
-        private class DrawableComparer : IComparer<Drawable>
+        public class DrawableComparer : IComparer<Drawable>
         {
             public int Compare(Drawable? a, Drawable? b)
             {

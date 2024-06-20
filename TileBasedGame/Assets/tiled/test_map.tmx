@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="130" height="20" tilewidth="16" tileheight="16" infinite="1" nextlayerid="3" nextobjectid="4">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="130" height="20" tilewidth="16" tileheight="16" infinite="1" nextlayerid="3" nextobjectid="14">
  <tileset firstgid="1" source="Sewer.tsx"/>
  <layer id="1" name="Tile Layer 1" width="130" height="20">
+  <properties>
+   <property name="components" type="object" value="0"/>
+  </properties>
   <data encoding="csv">
    <chunk x="0" y="0" width="16" height="16">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -167,5 +170,19 @@
 </chunk>
   </data>
  </layer>
- <objectgroup id="2" name="Objects"/>
+ <objectgroup id="2" name="Objects">
+  <properties>
+   <property name="components" value="TileBasedGame.TestScript"/>
+  </properties>
+  <object id="6" x="504.5" y="54" width="80" height="17">
+   <text wrap="1">Test</text>
+  </object>
+  <object id="7" gid="82" x="615" y="39" width="16" height="16"/>
+  <object id="8" gid="82" x="610.5" y="46" width="16" height="16"/>
+  <object id="9" gid="82" x="614.5" y="51" width="16" height="16"/>
+  <object id="10" gid="82" x="622" y="51" width="16" height="16"/>
+  <object id="11" gid="82" x="626" y="46.5" width="16" height="16"/>
+  <object id="12" gid="82" x="621.5" y="41.5" width="16" height="16"/>
+  <object id="13" x="546" y="34" width="32.5" height="34"/>
+ </objectgroup>
 </map>

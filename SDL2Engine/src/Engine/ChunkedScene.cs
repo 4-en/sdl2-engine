@@ -265,10 +265,12 @@ namespace SDL2Engine
         {
             // get the simulation bounds
             Rect bounds = GetSimulationBounds();
+            Rect alwaysLoaded = GetAlwaysLoadedBounds();
             bounds.x-= 200;
             bounds.y-= 200;
             bounds.w+= 400;
             bounds.h+= 400;
+
             var enumerator = chunkMap.LoadInBounds(bounds);
             var toAddFromChunks = new List<GameObject>();
             while(enumerator.MoveNext())
@@ -298,8 +300,7 @@ namespace SDL2Engine
                         // it will get destroyed later in the Update method
                         continue;
                     }
-                    if (gameObject.GetPosition().x < bounds.x || gameObject.GetPosition().x > bounds.x + bounds.w ||
-                                               gameObject.GetPosition().y < bounds.y || gameObject.GetPosition().y > bounds.y + bounds.h)
+                    if ((!alwaysLoaded.Contains(gameObject.GetPosition()))&&(!bounds.Contains(gameObject.GetPosition())))
                     {
                         MoveToChunks(gameObject);
                     }

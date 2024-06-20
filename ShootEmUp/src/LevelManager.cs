@@ -131,7 +131,7 @@ namespace ShootEmUp
 
         public static Scene CreateLevel1()
         {
-            var level = new Scene("Level1");
+            var level = new ChunkedScene("Level1");
             using (level.Activate())
             {
                 var levelScript = Component.CreateWithGameObject<BaseLevel>("Level").Item2;
@@ -146,6 +146,7 @@ namespace ShootEmUp
 
                 var music = Component.CreateWithGameObject<MusicPlayer>("Music Player");
                 var player = music.Item2;
+                music.Item1.KeepInScene = true;
 
                 player.playOnAwake = true;
                 player.SetSource("Assets/Audio/music1.mp3");

@@ -336,7 +336,7 @@ namespace SDL2Engine
             {
                 return _visibleWorldCache;
             }
-            Vec2D screenSize = GetVisibleSize();
+            Vec2D screenSize = GetScreenSize();
             Vec2D topLeft = ScreenToWorld(new Vec2D(0, 0));
             Vec2D bottomRight = ScreenToWorld(screenSize);
 

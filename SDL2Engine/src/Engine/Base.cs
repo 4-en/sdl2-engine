@@ -410,6 +410,14 @@ namespace SDL2Engine
             this.h = h;
         }
 
+        public Rect(Vec2D vec)
+        {
+            this.x = 0;
+            this.y = 0;
+            this.w = vec.x;
+            this.h = vec.y;
+        }
+
         public Vec2D GetTopLeft()
         {
             return new Vec2D(x, y);

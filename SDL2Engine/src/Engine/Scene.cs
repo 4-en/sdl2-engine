@@ -767,6 +767,21 @@ namespace SDL2Engine
             return _simBoundsCache;
         }
 
+        public Rect GetAlwaysLoadedBounds()
+        {
+            Rect rect = new Rect(mainCamera.WorldSize);
+            
+            double width10 = rect.w / 10;
+            double height10 = rect.h / 10;
+
+            rect.x -= width10;
+            rect.y -= height10;
+            rect.w += width10 * 2;
+            rect.h += height10 * 2;
+
+            return rect;
+        }
+
         // Iterate through all Drawable components and call their Draw method using the main camera defined in the scene
         public void Draw()
         {

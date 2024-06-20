@@ -109,6 +109,11 @@ namespace ShootEmUp.Level
             }
         }
 
+        public override void Awake()
+        {
+            gameObject.KeepInScene = true;
+        }
+
         public void SetupLevel(int levelID, EnemyWave[] waves, double duration = 60)
         {
             LevelID = levelID;

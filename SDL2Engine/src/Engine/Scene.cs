@@ -266,8 +266,13 @@ namespace SDL2Engine
             return coroutineManager;
         }
 
-        public virtual void AddGameObject(GameObject gameObject)
+        public void AddGameObject(GameObject gameObject)
         {
+            if(gameObject.ToBeDestroyed())
+            {
+                return;
+            }
+
             if (gameObject.GetScene() != null && gameObject.GetScene() != this)
             {
                 /*

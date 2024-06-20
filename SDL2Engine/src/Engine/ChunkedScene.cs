@@ -23,11 +23,13 @@ namespace SDL2Engine
         {
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string GetChunkKey(int x, int y)
         {
-            return x + "_" + y;
+            return $"{x}_{y}";
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddGameObject(GameObject gameObject)
         {
             Vec2D position = gameObject.GetPosition();
@@ -265,11 +267,8 @@ namespace SDL2Engine
         {
             // get the simulation bounds
             Rect bounds = GetSimulationBounds();
+            bounds = chunkMap.FitToChunkGrid(bounds);
             Rect alwaysLoaded = GetAlwaysLoadedBounds();
-            bounds.x-= 200;
-            bounds.y-= 200;
-            bounds.w+= 400;
-            bounds.h+= 400;
 
             var enumerator = chunkMap.LoadInBounds(bounds);
             var toAddFromChunks = new List<GameObject>();
@@ -312,6 +311,7 @@ namespace SDL2Engine
             {
                 gameObjects.Remove(gameObject);
             }
+
 
             toBeUnloaded.Clear();
 

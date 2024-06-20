@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -1254,5 +1255,116 @@ namespace SDL2Engine
 
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        struct _ObjectRef
+        {
+            public int object_index;
+            public float x;
+            public float y;
+            public float w;
+            public float h;
+        }
+        /*
+        [DllImport("SDL2EngineNative", CallingConvention = CallingConvention.Cdecl)]
+        extern static private unsafe IntPtr _GroupGameObjects(_ObjectRef[] objects, int count, float x, float y, float w, float h);
+
+        /*
+         * _UnsafePhysicsInArea
+         * Optimized function using c code to gather all objects in the area
+         * TODO: implement this function
+         
+        public static void _UnsafePhysicsInArea(List<GameObject> gameObjects, Rect area)
+        {
+            float x = (float)area.x;
+            float y = (float)area.y;
+            float w = (float)area.w;
+            float h = (float)area.h;
+
+            LinkedList<GameObject> noColliderButInBounds = new LinkedList<GameObject>();
+            _ObjectRef[] objects = new _ObjectRef[gameObjects.Count];
+            int trueCount = 0;
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                if (!area.Contains(gameObjects[i].GetPosition()))
+                {
+                    continue;
+                }
+
+                Collider? collider = gameObjects[i].GetComponent<Collider>();
+                if (collider == null)
+                {
+                    noColliderButInBounds.AddLast(gameObjects[i]);
+                    continue;
+                }
+
+                Rect bounds = collider.GetBounds();
+                objects[trueCount] = new _ObjectRef
+                {
+                    object_index = i,
+                    x = (float)bounds.x,
+                    y = (float)bounds.y,
+                    w = (float)bounds.w,
+                    h = (float)bounds.h
+                };
+                trueCount++;
+                
+            }
+
+            LinkedList<GameObject[]> collisionAreas = new LinkedList<GameObject[]>();
+
+            unsafe
+            {
+                IntPtr ptr = _GroupGameObjects(objects, trueCount, x, y, w, h);
+
+                /*
+                 * IntPtr is a pointer to a memory location of arrays of integers
+                 * The first integer is the number of arrays
+                 * Each of the arrays contains the indices of the objects in the area
+                 * Their first element is the number of objects in the array
+                 
+
+                int* intPtr = (int*)ptr.ToPointer();
+
+                /*
+                 * ...
+                 * foreach array in the pointer
+                 *   GameObject[] objects = new GameObject[array[0]]
+                 *   for i = 0 to array[0]
+                 *     objects[i] = gameObjects[array[i + 1]]
+                 *     
+                 *   Marshal.FreeHGlobal(array)
+                 
+
+                Marshal.FreeHGlobal(ptr);
+            }
+
+            ApplyPhysics(noColliderButInBounds.ToList());
+
+            foreach(GameObject[] collArea in collisionAreas)
+            {
+                ApplyPhysics([.. collArea]);
+            }
+
+            LinkedList<CollisionPair> collisionPairs = new LinkedList<CollisionPair>();
+            foreach (GameObject[] collArea in collisionAreas)
+            {
+                var pairs = CheckCollisions([.. collArea]);
+                foreach (var pair in pairs)
+                {
+                    collisionPairs.AddLast(pair);
+                }
+            }
+
+            NotifyPreResolveCollisions(collisionPairs.ToList());
+
+            ResolveCollisions(collisionPairs.ToList());
+
+            NotifyCollisions(collisionPairs.ToList());
+
+
+            
+
+        }
+        */
     }
 }

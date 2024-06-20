@@ -19,8 +19,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 131,
-                "y": 72.5
+                "x": 300,
+                "y": -7
             }
         },
         "Sewer.tsx": {
@@ -31,8 +31,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 209.5,
-                "y": 257.5
+                "x": 264,
+                "y": 176
             }
         }
     },
@@ -44,14 +44,13 @@
     "map.tileHeight": 16,
     "map.tileWidth": 16,
     "openFiles": [
-        "Sewer.tsx",
         "C:/Users/Ben/Documents/code/csharp/sdl2-engine/TileBasedGame/Assets/Tiled/test_map.tmx"
     ],
     "project": "test.tiled-project",
     "property.type": "object",
     "recentFiles": [
-        "Sewer.tsx",
         "C:/Users/Ben/Documents/code/csharp/sdl2-engine/TileBasedGame/Assets/Tiled/test_map.tmx",
+        "Sewer.tsx",
         "test_map.tmx"
     ],
     "tileset.lastUsedFormat": "tsx"

@@ -200,6 +200,16 @@ namespace SDL2Engine
             return null;
         }
 
+        public static Camera? GetSceneCamera()
+        {
+            Scene? scene = SceneManager.GetActiveScene();
+            if (scene != null)
+            {
+                return scene.GetCamera();
+            }
+            return null;
+        }
+
         public double GetScreenWidth()
         {
             return GetScreenSize().x;

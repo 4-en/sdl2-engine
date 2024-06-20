@@ -24,6 +24,17 @@ namespace SDL2Engine
             path = AdjustPath(path, "Assets/Tiled/");
             string rootDir = path.Substring(0, path.LastIndexOf("/") + 1);
             var map = new TiledMap(path);
+
+            double height = map.Height * map.TileHeight;
+
+            double aspectRatio = 16.0 / 9.0;
+            double width = height * aspectRatio;
+            Camera? cam = Camera.GetSceneCamera();
+            if(cam != null)
+            {
+                cam.WorldSize = new Vec2D(width, height);
+            }
+
             var tilesets = map.GetTiledTilesets(rootDir);
             var tileLayers = map.Layers.Where(x => x.Type == TiledLayerType.TileLayer);
 
@@ -59,12 +70,10 @@ namespace SDL2Engine
                             
 
                             // Get the tile object from the tileset
-                            var tile = map.GetTiledTile(mapTileset, tileset, gid);
-                            if (tile == default)
-                            {
-                                Console.WriteLine("Error: Tile not found");
-                                continue;
-                            }
+                            TiledTile? tile = map.GetTiledTile(mapTileset, tileset, gid);
+                            
+                            // this can be null if the tile does not have any properties
+                            // it can still be rendered by getting the rect from the tileset
 
 
                             CreateGameObjectFromTile(gid, callingAssembly, rootDir, map, gameObjects, tileX, tileY, tileset, tile, mapTileset);
@@ -75,7 +84,8 @@ namespace SDL2Engine
             return gameObjects;
         }
 
-        private static void CreateGameObjectFromTile(int gid, Assembly callingAssembly, string rootDir, TiledMap map, List<GameObject> gameObjects, int tileX, int tileY, TiledTileset tileset, TiledTile tile, TiledMapTileset mapTileset)
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        private static void CreateGameObjectFromTile(int gid, Assembly callingAssembly, string rootDir, TiledMap map, List<GameObject> gameObjects, int tileX, int tileY, TiledTileset tileset, TiledTile? tile, TiledMapTileset mapTileset, bool addCollision = false)
         {
             // Create GameObject
             string source = tileset.Image.Source;
@@ -87,7 +97,7 @@ namespace SDL2Engine
 
             // use animation properties if available
 
-            if (tile.Animations.Length > 0)
+            if (tile!=null && tile.Animations.Length > 0)
             {
                 var renderer = gameObject.AddComponent<TiledAnimationRenderer>();
 
@@ -124,6 +134,10 @@ namespace SDL2Engine
                 renderer.SetRect(new Rect(map.TileWidth, map.TileHeight));
             }
 
+            if(addCollision)
+            {
+                BoxCollider.FromDrawableRect(gameObject);
+            }
             
 
             gameObjects.Add(gameObject);

@@ -257,52 +257,6 @@ namespace SDL2Engine
             
         }
 
-        public override void AddGameObject(GameObject gameObject)
-        {
-            base.AddGameObject(gameObject);
-            return;
-
-            // if the GameObject is set to keep in scene, add it to the scene no matter what position it is
-            if(gameObject.KeepInScene)
-            {
-                base.AddGameObject(gameObject);
-                return;
-            }
-
-            // if the GameObject has a parent, use base method since parent decides
-            // whether the GameObject should be added to the scene or not
-            if(gameObject.GetParent() != null)
-            {
-                base.AddGameObject(gameObject);
-                return;
-            }
-
-            var bounds = this.GetSimulationBounds();
-            bounds = chunkMap.FitToChunkGrid(bounds);
-            if (gameObject.GetPosition().x < bounds.x || gameObject.GetPosition().x > bounds.x + bounds.w ||
-                               gameObject.GetPosition().y < bounds.y || gameObject.GetPosition().y > bounds.y + bounds.h)
-            {
-                // add to the chunk map
-
-                if(gameObject.GetScene() != null)
-                {
-                    if(gameObject.GetScene() != this)
-                    {
-                        throw new Exception("GameObject is already in another scene");
-                    }
-
-                    // TODO: remove from scene first
-                    // should just be caught in Update method
-                    return;
-                }
-
-                chunkMap.AddGameObject(gameObject);
-                return;
-            }
-
-
-            base.AddGameObject(gameObject);
-        }
 
         private double lastBoundsCheck = -1;
         private double boundsCheckInterval = 0.5;

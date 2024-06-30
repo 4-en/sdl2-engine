@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="130" height="20" tilewidth="16" tileheight="16" infinite="1" nextlayerid="4" nextobjectid="14">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="130" height="20" tilewidth="16" tileheight="16" infinite="1" nextlayerid="5" nextobjectid="17">
  <tileset firstgid="1" source="Sewer.tsx"/>
- <layer id="3" name="Tile Layer 2" width="130" height="20">
+ <layer id="3" name="Tile Layer 2" width="130" height="20" parallaxx="0.5" parallaxy="0.5">
   <data encoding="csv">
    <chunk x="0" y="0" width="16" height="16">
 139,139,139,139,139,139,139,139,139,139,139,139,139,139,139,139,
@@ -167,7 +167,7 @@
 </chunk>
   </data>
  </layer>
- <layer id="1" name="Tile Layer 1" class="Obstacle" width="130" height="20">
+ <layer id="1" name="Tile Layer 1" class="Obstacles" width="130" height="20">
   <data encoding="csv">
    <chunk x="0" y="0" width="16" height="16">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -333,19 +333,11 @@
 </chunk>
   </data>
  </layer>
- <objectgroup id="2" name="Objects">
-  <properties>
-   <property name="components" value="TileBasedGame.TestScript"/>
-  </properties>
-  <object id="6" x="504.5" y="54" width="80" height="17">
-   <text wrap="1">Test</text>
+ <objectgroup id="4" name="Object Layer 1">
+  <object id="15" name="Player" x="216.167" y="136.417" width="16.6667" height="16.3333">
+   <properties>
+    <property name="components" value="TileBasedGame.Player"/>
+   </properties>
   </object>
-  <object id="7" gid="82" x="615" y="39" width="16" height="16"/>
-  <object id="8" gid="82" x="610.5" y="46" width="16" height="16"/>
-  <object id="9" gid="82" x="614.5" y="51" width="16" height="16"/>
-  <object id="10" gid="82" x="622" y="51" width="16" height="16"/>
-  <object id="11" gid="82" x="626" y="46.5" width="16" height="16"/>
-  <object id="12" gid="82" x="621.5" y="41.5" width="16" height="16"/>
-  <object id="13" x="546" y="34" width="32.5" height="34"/>
  </objectgroup>
 </map>

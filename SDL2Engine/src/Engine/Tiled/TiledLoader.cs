@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SDL2Engine.Tiled;
+using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using TiledCSPlus;
@@ -20,7 +21,7 @@ namespace SDL2Engine
         }
 
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
-        public static List<GameObject> LoadTMX(string path, Assembly? callingAssembly=null)
+        public static List<GameObject> LoadTMX(string path, Assembly? callingAssembly = null)
         {
             path = AdjustPath(path, "Assets/Tiled/");
             string rootDir = path.Substring(0, path.LastIndexOf("/") + 1);
@@ -31,7 +32,7 @@ namespace SDL2Engine
             double aspectRatio = 16.0 / 9.0;
             double width = height * aspectRatio;
             Camera? cam = Camera.GetSceneCamera();
-            if(cam != null)
+            if (cam != null)
             {
                 cam.WorldSize = new Vec2D(width, height);
             }
@@ -42,9 +43,10 @@ namespace SDL2Engine
             var gameObjects = new List<GameObject>();
 
             callingAssembly ??= Assembly.GetCallingAssembly();
-
+            int layerOrder = tileLayers.Count();
             foreach (var layer in tileLayers)
             {
+                Console.WriteLine("Layer: " + layer.Name);
                 foreach (var chunk in layer.Chunks)
                     for (var y = 0; y < chunk.Height; y++)
                     {
@@ -68,25 +70,82 @@ namespace SDL2Engine
                             // Retrieve the actual tileset based on the firstgid property of the connection object we retrieved just now
                             var tileset = tilesets[mapTileset.FirstGid];
 
-                            
+
 
                             // Get the tile object from the tileset
                             TiledTile? tile = map.GetTiledTile(mapTileset, tileset, gid);
-                            
+
                             // this can be null if the tile does not have any properties
                             // it can still be rendered by getting the rect from the tileset
 
 
-                            CreateGameObjectFromTile(gid, layer, callingAssembly, rootDir, map, gameObjects, tileX, tileY, tileset, tile, mapTileset);
+                            CreateGameObjectFromTile(gid, layer, layerOrder, callingAssembly, rootDir, map, gameObjects, tileX, tileY, tileset, tile, mapTileset);
                         }
                     }
+                layerOrder--;
+            }
+
+            var objectLayers = map.Layers.Where(x => x.Type == TiledLayerType.ObjectLayer);
+            foreach (var layer in objectLayers)
+            {
+                foreach (var obj in layer.Objects)
+                {
+                    var position = obj.Position;
+                    var size = obj.Size;
+                    var gid = obj.Gid;
+                    var tileX = position.X;
+                    var tileY = position.Y;
+
+
+                    GameObject gameObject = new GameObject(obj.Name);
+                    gameObject.SetPosition(new Vec2D(tileX, tileY));
+
+                    // Add components
+                    // first layer components
+                    foreach (TiledProperty property in layer.Properties)
+                    {
+                        if (property.Name == "components")
+                        {
+                            AddComponentsToTile(gameObject, property.Value, callingAssembly);
+                        }
+                    }
+
+
+                    foreach (TiledProperty property in obj.Properties)
+                    {
+                        if (property.Name == "components")
+                        {
+                            AddComponentsToTile(gameObject, property.Value, callingAssembly);
+                        }
+                    }
+
+                    // set properties after adding components, in case properties are part of the components
+                    // set layer properties
+                    foreach (TiledProperty property in layer.Properties)
+                    {
+                        SetComponentField(gameObject, property.Name, property.Value);
+                    }
+
+                    // set tile properties
+                    foreach (TiledProperty property in obj.Properties)
+                    {
+                        SetComponentField(gameObject, property.Name, property.Value);
+                    }
+
+
+
+                    gameObjects.Add(gameObject);
+
+
+
+                }
             }
 
             return gameObjects;
         }
 
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        private static void CreateGameObjectFromTile(int gid, TiledLayer layer, Assembly callingAssembly, string rootDir, TiledMap map, List<GameObject> gameObjects, int tileX, int tileY, TiledTileset tileset, TiledTile? tile, TiledMapTileset mapTileset, bool addCollision = false)
+        private static void CreateGameObjectFromTile(int gid, TiledLayer layer, int layerOrder, Assembly callingAssembly, string rootDir, TiledMap map, List<GameObject> gameObjects, int tileX, int tileY, TiledTileset tileset, TiledTile? tile, TiledMapTileset mapTileset)
         {
             // Create GameObject
             string source = tileset.Image.Source;
@@ -98,7 +157,7 @@ namespace SDL2Engine
 
             // use animation properties if available
 
-            if (tile!=null && tile.Animations.Length > 0)
+            if (tile != null && tile.Animations.Length > 0)
             {
                 var renderer = gameObject.AddComponent<TiledAnimationRenderer>();
 
@@ -109,7 +168,7 @@ namespace SDL2Engine
 
                     TiledSourceRect? rect = map.GetSourceRect(mapTileset, tileset, tileId + mapTileset.FirstGid);
 
-                    if(rect == null)
+                    if (rect == null)
                     {
                         Console.WriteLine("Error: Source rect not found");
                         continue;
@@ -122,6 +181,7 @@ namespace SDL2Engine
                 renderer.SetSource(source);
                 renderer.anchorPoint = AnchorPoint.TopLeft;
                 renderer.SetSize(map.TileWidth, map.TileHeight);
+                renderer.SetZIndex(layerOrder*10);
 
             }
             else
@@ -133,25 +193,33 @@ namespace SDL2Engine
                 renderer.SetSourceRect(new Rect(rect.X, rect.Y, rect.Width, rect.Height));
                 renderer.anchorPoint = AnchorPoint.TopLeft;
                 renderer.SetRect(new Rect(map.TileWidth, map.TileHeight));
+                renderer.SetZIndex(layerOrder*10);
             }
 
-            if(addCollision)
+            if (layer.Class == "Obstacles")
             {
                 BoxCollider.FromDrawableRect(gameObject);
             }
 
+            if (layer.Parallax.X != 1.0 || layer.Parallax.Y != 1.0)
+            {
+                var phelper = gameObject.AddComponent<ParallaxHelper>();
+                phelper.parallaxX = layer.Parallax.X;
+                phelper.parallaxY = layer.Parallax.Y;
+            }
+
             // Add components
             // first layer components
-            foreach(TiledProperty property in layer.Properties)
+            foreach (TiledProperty property in layer.Properties)
             {
-                if(property.Name == "components")
+                if (property.Name == "components")
                 {
                     AddComponentsToTile(gameObject, property.Value, callingAssembly);
                 }
             }
 
             // then tile components
-            if(tile != null)
+            if (tile != null)
             {
                 foreach (TiledProperty property in tile.Properties)
                 {
@@ -177,7 +245,7 @@ namespace SDL2Engine
                     SetComponentField(gameObject, property.Name, property.Value);
                 }
             }
-            
+
 
             gameObjects.Add(gameObject);
 
@@ -255,7 +323,7 @@ namespace SDL2Engine
             {
                 return;
             }
-            if(parts.Length == 1)
+            if (parts.Length == 1)
             {
                 return;
             }

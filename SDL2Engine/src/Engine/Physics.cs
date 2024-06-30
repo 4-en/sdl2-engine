@@ -231,6 +231,10 @@ namespace SDL2Engine
         private double drag = 0.0;
         [JsonProperty]
         private bool rotateWithVelocity = false;
+        [JsonProperty]
+        private bool collideWithMovingObjects = true;
+        [JsonProperty]
+        private bool collideWithStaticObjects = true;
 
         public PhysicsBody()
         {
@@ -250,6 +254,18 @@ namespace SDL2Engine
             this.bounciness = bounciness;
             this.friction = friction;
             this.drag = drag;
+        }
+
+        public bool CollideWithMovingObjects
+        {
+            get { return collideWithMovingObjects; }
+            set { collideWithMovingObjects = value; }
+        }
+
+        public bool CollideWithStaticObjects
+        {
+            get { return collideWithStaticObjects; }
+            set { collideWithStaticObjects = value; }
         }
 
         public bool RotateWithVelocity
@@ -443,7 +459,15 @@ namespace SDL2Engine
     // a box collider is a rectangle that can be used to detect collisions
     public class BoxCollider : Collider
     {
+        public static BoxCollider FromDrawableRect(DrawableRect drawableRect)
+        {
+            Rect r = drawableRect.GetRect();
 
+            var collider = drawableRect.GetGameObject().AddComponent<BoxCollider>();
+            collider.box = r;
+            return collider;
+
+        }
         public static BoxCollider? FromDrawableRect(GameObject gameObject)
         {
             Drawable? drawable = gameObject.GetComponent<Drawable>();
@@ -751,6 +775,15 @@ namespace SDL2Engine
         // This class should contain information about a collision between a ray and a collider
         private Collider? collider;
     }
+
+    public class WorldSettings
+    {
+        public double gravity = 100;
+        public double drag = 0.0;
+        public double wind = 0.0;
+        public bool enablePhysics = true;
+    }
+
     public static class Physics
     {
         public static bool Raycast(Vec2D origin, Vec2D direction, double distance, out RaycastHit hit)
@@ -773,20 +806,28 @@ namespace SDL2Engine
         }
 
         // Adds gravity and other forces, moves objects
-        public static void ApplyPhysics(List<GameObject> gameObjects)
+        public static void ApplyPhysics(List<GameObject> gameObjects, WorldSettings? worldSettings = null)
         {
             double deltaTime = Time.deltaTime;
             // Apply gravity, forces, etc.
             foreach (var gameObject in gameObjects)
             {
-                //apply gravity
+                
                 PhysicsBody? physicsBody = gameObject.GetComponent<PhysicsBody>();
                 if (physicsBody == null) continue;
                 if (!physicsBody.IsMovable) continue;
                 if (!physicsBody.IsEnabled()) continue;
 
 
-                //gameObject.GetComponent<PhysicsBody>().Velocity = new Vec2D(gameObject.GetComponent<PhysicsBody>().Velocity.x, gameObject.GetComponent<PhysicsBody>().Velocity.y + 0.1);
+                // apply gravity
+                if (worldSettings != null)
+                {
+                    if (worldSettings.gravity != 0)
+                    {
+                        double acclY = worldSettings.gravity * deltaTime;
+                        physicsBody.SetVelocity(physicsBody.Velocity.x, physicsBody.Velocity.y + acclY);
+                    }
+                }
 
 
                 //move objects
@@ -801,7 +842,8 @@ namespace SDL2Engine
                 var vel_magnitude_squared = physicsBody.Velocity.LengthSquared();
 
                 // if velocity is below a certain threshold, set it to 0
-                if (vel_magnitude_squared > 0 && vel_magnitude_squared < 1.0)
+                // disabled, since it cause problems with gravity
+                if (vel_magnitude_squared > 0 && vel_magnitude_squared < 1.0 && false)
                 {
                     physicsBody.Velocity = new Vec2D(0, 0);
                     vel_magnitude_squared = 0;
@@ -858,6 +900,7 @@ namespace SDL2Engine
             }
         }
 
+
         // Checks for collisions between objects
         public static List<CollisionPair> CheckCollisions(List<GameObject> gameObjects)
         {
@@ -884,20 +927,56 @@ namespace SDL2Engine
 
                 colliderI.SwapCollisions();
 
+
                 for (uint j = i + 1; j < gameObjects.Count; j++)
                 {
                     colliderJ = gameObjects[(int)j].GetComponent<Collider>();
                     if (colliderJ == null) continue;
                     if (!colliderJ.IsEnabled()) continue;
-                    colliderJ.SwapCollisions();
 
-                    if (colliderI.CollidesWith(colliderJ))
+
+                    if (physicsBody.CollideWithMovingObjects && physicsBody.CollideWithStaticObjects)
                     {
-                        var cp = CalculateCollisionPoint(gameObjects[(int)i], gameObjects[(int)j]);
-                        collisionPairList.Add(new CollisionPair(gameObjects[(int)i], gameObjects[(int)j], cp));
-                        colliderJ.GetCurrentCollisionList().Add(colliderI);
-                        colliderI.GetCurrentCollisionList().Add(colliderJ);
+                        colliderJ.SwapCollisions();
 
+                        if (colliderI.CollidesWith(colliderJ))
+                        {
+                            var cp = CalculateCollisionPoint(gameObjects[(int)i], gameObjects[(int)j]);
+                            collisionPairList.Add(new CollisionPair(gameObjects[(int)i], gameObjects[(int)j], cp));
+                            colliderJ.GetCurrentCollisionList().Add(colliderI);
+                            colliderI.GetCurrentCollisionList().Add(colliderJ);
+
+                        }
+                    } else if (physicsBody.CollideWithStaticObjects)
+                    {
+                        PhysicsBody? physicsBodyJ = gameObjects[(int)j].GetComponent<PhysicsBody>();
+                        if (physicsBodyJ != null && physicsBodyJ.IsMovable) continue;
+
+                        colliderJ.SwapCollisions();
+
+                        if (colliderI.CollidesWith(colliderJ))
+                        {
+                            var cp = CalculateCollisionPoint(gameObjects[(int)i], gameObjects[(int)j]);
+                            collisionPairList.Add(new CollisionPair(gameObjects[(int)i], gameObjects[(int)j], cp));
+                            colliderJ.GetCurrentCollisionList().Add(colliderI);
+                            colliderI.GetCurrentCollisionList().Add(colliderJ);
+
+                        }
+                    } else if (physicsBody.CollideWithMovingObjects)
+                    {
+                        PhysicsBody? physicsBodyJ = gameObjects[(int)j].GetComponent<PhysicsBody>();
+                        if (physicsBodyJ == null || !physicsBodyJ.IsMovable) continue;
+
+                        colliderJ.SwapCollisions();
+
+                        if (colliderI.CollidesWith(colliderJ))
+                        {
+                            var cp = CalculateCollisionPoint(gameObjects[(int)i], gameObjects[(int)j]);
+                            collisionPairList.Add(new CollisionPair(gameObjects[(int)i], gameObjects[(int)j], cp));
+                            colliderJ.GetCurrentCollisionList().Add(colliderI);
+                            colliderI.GetCurrentCollisionList().Add(colliderJ);
+
+                        }
                     }
 
 
@@ -1176,17 +1255,20 @@ namespace SDL2Engine
          * to check if the object has a collider or physics body, use HasCollider() and HasPhysicsBody() methods
          * to get the collider or physics body of an object, use propterties collider and physicsBody or use generic GetComponent<T>() method
          */
-        public static void UpdatePhysics(List<GameObject> gameObjects, Rect? bounds = null)
+        public static void UpdatePhysics(List<GameObject> gameObjects, Rect? bounds = null, WorldSettings? worldSettings = null)
         {
 
             if(bounds != null)
             {
-                UpdatePhysicsInArea(gameObjects, bounds.Value);
+                UpdatePhysicsInArea(gameObjects, bounds.Value, worldSettings);
                 return;
             }
 
-            // Apply physics
-            ApplyPhysics(gameObjects);
+            if (worldSettings == null || worldSettings.enablePhysics == true)
+            {
+                // Apply physics
+                ApplyPhysics(gameObjects, worldSettings);
+            }
 
             // Check for collisions
             List<CollisionPair> collisions = CheckCollisions(gameObjects);
@@ -1202,7 +1284,7 @@ namespace SDL2Engine
         }
 
 
-        private static void UpdatePhysicsInArea(List<GameObject> gameObjects, Rect bounds)
+        private static void UpdatePhysicsInArea(List<GameObject> gameObjects, Rect bounds, WorldSettings? worldSettings = null)
         {
             List<GameObject> objectsInBounds = new List<GameObject>();
 
@@ -1214,8 +1296,11 @@ namespace SDL2Engine
                 }
             }
 
-            // Apply physics
-            ApplyPhysics(objectsInBounds);
+            if (worldSettings == null || worldSettings.enablePhysics == true)
+            {
+                // Apply physics
+                ApplyPhysics(objectsInBounds, worldSettings);
+            }
 
             // seperate using quadtree
             QuadTree<Collider> quadTree = new QuadTree<Collider>(bounds);

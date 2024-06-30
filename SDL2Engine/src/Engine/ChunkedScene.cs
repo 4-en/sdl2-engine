@@ -417,7 +417,7 @@ namespace SDL2Engine
                 // 3* viewport size
                 Rect rect = GetSimulationBounds();
 
-                Physics.UpdatePhysics(physicsObjects, rect);
+                Physics.UpdatePhysics(physicsObjects, rect, worldSettings);
             }
 
 

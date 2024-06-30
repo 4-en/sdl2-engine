@@ -147,6 +147,7 @@ namespace SDL2Engine
         protected string name = "Scene";
         protected int gameObjectsCount = 0;
         protected bool doPhysics = true;
+        protected WorldSettings worldSettings = new();
 
         protected Camera mainCamera;
         protected SceneType sceneType = SceneType.GAME;
@@ -214,6 +215,12 @@ namespace SDL2Engine
             List<GameObject> gameObjects = TiledLoader.LoadTMX(path, callingAsm);
             SceneManager.SetActiveScene(tempScene);
             return gameObjects;
+        }
+
+        public WorldSettings WorldSettings
+        {
+            get { return worldSettings; }
+            set { worldSettings = value; }
         }
 
         public string GetName()
@@ -915,7 +922,7 @@ namespace SDL2Engine
                 // 3* viewport size
                 Rect rect = GetSimulationBounds();
 
-                Physics.UpdatePhysics(physicsObjects, rect);
+                Physics.UpdatePhysics(physicsObjects, rect, worldSettings);
             }
 
 

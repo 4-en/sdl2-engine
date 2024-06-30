@@ -30,31 +30,45 @@ namespace TileBasedGame
 
     public class Player : Script
     {
+        private DrawableRect? renderer;
+        private PhysicsBody? physicsBody;
         public override void Start()
         {
-            Console.WriteLine("Player Start");
+            renderer = AddComponent<FilledRect>();
+            renderer.color = new Color(155, 30, 200, 255);
+            renderer.SetRect(new Rect(0, 0, 20, 40));
+            renderer.anchorPoint = AnchorPoint.BottomCenter;
+            BoxCollider.FromDrawableRect(gameObject);
+            physicsBody = AddComponent<PhysicsBody>();
+
         }
 
         public override void Update()
         {
-            var camera = GetCamera();
+            
 
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_w))
             {
-                camera.SetPosition(camera.GetPosition() + new Vec2D(0, -1000) * Time.deltaTime);
+                gameObject.transform.Move(0, -200*Time.deltaTime);
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_s))
             {
-                camera.SetPosition(camera.GetPosition() + new Vec2D(0, 1000) * Time.deltaTime);
+                gameObject.transform.Move(0, 200*Time.deltaTime);
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_a))
             {
-                camera.SetPosition(camera.GetPosition() + new Vec2D(-1000, 0) * Time.deltaTime);
+                gameObject.transform.Move(-200*Time.deltaTime, 0);
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_d))
             {
-                camera.SetPosition(camera.GetPosition() + new Vec2D(1000, 0) * Time.deltaTime);
+                gameObject.transform.Move(200*Time.deltaTime, 0);
             }
+
+            // center camera on player
+            var camera = GetCamera();
+            var cameraPosition = camera.GetPosition();
+            var cameraHalfSize = camera.GetVisibleSize() / 2;
+            camera.SetPosition(gameObject.transform.position - cameraHalfSize);
         }
     }
 }

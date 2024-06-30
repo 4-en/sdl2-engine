@@ -672,7 +672,7 @@ namespace SDL2Engine
         private bool showColliders = false;
         private static bool forceAspectRatio = false;
         private static double aspectRatio = 16.0 / 9.0;
-        public static UInt32 targetFPS = 500;
+        public static UInt32 targetFPS = 144;
         public static int windowWidth = 1000;
         public static int windowHeight = (int)(windowWidth / aspectRatio);
         private Font? font = null;

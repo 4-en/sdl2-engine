@@ -92,6 +92,10 @@
  <tile id="73" type="Obstacle"/>
  <tile id="74" type="Obstacle"/>
  <tile id="82">
+  <properties>
+   <property name="TestScript.value" type="int" value="69"/>
+   <property name="components" value="TileBasedGame.TestScript,TileBasedGame.TestScript2"/>
+  </properties>
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="16" height="16"/>
   </objectgroup>

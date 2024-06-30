@@ -48,7 +48,7 @@
         "Sewer.tsx"
     ],
     "project": "test.tiled-project",
-    "property.type": "string",
+    "property.type": "int",
     "recentFiles": [
         "Sewer.tsx",
         "C:/Users/Ben/Documents/code/csharp/sdl2-engine/TileBasedGame/Assets/Tiled/test_map.tmx",

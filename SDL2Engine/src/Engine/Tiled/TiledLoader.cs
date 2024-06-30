@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using TiledCSPlus;
 
@@ -76,7 +77,7 @@ namespace SDL2Engine
                             // it can still be rendered by getting the rect from the tileset
 
 
-                            CreateGameObjectFromTile(gid, callingAssembly, rootDir, map, gameObjects, tileX, tileY, tileset, tile, mapTileset);
+                            CreateGameObjectFromTile(gid, layer, callingAssembly, rootDir, map, gameObjects, tileX, tileY, tileset, tile, mapTileset);
                         }
                     }
             }
@@ -85,7 +86,7 @@ namespace SDL2Engine
         }
 
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        private static void CreateGameObjectFromTile(int gid, Assembly callingAssembly, string rootDir, TiledMap map, List<GameObject> gameObjects, int tileX, int tileY, TiledTileset tileset, TiledTile? tile, TiledMapTileset mapTileset, bool addCollision = false)
+        private static void CreateGameObjectFromTile(int gid, TiledLayer layer, Assembly callingAssembly, string rootDir, TiledMap map, List<GameObject> gameObjects, int tileX, int tileY, TiledTileset tileset, TiledTile? tile, TiledMapTileset mapTileset, bool addCollision = false)
         {
             // Create GameObject
             string source = tileset.Image.Source;
@@ -138,6 +139,44 @@ namespace SDL2Engine
             {
                 BoxCollider.FromDrawableRect(gameObject);
             }
+
+            // Add components
+            // first layer components
+            foreach(TiledProperty property in layer.Properties)
+            {
+                if(property.Name == "components")
+                {
+                    AddComponentsToTile(gameObject, property.Value, callingAssembly);
+                }
+            }
+
+            // then tile components
+            if(tile != null)
+            {
+                foreach (TiledProperty property in tile.Properties)
+                {
+                    if (property.Name == "components")
+                    {
+                        AddComponentsToTile(gameObject, property.Value, callingAssembly);
+                    }
+                }
+            }
+
+            // set properties after adding components, in case properties are part of the components
+            // set layer properties
+            foreach (TiledProperty property in layer.Properties)
+            {
+                SetComponentField(gameObject, property.Name, property.Value);
+            }
+
+            // set tile properties
+            if (tile != null)
+            {
+                foreach (TiledProperty property in tile.Properties)
+                {
+                    SetComponentField(gameObject, property.Name, property.Value);
+                }
+            }
             
 
             gameObjects.Add(gameObject);
@@ -170,6 +209,131 @@ namespace SDL2Engine
                 Console.WriteLine("Component not found");
             }
             */
+        }
+
+        /*
+         * Add components that were defined in a Tiles components property
+         * to the GameObject
+         * Format: namespace1.Component1,namespace1.Component2,namespace2.Component3
+         * 
+         */
+
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        private static void AddComponentsToTile(GameObject gameObject, string componentNames, Assembly callingAssembly)
+        {
+
+            var components = componentNames.Split(',');
+            foreach (var componentName in components)
+            {
+                Type? componentType = callingAssembly.GetType(componentName);
+                if (componentType == null)
+                {
+                    componentType = Assembly.GetExecutingAssembly().GetType(componentName);
+                }
+
+                if (componentType != null)
+                {
+                    var instance = Activator.CreateInstance(componentType);
+                    if (instance is Component script)
+                    {
+                        gameObject.AddComponent(script);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Component {componentName} not found");
+                }
+            }
+
+        }
+
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        private static void SetComponentField(GameObject gameObject, string attribute, string value)
+        {
+            string[] parts = attribute.Split('.');
+            if (parts.Length < 1)
+            {
+                return;
+            }
+            if(parts.Length == 1)
+            {
+                return;
+            }
+
+            // only allow attribute names in the format ComponentName.AttributeName[.AttributeName]
+            // basically, the first part should be a component name and it needs at least one dot
+
+            string componentName = parts[0];
+            string other = string.Join(".", parts.Skip(1));
+
+            Component? component = gameObject.GetComponentByClassName(componentName);
+            if (component == null)
+            {
+                Console.WriteLine($"Component {componentName} not found");
+                return;
+            }
+
+            set_attribute(component, other, value);
+        }
+
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        private static void set_attribute(object obj, string attribute, string value)
+        {
+            var type = obj.GetType();
+            string[] parts = attribute.Split('.');
+            if (parts.Length < 1)
+            {
+                return;
+            }
+            attribute = parts[0];
+            string otherAttributes = string.Join(".", parts.Skip(1));
+            var field = type.GetField(attribute, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            while (field == null && type.BaseType != null)
+            {
+                type = type.BaseType;
+                field = type.GetField(attribute, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            }
+            if (field == null)
+            {
+                Console.WriteLine("Attribute not found: " + attribute);
+                return;
+            }
+
+            if (otherAttributes == "")
+            {
+                // convert value to the correct type
+                switch (field.FieldType.Name)
+                {
+                    case "Int32":
+                        field.SetValue(obj, int.Parse(value));
+                        break;
+                    case "Single":
+                        field.SetValue(obj, float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
+                        break;
+                    case "Double":
+                        double doubleValue = double.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
+                        field.SetValue(obj, doubleValue);
+                        break;
+                    case "String":
+                        field.SetValue(obj, value);
+                        break;
+                    case "Boolean":
+                        field.SetValue(obj, bool.Parse(value));
+                        break;
+                    default:
+                        Console.WriteLine("Unsupported type: " + field.FieldType.Name);
+                        break;
+                }
+            }
+            else
+            {
+                var subObj = field.GetValue(obj);
+                if (subObj == null)
+                {
+                    return;
+                }
+                set_attribute(subObj, otherAttributes, value);
+            }
         }
     }
 }

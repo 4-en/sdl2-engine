@@ -40,28 +40,35 @@ namespace TileBasedGame
             renderer.anchorPoint = AnchorPoint.BottomCenter;
             BoxCollider.FromDrawableRect(gameObject);
             physicsBody = AddComponent<PhysicsBody>();
+            physicsBody.Bounciness = 0.0;
 
         }
 
         public override void Update()
         {
+            if(physicsBody == null)
+            {
+                return;
+            }
             
+            double maxVelocity = 200.0;
+            double acceleration = 1000.0;
 
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_w))
             {
-                gameObject.transform.Move(0, -200*Time.deltaTime);
+                physicsBody.AddVelocity(new Vec2D(0, -acceleration * Time.deltaTime));
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_s))
             {
-                gameObject.transform.Move(0, 200*Time.deltaTime);
+                physicsBody.AddVelocity(new Vec2D(0, acceleration * Time.deltaTime));
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_a))
             {
-                gameObject.transform.Move(-200*Time.deltaTime, 0);
+                physicsBody.AddVelocity(new Vec2D(-acceleration * Time.deltaTime, 0));
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_d))
             {
-                gameObject.transform.Move(200*Time.deltaTime, 0);
+                physicsBody.AddVelocity(new Vec2D(acceleration * Time.deltaTime, 0));
             }
 
             // center camera on player

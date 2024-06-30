@@ -7,6 +7,7 @@ namespace TileBasedGame
         static void TestTileLoading()
         {
             var scene = new ChunkedScene("TileTest");
+            scene.SetGravity(100);
             scene.LoadTMX("test_map.tmx");
 
             var engine = new Engine(scene, "TileBasedGame");

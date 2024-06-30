@@ -41,6 +41,7 @@ namespace TileBasedGame
             BoxCollider.FromDrawableRect(gameObject);
             physicsBody = AddComponent<PhysicsBody>();
             physicsBody.Bounciness = 0.0;
+            physicsBody.Friction = 2;
 
         }
 
@@ -52,23 +53,37 @@ namespace TileBasedGame
             }
             
             double maxVelocity = 200.0;
+            double stopVelocity = 25;
             double acceleration = 1000.0;
 
-            if(Input.GetKeyPressed(SDL_Keycode.SDLK_w))
+            if(Input.GetKeyDown(SDL_Keycode.SDLK_SPACE))
             {
-                physicsBody.AddVelocity(new Vec2D(0, -acceleration * Time.deltaTime));
-            }
-            if(Input.GetKeyPressed(SDL_Keycode.SDLK_s))
-            {
-                physicsBody.AddVelocity(new Vec2D(0, acceleration * Time.deltaTime));
+                physicsBody.AddVelocity(new Vec2D(0, -acceleration/10));
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_a))
             {
                 physicsBody.AddVelocity(new Vec2D(-acceleration * Time.deltaTime, 0));
+                stopVelocity = 0;
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_d))
             {
                 physicsBody.AddVelocity(new Vec2D(acceleration * Time.deltaTime, 0));
+                stopVelocity = 0;
+            }
+
+            if(physicsBody.Velocity.x > maxVelocity)
+            {
+                physicsBody.Velocity = new Vec2D(maxVelocity, physicsBody.Velocity.y);
+            }
+
+            if(physicsBody.Velocity.x < -maxVelocity)
+            {
+                physicsBody.Velocity = new Vec2D(-maxVelocity, physicsBody.Velocity.y);
+            }
+
+            if(physicsBody.Velocity.x < stopVelocity && physicsBody.Velocity.x > -stopVelocity)
+            {
+                physicsBody.Velocity = new Vec2D(0, physicsBody.Velocity.y);
             }
 
             // center camera on player

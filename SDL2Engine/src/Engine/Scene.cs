@@ -223,6 +223,11 @@ namespace SDL2Engine
             set { worldSettings = value; }
         }
 
+        public void SetGravity(double gravity)
+        {
+            worldSettings.gravity = gravity;
+        }
+
         public string GetName()
         {
             return name;

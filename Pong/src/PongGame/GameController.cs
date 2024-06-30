@@ -308,7 +308,8 @@ namespace Pong
             ball_drawable.SetRect(new Rect(50, 50));
             ball_drawable.anchorPoint = AnchorPoint.TopLeft;
             BoxCollider.FromDrawableRect(ball);
-            ball.AddComponent<PhysicsBody>();
+            var body = ball.AddComponent<PhysicsBody>();
+            body.Bounciness = 1.0;
             ball.AddComponent<BallBounceScript>();
 
             // create the paddles

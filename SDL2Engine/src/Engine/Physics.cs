@@ -49,9 +49,9 @@ namespace SDL2Engine
             quadTrees[hash].Insert(item);
         }
 
-        public List<T> Query(Rect range)
+        public LinkedList<T> Query(Rect range)
         {
-            List<T> found = new List<T>();
+            LinkedList<T> found = new ();
             int x = (int)range.x;
             int y = (int)range.y;
             int hash = GetQuadTreeHash(x, y, quadTreeSize);
@@ -62,7 +62,7 @@ namespace SDL2Engine
             return found;
         }
 
-        public IEnumerator<List<T>> GetPossibleCollisions()
+        public IEnumerator<LinkedList<T>> GetPossibleCollisions()
         {
             foreach (var quadTree in quadTrees.Values)
             {
@@ -82,7 +82,7 @@ namespace SDL2Engine
     {
         private const int MAX_CAPACITY = 16;
         private int maxDepth = 8;
-        private List<T> items = new List<T>();
+        private LinkedList<T> items = new LinkedList<T>();
         private Rect bounds;
         private QuadTree<T>[]? children = null;
         private bool isDivided = false;
@@ -111,7 +111,7 @@ namespace SDL2Engine
 
             if ((items.Count < MAX_CAPACITY && !isDivided) || maxDepth <= 0 || IntersectsMultiple(itemBounds))
             {
-                items.Add(item);
+                items.AddLast(item);
                 return true;
             }
 
@@ -125,15 +125,15 @@ namespace SDL2Engine
             {
                 return false;
             }
-            bool inserted = false;
+
             foreach (var child in children)
             {
                 if (child.Insert(item))
                 {
-                    inserted = true;
+                    return true;
                 }
             }
-            return inserted;
+            return false;
         }
 
         private void Subdivide()
@@ -143,28 +143,28 @@ namespace SDL2Engine
             double halfWidth = bounds.w / 2;
             double halfHeight = bounds.h / 2;
 
-            children = new QuadTree<T>[4]
-            {
-            new QuadTree<T>(new Rect(x, y, halfWidth, halfHeight), maxDepth - 1),
-            new QuadTree<T>(new Rect(x + halfWidth, y, halfWidth, halfHeight), maxDepth - 1),
-            new QuadTree<T>(new Rect(x, y + halfHeight, halfWidth, halfHeight), maxDepth - 1),
-            new QuadTree<T>(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), maxDepth - 1)
-            };
+            children =
+                [
+                    new QuadTree<T>(new Rect(x, y, halfWidth, halfHeight), maxDepth - 1),
+                    new QuadTree<T>(new Rect(x + halfWidth, y, halfWidth, halfHeight), maxDepth - 1),
+                    new QuadTree<T>(new Rect(x, y + halfHeight, halfWidth, halfHeight), maxDepth - 1),
+                    new QuadTree<T>(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), maxDepth - 1)
+                ];
             isDivided = true;
 
-            List<T> tempItems = new List<T>(items);
-            items.Clear();
-            foreach (T item in tempItems)
+            var oldItems = items;
+            this.items = new LinkedList<T>();
+            foreach (T item in oldItems)
             {
                 Insert(item);
             }
         }
 
-        public List<T> Query(Rect range, List<T>? found = null)
+        public LinkedList<T> Query(Rect range, LinkedList<T>? found = null)
         {
             if (found == null)
             {
-                found = new List<T>();
+                found = new LinkedList<T>();
             }
 
             if (!bounds.Intersects(range))
@@ -178,7 +178,7 @@ namespace SDL2Engine
                 {
                     if (item.GetBounds().Intersects(range))
                     {
-                        found.Add(item);
+                        found.AddLast(item);
                     }
                 }
             }
@@ -197,24 +197,28 @@ namespace SDL2Engine
          * Yield returns List<T> of Ts that are in the same QuadTree node
          * Use this to compare collisions between objects in the same QuadTree node
          */
-        public IEnumerator<List<T>> GetPossibleCollisions()
+        public IEnumerator<LinkedList<T>> GetPossibleCollisions()
         {
-            if(!isDivided)
+            if (items.Count > 0)
             {
-                yield return items;
+                yield return new LinkedList<T>(items);
             }
-            else if(children != null)
+            if (children != null)
             {
-                foreach(var child in children)
+                foreach (var child in children)
                 {
                     var possibleCollisions = child.GetPossibleCollisions();
-                    while(possibleCollisions.MoveNext())
+                    while (possibleCollisions.MoveNext())
                     {
+                        foreach(var item in this.items)
+                        {
+                            // possibleCollisions.Current.AddLast(item);
+                        }
                         yield return possibleCollisions.Current;
                     }
                 }
             }
-            
+
         }
     }
 
@@ -791,7 +795,7 @@ namespace SDL2Engine
 
     public class WorldSettings
     {
-        public double gravity = 100;
+        public double gravity = 0;
         public double drag = 0.0;
         public double wind = 0.0;
         public bool enablePhysics = true;
@@ -825,7 +829,7 @@ namespace SDL2Engine
             // Apply gravity, forces, etc.
             foreach (var gameObject in gameObjects)
             {
-                
+
                 PhysicsBody? physicsBody = gameObject.GetComponent<PhysicsBody>();
                 if (physicsBody == null) continue;
                 if (!physicsBody.IsMovable) continue;
@@ -860,7 +864,8 @@ namespace SDL2Engine
                 {
                     physicsBody.Velocity = new Vec2D(0, 0);
                     vel_magnitude_squared = 0;
-                } else
+                }
+                else
                 {
                     if (physicsBody.RotateWithVelocity)
                     {
@@ -907,8 +912,8 @@ namespace SDL2Engine
                     // Update velocity by adding acceleration due to drag (F = ma -> a = F/m)
                     physicsBody.Velocity += dragForce / physicsBody.Mass * deltaTime;
                 }
-                
-                
+
+
 
             }
         }
@@ -948,7 +953,7 @@ namespace SDL2Engine
                     if (!colliderJ.IsEnabled()) continue;
 
                     var physicsBodyJ = gameObjects[(int)j].GetComponent<PhysicsBody>();
-                    if (physicsBodyJ != null && j<=i) continue;
+                    if (physicsBodyJ != null && j <= i) continue;
 
 
                     if (physicsBody.CollideWithMovingObjects && physicsBody.CollideWithStaticObjects)
@@ -963,7 +968,8 @@ namespace SDL2Engine
                             colliderI.GetCurrentCollisionList().Add(colliderJ);
 
                         }
-                    } else if (physicsBody.CollideWithStaticObjects)
+                    }
+                    else if (physicsBody.CollideWithStaticObjects)
                     {
                         if (physicsBodyJ != null && physicsBodyJ.IsMovable) continue;
 
@@ -977,7 +983,8 @@ namespace SDL2Engine
                             colliderI.GetCurrentCollisionList().Add(colliderJ);
 
                         }
-                    } else if (physicsBody.CollideWithMovingObjects)
+                    }
+                    else if (physicsBody.CollideWithMovingObjects)
                     {
                         if (physicsBodyJ == null || !physicsBodyJ.IsMovable) continue;
 
@@ -1137,7 +1144,85 @@ namespace SDL2Engine
                 return new Vec2D(x_overlap, y_overlap);
             };
 
-            // Console.WriteLine("Resolving collisions: " + collisions.Count);
+            var getNormal = (Rect rect1, Rect rect2, Vec2D overlap) =>
+            {
+                Vec2D normal = new Vec2D(0, 0);
+
+                if (overlap.x < overlap.y)
+                {
+                    if(rect1.x < rect2.x)
+                    {
+                        normal = new Vec2D(-1, 0);
+                    }
+                    else
+                    {
+                        normal = new Vec2D(1, 0);
+                    }
+                }
+                else
+                {
+                    if (rect1.y < rect2.y)
+                    {
+                        normal = new Vec2D(0, -1);
+                    }
+                    else
+                    {
+                        normal = new Vec2D(0, 1);
+                    }
+                }
+
+                return normal;
+            };
+
+            var seperate = (Rect rect1, GameObject go1, Rect rect2, GameObject go2, Vec2D normal, Vec2D overlap) =>
+            {
+                PhysicsBody? pb1 = go1.GetComponent<PhysicsBody>();
+                PhysicsBody? pb2 = go2.GetComponent<PhysicsBody>();
+
+                bool move1 = pb1 != null && pb1.IsMovable;
+                bool move2 = pb2 != null && pb2.IsMovable;
+
+                double friction1 = pb1 != null ? pb1.Friction : 0;
+                double friction2 = pb2 != null ? pb2.Friction : 0;
+
+                double combinedFriction = (friction1 + friction2) * Time.deltaTime;
+
+                bool eitherNonMovable = !move1 || !move2;
+                double halfMovement = eitherNonMovable ? 1 : 0.5;
+                if (normal.x != 0)
+                {
+                    double move_x = overlap.x * normal.x;
+
+                    if (pb1 != null && move1)
+                    {
+                        pb1.Velocity = new Vec2D(pb1.Velocity.x * -pb1.Bounciness, pb1.Velocity.y * Math.Max(0,1 - combinedFriction));
+                        go1.transform.Move(move_x * halfMovement, 0);
+                    }
+
+                    if (pb2 != null && move2)
+                    {
+                        pb2.Velocity = new Vec2D(pb2.Velocity.x * -pb2.Bounciness, pb2.Velocity.y * Math.Max(0, 1 - combinedFriction));
+                        go2.transform.Move(-move_x * halfMovement, 0);
+                    }
+                }
+                else
+                {
+                    double move_y = overlap.y * normal.y;
+                    
+                    if(pb1 != null && move1)
+                    {
+                        pb1.Velocity = new Vec2D(pb1.Velocity.x * Math.Max(0, 1 - combinedFriction), pb1.Velocity.y * -pb1.Bounciness);
+                        go1.transform.Move(0, move_y * halfMovement);
+                    }
+                    if(pb2 != null && move2)
+                    {
+                        pb2.Velocity = new Vec2D(pb2.Velocity.x * Math.Max(0, 1 - combinedFriction), pb2.Velocity.y * -pb2.Bounciness);
+                        go2.transform.Move(0, -move_y * halfMovement);
+                    }
+                }
+            };
+
+            Console.WriteLine("Resolving collisions: " + collisions.Count);
 
             foreach (var collision in collisions)
             {
@@ -1167,6 +1252,15 @@ namespace SDL2Engine
                 // this is either horizontal or vertical, since we are only dealing with boxes
                 // for now, just check if box1 center is to the left or right of box2.
                 // If so, the collision is horizontal, otherwise it is vertical
+
+
+                var overlap = getOverlap(box1.GetCollisionBox(), box2.GetCollisionBox());
+                var normal = getNormal(box1.GetCollisionBox(), box2.GetCollisionBox(), overlap);
+
+                seperate(box1.GetCollisionBox(), obj1, box2.GetCollisionBox(), obj2, normal, overlap);
+
+
+                /*
                 Vec2D collisionNormal = new Vec2D(0, 0);
                 Vec2D box1Center = box1.GetCenter();
                 Rect box2Area = box2.GetCollisionBox();
@@ -1187,7 +1281,7 @@ namespace SDL2Engine
                     collisionNormal = new Vec2D(0, 1);
                 }
 
-                if(pb1 != null)
+                if (pb1 != null)
                 {
                     Vec2D relativeVelocity1 = pb1.Velocity;
                     double velocityAlongNormal1 = Vec2D.Dot(relativeVelocity1, collisionNormal);
@@ -1205,9 +1299,9 @@ namespace SDL2Engine
                     //double dt = Time.deltaTime / 2;
                     //obj1.transform.Move(impulse.x * dt, impulse.y * dt);
                 }
-                
 
-                if(pb2 != null)
+
+                if (pb2 != null)
                 {
 
                     collisionNormal = -collisionNormal;
@@ -1228,7 +1322,7 @@ namespace SDL2Engine
                     //double dt = Time.deltaTime / 2;
                     //obj2.transform.Move(impulse.x * dt, impulse.y * dt);
                 }
-                
+
 
 
 
@@ -1237,7 +1331,7 @@ namespace SDL2Engine
                 // {
                 //    continue;
                 // }
-
+                */
             }
         }
 
@@ -1334,10 +1428,24 @@ namespace SDL2Engine
         public static void UpdatePhysics(List<GameObject> gameObjects, Rect? bounds = null, WorldSettings? worldSettings = null)
         {
 
-            if(bounds != null)
+            if (bounds != null)
             {
+                // TODO: fix QuadTree and use optimized physics update
                 //UpdatePhysicsInArea(gameObjects, bounds.Value, worldSettings);
                 //return;
+
+                List<GameObject> objectsInBounds = new List<GameObject>();
+
+                foreach (var obj in gameObjects)
+                {
+                    if (bounds.Value.Contains(obj.GetPosition()))
+                    {
+                        objectsInBounds.Add(obj);
+                    }
+                }
+
+                gameObjects = objectsInBounds;
+
             }
 
             if (worldSettings == null || worldSettings.enablePhysics == true)
@@ -1398,7 +1506,7 @@ namespace SDL2Engine
                 var gameObjectsInQuadTree = colliders.Select(collider => collider.GetGameObject()).ToList();
 
                 List<CollisionPair> quadPairs = CheckCollisions(gameObjectsInQuadTree);
-                if(quadPairs.Count > 0)
+                if (quadPairs.Count > 0)
                 {
                     collisions.AddRange(quadPairs);
                 }

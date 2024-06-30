@@ -19,9 +19,9 @@ namespace TileBasedGame
 
         static void Main(string[] args)
         {
-            //LevelManager.Start();
+            LevelManager.Start();
 
-            TestTileLoading();
+            // TestTileLoading();
         }
     }
 }

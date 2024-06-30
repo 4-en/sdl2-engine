@@ -82,7 +82,9 @@ namespace TileBasedGame
 
         public static Scene CreateBaseLevel()
         {
-            var level = new Scene("TestLevel");
+            var level = new ChunkedScene("TileTest");
+            level.SetGravity(100);
+            level.LoadTMX("test_map.tmx");
             return level;
         }
 

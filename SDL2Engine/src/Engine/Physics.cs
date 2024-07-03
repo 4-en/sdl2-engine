@@ -1222,7 +1222,7 @@ namespace SDL2Engine
                 }
             };
 
-            Console.WriteLine("Resolving collisions: " + collisions.Count);
+            // Console.WriteLine("Resolving collisions: " + collisions.Count);
 
             foreach (var collision in collisions)
             {

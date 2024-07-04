@@ -6,6 +6,31 @@ using static SDL2.SDL;
 namespace SDL2Engine.Tiled
 {
 
+    public struct PathfindingSettings {
+        public double entityWidth = 1;
+        public double entityHeight = 1;
+        public double maxJumpHeight = 1;
+        public double maxFallHeight = double.MaxValue;
+
+        public int maxSteps = 1000;
+
+        public PathfindingSettings(double entityWidth, double entityHeight, double maxJumpHeight, double maxFallHeight, int maxSteps) {
+            this.entityWidth = entityWidth;
+            this.entityHeight = entityHeight;
+            this.maxJumpHeight = maxJumpHeight;
+            this.maxFallHeight = maxFallHeight;
+            this.maxSteps = maxSteps;
+        }
+
+        public PathfindingSettings() {
+            this.entityWidth = 1;
+            this.entityHeight = 1;
+            this.maxJumpHeight = 1;
+            this.maxFallHeight = double.MaxValue;
+            this.maxSteps = 1000;
+        }
+
+    }
     
     public class TileMapData : Script {
 
@@ -58,6 +83,17 @@ namespace SDL2Engine.Tiled
 
             return data;
 
+        }
+
+        public List<Vec2D> AStar(int[,] map, Vec2D start, Vec2D goal, int entityWidth, int entityHeight) {
+
+            // path: list of points from start to goal
+            //
+            List<Vec2D> path = new List<Vec2D>();
+
+            // todo: implement A* algorithm to find path from start to goal
+            
+            return path;
         }
 
     }

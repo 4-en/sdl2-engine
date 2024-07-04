@@ -251,7 +251,7 @@ namespace SDL2Engine
         private ulong _screenSizeCacheFrame = ulong.MaxValue;
         public Vec2D GetScreenSize()
         {
-            if(Time.tick == _screenSizeCacheFrame)
+            if (Time.tick == _screenSizeCacheFrame)
             {
                 return _screenSizeCache;
             }
@@ -317,7 +317,7 @@ namespace SDL2Engine
             return _visibleSizeCache;
         }
 
-        
+
         public double GetVisibleWidth()
         {
             return GetVisibleSize().x;
@@ -405,15 +405,42 @@ namespace SDL2Engine
         public bool relativeToCamera = true;
         [JsonProperty]
         public int z_index = 0;
+        [JsonProperty]
+        public bool relativePosition = false;
 
         public virtual void Draw(Camera camera)
         {
             throw new NotImplementedException();
         }
 
+        // Converts a relative position (0,0) to (1,1) to a screen position
+        // this can be used to position UI elements
+        public static Vec2D RelativeToScreen(Vec2D relativePosition)
+        {
+            return new Vec2D(relativePosition.x * Engine.windowWidth, relativePosition.y * Engine.windowHeight);
+        }
+
+        public Vec2D RelativeToWorld(Vec2D relativePosition)
+        {
+            var camera = GetCamera();
+            return new Vec2D(relativePosition.x * camera.WorldSize.x, relativePosition.y * camera.WorldSize.y);
+        }
+
+        public Vec2D RelativeToVisibleWorld(Vec2D relativePosition)
+        {
+            var camera = GetCamera();
+            var visibleSize = camera.GetVisibleSize();
+            return new Vec2D(relativePosition.x * visibleSize.x, relativePosition.y * visibleSize.y);
+        }
+
         public virtual Vec2D GetDrawRoot()
         {
             var goRoot = this.gameObject.GetPosition();
+
+            if (relativePosition)
+            {
+                return RelativeToScreen(goRoot);
+            }
 
             // for implemented Drawables, we should use the outline of the drawable to calculate the root with the anchor point
             // in this case, we ignore the anchor point and just return the position of the GameObject
@@ -435,7 +462,7 @@ namespace SDL2Engine
 
         public virtual bool IsVisible(Rect worldRect)
         {
-            if(!relativeToCamera)
+            if (!relativeToCamera)
             {
                 return true;
             }
@@ -458,6 +485,12 @@ namespace SDL2Engine
         public override Vec2D GetDrawRoot()
         {
             Vec2D localCenter = GetRect().GetTopLeft();
+
+            if (relativePosition)
+            {
+                return RelativeToScreen(gameObject.GetPosition()) + localCenter;
+            }
+
             //return scene?.GetCamera().WorldToScreen(localCenter, gameObject.GetPosition()) ?? localCenter + gameObject.GetPosition();
             Camera cam = this.relativeToCamera ? GetCamera() : GetCamera().Fixed;
             return cam.WorldToScreen(localCenter, gameObject.GetPosition());
@@ -466,7 +499,7 @@ namespace SDL2Engine
 
         public override bool IsVisible(Rect worldRect)
         {
-            if(!relativeToCamera)
+            if (!relativeToCamera)
             {
                 return true;
             }
@@ -528,18 +561,23 @@ namespace SDL2Engine
 
         public Rect GetScreenRect(Rect? custom_rect = null)
         {
-            var scene = gameObject.GetScene();
-            Camera? camera = scene?.GetCamera();
-            if (camera != null)
-            {
-                Rect cam_rect = camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
-                if (relativeToCamera)
-                {
-                    return cam_rect;
-                }
-                return camera.Fixed.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
+            Camera camera = GetCamera();
 
+            if(relativePosition) {
+                return camera.RectToScreen(GetRect(custom_rect), RelativeToVisibleWorld(gameObject.GetPosition()) + camera.GetPosition());
             }
+
+            
+            Rect cam_rect = camera.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
+
+
+            if (relativeToCamera)
+            {
+                return cam_rect;
+            }
+
+            return camera.Fixed.RectToScreen(GetRect(custom_rect), gameObject.GetPosition());
+
             return GetRect(custom_rect);
         }
 
@@ -601,7 +639,7 @@ namespace SDL2Engine
 
         public static TextRenderer Create(Vec2D pos, string text, int fontSize = 24, Color? color = null, string fontPath = "Assets/Fonts/Roboto-Regular.ttf")
         {
-            
+
 
             var textObject = new GameObject(text);
             textObject.transform.position = pos;
@@ -947,12 +985,12 @@ namespace SDL2Engine
             {
                 texture = AssetManager.LoadTexture(source);
                 texture.Load();
-                if(source_rect.w == -1 && source_rect.h == -1)
+                if (source_rect.w == -1 && source_rect.h == -1)
                 {
                     source_rect = texture.GetTextureRect() ?? new Rect(0, 0, 64, 64);
                     this.rect = this.source_rect * 1;
                 }
-                
+
             }
         }
 

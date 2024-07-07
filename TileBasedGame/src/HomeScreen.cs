@@ -22,7 +22,9 @@ namespace TileBasedGame
             using (var activeScene = scene.Activate())
             {
                 GameObject background = new GameObject("Background");
-                background.AddComponent<TextureRenderer>()?.SetSource("Assets/Textures/space_background.jpg");
+                var bg_renderer = background.AddComponent<BackgroundRenderer>();
+                bg_renderer.SetSource("Assets/Textures/space_background.jpg");
+                bg_renderer.SetRect(new Rect(0, 0, 192, 108));
                 background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
                 GameObject gameTitle = HomeScreenText(HomeScreen.gameName, 0.5, 0.2, 200);
                 var gameTitleRenderer = gameTitle.GetComponent<TextRenderer>();

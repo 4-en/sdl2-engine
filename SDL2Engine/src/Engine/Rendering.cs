@@ -937,7 +937,7 @@ namespace SDL2Engine
     public class TextureRenderer : DrawableRect, ILoadable
     {
         [JsonIgnore]
-        private Texture? texture;
+        protected Texture? texture;
         [JsonIgnore]
         private Rect source_rect = new Rect(0, 0, -1, -1);
         [JsonProperty]
@@ -1026,7 +1026,7 @@ namespace SDL2Engine
             var texture_ptr = texture.Get();
 
 
-            var srcRect = this.source_rect.ToSDLRect();
+            var srcRect = GetSourceRect().ToSDLRect();
             var dstRect = this.GetDestRect();
 
             double angle = gameObject.transform.rotation;
@@ -1035,6 +1035,51 @@ namespace SDL2Engine
 
         }
     }
+
+
+    public class BackgroundRenderer : TextureRenderer {
+
+        public BackgroundRenderer() {
+            this.relativeToCamera = false;
+        }
+
+        public override void Draw(Camera camera)
+        {
+            if (texture == null)
+            {
+                this.Load();
+            }
+
+            if (texture == null)
+            {
+                return;
+            }
+
+            var texture_ptr = texture.Get();
+
+            var srcRect = GetSourceRect().ToSDLRect();
+            var dstRect = this.GetDestRect();
+
+            int window_x_start = 0;
+            int window_y_start = 0;
+            int window_x_end = Engine.windowWidth;
+            int window_y_end = Engine.windowHeight;
+
+            // draw repeating background
+            for (int x = window_x_start; x < window_x_end; x += dstRect.w)
+            {
+                for (int y = window_y_start; y < window_y_end; y += dstRect.h)
+                {
+                    dstRect.x = x;
+                    dstRect.y = y;
+                    SDL_RenderCopy(Engine.renderer, texture_ptr, ref srcRect, ref dstRect);
+                }
+            }
+
+            // SDL_RenderCopy(Engine.renderer, texture_ptr, ref srcRect, ref dstRect);
+        }
+    }
+
     [Serializable]
     public class AnimationInfo
     {

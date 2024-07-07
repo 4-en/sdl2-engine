@@ -23,7 +23,7 @@ namespace TileBasedGame
             {
                 GameObject background = new GameObject("Background");
                 var bg_renderer = background.AddComponent<BackgroundRenderer>();
-                bg_renderer.SetSource("Assets/Textures/space_background.jpg");
+                bg_renderer.SetSource("Assets/Textures/bk.jpg");
                 bg_renderer.SetRect(new Rect(0, 0, 192, 108));
                 background.transform.position = new Vec2D(gameBounds.x / 2, gameBounds.y / 2);
                 GameObject gameTitle = HomeScreenText(HomeScreen.gameName, 0.5, 0.2, 200);
@@ -82,7 +82,7 @@ namespace TileBasedGame
             textObject.transform.position = new Vec2D(x, y);
             var textComponent = textObject.AddComponent<TextRenderer>();
             textComponent.relativePosition = true;
-            textComponent.color = new Color(65, 105, 255, 255);
+            textComponent.color = new Color(192, 192, 192, 255);
             textComponent.SetFontSize(fontSize);
             textComponent.SetText(text);
             textComponent.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
@@ -94,13 +94,13 @@ namespace TileBasedGame
                 {
                     renderer.SetFontSize(renderer.GetText() != HomeScreen.gameName ? 125 : 200);
                 }
-
+                renderer.SetColor(new Color(244, 244, 244, 255));
 
             };
 
             helper.OnLeave += (object? source, TextRenderer renderer) =>
             {
-                renderer.SetColor(new Color(65, 105, 255, 255));
+                renderer.SetColor(new Color(192, 192, 192, 255));
                 renderer.SetFontSize(renderer.GetText() != HomeScreen.gameName ? 100 : 200);
 
 

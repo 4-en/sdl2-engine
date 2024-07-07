@@ -33,16 +33,52 @@ namespace TileBasedGame
                 GameObject level3Text = HomeScreenText("Level 3", 0.5, 0.6, 100);
                 GameObject level4Text = HomeScreenText("Level 4", 0.5, 0.7, 100);
                 GameObject level5Text = HomeScreenText("Level 5", 0.5, 0.8, 100);
+               
+                
+                
+
             }
 
             return scene;
         }
 
+        internal static GameObject LockObject(double x, double y)
+        {
+            
+            GameObject newLock = new GameObject("Lock1");
+            newLock.transform.position = new Vec2D(x,y);
+            var lockOne = newLock.AddComponent<SpriteRenderer>();
+            lockOne.anchorPoint = AnchorPoint.Center;
+            lockOne.SetSource("Assets/Textures/lock.png");
+            lockOne.SetWorldSize(80, 80);
+            lockOne.relativePosition = true;
+            lockOne.SetZIndex(-1);
+            return new GameObject("Lock");
+        }
+
 
         internal static GameObject HomeScreenText(string text, double x, double y, int fontSize)
         {
-
             var textObject = new GameObject(text);
+            //add a lock for every level which is not unlocked
+            var unlockedLevel = LevelManager.unlockedLevel;
+            if (text.Equals("Level 2") && unlockedLevel < 2)
+            {
+                textObject.AddChild(LockObject(x, y));
+            }
+            if (text.Equals("Level 3") && unlockedLevel < 3)
+            {
+                textObject.AddChild(LockObject(x, y));
+            }
+            if (text.Equals("Level 4") && unlockedLevel < 4)
+            {
+                textObject.AddChild(LockObject(x, y));
+            }
+            if (text.Equals("Level 5") && unlockedLevel < 5)
+            {
+                textObject.AddChild(LockObject(x, y));
+            }
+
             textObject.transform.position = new Vec2D(x, y);
             var textComponent = textObject.AddComponent<TextRenderer>();
             textComponent.relativePosition = true;
@@ -50,6 +86,7 @@ namespace TileBasedGame
             textComponent.SetFontSize(fontSize);
             textComponent.SetText(text);
             textComponent.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+            textComponent.SetZIndex(0);
             var helper = textObject.AddComponent<TextRenderHelper>();
             helper.OnHover += (object? source, TextRenderer renderer) =>
             {

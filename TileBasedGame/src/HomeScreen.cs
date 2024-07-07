@@ -45,8 +45,8 @@ namespace TileBasedGame
         internal static GameObject LockObject(double x, double y)
         {
             
-            GameObject newLock = new GameObject("Lock1");
-            newLock.transform.position = new Vec2D(x,y);
+            GameObject newLock = new GameObject("Lock");
+            newLock.transform.position = new Vec2D(x,y-0.01);
             var lockOne = newLock.AddComponent<SpriteRenderer>();
             lockOne.anchorPoint = AnchorPoint.Center;
             lockOne.SetSource("Assets/Textures/lock.png");
@@ -90,8 +90,10 @@ namespace TileBasedGame
             var helper = textObject.AddComponent<TextRenderHelper>();
             helper.OnHover += (object? source, TextRenderer renderer) =>
             {
-                renderer.SetColor(new Color(0, 0, 255, 255));
-                renderer.SetFontSize(renderer.GetText() != HomeScreen.gameName ? 125 : 200);
+                if (textObject.GetChild("Lock") == null)
+                {
+                    renderer.SetFontSize(renderer.GetText() != HomeScreen.gameName ? 125 : 200);
+                }
 
 
             };
@@ -117,23 +119,35 @@ namespace TileBasedGame
                 }
                 if (textObject.GetName().Equals("Level 2"))
                 {
-                    LevelManager.levelIndex = 1;
-                    LevelManager.LoadNextLevel();
+                    if (unlockedLevel > 1)
+                    {
+                        LevelManager.levelIndex = 1;
+                        LevelManager.LoadNextLevel();
+                    }
                 }
                 if (textObject.GetName().Equals("Level 3"))
                 {
-                    LevelManager.levelIndex = 2;
-                    LevelManager.LoadNextLevel();
+                    if (unlockedLevel > 2)
+                    {
+                        LevelManager.levelIndex = 2;
+                        LevelManager.LoadNextLevel();
+                    }
                 }
                 if (textObject.GetName().Equals("Level 4"))
                 {
-                    LevelManager.levelIndex = 3;
-                    LevelManager.LoadNextLevel();
+                    if (unlockedLevel > 3)
+                    {
+                        LevelManager.levelIndex = 3;
+                        LevelManager.LoadNextLevel();
+                    }
                 }
                 if (textObject.GetName().Equals("Level 5"))
                 {
-                    LevelManager.levelIndex = 4;
-                    LevelManager.LoadNextLevel();
+                    if (unlockedLevel > 4)
+                    {
+                        LevelManager.levelIndex = 4;
+                        LevelManager.LoadNextLevel();
+                    }
                 }
             };
 

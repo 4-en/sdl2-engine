@@ -92,7 +92,6 @@ namespace TileBasedGame.Entities
                 double yDistance = collisionPoint.y - gameObjectPosition.y;
                 if (Math.Abs(xDistance) > Math.Abs(yDistance) || true)
                 {
-
                     isGrounded = true;
                     airJumps = 0;
                     lastGroundedTime = Time.tick;

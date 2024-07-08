@@ -1409,10 +1409,12 @@ namespace SDL2Engine
                     foreach (var script in obj1Scripts)
                     {
                         script.OnCollisionEnter(pair);
+                        script.OnCollisionStay(pair);
                     }
                     foreach (var script in obj2Scripts)
                     {
                         script.OnCollisionEnter(pair);
+                        script.OnCollisionStay(pair);
                     }
                 }
 

@@ -4,7 +4,7 @@ using SDL2Engine;
 namespace TileBasedGame.Entities
 {
 
-    public class BaseEnemy : Script, IDamageable, IEnemy
+    public class BaseEnemyOld : Script, IDamageable, IEnemy
     {
         public static Prototype CreateBasePrototype()
         {
@@ -18,7 +18,7 @@ namespace TileBasedGame.Entities
                 collider.SetRadius(50);
                 collider.IsTrigger = true;
             }
-            prototype.AddComponent<BaseEnemy>();
+            prototype.AddComponent<BaseEnemyOld>();
             prototype.AddComponent<Damager>();
             var body = prototype.AddComponent<PhysicsBody>();
             body.RotateWithVelocity = true;

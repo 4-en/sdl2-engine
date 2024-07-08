@@ -32,14 +32,14 @@ namespace TileBasedGame
                 spriteRenderer.SetSpriteSize(50, 37);
                 spriteRenderer.SetSize(25, 25);
                 spriteRenderer.AddAnimation(new AnimationInfo("idle1", 0, 4, 0.15));
-                spriteRenderer.AddAnimation(new AnimationInfo("run", 8, 7, 0.20));
+                spriteRenderer.AddAnimation(new AnimationInfo("run", 8, 6, 0.10));
                 spriteRenderer.AddAnimation(new AnimationInfo("jump", 15, 4, 0.07));
                 spriteRenderer.AddAnimation(new AnimationInfo("falling", 19, 4, 0.07));
                 spriteRenderer.AddAnimation(new AnimationInfo("attack", 42, 5, 0.07));
                 spriteRenderer.AddAnimation(new AnimationInfo("crouch", 4, 2, 0.1));
                 spriteRenderer.AddAnimation(new AnimationInfo("shoot", 48, 4, 0.03));
                 spriteRenderer.PlayAnimation("idle1");
-                spriteRenderer.SetAnimationType(AnimationType.LoopReversed);
+                spriteRenderer.SetAnimationType(AnimationType.Loop);
             }
             AddComponent<PlayerAnimation>();
             /*
@@ -182,7 +182,7 @@ namespace TileBasedGame
                 {
                     gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("run");
                     gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
-                    gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.LoopReversed);
+                    gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.Loop);
                 }
 
             }

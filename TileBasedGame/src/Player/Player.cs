@@ -28,49 +28,45 @@ namespace TileBasedGame
             physicsBody = AddComponent<PhysicsBody>();
             AddComponent<CameraController>();
             physicsBody.Bounciness = 0.0;
-            physicsBody.Friction = 2;
+            physicsBody.Friction = 0;
 
         }
 
         public override void Update()
         {
+            base.Update();
             if(physicsBody == null)
             {
                 return;
             }
-            
-            double maxVelocity = 200.0;
-            double stopVelocity = 25;
-            double acceleration = 1000.0;
-
+            bool isShooting = false;
+            if(Input.GetKeyPressed(SDL_Keycode.SDLK_1))
+            {
+                isShooting = true;
+            }
+            bool movementKeyPressed = false;
             if(Input.GetKeyDown(SDL_Keycode.SDLK_SPACE))
             {
-                physicsBody.AddVelocity(new Vec2D(0, -acceleration/10));
+                Jump();
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_a))
             {
-                physicsBody.AddVelocity(new Vec2D(-acceleration * Time.deltaTime, 0));
-                stopVelocity = 0;
+                MoveLeft();
+                movementKeyPressed = true;
+                if(!isShooting)
+                    facingRight = false;
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_d))
             {
-                physicsBody.AddVelocity(new Vec2D(acceleration * Time.deltaTime, 0));
-                stopVelocity = 0;
+                MoveRight();
+                movementKeyPressed = true;
+                if(!isShooting)
+                    facingRight = true;
             }
 
-            if(physicsBody.Velocity.x > maxVelocity)
+            if (!movementKeyPressed)
             {
-                physicsBody.Velocity = new Vec2D(maxVelocity, physicsBody.Velocity.y);
-            }
-
-            if(physicsBody.Velocity.x < -maxVelocity)
-            {
-                physicsBody.Velocity = new Vec2D(-maxVelocity, physicsBody.Velocity.y);
-            }
-
-            if(physicsBody.Velocity.x < stopVelocity && physicsBody.Velocity.x > -stopVelocity)
-            {
-                physicsBody.Velocity = new Vec2D(0, physicsBody.Velocity.y);
+                Decellerate();
             }
         }
     }

@@ -13,11 +13,11 @@ namespace TileBasedGame.Entities
         private GameObject? player;
 
         [JsonProperty]
-        protected double maxSpeed = 100;
+        protected double maxSpeed = 80;
         [JsonProperty]
-        protected double acceleration = 100;
+        protected double acceleration = 250;
         [JsonProperty]
-        protected double jumpForce = 100;
+        protected double jumpForce = 80;
         [JsonProperty]
         protected double health = 100;
         [JsonProperty]
@@ -41,6 +41,7 @@ namespace TileBasedGame.Entities
         protected int airJumps = 0;
 
         protected bool isGrounded = false;
+        private ulong lastGroundedTime = 0;
 
         protected PhysicsBody? physicsBody;
 
@@ -53,7 +54,10 @@ namespace TileBasedGame.Entities
 
         public override void Update()
         {
-            
+            if(lastGroundedTime + 10 < Time.tick)
+            {
+                isGrounded = false;
+            }
         }
 
         public override void OnCollisionEnter(CollisionPair collision)
@@ -73,7 +77,7 @@ namespace TileBasedGame.Entities
                 return;
             }
 
-            if(other.GetName() == "Obstacle")
+            if (other.GetName() == "Obstacle")
             {
                 // check if collisionPoint is below the gameObject
                 var collisionPoint = collision.collisionPoint;
@@ -81,14 +85,12 @@ namespace TileBasedGame.Entities
                 var gameObjectPosition = gameObject.GetPosition();
                 double xDistance = collisionPoint.x - gameObjectPosition.x;
                 double yDistance = collisionPoint.y - gameObjectPosition.y;
-                if (Math.Abs(xDistance) > Math.Abs(yDistance))
+                if (Math.Abs(xDistance) > Math.Abs(yDistance) || true)
                 {
-                    // check if collisionPoint is below the gameObject
-                    if (yDistance > 0)
-                    {
-                        isGrounded = true;
-                        airJumps = 0;
-                    }
+
+                    isGrounded = true;
+                    airJumps = 0;
+                    lastGroundedTime = Time.tick;
                 }
             }
 
@@ -128,7 +130,7 @@ namespace TileBasedGame.Entities
                 // if velocity is in the opposite direction, lower it
                 if (physicsBody.Velocity.x < 0)
                 {
-                    physicsBody.Velocity = new Vec2D(physicsBody.Velocity.x / ( 1 + 10* Time.deltaTime));
+                    physicsBody.Velocity = new Vec2D(physicsBody.Velocity.x / (1 + 10 * Time.deltaTime));
                 }
 
                 physicsBody.AddVelocity(new Vec2D(acceleration * Time.deltaTime, 0));
@@ -145,10 +147,7 @@ namespace TileBasedGame.Entities
             if (isGrounded || airJumps < maxAirJumps)
             {
                 physicsBody.SetVelocity(new Vec2D(physicsBody.Velocity.x, -jumpForce));
-                if (!isGrounded)
-                {
-                    airJumps++;
-                }
+                airJumps++;
             }
         }
 
@@ -159,11 +158,16 @@ namespace TileBasedGame.Entities
                 return;
             }
 
+            if(!isGrounded)
+            {
+                return;
+            }
+
             double vel = physicsBody.Velocity.x;
 
             if (vel > 0)
             {
-                vel -= 10 * acceleration * Time.deltaTime;
+                vel -= 2 * acceleration * Time.deltaTime;
                 if (vel < 0)
                 {
                     vel = 0;
@@ -171,7 +175,7 @@ namespace TileBasedGame.Entities
             }
             else
             {
-                vel += 10 * acceleration * Time.deltaTime;
+                vel += 2 * acceleration * Time.deltaTime;
                 if (vel > 0)
                 {
                     vel = 0;

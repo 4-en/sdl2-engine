@@ -1245,6 +1245,11 @@ namespace SDL2Engine
             this.rect = new Rect(0, 0, width, height);
         }
 
+        public String GetCurrentAnimation()
+        {
+            return currentAnimation;
+        }
+
         public override string TextureBatchingCompareKey()
         {
             return source;

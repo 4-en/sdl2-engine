@@ -14,7 +14,9 @@
     <None Remove="Assets\Textures\lock.png" />
     <None Remove="Assets\Textures\space_background.jpg" />
     <None Remove="Assets\Textures\tilesets\lock.png" />
+    <None Remove="Assets\Textures\tilesets\sky_background.png" />
     <None Remove="Assets\Textures\tilesets\tileset2.png" />
+    <None Remove="Assets\Tiled\background.tsx" />
     <None Remove="Assets\Tiled\level1.tmx" />
     <None Remove="Assets\Tiled\level2.tmx" />
     <None Remove="Assets\Tiled\tileset2.tsx" />

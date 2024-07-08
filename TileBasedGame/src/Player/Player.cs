@@ -55,9 +55,17 @@ namespace TileBasedGame
             {
                 return;
             }
+
+            double runningBoost = 1.0;
+            if (Input.GetKeyPressed(SDL_Keycode.SDLK_LSHIFT))
+            {
+                runningBoost = 1.5;
+            }
+
             bool isShooting = false;
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_1))
             {
+                TryShoot();
                 isShooting = true;
             }
             bool movementKeyPressed = false;
@@ -67,14 +75,16 @@ namespace TileBasedGame
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_a))
             {
-                MoveLeft();
+                MoveLeft(runningBoost);
                 movementKeyPressed = true;
-                if(!isShooting)
+                if (!isShooting)
+                {
                     facingRight = false;
+                }
             }
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_d))
             {
-                MoveRight();
+                MoveRight(runningBoost);
                 movementKeyPressed = true;
                 if(!isShooting)
                     facingRight = true;
@@ -90,30 +100,42 @@ namespace TileBasedGame
     
     public class PlayerAnimation : Script
     {
+        private Player? player;
+
+        public override void Start()
+        {
+            player = gameObject.GetComponent<Player>();
+        }
         public override void Update()
         {
+            bool isFacingRight = true;
+            if(player != null) {
+                isFacingRight = player.IsFacingRight();
+            }
+
             if(gameObject.GetComponent<PhysicsBody>()?.Velocity.x == 0 && gameObject.GetComponent<PhysicsBody>()?.Velocity.y == 0)
             {
                 //play animation idle
                 gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("idle1");
                 gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.LoopReversed);
+                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
             }
             else if(gameObject.GetComponent<PhysicsBody>()?.Velocity.y < 0)
             {
                 gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("jump");
-                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(gameObject.GetComponent<PhysicsBody>()?.Velocity.x < 0);
+                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
                 gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.OnceAndHold);
             }
             else if (gameObject.GetComponent<PhysicsBody>()?.Velocity.y > 0)
             {
                 gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("falling");
-                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(gameObject.GetComponent<PhysicsBody>()?.Velocity.x < 0);
+                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
                 gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.OnceAndHold);
             }
             else
             {
                 gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("run");
-                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(gameObject.GetComponent<PhysicsBody>()?.Velocity.x < 0);
+                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
                 gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.LoopReversed);
             }
         }

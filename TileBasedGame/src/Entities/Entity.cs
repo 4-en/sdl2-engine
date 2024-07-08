@@ -17,7 +17,7 @@ namespace TileBasedGame.Entities
         [JsonProperty]
         protected double acceleration = 250;
         [JsonProperty]
-        protected double jumpForce = 80;
+        protected double jumpForce = 120;
         [JsonProperty]
         protected double health = 100;
         [JsonProperty]
@@ -74,9 +74,14 @@ namespace TileBasedGame.Entities
                     damageable.Damage(new Damage(damage, gameObject, team));
                 }
 
-                return;
             }
 
+
+        }
+
+        public override void OnCollisionStay(CollisionPair collision)
+        {
+            var other = collision.GetOther(gameObject);
             if (other.GetName() == "Obstacle")
             {
                 // check if collisionPoint is below the gameObject
@@ -85,7 +90,7 @@ namespace TileBasedGame.Entities
                 var gameObjectPosition = gameObject.GetPosition();
                 double xDistance = collisionPoint.x - gameObjectPosition.x;
                 double yDistance = collisionPoint.y - gameObjectPosition.y;
-                if (Math.Abs(xDistance) > Math.Abs(yDistance) || true)
+                if (Math.Abs(xDistance) > Math.Abs(yDistance))
                 {
 
                     isGrounded = true;
@@ -93,10 +98,37 @@ namespace TileBasedGame.Entities
                     lastGroundedTime = Time.tick;
                 }
             }
+        }
 
+        protected void AddRecoil()
+        {
+            double recoil = 40;
+            if (facingRight)
+            {
+                recoil = -recoil;
+            }
+
+            physicsBody?.AddVelocity(new Vec2D(recoil, 0));
+        }
+
+        protected virtual void Shoot()
+        {
 
         }
-        protected void MoveLeft()
+
+        private double lastShot = 0;
+        protected void TryShoot()
+        {
+            if(lastShot + 1 / attackSpeed > Time.time)
+            {
+                return;
+            }
+            lastShot = Time.time;
+            AddRecoil();
+            Shoot();
+        }
+
+        protected void MoveLeft(double boost=1.0)
         {
             if (physicsBody == null)
             {
@@ -104,7 +136,7 @@ namespace TileBasedGame.Entities
             }
 
             // check if velocity is less than max speed
-            if (physicsBody.Velocity.x > -maxSpeed)
+            if (physicsBody.Velocity.x > -maxSpeed * boost)
             {
                 // if velocity is in the opposite direction, lower it
                 if (physicsBody.Velocity.x > 0)
@@ -112,11 +144,11 @@ namespace TileBasedGame.Entities
                     physicsBody.Velocity = new Vec2D(physicsBody.Velocity.x / (1 + 10 * Time.deltaTime));
                 }
 
-                physicsBody.AddVelocity(new Vec2D(-acceleration * Time.deltaTime, 0));
+                physicsBody.AddVelocity(new Vec2D(-acceleration * boost * Time.deltaTime, 0));
             }
         }
 
-        protected void MoveRight()
+        protected void MoveRight(double boost=1.0)
         {
             if (physicsBody == null)
             {
@@ -124,7 +156,7 @@ namespace TileBasedGame.Entities
             }
 
             // check if velocity is less than max speed
-            if (physicsBody.Velocity.x < maxSpeed)
+            if (physicsBody.Velocity.x < maxSpeed * boost)
             {
 
                 // if velocity is in the opposite direction, lower it
@@ -133,7 +165,7 @@ namespace TileBasedGame.Entities
                     physicsBody.Velocity = new Vec2D(physicsBody.Velocity.x / (1 + 10 * Time.deltaTime));
                 }
 
-                physicsBody.AddVelocity(new Vec2D(acceleration * Time.deltaTime, 0));
+                physicsBody.AddVelocity(new Vec2D(acceleration * boost * Time.deltaTime, 0));
             }
         }
 
@@ -147,7 +179,12 @@ namespace TileBasedGame.Entities
             if (isGrounded || airJumps < maxAirJumps)
             {
                 physicsBody.SetVelocity(new Vec2D(physicsBody.Velocity.x, -jumpForce));
-                airJumps++;
+                
+                if(!isGrounded)
+                {
+                    airJumps++;
+                    Console.WriteLine("Air jumps: " + airJumps);
+                }
             }
         }
 

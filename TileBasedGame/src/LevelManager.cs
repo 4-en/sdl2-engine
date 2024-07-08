@@ -85,6 +85,12 @@ namespace TileBasedGame
             var level = new ChunkedScene("TileTest");
             level.SetGravity(100);
             level.LoadTMX("test_map.tmx");
+
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<Level>("Level");
+            }
+
             return level;
         }
 

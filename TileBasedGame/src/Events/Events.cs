@@ -9,6 +9,16 @@ using TileBasedGame.Entities;
 namespace TileBasedGame
 {
 
+    public class PlayerScoreEvent
+    {
+        public int score;
+
+        public PlayerScoreEvent(int score)
+        {
+            this.score = score;
+        }
+    }
+
     public class EnemyKilledEvent
     {
         public IEnemy enemy;

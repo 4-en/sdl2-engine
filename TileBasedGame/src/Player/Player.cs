@@ -244,9 +244,9 @@ namespace TileBasedGame
         {
             double currentHealth = Player.currentHealth;
             double maxHealth = Player.maxHealth;
-            double healthBarWidth = currentHealth / maxHealth * width;
+            double healthBarWidth = currentHealth / maxHealth * 64;
             var healthIndicator = healthBarBackground.GetComponent<TextRenderer>();
-            //healthIndicator?.SetRect(new Rect(0, 0, healthBarWidth, height));
+            healthIndicator?.SetRect(new Rect(0, 0, healthBarWidth, 10));
             healthIndicator?.SetBackgroundColor(backgroundColor);
 
             //update the text
@@ -260,8 +260,6 @@ namespace TileBasedGame
             healthBarText.transform.position = new Vec2D(233 + width / 2, camera.GetVisibleHeight() - 15);
             if (heart == null) return;
             heart.transform.position = new Vec2D(210, camera.GetVisibleHeight() - 15);
-
-            
 
         }
     }

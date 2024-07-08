@@ -14,6 +14,7 @@
     <None Remove="Assets\Textures\lock.png" />
     <None Remove="Assets\Textures\space_background.jpg" />
     <None Remove="Assets\Textures\tilesets\lock.png" />
+    <None Remove="Assets\Tiled\level2.tmx" />
   </ItemGroup>
   
 

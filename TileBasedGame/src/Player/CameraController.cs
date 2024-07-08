@@ -98,6 +98,7 @@ namespace TileBasedGame
 
 
             // limit camera to world bounds
+            /*
             double minWorldX = 0;
             double minWorldY = 0;
             double maxWorldX = camera_width * 16;
@@ -108,6 +109,7 @@ namespace TileBasedGame
             camera_position_clamped.y = Math.Max(minWorldY, Math.Min(maxWorldY - camera_world_height, camera_position_clamped.y));
 
             camera.SetPosition(camera_position_clamped);
+            */
 
         }
     }

@@ -9,7 +9,7 @@ namespace TileBasedGame
 {
     public static partial class LevelManager
     {
-        public static int unlockedLevel = 1;
+        public static int unlockedLevel = 2;
 
 
         public static void Start()
@@ -102,7 +102,15 @@ namespace TileBasedGame
 
         public static Scene CreateLevel2()
         {
-            var level = CreateBaseLevel();
+            var level = new ChunkedScene("Level 2");
+            level.SetGravity(200);
+            level.LoadTMX("level2.tmx");
+
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<Level>("Level");
+            }
+
             return level;
         }
 

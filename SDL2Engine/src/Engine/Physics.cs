@@ -839,7 +839,7 @@ namespace SDL2Engine
                 // apply gravity
                 if (worldSettings != null)
                 {
-                    if (worldSettings.gravity != 0)
+                    if (worldSettings.gravity != 0 && physicsBody.Mass != 0)
                     {
                         double acclY = worldSettings.gravity * deltaTime;
                         physicsBody.SetVelocity(physicsBody.Velocity.x, physicsBody.Velocity.y + acclY);

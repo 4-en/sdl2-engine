@@ -1158,6 +1158,14 @@ namespace SDL2Engine
                 beforeUpdate = Stopwatch.GetTimestamp();
                 temp_double = ticksToSec * beforeUpdate;
                 Time.deltaTime = temp_double - beforeUpdateSec;
+
+                // make dTime max 1/30 to avoid physics issues
+                if (Time.deltaTime > 1.0 / 30)
+                {
+                    Console.WriteLine("Warning: Can't keep up! Framerate too low!");
+                    Time.deltaTime = 1.0 / 30;
+                }
+
                 beforeUpdateSec = temp_double;
 
                 Time.AddFrameTime(Time.deltaTime);

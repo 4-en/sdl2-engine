@@ -150,7 +150,7 @@ namespace SDL2Engine
             // Create GameObject
             string source = tileset.Image.Source;
             source = rootDir + source;
-            string name = tileset.Tiles[1].Class;
+            string name = tile?.Class ?? "Tile";
 
             GameObject gameObject = new GameObject(name);
             gameObject.SetPosition(new Vec2D(tileX, tileY));
@@ -199,6 +199,7 @@ namespace SDL2Engine
             if (layer.Class == "Obstacles")
             {
                 BoxCollider.FromDrawableRect(gameObject);
+                gameObject.SetName("Obstacle");
             }
 
             if (layer.Parallax.X != 1.0 || layer.Parallax.Y != 1.0)

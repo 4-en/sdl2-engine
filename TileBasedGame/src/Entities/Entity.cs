@@ -17,6 +17,8 @@ namespace TileBasedGame.Entities
         [JsonProperty]
         protected double acceleration = 100;
         [JsonProperty]
+        protected double jumpForce = 100;
+        [JsonProperty]
         protected double health = 100;
         [JsonProperty]
         protected double maxHealth = 100;
@@ -60,6 +62,36 @@ namespace TileBasedGame.Entities
 
             var other = collision.GetOther(gameObject);
 
+            IDamageable? damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                if (damageable.GetTeam() != team && damageable.GetTeam() != Team.Neutral)
+                {
+                    damageable.Damage(new Damage(damage, gameObject, team));
+                }
+
+                return;
+            }
+
+            if(other.GetName() == "Obstacle")
+            {
+                // check if collisionPoint is below the gameObject
+                var collisionPoint = collision.collisionPoint;
+
+                var gameObjectPosition = gameObject.GetPosition();
+                double xDistance = collisionPoint.x - gameObjectPosition.x;
+                double yDistance = collisionPoint.y - gameObjectPosition.y;
+                if (Math.Abs(xDistance) > Math.Abs(yDistance))
+                {
+                    // check if collisionPoint is below the gameObject
+                    if (yDistance > 0)
+                    {
+                        isGrounded = true;
+                        airJumps = 0;
+                    }
+                }
+            }
+
 
         }
         protected void MoveLeft()
@@ -72,6 +104,12 @@ namespace TileBasedGame.Entities
             // check if velocity is less than max speed
             if (physicsBody.Velocity.x > -maxSpeed)
             {
+                // if velocity is in the opposite direction, lower it
+                if (physicsBody.Velocity.x > 0)
+                {
+                    physicsBody.Velocity = new Vec2D(physicsBody.Velocity.x / (1 + 10 * Time.deltaTime));
+                }
+
                 physicsBody.AddVelocity(new Vec2D(-acceleration * Time.deltaTime, 0));
             }
         }
@@ -86,6 +124,13 @@ namespace TileBasedGame.Entities
             // check if velocity is less than max speed
             if (physicsBody.Velocity.x < maxSpeed)
             {
+
+                // if velocity is in the opposite direction, lower it
+                if (physicsBody.Velocity.x < 0)
+                {
+                    physicsBody.Velocity = new Vec2D(physicsBody.Velocity.x / ( 1 + 10* Time.deltaTime));
+                }
+
                 physicsBody.AddVelocity(new Vec2D(acceleration * Time.deltaTime, 0));
             }
         }
@@ -99,12 +144,41 @@ namespace TileBasedGame.Entities
 
             if (isGrounded || airJumps < maxAirJumps)
             {
-                physicsBody.AddVelocity(new Vec2D(0, -acceleration));
+                physicsBody.SetVelocity(new Vec2D(physicsBody.Velocity.x, -jumpForce));
                 if (!isGrounded)
                 {
                     airJumps++;
                 }
             }
+        }
+
+        protected void Decellerate()
+        {
+            if (physicsBody == null)
+            {
+                return;
+            }
+
+            double vel = physicsBody.Velocity.x;
+
+            if (vel > 0)
+            {
+                vel -= 10 * acceleration * Time.deltaTime;
+                if (vel < 0)
+                {
+                    vel = 0;
+                }
+            }
+            else
+            {
+                vel += 10 * acceleration * Time.deltaTime;
+                if (vel > 0)
+                {
+                    vel = 0;
+                }
+            }
+
+            physicsBody.SetVelocity(new Vec2D(vel, physicsBody.Velocity.y));
         }
 
         public Team GetTeam()

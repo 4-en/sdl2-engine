@@ -262,7 +262,7 @@ namespace TileBasedGame.Entities
                 hitSound?.SetVolume(0.2);
                 hitSound?.Play();
 
-                if (collision.GetOther(gameObject).GetComponent<BaseEnemy>() != null && !collision.GetOther(gameObject).GetName().Contains("Planet"))
+                if (collision.GetOther(gameObject).GetComponent<BaseEnemyOld>() != null && !collision.GetOther(gameObject).GetName().Contains("Planet"))
                 {
                     var fire = new GameObject("ExplosionAnimation");
                     var sprite = fire.AddComponent<SpriteRenderer>();

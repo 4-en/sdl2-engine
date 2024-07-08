@@ -90,7 +90,7 @@ namespace TileBasedGame.Entities
                 var gameObjectPosition = gameObject.GetPosition();
                 double xDistance = collisionPoint.x - gameObjectPosition.x;
                 double yDistance = collisionPoint.y - gameObjectPosition.y;
-                if (Math.Abs(xDistance) > Math.Abs(yDistance))
+                if (Math.Abs(xDistance) > Math.Abs(yDistance) || true)
                 {
 
                     isGrounded = true;

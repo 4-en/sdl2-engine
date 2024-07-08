@@ -46,7 +46,7 @@ namespace SDL2Engine
             int layerOrder = tileLayers.Count();
             foreach (var layer in tileLayers)
             {
-                Console.WriteLine("Layer: " + layer.Name);
+                // Console.WriteLine("Layer: " + layer.Name);
                 foreach (var chunk in layer.Chunks)
                     for (var y = 0; y < chunk.Height; y++)
                     {

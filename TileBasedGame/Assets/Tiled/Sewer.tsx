@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="Sewer" tilewidth="16" tileheight="16" tilecount="352" columns="16" objectalignment="topleft">
+<tileset version="1.10" tiledversion="1.11.0" name="Sewer" tilewidth="16" tileheight="16" tilecount="352" columns="16" objectalignment="topleft">
  <image source="../Textures/tilesets/sewer_1.png" width="256" height="352"/>
  <tile id="0" type="Obstacle">
   <properties>
@@ -92,10 +92,6 @@
  <tile id="73" type="Obstacle"/>
  <tile id="74" type="Obstacle"/>
  <tile id="82">
-  <properties>
-   <property name="TestScript.value" type="int" value="69"/>
-   <property name="components" value="TileBasedGame.TestScript,TileBasedGame.TestScript2"/>
-  </properties>
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="16" height="16"/>
   </objectgroup>

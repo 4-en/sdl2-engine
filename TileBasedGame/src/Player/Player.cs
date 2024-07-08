@@ -8,7 +8,6 @@ namespace TileBasedGame
     public class Player : Entities.Entity
     {
         private DrawableRect? renderer;
-        private PhysicsBody? physicsBody;
 
         public static Player CreatePlayer()
         {

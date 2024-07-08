@@ -631,6 +631,8 @@ namespace SDL2Engine
         private Color backgroundColor = new Color(0, 0, 0, 0);
         [JsonProperty]
         private Color borderColor = new Color(0, 0, 0, 0);
+        [JsonProperty]
+        private double textScale = 1;
 
         public TextRenderer()
         {
@@ -649,6 +651,11 @@ namespace SDL2Engine
             textComponent.SetText(text);
             textComponent.SetFontPath(fontPath);
             return textComponent;
+        }
+
+        public void SetTextScale(double scale)
+        {
+            this.textScale = scale;
         }
 
         public void SetBorderSize(double borderSize)
@@ -767,6 +774,11 @@ namespace SDL2Engine
             for (int i = 0; i < texts.Length; i++)
             {
                 textures[i] = font.RenderTexture(texts[i], color.ToSDLColor(), out out_rect);
+
+                // apply scale to out_rect
+                out_rect.w = out_rect.w * textScale;
+                out_rect.h = out_rect.h * textScale;
+
                 this.textTextureSize.w = Math.Max(this.rect.w, out_rect.w);
                 this.textTextureSize.h += out_rect.h + 10;
                 textureRects[i] = out_rect;

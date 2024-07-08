@@ -10,10 +10,14 @@ namespace TileBasedGame
     {
         private DrawableRect? renderer;
 
+        public static double maxHealth = 1000;
+        public static double currentHealth = 1000;
+
         public static Player CreatePlayer()
         {
             var player = new GameObject("Player");
             var playerComp = player.AddComponent<Player>();
+            player.AddComponent<HealthBar>();
 
             return playerComp;
         }
@@ -186,5 +190,80 @@ namespace TileBasedGame
     }
 
 
-    
+    internal class HealthBar : Script
+    {
+        GameObject healthBarBackground = new GameObject("HealthBarBackground");
+        GameObject healthBarBorder = new GameObject("HealthBarBorder");
+        GameObject healthBarText = new GameObject("HealthBarText");
+        GameObject? heart = null;
+        int width = 20;
+        int height = 4;
+
+        public static SDL2Engine.Color backgroundColor = new SDL2Engine.Color(255, 0, 0, 255);
+
+        public override void Start()
+        {
+            var camera = GetCamera();
+
+            healthBarBackground.transform.position = new Vec2D(100, camera.GetVisibleHeight() - 100);
+            var healthIndicator = healthBarBackground.AddComponent<TextRenderer>();
+            healthIndicator.anchorPoint = AnchorPoint.CenterLeft;
+            healthIndicator.SetPreferredSize(new Rect(0, 0, width, height));
+            healthIndicator.SetColor(Color.Green);
+            healthIndicator.SetBackgroundColor(backgroundColor);
+
+
+
+            var border = healthBarBorder.AddComponent<TextRenderer>();
+            var textRenderHelper = healthBarBorder.AddComponent<TextRenderHelper>();
+            healthBarBorder.transform.position = new Vec2D(800, camera.GetVisibleHeight() - 800);
+            border.anchorPoint = AnchorPoint.CenterLeft;
+            border.SetPreferredSize(new Rect(0, 0, width, height));
+            border.SetBorderSize(2);
+            border.SetBorderColor(Color.Black);
+
+            var text = healthBarText.AddComponent<TextRenderer>();
+            healthBarText.transform.position = new Vec2D(100 + width / 2, camera.GetVisibleHeight() - 100);
+            text.anchorPoint = AnchorPoint.Center;
+            text.SetText(Player.currentHealth.ToString());
+            text.SetColor(Color.White);
+            text.SetFontSize(8);
+            text.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
+
+            heart = new GameObject("Heart");
+            var heartTexture = heart.AddComponent<SpriteRenderer>();
+            heartTexture.SetSize(12, 12);
+            heartTexture.relativeToCamera = false;
+            heartTexture.SetSource("Assets/Textures/health.png");
+            heartTexture.IsVisible(new Rect(4, 4));
+            heart.transform.position = new Vec2D(-100, camera.GetVisibleHeight() - 100);
+
+        }
+
+        public override void Update()
+        {
+            double currentHealth = Player.currentHealth;
+            double maxHealth = Player.maxHealth;
+            double healthBarWidth = currentHealth / maxHealth * width;
+            var healthIndicator = healthBarBackground.GetComponent<TextRenderer>();
+            //healthIndicator?.SetRect(new Rect(0, 0, healthBarWidth, height));
+            healthIndicator?.SetBackgroundColor(backgroundColor);
+
+            //update the text
+            var text = healthBarText.GetComponent<TextRenderer>();
+            text?.SetText(Player.currentHealth.ToString());
+
+            var camera = GetCamera();
+
+            healthBarBackground.transform.position = new Vec2D(210, camera.GetVisibleHeight() - 15);
+            healthBarBorder.transform.position = new Vec2D(210, camera.GetVisibleHeight() - 15);
+            healthBarText.transform.position = new Vec2D(233 + width / 2, camera.GetVisibleHeight() - 15);
+            if (heart == null) return;
+            heart.transform.position = new Vec2D(210, camera.GetVisibleHeight() - 15);
+
+            
+
+        }
+    }
+
 }

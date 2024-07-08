@@ -96,6 +96,19 @@ namespace TileBasedGame
             // shake camera
             // TODO
 
+
+            // limit camera to world bounds
+            double minWorldX = 0;
+            double minWorldY = 0;
+            double maxWorldX = camera_width * 16;
+            double maxWorldY = camera_height * 16;
+
+            Vec2D camera_position_clamped = camera.GetPosition();
+            camera_position_clamped.x = Math.Max(minWorldX, Math.Min(maxWorldX - camera_world_width, camera_position_clamped.x));
+            camera_position_clamped.y = Math.Max(minWorldY, Math.Min(maxWorldY - camera_world_height, camera_position_clamped.y));
+
+            camera.SetPosition(camera_position_clamped);
+
         }
     }
 }

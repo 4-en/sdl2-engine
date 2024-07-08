@@ -9,7 +9,7 @@ namespace TileBasedGame
 {
     public static partial class LevelManager
     {
-
+        public static int unlockedLevel = 1;
 
 
         public static void Start()

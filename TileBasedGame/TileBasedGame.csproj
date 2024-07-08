@@ -9,7 +9,10 @@
 
   <ItemGroup>
     <None Remove="Assets\Fonts\Arcadeclassic.ttf" />
+    <None Remove="Assets\Textures\bk.jpg" />
+    <None Remove="Assets\Textures\lock.png" />
     <None Remove="Assets\Textures\space_background.jpg" />
+    <None Remove="Assets\Textures\tilesets\lock.png" />
   </ItemGroup>
   
 
@@ -21,6 +24,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SDL2Engine\SDL2Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Assets\Textures\lock.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

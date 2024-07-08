@@ -48,6 +48,26 @@ namespace TileBasedGame
 
         }
 
+        private void Testing()
+        {
+            if(Input.GetKeyDown(SDL_Keycode.SDLK_r))
+            {
+                gameObject.SetPosition(new Vec2D(0, 0));
+            }
+
+            if(Input.GetKeyDown(SDL_Keycode.SDLK_2)) {
+                // Explosion effect
+                var pos = gameObject.GetPosition();
+                Effects.ExplosionParticles(pos, 10, new Color(255, 0, 0), 3);
+            }
+
+            if(Input.GetKeyDown(SDL_Keycode.SDLK_3)) {
+                // Blood effect
+                var pos = gameObject.GetPosition();
+                Effects.SpawnBlood(pos, 10, new Vec2D(0, 0), new Color(255, 0, 0));
+            }
+        }
+
         public override void Update()
         {
             base.Update();
@@ -55,6 +75,8 @@ namespace TileBasedGame
             {
                 return;
             }
+
+            Testing();
 
             double runningBoost = 1.0;
             if (Input.GetKeyPressed(SDL_Keycode.SDLK_LSHIFT))

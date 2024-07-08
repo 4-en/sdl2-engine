@@ -955,8 +955,21 @@ namespace SDL2Engine
                     var physicsBodyJ = gameObjects[(int)j].GetComponent<PhysicsBody>();
                     if (physicsBodyJ != null && j <= i) continue;
 
+                    bool collideWithMovingObjects = physicsBody.CollideWithMovingObjects;
+                    bool collideWithStaticObjects = physicsBody.CollideWithStaticObjects;
+                    if(physicsBodyJ!= null)
+                    {
+                        if(physicsBodyJ.CollideWithMovingObjects)
+                        {
+                            collideWithMovingObjects = true && collideWithMovingObjects;
+                        } else
+                        {
+                            continue;
+                        }
+                    }
 
-                    if (physicsBody.CollideWithMovingObjects && physicsBody.CollideWithStaticObjects)
+
+                    if (collideWithMovingObjects && collideWithStaticObjects)
                     {
                         colliderJ.SwapCollisions();
 
@@ -969,7 +982,7 @@ namespace SDL2Engine
 
                         }
                     }
-                    else if (physicsBody.CollideWithStaticObjects)
+                    else if (collideWithStaticObjects)
                     {
                         if (physicsBodyJ != null && physicsBodyJ.IsMovable) continue;
 
@@ -984,7 +997,7 @@ namespace SDL2Engine
 
                         }
                     }
-                    else if (physicsBody.CollideWithMovingObjects)
+                    else if (collideWithMovingObjects)
                     {
                         if (physicsBodyJ == null || !physicsBodyJ.IsMovable) continue;
 

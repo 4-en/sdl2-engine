@@ -68,13 +68,13 @@ namespace TileBasedGame
 
                 var rect = particle.AddComponent<FilledRect>();
                 rect.color = color ?? new Color(255, 255, 255);
-                rect.SetRect(new Rect(10, 10));
+                rect.SetRect(new Rect(2, 2));
                 particle.SetPosition(position);
 
                 var body = particle.AddComponent<PhysicsBody>();
                 body.IsMovable = true;
-                double minVel = 350;
-                double maxVel = 500;
+                double minVel = 35;
+                double maxVel = 50;
                 double vel = EngineObject.GetRandom().NextDouble() * (maxVel - minVel) + minVel;
                 double angle = EngineObject.GetRandom().NextDouble() * Math.PI * 2;
 

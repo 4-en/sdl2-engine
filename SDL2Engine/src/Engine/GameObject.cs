@@ -555,11 +555,53 @@ namespace SDL2Engine
 
         public bool RemoveComponent(Component script)
         {
+
+            if(script is Collider)
+            {
+                _collider = null;
+            }
+
+            else if(script is PhysicsBody)
+            {
+                _physicsBody = null;
+            }
+
+            else if(script is Transform)
+            {
+                _transform = new Transform();
+            }
+
+            else if(script is Drawable)
+            {
+                _drawable = null;
+            }
+
             return components.Remove(script);
         }
 
         public bool RemoveComponent<T>()
         {
+
+            if(typeof(T) == typeof(Collider))
+            {
+                _collider = null;
+            }
+
+            else if(typeof(T) == typeof(PhysicsBody))
+            {
+                _physicsBody = null;
+            }
+
+            else if(typeof(T) == typeof(Transform))
+            {
+                _transform = new Transform();
+            }
+
+            else if(typeof(T) == typeof(Drawable))
+            {
+                _drawable = null;
+            }
+
             foreach (Component script in components)
             {
                 if (script is T)

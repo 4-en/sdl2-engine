@@ -27,9 +27,11 @@ namespace TileBasedGame
                 spriteRenderer.SetSpriteSize(50, 37);
                 spriteRenderer.SetSize(25, 25);
                 spriteRenderer.AddAnimation(new AnimationInfo("idle1", 0, 4, 0.15));
-                spriteRenderer.AddAnimation(new AnimationInfo("run", 8, 7, 0.15));
+                spriteRenderer.AddAnimation(new AnimationInfo("run", 8, 7, 0.20));
                 spriteRenderer.AddAnimation(new AnimationInfo("jump", 15, 4, 0.07));
                 spriteRenderer.AddAnimation(new AnimationInfo("falling", 19, 4, 0.07));
+                spriteRenderer.AddAnimation(new AnimationInfo("attack", 42, 5, 0.07));
+                spriteRenderer.AddAnimation(new AnimationInfo("crouch", 4, 2, 0.1));
                 spriteRenderer.PlayAnimation("idle1");
                 spriteRenderer.SetAnimationType(AnimationType.LoopReversed);
             }
@@ -135,30 +137,48 @@ namespace TileBasedGame
                 isFacingRight = player.IsFacingRight();
             }
 
-            if(gameObject.GetComponent<PhysicsBody>()?.Velocity.x == 0 && gameObject.GetComponent<PhysicsBody>()?.Velocity.y == 0)
+
+            if (Input.GetMouseButtonDown(0))
             {
-                //play animation idle
-                gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("idle1");
-                gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.LoopReversed);
+                gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("attack");
                 gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
+                gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.Once);
             }
-            else if(gameObject.GetComponent<PhysicsBody>()?.Velocity.y < 0)
+            if (Input.GetKeyPressed(SDL_Keycode.SDLK_s) && !Input.GetKeyPressed(SDL_Keycode.SDLK_a) && !Input.GetKeyPressed(SDL_Keycode.SDLK_d))
             {
-                gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("jump");
+                gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("crouch");
                 gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
-                gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.OnceAndHold);
+                gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.Once);
             }
-            else if (gameObject.GetComponent<PhysicsBody>()?.Velocity.y > 0)
+            //check if animation attack or crouch else movin animations
+            if (gameObject.GetComponent<SpriteRenderer>()?.GetCurrentAnimation() != "attack" && gameObject.GetComponent<SpriteRenderer>()?.GetCurrentAnimation() != "crouch")
             {
-                gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("falling");
-                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
-                gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.OnceAndHold);
-            }
-            else
-            {
-                gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("run");
-                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
-                gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.LoopReversed);
+                if (gameObject.GetComponent<PhysicsBody>()?.Velocity.x == 0 && gameObject.GetComponent<PhysicsBody>()?.Velocity.y == 0)
+                {
+                    //play animation idle
+                    gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("idle1");
+                    gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.LoopReversed);
+                    gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
+                }
+                else if (gameObject.GetComponent<PhysicsBody>()?.Velocity.y < 0)
+                {
+                    gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("jump");
+                    gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
+                    gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.OnceAndHold);
+                }
+                else if (gameObject.GetComponent<PhysicsBody>()?.Velocity.y > 0)
+                {
+                    gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("falling");
+                    gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
+                    gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.OnceAndHold);
+                }
+                else
+                {
+                    gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("run");
+                    gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
+                    gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.LoopReversed);
+                }
+
             }
         }
     }

@@ -34,7 +34,78 @@ namespace TileBasedGame.Entities
         protected double range = 100;
         [JsonProperty]
         protected bool facingRight = true;
+        [JsonProperty]
+        protected int maxAirJumps = 1;
+        protected int airJumps = 0;
 
+        protected bool isGrounded = false;
+
+        protected PhysicsBody? physicsBody;
+
+
+        public override void Start()
+        {
+            player = Find("Player");
+            physicsBody = gameObject.GetComponent<PhysicsBody>();
+        }
+
+        public override void Update()
+        {
+            
+        }
+
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            // check for collisions with walls
+
+            var other = collision.GetOther(gameObject);
+
+
+        }
+        protected void MoveLeft()
+        {
+            if (physicsBody == null)
+            {
+                return;
+            }
+
+            // check if velocity is less than max speed
+            if (physicsBody.Velocity.x > -maxSpeed)
+            {
+                physicsBody.AddVelocity(new Vec2D(-acceleration * Time.deltaTime, 0));
+            }
+        }
+
+        protected void MoveRight()
+        {
+            if (physicsBody == null)
+            {
+                return;
+            }
+
+            // check if velocity is less than max speed
+            if (physicsBody.Velocity.x < maxSpeed)
+            {
+                physicsBody.AddVelocity(new Vec2D(acceleration * Time.deltaTime, 0));
+            }
+        }
+
+        protected void Jump()
+        {
+            if (physicsBody == null)
+            {
+                return;
+            }
+
+            if (isGrounded || airJumps < maxAirJumps)
+            {
+                physicsBody.AddVelocity(new Vec2D(0, -acceleration));
+                if (!isGrounded)
+                {
+                    airJumps++;
+                }
+            }
+        }
 
         public Team GetTeam()
         {
@@ -49,11 +120,6 @@ namespace TileBasedGame.Entities
         public bool IsFacingRight()
         {
             return facingRight;
-        }
-
-        public override void Start()
-        {
-            player = Find("Player");
         }
 
         protected void OnHealthChange()

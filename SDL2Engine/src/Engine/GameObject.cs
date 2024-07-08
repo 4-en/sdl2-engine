@@ -806,5 +806,9 @@ namespace SDL2Engine
             return GetComponents<Component>();
         }
 
+        internal void SetName(string v)
+        {
+            this.name = v;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SDL2Engine;
+using SDL2Engine.Coro;
 using TileBasedGame.Entities;
 
 namespace TileBasedGame.Entities
@@ -112,7 +113,7 @@ namespace TileBasedGame.Entities
 
         protected virtual void Shoot()
         {
-
+            Projectile.CreateAt(gameObject);
         }
 
         private double lastShot = 0;
@@ -311,4 +312,68 @@ namespace TileBasedGame.Entities
             OnHealthChange();
         }
     }
+
+    public class Projectile
+    {
+        public static void CreateAt(GameObject gameObject)
+        {
+            var facingRight = true;
+
+            var playerSpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+            if (playerSpriteRenderer != null)
+            {
+                playerSpriteRenderer.PlayAnimation("shoot");
+                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!facingRight);
+                gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.Once);
+            }
+            
+
+            var projectile = new GameObject("Projectile");
+            var projectileScript = projectile.AddComponent<ProjectileScript>();
+            projectileScript.team = Team.Player;
+            projectileScript.damage = 10;
+
+            //set the position of the projectile to the position of the player
+            //add a small offset to the position of the player to avoid collision with the player  
+            
+            var pb = projectile.AddComponent<PhysicsBody>();
+            pb.Mass = 0;
+
+            var player = gameObject.GetComponent<Entity>();
+            if (player != null)
+            {
+                facingRight = player.IsFacingRight();
+            }
+            if (facingRight)
+            {
+                projectile.transform.position = gameObject.transform.position + new Vec2D(17, 0);
+                pb.Velocity = new Vec2D(400, 0);
+            }
+            else
+            {
+                projectile.transform.position = gameObject.transform.position + new Vec2D(-17, 0);
+                pb.Velocity = new Vec2D(-400, 0);
+            }
+
+            var spriteRenderer = projectile.AddComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.SetTexture("Assets/Textures/projectile_sheet.png");
+                spriteRenderer.SetSpriteSize(116, 115);
+                spriteRenderer.SetSize(10, 10);
+                spriteRenderer.AddAnimation(new AnimationInfo("projectile", 0, 4, 0.075));
+                spriteRenderer.PlayAnimation("projectile");
+                spriteRenderer.SetAnimationType(AnimationType.LoopReversed);
+                spriteRenderer.SetFlipX(facingRight);
+            }
+            BoxCollider.FromDrawableRect(projectile);
+
+
+        }
+
+        
+    }
+
+    
+
 }

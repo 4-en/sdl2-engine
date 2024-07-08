@@ -1,6 +1,7 @@
 using SDL2Engine;
 using SDL2;
 using static SDL2.SDL;
+using TileBasedGame.Entities;
 
 namespace TileBasedGame
 {
@@ -32,6 +33,7 @@ namespace TileBasedGame
                 spriteRenderer.AddAnimation(new AnimationInfo("falling", 19, 4, 0.07));
                 spriteRenderer.AddAnimation(new AnimationInfo("attack", 42, 5, 0.07));
                 spriteRenderer.AddAnimation(new AnimationInfo("crouch", 4, 2, 0.1));
+                spriteRenderer.AddAnimation(new AnimationInfo("shoot", 48, 4, 0.03));
                 spriteRenderer.PlayAnimation("idle1");
                 spriteRenderer.SetAnimationType(AnimationType.LoopReversed);
             }
@@ -87,7 +89,7 @@ namespace TileBasedGame
             }
 
             bool isShooting = false;
-            if(Input.GetKeyPressed(SDL_Keycode.SDLK_1))
+            if(Input.GetKeyDown(SDL_Keycode.SDLK_1))
             {
                 TryShoot();
                 isShooting = true;
@@ -151,7 +153,7 @@ namespace TileBasedGame
                 gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.Once);
             }
             //check if animation attack or crouch else movin animations
-            if (gameObject.GetComponent<SpriteRenderer>()?.GetCurrentAnimation() != "attack" && gameObject.GetComponent<SpriteRenderer>()?.GetCurrentAnimation() != "crouch")
+            if (gameObject.GetComponent<SpriteRenderer>()?.GetCurrentAnimation() != "attack" && gameObject.GetComponent<SpriteRenderer>()?.GetCurrentAnimation() != "crouch" && gameObject.GetComponent<SpriteRenderer>()?.GetCurrentAnimation() != "shoot")
             {
                 if (gameObject.GetComponent<PhysicsBody>()?.Velocity.x == 0 && gameObject.GetComponent<PhysicsBody>()?.Velocity.y == 0)
                 {
@@ -184,5 +186,5 @@ namespace TileBasedGame
     }
 
 
-
+    
 }

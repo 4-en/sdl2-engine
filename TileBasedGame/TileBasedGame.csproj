@@ -12,6 +12,7 @@
     <None Remove="Assets\Textures\adventurer-Sheet.png" />
     <None Remove="Assets\Textures\bk.jpg" />
     <None Remove="Assets\Textures\lock.png" />
+    <None Remove="Assets\Textures\projectile_sheet.png" />
     <None Remove="Assets\Textures\space_background.jpg" />
     <None Remove="Assets\Textures\tilesets\lock.png" />
     <None Remove="Assets\Textures\tilesets\sky_background.png" />

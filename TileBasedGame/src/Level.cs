@@ -1,4 +1,5 @@
 ﻿using SDL2Engine;
+using SDL2Engine.Tiled;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace TileBasedGame
         private int score = 0;
         public int totalTime = 60 * 5; // 5 minutes
         public double remainingTime = 60 * 5; // 5 minutes
+
+        private Rect levelBounds = new Rect(-49999, -49999, 99999, 99999);
 
 
         // eventlisteners
@@ -37,8 +40,25 @@ namespace TileBasedGame
             RegisterEventListeners();
 
             remainingTime = totalTime;
-
             CreateLevelUI();
+
+            var tileMapData = FindComponent<TileMapData>();
+
+            if (tileMapData != null)
+            {
+
+                double tileHeight = tileMapData.GetTileHeight();
+                double tileWidth = tileMapData.GetTileWidth();
+                double minWorldX = tileMapData.GetMapStartX() * tileWidth;
+                double minWorldY = tileMapData.GetMapStartY() * tileHeight;
+                double worldWidth = tileMapData.GetMapWidth() * tileWidth;
+                double worldHeight =  tileMapData.GetMapHeight() * tileHeight;
+
+                levelBounds = new Rect(minWorldX-100, minWorldY-500, worldWidth+200, worldHeight+700);
+            } else
+            {
+                Console.WriteLine("No TileMapData component");
+            }
         }
 
 
@@ -237,6 +257,15 @@ namespace TileBasedGame
                     time_renderer.SetText(renderTime + "s");
                     lastRenderTime = renderTime;
                 }
+            }
+
+            // only check if player is below bounds
+            Vec2D player_position = player.GetGameObject().GetPosition();
+            double maxY = levelBounds.y + levelBounds.h;
+            if (player_position.y > maxY)
+            {
+                player.Damage(new Entities.Damage(10000));
+                FailLevel();
             }
 
 

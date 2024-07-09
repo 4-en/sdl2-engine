@@ -1442,7 +1442,7 @@ namespace SDL2Engine
          */
         public static void UpdatePhysics(List<GameObject> gameObjects, Rect? bounds = null, WorldSettings? worldSettings = null)
         {
-
+            List<GameObject> notInBoundsButApplyPhysics = new List<GameObject>();
             if (bounds != null)
             {
                 // TODO: fix QuadTree and use optimized physics update
@@ -1456,6 +1456,9 @@ namespace SDL2Engine
                     if (bounds.Value.Contains(obj.GetPosition()))
                     {
                         objectsInBounds.Add(obj);
+                    } else if (obj.KeepInScene)
+                    {
+                        notInBoundsButApplyPhysics.Add(obj);
                     }
                 }
 
@@ -1467,6 +1470,7 @@ namespace SDL2Engine
             {
                 // Apply physics
                 ApplyPhysics(gameObjects, worldSettings);
+                ApplyPhysics(notInBoundsButApplyPhysics, worldSettings);
             }
 
             // Check for collisions

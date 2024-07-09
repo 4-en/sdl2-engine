@@ -341,7 +341,7 @@ namespace TileBasedGame.Entities
                 this.health = maxHealth;
             }
 
-            OnHealthChange();
+            // OnHealthChange();
         }
 
         public void SetMaxHealth(double value)
@@ -357,7 +357,7 @@ namespace TileBasedGame.Entities
                 health = maxHealth;
             }
 
-            OnHealthChange();
+            // OnHealthChange();
         }
     }
 

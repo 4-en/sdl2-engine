@@ -16,6 +16,7 @@ namespace TileBasedGame
         public static Player CreatePlayer()
         {
             var player = new GameObject("Player");
+            player.KeepInScene = true;
             var playerComp = player.AddComponent<Player>();
             player.AddComponent<HealthBar>();
 

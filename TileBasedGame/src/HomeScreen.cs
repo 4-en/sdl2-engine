@@ -33,8 +33,23 @@ namespace TileBasedGame
                 GameObject level3Text = HomeScreenText("Level 3", 0.5, 0.6, 100);
                 GameObject level4Text = HomeScreenText("Level 4", 0.5, 0.7, 100);
                 GameObject level5Text = HomeScreenText("Level 5", 0.5, 0.8, 100);
-               
-                
+
+                var resetProgressButton = TileBasedGame.UI.Button(
+                    "Reset Progress",
+                    () =>
+                    {
+                        LevelManager.ResetProgress();
+                        LevelManager.LoadHomeScreen();
+                        return true;
+                    },
+                    new Rect(200, 80),
+                    Color.White,
+                    50
+                    );
+
+                resetProgressButton.Item1.SetPosition(new Vec2D(0.05, 0.95));
+                resetProgressButton.Item2.anchorPoint = AnchorPoint.BottomLeft;
+                resetProgressButton.Item2.relativePosition = true;
                 
 
             }

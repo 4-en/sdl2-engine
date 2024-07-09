@@ -59,6 +59,17 @@ namespace TileBasedGame
             }
         }
 
+        public static void ResetProgress() {
+            totalScore = 0;
+            unlockedLevel = 1;
+            levelIndex = 0;
+
+            var saveData = new TileSaveData();
+            saveData.unlockedLevel = unlockedLevel;
+            saveData.totalScore = totalScore;
+            Serialization.SaveObject(saveData, "saveData.json");
+        }
+
         public static void LoadLevel(int levelIndex=-1)
         {
             if(levelIndex == -1)
@@ -135,7 +146,8 @@ namespace TileBasedGame
 
         public static void LoadLevelCompletedScene(int score, int time)
         {
-            var scene = UI.LevelCompletedScene(score, time);
+            int currentLevel = levelIndex;
+            var scene = UI.LevelCompletedScene(score, time, currentLevel);
             SceneManager.SetScene(scene);
         }
 

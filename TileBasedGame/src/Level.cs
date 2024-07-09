@@ -160,16 +160,15 @@ namespace TileBasedGame
         {
             Pause();
             failed = true;
-            // TODO: show game over scene instead
-            LevelManager.LoadHomeScreen();
+            
+            LevelManager.LoadGameOverScene(score, (int)remainingTime);
         }
 
         public void CompleteLevel()
         {
             LevelManager.CompleteCurrentLevel(score);
 
-            // TODO: show level completed scene
-            LevelManager.LoadHomeScreen();
+            LevelManager.LoadLevelCompletedScene(score, (int) remainingTime);
         }
 
         private bool paused = false;

@@ -61,7 +61,7 @@ namespace TileBasedGame
             return scene;
         }
 
-        public static Scene LevelCompletedScene(int score, int time)
+        public static Scene LevelCompletedScene(int score, int time, int currentLevel)
         {
             var scene = new Scene("GameOverScene");
 
@@ -81,7 +81,7 @@ namespace TileBasedGame
                 var titleRenderer = titleObject.AddComponent<TextRenderer>();
                 titleRenderer.SetFontSize(94);
                 titleRenderer.relativePosition = true;
-                titleRenderer.SetText("Completed");
+                titleRenderer.SetText("Completed Level " + currentLevel);
                 titleRenderer.anchorPoint = AnchorPoint.Center;
 
                 var scoreObject = new GameObject("GameOverScore");

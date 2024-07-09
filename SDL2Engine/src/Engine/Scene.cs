@@ -2,7 +2,7 @@
 using SDL2Engine.Coro;
 using System.Collections;
 using System.Runtime.CompilerServices;
-using TiledCS;
+using SDL2Engine.Tiled;
 
 namespace SDL2Engine
 {

@@ -86,12 +86,21 @@ namespace TileBasedGame.Entities
             if (other.GetName() == "Obstacle")
             {
                 // check if collisionPoint is below the gameObject
-                var collisionPoint = collision.collisionPoint;
-
-                var gameObjectPosition = gameObject.GetPosition();
+                Collider? otherCollider = other.GetComponent<Collider>();
+                if(otherCollider == null)
+                {
+                    return;
+                }
+                var collisionPoint = otherCollider.GetCenter();
+                Collider? myCollider = GetComponent<Collider>();
+                if(myCollider == null)
+                {
+                    return;
+                }
+                var gameObjectPosition = myCollider.GetCenter();
                 double xDistance = collisionPoint.x - gameObjectPosition.x;
                 double yDistance = collisionPoint.y - gameObjectPosition.y;
-                if (Math.Abs(xDistance) > Math.Abs(yDistance) || true)
+                if (yDistance > 0)
                 {
                     isGrounded = true;
                     airJumps = 0;

@@ -254,8 +254,6 @@ namespace TileBasedGame.Entities
                 gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet_blue.png");
             }
             //play hit sound
-            if (collision.GetOther(gameObject).GetName().Contains("Projectile") || this.gameObject.GetName().Contains("Projectile"))
-            {
 
                 hitSound = AddComponent<SoundPlayer>();
                 hitSound?.Load("Assets/Audio/hit.wav");
@@ -276,7 +274,6 @@ namespace TileBasedGame.Entities
                     fire.SetPosition(other.GetPosition());
                 }
 
-            }
 
             hasCollided = true;
             collisionFrame = Time.tick;

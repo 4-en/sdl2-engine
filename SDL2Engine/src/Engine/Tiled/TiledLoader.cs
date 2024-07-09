@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using TiledCSPlus;
 
-namespace SDL2Engine
+namespace SDL2Engine.Tiled
 {
     public static class TiledLoader
     {
@@ -21,11 +21,17 @@ namespace SDL2Engine
         }
 
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
-        public static List<GameObject> LoadTMX(string path, Assembly? callingAssembly = null)
+        public static List<GameObject> LoadTMX(string path, Assembly? callingAssembly = null, bool sideBorder = true)
         {
             path = AdjustPath(path, "Assets/Tiled/");
             string rootDir = path.Substring(0, path.LastIndexOf("/") + 1);
             var map = new TiledMap(path);
+
+            GameObject tiledData = new GameObject("TiledData");
+            var dataComp = tiledData.AddComponent<TileMapData>();
+            int mapHeight = map.Height;
+            int mapWidth = map.Width;
+            int[,] mapData = new int[mapHeight, mapWidth];
 
             double height = map.Height * map.TileHeight;
 
@@ -42,6 +48,11 @@ namespace SDL2Engine
 
             var gameObjects = new List<GameObject>();
 
+            int minX = 0;
+            int minY = 0;
+            int maxX = 0;
+            int maxY = 0;
+
             callingAssembly ??= Assembly.GetCallingAssembly();
             int layerOrder = tileLayers.Count();
             foreach (var layer in tileLayers)
@@ -54,8 +65,16 @@ namespace SDL2Engine
                         {
                             var index = (y * chunk.Width) + x; // Assuming the default render order is used which is from right to bottom
                             var gid = chunk.Data[index]; // The tileset tile index
-                            var tileX = (x * map.TileWidth) + chunk.X * map.TileWidth;
-                            var tileY = (y * map.TileHeight) + chunk.Y * map.TileHeight;
+
+                            int gridX = x + chunk.X;
+                            int gridY = y + chunk.Y;
+                            var tileX = gridX * map.TileWidth;
+                            var tileY = gridY * map.TileHeight;
+
+                            minX = Math.Min(minX, gridX);
+                            maxX = Math.Max(maxX, gridX);
+                            minY = Math.Min(minY, gridY);
+                            maxY = Math.Max(maxY, gridY);
 
                             // Gid 0 is used to tell there is no tile set
                             if (gid == 0)
@@ -138,6 +157,28 @@ namespace SDL2Engine
 
 
 
+                }
+            }
+
+            if(sideBorder)
+            {
+                // add invisible border on each side
+                int tileHeight = map.TileHeight;
+                int tileWidth = map.TileWidth;
+
+                int[] sides = new int[] { minX - 1, maxX + 1 };
+
+                foreach (int x in sides)
+                {
+                    for (int y = minY - 1; y <= maxY + 1; y++)
+                    {
+                        GameObject gameObject = new GameObject("Border");
+                        gameObject.SetPosition(new Vec2D(x * tileWidth, y * tileHeight));
+                        var boxCollider = gameObject.AddComponent<BoxCollider>();
+                        boxCollider.box = new Rect(tileWidth, tileHeight);
+                        gameObject.SetName("Obstacle");
+                        gameObjects.Add(gameObject);
+                    }
                 }
             }
 

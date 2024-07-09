@@ -93,7 +93,7 @@ namespace TileBasedGame
             }
 
             bool isShooting = false;
-            if(Input.GetKeyDown(SDL_Keycode.SDLK_1))
+            if(Input.GetKeyPressed(SDL_Keycode.SDLK_1))
             {
                 TryShoot();
                 isShooting = true;

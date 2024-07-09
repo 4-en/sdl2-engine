@@ -78,4 +78,14 @@
    <frame tileid="828" duration="100"/>
   </animation>
  </tile>
+ <tile id="2404">
+  <properties>
+   <property name="components" value="TileBasedGame.Goal"/>
+  </properties>
+ </tile>
+ <tile id="2405">
+  <properties>
+   <property name="components" value="TileBasedGame.Goal"/>
+  </properties>
+ </tile>
 </tileset>

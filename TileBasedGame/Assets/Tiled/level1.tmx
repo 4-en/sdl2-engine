@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="130" height="20" tilewidth="16" tileheight="16" infinite="1" nextlayerid="10" nextobjectid="18">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="130" height="20" tilewidth="16" tileheight="16" infinite="1" nextlayerid="10" nextobjectid="18">
  <tileset firstgid="1" source="Sewer.tsx"/>
  <tileset firstgid="353" source="tileset2.tsx"/>
  <tileset firstgid="978" source="background.tsx"/>
+ <tileset firstgid="1158" source="coins-chests-etc-2-0-noborders.tsx"/>
  <layer id="6" name="Tile Layer 2" width="130" height="20">
   <data encoding="csv">
    <chunk x="0" y="0" width="16" height="16">
@@ -170,6 +171,24 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 531,531,531,0,0,0,0,0,0,0,0,0,0,0,0,0,
 531,531,531,531,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+   <chunk x="128" y="-16" width="16" height="16">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,3562,3563,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </chunk>
    <chunk x="144" y="-16" width="16" height="16">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

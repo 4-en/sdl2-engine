@@ -6,6 +6,7 @@ namespace TileBasedGame
     internal class TileSaveData
     {
         public int unlockedLevel = 1;
+        public int totalScore = 0;
 
         public TileSaveData() { }
     }
@@ -13,6 +14,7 @@ namespace TileBasedGame
     public static partial class LevelManager
     {
         public static int unlockedLevel = 1;
+        public static int totalScore = 0;
 
         public static void Start()
         {
@@ -27,6 +29,7 @@ namespace TileBasedGame
             if (saveData != null)
             {
                 unlockedLevel = saveData.unlockedLevel;
+                totalScore = saveData.totalScore;
             }
 
             LoadHomeScreen();
@@ -41,8 +44,9 @@ namespace TileBasedGame
         public static int levelIndex = 0;
 
 
-        public static void UnlockNextLevel()
+        public static void UnlockNextLevel(int score = 0)
         {
+            totalScore += score;
             if(levelIndex >= unlockedLevel)
             {
                 unlockedLevel++;
@@ -50,6 +54,7 @@ namespace TileBasedGame
                 // save data
                 var saveData = new TileSaveData();
                 saveData.unlockedLevel = unlockedLevel;
+                saveData.totalScore = totalScore;
                 Serialization.SaveObject(saveData, "saveData.json");
             }
         }

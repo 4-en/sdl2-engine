@@ -26,6 +26,10 @@ namespace TileBasedGame
             base.Start();
 
             this.attackSpeed = 4;
+            this.team = Team.Player;
+
+            this.SetMaxHealth(maxHealth);
+            this.SetHealth(currentHealth);
 
             var spriteRenderer = AddComponent<SpriteRenderer>();
             if (spriteRenderer != null)
@@ -85,6 +89,9 @@ namespace TileBasedGame
             {
                 return;
             }
+
+            Player.currentHealth = this.GetHealth();
+            Player.maxHealth = this.GetMaxHealth();
 
             Testing();
 

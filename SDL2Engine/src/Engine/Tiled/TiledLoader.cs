@@ -27,12 +27,6 @@ namespace SDL2Engine.Tiled
             string rootDir = path.Substring(0, path.LastIndexOf("/") + 1);
             var map = new TiledMap(path);
 
-            GameObject tiledData = new GameObject("TiledData");
-            var dataComp = tiledData.AddComponent<TileMapData>();
-            int mapHeight = map.Height;
-            int mapWidth = map.Width;
-            int[,] mapData = new int[mapHeight, mapWidth];
-
             double height = map.Height * map.TileHeight;
 
             double aspectRatio = 16.0 / 9.0;
@@ -188,6 +182,53 @@ namespace SDL2Engine.Tiled
                     }
                 }
             }
+
+            // create tile data component
+            GameObject tileData = new GameObject("TileData");
+            var dataComp = tileData.AddComponent<TileMapData>();
+            int mapHeight = maxY - minY + 1;
+            int mapWidth = maxX - minX + 1;
+            int[,] mapData = new int[mapHeight, mapWidth];
+
+            foreach (var layer in tileLayers)
+            {
+                // only add tile data for obstacle layers
+                if (layer.Class != "Obstacles")
+                {
+                    continue;
+                }
+                foreach (var chunk in layer.Chunks)
+                {
+                    for (var y = 0; y < chunk.Height; y++)
+                    {
+                        for (var x = 0; x < chunk.Width; x++)
+                        {
+                            var index = (y * chunk.Width) + x; // Assuming the default render order is used which is from right to bottom
+                            var gid = chunk.Data[index]; // The tileset tile index
+
+                            int gridX = x + chunk.X;
+                            int gridY = y + chunk.Y;
+
+                            if (gid == 0)
+                            {
+                                continue;
+                            }
+
+                            mapData[gridY - minY, gridX - minX] = TileMapData.OBSTACLE;
+                        }
+                    }
+                }
+            }
+
+            dataComp.SetMapData(
+                mapData,
+                map.TileWidth,
+                map.TileHeight,
+                mapWidth,
+                mapHeight,
+                minX,
+                minY
+                );
 
             return gameObjects;
         }

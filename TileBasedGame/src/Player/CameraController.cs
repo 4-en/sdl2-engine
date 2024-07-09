@@ -1,6 +1,5 @@
 using SDL2Engine;
-using SDL2;
-using static SDL2.SDL;
+using SDL2Engine.Tiled;
 
 namespace TileBasedGame
 {
@@ -15,6 +14,7 @@ namespace TileBasedGame
         private Player? player;
 
         private EventListener<PlayerDamagedEvent>? player_damaged_listener;
+        private TileMapData? tileMapData;
 
         public override void Start() {
             // get player component from same game object
@@ -25,6 +25,9 @@ namespace TileBasedGame
 
             // set camera size
             GetCamera().WorldSize = new Vec2D(camera_width, camera_height);
+
+            // get tilemap data
+            tileMapData = FindComponent<TileMapData>();
         }
 
         private void OnPlayerDamagedEvent(PlayerDamagedEvent e) {
@@ -98,18 +101,22 @@ namespace TileBasedGame
 
 
             // limit camera to world bounds
-            /*
-            double minWorldX = 0;
-            double minWorldY = 0;
-            double maxWorldX = camera_width * 16;
-            double maxWorldY = camera_height * 16;
+            if(tileMapData == null)
+            {
+                return;
+            }
+            double tileHeight = tileMapData.GetTileHeight();
+            double tileWidth = tileMapData.GetTileWidth();
+            double minWorldX = tileMapData.GetMapStartX() * tileWidth;
+            double minWorldY = tileMapData.GetMapStartY() * tileHeight;
+            double maxWorldX = minWorldX + tileMapData.GetMapWidth() * tileWidth;
+            double maxWorldY = minWorldY + tileMapData.GetMapHeight() * tileHeight;
 
             Vec2D camera_position_clamped = camera.GetPosition();
             camera_position_clamped.x = Math.Max(minWorldX, Math.Min(maxWorldX - camera_world_width, camera_position_clamped.x));
             camera_position_clamped.y = Math.Max(minWorldY, Math.Min(maxWorldY - camera_world_height, camera_position_clamped.y));
 
             camera.SetPosition(camera_position_clamped);
-            */
 
         }
     }

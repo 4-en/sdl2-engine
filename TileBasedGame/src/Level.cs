@@ -13,6 +13,8 @@ namespace TileBasedGame
         private Player? player;
         private Vec2D spawnPosition = new Vec2D(0, 0);
         private int score = 0;
+        public int totalTime = 60 * 5; // 5 minutes
+        public double remainingTime = 60 * 5; // 5 minutes
 
 
         // eventlisteners
@@ -33,6 +35,8 @@ namespace TileBasedGame
             player.GetGameObject().SetPosition(spawnPosition);
 
             RegisterEventListeners();
+
+            remainingTime = totalTime;
 
             CreateLevelUI();
         }
@@ -69,7 +73,7 @@ namespace TileBasedGame
             score += e.score;
 
             if(score_renderer != null) {
-                score_renderer.SetText("Score " + score);
+                score_renderer.SetText("" + score);
             }
         }
 
@@ -98,7 +102,7 @@ namespace TileBasedGame
             score_renderer.relativePosition = true;
             score_renderer.relativeToCamera = true;
             score_object.SetPosition(new Vec2D(0.95, 0.05));
-            score_renderer.SetText("Score " + score);
+            score_renderer.SetText(""+score);
             score_renderer.anchorPoint = AnchorPoint.TopRight;
             score_renderer.color = Color.White;
             score_renderer.SetFontSize(100);
@@ -109,7 +113,7 @@ namespace TileBasedGame
             time_renderer = time_object.AddComponent<TextRenderer>();
             time_renderer.relativePosition = true;
             time_object.SetPosition(new Vec2D(0.05, 0.05));
-            time_renderer.SetText("Time 0");
+            time_renderer.SetText("0");
             time_renderer.anchorPoint = AnchorPoint.TopLeft;
             time_renderer.color = Color.White;
             time_renderer.SetFontSize(100);
@@ -131,9 +135,20 @@ namespace TileBasedGame
 
         }
 
+        private bool failed = false;
+        public void FailLevel()
+        {
+            Pause();
+            failed = true;
+            // TODO: show game over scene instead
+            LevelManager.LoadHomeScreen();
+        }
+
         public void CompleteLevel()
         {
-            LevelManager.UnlockNextLevel();
+            LevelManager.UnlockNextLevel(score);
+
+            // TODO: show level completed scene
             LevelManager.LoadHomeScreen();
         }
 
@@ -151,6 +166,7 @@ namespace TileBasedGame
             GetScene()?.SetPhysics(true);
         }
 
+        int lastRenderTime = -1;
         public override void Update()
         {
 
@@ -183,6 +199,47 @@ namespace TileBasedGame
                     this.Pause();
                 }
             }
+
+            if(paused || failed)
+            {
+                return;
+            }
+
+            if (player == null)
+            {
+                return;
+            }
+
+            if (escapeMenu != null) {
+                escapeMenu.Destroy();
+                escapeMenu = null;
+            }
+
+            remainingTime -= Time.deltaTime;
+
+            if (remainingTime < 0)
+            {
+                this.FailLevel();
+                return;
+            }
+
+            if(player.GetHealth() <= 0)
+            {
+                this.FailLevel();
+                return;
+            }
+
+            if (time_renderer != null)
+            {
+                int renderTime = (int)(remainingTime);
+                if (lastRenderTime != renderTime)
+                {
+                    time_renderer.SetText(renderTime + "s");
+                    lastRenderTime = renderTime;
+                }
+            }
+
+
         }
 
 

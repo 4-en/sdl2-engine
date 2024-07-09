@@ -72,6 +72,34 @@ namespace TileBasedGame.Entities
             {
                 if (damageable.GetTeam() != team && damageable.GetTeam() != Team.Neutral)
                 {
+
+
+                    // check if jumped on head
+                    Collider? myCollider = GetComponent<Collider>();
+                    Collider? otherCollider = other.GetComponent<Collider>();
+
+                    if(myCollider != null && otherCollider != null)
+                    {
+                        double otherBottom = otherCollider.GetBounds().y + otherCollider.GetBounds().h;
+                        double distance = myCollider.GetCenter().y - otherBottom;
+                        if (distance > 0)
+                        {
+                            // other is above me
+                            EventBus.Dispatch(new PlayerScoreEvent(this.points * 3));
+
+                            var otherBody = other.GetComponent<PhysicsBody>();
+                            if (otherBody != null)
+                            {
+                                otherBody.AddVelocity(new Vec2D(0, -200));
+                            }
+
+                            gameObject.Destroy();
+
+                            return;
+                        }
+                    }
+
+
                     damageable.Damage(new Damage(damage, gameObject, team));
                 }
 

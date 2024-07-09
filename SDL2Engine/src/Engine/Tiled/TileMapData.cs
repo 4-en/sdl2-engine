@@ -39,22 +39,26 @@ namespace SDL2Engine.Tiled
         public static readonly int DANGER = 2;
 
 
-        private int[,] mapData;
-        private int tileWidth;
-        private int tileHeight;
-        private int mapWidth;
-        private int mapHeight;
-        private int mapStartX;
-        private int mapStartY;
+        private int[,] mapData = new int[0, 0];
+        private int tileWidth = 0;
+        private int tileHeight = 0;
+        private int mapWidth = 0;
+        private int mapHeight = 0;
+        private int mapStartX = 0;
+        private int mapStartY = 0;
 
         public override void Start() {
-
+            if(!dataSet)
+            {
+                Console.WriteLine("Map data not set");
+                gameObject.Destroy();
+            }
         }
 
         public override void Update() {
 
         }
-
+        private bool dataSet = false;
         public void SetMapData(int[,] mapData, int tileWidth, int tileHeight, int mapWidth, int mapHeight, int mapStartX, int mapStartY) {
             this.mapData = mapData;
             this.tileWidth = tileWidth;
@@ -63,6 +67,8 @@ namespace SDL2Engine.Tiled
             this.mapHeight = mapHeight;
             this.mapStartX = mapStartX;
             this.mapStartY = mapStartY;
+
+            dataSet = true;
         }
 
         public int[,] GetMapData() {
@@ -84,6 +90,63 @@ namespace SDL2Engine.Tiled
             return data;
 
         }
+
+        public int GetTileWidth() {
+            return tileWidth;
+        }
+
+        public int GetTileHeight() {
+            return tileHeight;
+        }
+
+        public int GetMapWidth() {
+            return mapWidth;
+        }
+
+        public int GetMapHeight() {
+            return mapHeight;
+        }
+
+        public int GetMapStartX() {
+            return mapStartX;
+        }
+
+        public int GetMapStartY() {
+            return mapStartY;
+        }
+
+        public Vec2D TilePosToWorldPos(int x, int y)
+        {
+            return new Vec2D(
+                (mapStartX + x * tileWidth),
+                (mapStartY + y * tileHeight)
+                );
+        }
+
+        public Vec2D WorldPosToTilePos(Vec2D pos)
+        {
+            return new Vec2D(
+                (int)((pos.x - mapStartX) / tileWidth),
+                (int)((pos.y - mapStartY) / tileHeight)
+                );
+        }
+
+        public int GetTileAt(int x, int y) {
+            x = x - mapStartX;
+            y = y - mapStartY;
+
+            if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight) {
+                return -1;
+            }
+
+            return mapData[x, y];
+        }
+
+        public int GetTileAt(Vec2D pos)
+        {
+            return GetTileAt((int)(pos.x / tileWidth), (int)(pos.y / tileHeight));
+        }
+
 
         public List<Vec2D> AStar(int[,] map, Vec2D start, Vec2D goal, int entityWidth, int entityHeight) {
 

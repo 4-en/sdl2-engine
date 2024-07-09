@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static SDL2.SDL;
 
 namespace TileBasedGame
 {
@@ -125,8 +126,47 @@ namespace TileBasedGame
 
         }
 
+        private bool paused = false;
+        private GameObject? escapeMenu;
+        private void Pause()
+        {
+            paused = true;
+            GetScene()?.SetPhysics(false);
+        }
+
+        private void Unpause()
+        {
+            paused = false;
+            GetScene()?.SetPhysics(true);
+        }
+
         public override void Update()
         {
+
+            // Check for pause input
+            if (Input.GetKeyDown((int)SDL_Keycode.SDLK_ESCAPE))
+            {
+                if (this.escapeMenu != null)
+                {
+                    this.escapeMenu.Destroy();
+                    this.escapeMenu = null;
+                }
+                else
+                {
+                    var stopState = !!paused;
+                    var escapemenu = UI.EscapeMenu("Paused", () =>
+                    {
+
+                        this.paused = stopState;
+                        GetScene()?.SetPhysics(true);
+                        this.escapeMenu = null;
+                        return true;
+                    });
+
+                    this.escapeMenu = escapemenu;
+                    this.Pause();
+                }
+            }
         }
 
 

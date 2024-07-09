@@ -12,6 +12,7 @@ namespace TileBasedGame
 
             var menu = new GameObject("EscapeMenu");
             menu.SetPosition(new Vec2D(0.5, 0.3));
+            menu.KeepInScene = true;
 
             var background = Component.CreateWithGameObject<FilledRect>("EscapeMenuBackground");
             background.Item2.SetRect(new Rect(0, 0, 4 * 1920, 4 * 1080));

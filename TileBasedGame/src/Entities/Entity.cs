@@ -111,7 +111,7 @@ namespace TileBasedGame.Entities
 
         protected void AddRecoil()
         {
-            double recoil = 40;
+            double recoil = 20;
             if (facingRight)
             {
                 recoil = -recoil;
@@ -192,7 +192,7 @@ namespace TileBasedGame.Entities
                 if(!isGrounded)
                 {
                     airJumps++;
-                    Console.WriteLine("Air jumps: " + airJumps);
+                    // Console.WriteLine("Air jumps: " + airJumps);
                 }
             }
         }
@@ -271,6 +271,17 @@ namespace TileBasedGame.Entities
         {
             this.health -= damage.Value;
             OnHealthChange();
+
+            // spawn blood effect
+            int n_particles = 5 + (int)Math.Min(20, damage.Value / 10);
+            Vec2D? direction = null;
+            if(damage.Source != null)
+            {
+                direction = damage.Source.GetPosition() - gameObject.GetPosition();
+                direction = direction.Value.Normalize() * 100;
+            }
+
+            Effects.SpawnBlood(gameObject.GetPosition(), n_particles, direction);
         }
 
         public void Heal(double value)
@@ -339,6 +350,7 @@ namespace TileBasedGame.Entities
 
             var projectile = new GameObject("Projectile");
             var projectileScript = projectile.AddComponent<ProjectileScript>();
+            projectileScript.shooter = gameObject;
             projectileScript.team = Team.Player;
             projectileScript.damage = 10;
 
@@ -369,13 +381,15 @@ namespace TileBasedGame.Entities
             {
                 spriteRenderer.SetTexture("Assets/Textures/projectile_sheet.png");
                 spriteRenderer.SetSpriteSize(116, 115);
-                spriteRenderer.SetSize(10, 10);
+                spriteRenderer.SetSize(30, 30);
                 spriteRenderer.AddAnimation(new AnimationInfo("projectile", 0, 4, 0.075));
                 spriteRenderer.PlayAnimation("projectile");
                 spriteRenderer.SetAnimationType(AnimationType.LoopReversed);
                 spriteRenderer.SetFlipX(facingRight);
             }
-            BoxCollider.FromDrawableRect(projectile);
+            var collider = BoxCollider.FromDrawableRect(projectile);
+            if(collider != null)
+                collider.IsTrigger = true;
 
 
         }

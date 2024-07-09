@@ -34,9 +34,10 @@ namespace TileBasedGame
             textComponent.color = color ?? new Color(255, 255, 255, 255);
             textComponent.SetFontSize(fontSize);
             textComponent.SetText(text);
+            textComponent.SetTextScale(0.15);
             textComponent.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
             textComponent.duration = duration;
-            textComponent.velocity = new Vec2D(0, -speed);
+            textComponent.velocity = new Vec2D(0, -speed/10);
             return textObject;
         }
 
@@ -48,9 +49,10 @@ namespace TileBasedGame
             textComponent.color = color ?? new Color(255, 255, 255, 255);
             textComponent.SetFontSize(fontSize);
             textComponent.SetText(text);
+            textComponent.SetTextScale(0.15);
             textComponent.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
             textComponent.duration = duration;
-            textComponent.velocity = new Vec2D(0, -speed);
+            textComponent.velocity = new Vec2D(0, -speed/10);
             textComponent.relativeToCamera = false;
             textComponent.anchorPoint = anchor;
             return textObject;

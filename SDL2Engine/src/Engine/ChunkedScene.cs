@@ -332,7 +332,7 @@ namespace SDL2Engine
                         if (gameObject.GetActiveScene() == null)
                         {
                             var pos = gameObject.GetPosition();
-                            if (!bounds.Contains(pos))
+                            if (!(gameObject.KeepInScene || bounds.Contains(pos)))
                             {
                                 this.chunkMap.AddGameObject(gameObject);
                                 continue;

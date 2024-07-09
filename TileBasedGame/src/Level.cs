@@ -67,6 +67,10 @@ namespace TileBasedGame
         private void OnPlayerScoreEvent(PlayerScoreEvent e)
         {
             score += e.score;
+
+            if(score_renderer != null) {
+                score_renderer.SetText("Score " + score);
+            }
         }
 
         private void OnPlayerDamagedEvent(PlayerDamagedEvent e)
@@ -111,7 +115,7 @@ namespace TileBasedGame
             time_renderer.SetFontSize(100);
             time_renderer.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
             time_renderer.SetTextScale(0.1);
-
+            /*
             health_object = new GameObject("HealthUI");
             health_renderer = health_object.AddComponent<TextRenderer>();
             health_renderer.relativePosition = true;
@@ -122,8 +126,15 @@ namespace TileBasedGame
             health_renderer.SetFontSize(100);
             health_renderer.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
             health_renderer.SetTextScale(0.1);
+            */
 
 
+        }
+
+        public void CompleteLevel()
+        {
+            LevelManager.UnlockNextLevel();
+            LevelManager.LoadHomeScreen();
         }
 
         private bool paused = false;
@@ -142,6 +153,11 @@ namespace TileBasedGame
 
         public override void Update()
         {
+
+            if (Input.GetKeyDown(SDL_Keycode.SDLK_PLUS)) {
+                Console.WriteLine("Completing level...");
+                CompleteLevel();
+            }
 
             // Check for pause input
             if (Input.GetKeyDown((int)SDL_Keycode.SDLK_ESCAPE))

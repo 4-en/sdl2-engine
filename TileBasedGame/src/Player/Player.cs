@@ -25,6 +25,8 @@ namespace TileBasedGame
         {
             base.Start();
 
+            this.attackSpeed = 4;
+
             var spriteRenderer = AddComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
@@ -89,7 +91,7 @@ namespace TileBasedGame
             double runningBoost = 1.0;
             if (Input.GetKeyPressed(SDL_Keycode.SDLK_LSHIFT))
             {
-                runningBoost = 1.5;
+                runningBoost = 1.8;
             }
 
             bool isShooting = false;
@@ -227,7 +229,8 @@ namespace TileBasedGame
             text.anchorPoint = AnchorPoint.Center;
             text.SetText(Player.currentHealth.ToString());
             text.SetColor(Color.White);
-            text.SetFontSize(8);
+            text.SetFontSize(80);
+            text.SetTextScale(0.1);
             text.SetFontPath("Assets/Fonts/Arcadeclassic.ttf");
 
             heart = new GameObject("Heart");

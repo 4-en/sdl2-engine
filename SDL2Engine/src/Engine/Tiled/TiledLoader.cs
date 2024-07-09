@@ -57,8 +57,10 @@ namespace SDL2Engine.Tiled
             int layerOrder = tileLayers.Count();
             foreach (var layer in tileLayers)
             {
+                bool isObstaceLayer = layer.Class == "Obstacles";
                 // Console.WriteLine("Layer: " + layer.Name);
                 foreach (var chunk in layer.Chunks)
+                    
                     for (var y = 0; y < chunk.Height; y++)
                     {
                         for (var x = 0; x < chunk.Width; x++)
@@ -66,13 +68,18 @@ namespace SDL2Engine.Tiled
                             var index = (y * chunk.Width) + x; // Assuming the default render order is used which is from right to bottom
                             var gid = chunk.Data[index]; // The tileset tile index
 
+                            
                             int gridX = x + chunk.X;
                             int gridY = y + chunk.Y;
                             var tileX = gridX * map.TileWidth;
                             var tileY = gridY * map.TileHeight;
 
-                            minX = Math.Min(minX, gridX);
-                            maxX = Math.Max(maxX, gridX);
+                            if (isObstaceLayer)
+                            {
+                                minX = Math.Min(minX, gridX);
+                                maxX = Math.Max(maxX, gridX);
+                                
+                            }
                             minY = Math.Min(minY, gridY);
                             maxY = Math.Max(maxY, gridY);
 

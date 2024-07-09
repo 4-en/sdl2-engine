@@ -1,22 +1,36 @@
 ﻿using SDL2Engine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TileBasedGame
 {
+
+    internal class TileSaveData
+    {
+        public int unlockedLevel = 1;
+
+        public TileSaveData() { }
+    }
+
     public static partial class LevelManager
     {
-        public static int unlockedLevel = 3;
-
+        public static int unlockedLevel = 1;
 
         public static void Start()
         {
-            LoadHomeScreen();
+            
+
+            
             var engine = new Engine(null, "TileBasedGame");
             engine.Init();
+
+            // load save data
+            var saveData = Serialization.LoadObject<TileSaveData>("saveData.json");
+            if (saveData != null)
+            {
+                unlockedLevel = saveData.unlockedLevel;
+            }
+
+            LoadHomeScreen();
+
             engine.Run();
         }
 
@@ -26,9 +40,31 @@ namespace TileBasedGame
         private static Scene? level;
         public static int levelIndex = 0;
 
+
+        public static void UnlockNextLevel()
+        {
+            if(levelIndex >= unlockedLevel)
+            {
+                unlockedLevel++;
+
+                // save data
+                var saveData = new TileSaveData();
+                saveData.unlockedLevel = unlockedLevel;
+                Serialization.SaveObject(saveData, "saveData.json");
+            }
+        }
+
         public static void LoadNextLevel()
         {
             levelIndex++;
+
+            // make sure level is also unlocked
+            if(!(levelIndex <= unlockedLevel))
+            {
+                levelIndex = unlockedLevel;
+                Console.WriteLine($"Level {levelIndex} is not unlocked yet.");
+            }
+
             switch (levelIndex)
             {
                 case 1:

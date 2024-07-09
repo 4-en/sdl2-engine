@@ -80,6 +80,11 @@
  <tile id="64" type="Obstacle"/>
  <tile id="65" type="Obstacle"/>
  <tile id="66" type="Obstacle"/>
+ <tile id="67">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.ThinPlatform"/>
+  </properties>
+ </tile>
  <tile id="68">
   <animation>
    <frame tileid="68" duration="200"/>

@@ -44,7 +44,7 @@ namespace TileBasedGame
         public static int levelIndex = 0;
 
 
-        public static void UnlockNextLevel(int score = 0)
+        public static void CompleteCurrentLevel(int score = 0)
         {
             totalScore += score;
             if(levelIndex >= unlockedLevel)
@@ -57,6 +57,18 @@ namespace TileBasedGame
                 saveData.totalScore = totalScore;
                 Serialization.SaveObject(saveData, "saveData.json");
             }
+        }
+
+        public static void LoadLevel(int levelIndex=-1)
+        {
+            if(levelIndex == -1)
+            {
+                levelIndex = LevelManager.levelIndex;
+            }
+
+            levelIndex--;
+            LevelManager.levelIndex = levelIndex;
+            LoadNextLevel();
         }
 
         public static void LoadNextLevel()
@@ -113,6 +125,18 @@ namespace TileBasedGame
             homeScreen = CreateHomeScreen();
             SceneManager.SetScene(homeScreen);
 
+        }
+
+        public static void LoadGameOverScene(int score, int time)
+        {
+            var scene = UI.GameOverScene(score, time);
+            SceneManager.SetScene(scene);
+        }
+
+        public static void LoadLevelCompletedScene(int score, int time)
+        {
+            var scene = UI.LevelCompletedScene(score, time);
+            SceneManager.SetScene(scene);
         }
 
         public static void LoadShop()

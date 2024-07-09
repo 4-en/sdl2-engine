@@ -5,6 +5,122 @@ namespace TileBasedGame
 {
     public static class UI
     {
+
+        public static Scene GameOverScene(int score, int time)
+        {
+            var scene = new Scene("GameOverScene");
+
+            using (scene.Activate())
+            {
+                /*
+                var background = new GameObject("GameOverBackground");
+                var bgRenderer = background.AddComponent<FilledRect>();
+                bgRenderer.SetRect(new Rect(0, 0, 1920, 1080));
+                bgRenderer.color = new Color(0, 0, 0, 200);
+                bgRenderer.anchorPoint = AnchorPoint.TopLeft;
+                */
+
+
+                var titleObject = new GameObject("GameOverTitle");
+                titleObject.SetPosition(new Vec2D(0.5, 0.2));
+                var titleRenderer = titleObject.AddComponent<TextRenderer>();
+                titleRenderer.SetFontSize(94);
+                titleRenderer.relativePosition = true;
+                titleRenderer.SetText("Game Over");
+                titleRenderer.anchorPoint = AnchorPoint.Center;
+
+                var scoreObject = new GameObject("GameOverScore");
+                scoreObject.SetPosition(new Vec2D(0.3, 0.4));
+                var scoreRenderer = scoreObject.AddComponent<TextRenderer>();
+                scoreRenderer.SetFontSize(48);
+                scoreRenderer.relativePosition = true;
+                scoreRenderer.SetText("Score: " + score);
+                scoreRenderer.anchorPoint = AnchorPoint.Center;
+
+                var timeObject = new GameObject("GameOverTime");
+                timeObject.SetPosition(new Vec2D(0.7, 0.4));
+                var timeRenderer = timeObject.AddComponent<TextRenderer>();
+                timeRenderer.SetFontSize(48);
+                timeRenderer.relativePosition = true;
+                timeRenderer.SetText("Time Left: " + time);
+                timeRenderer.anchorPoint = AnchorPoint.Center;
+
+                var menuButtonTuple = Button("Main Menu", () => { LevelManager.LoadHomeScreen(); return true; }, new Rect(0, 0, 350, 150), Color.White, 440);
+                var menuButton = menuButtonTuple.Item1;
+                menuButton.SetPosition(new Vec2D(0.3, 0.7));
+                menuButtonTuple.Item2.relativePosition = true;
+
+
+                var tryAgainButtonTuple = Button("Try Again", () => { LevelManager.LoadLevel(LevelManager.levelIndex); return true; }, new Rect(0, 0, 350, 150), Color.White, 440);
+                var tryAgainButton = tryAgainButtonTuple.Item1;
+                tryAgainButton.SetPosition(new Vec2D(0.7, 0.7));
+                tryAgainButtonTuple.Item2.relativePosition = true;
+            }
+
+
+            return scene;
+        }
+
+        public static Scene LevelCompletedScene(int score, int time)
+        {
+            var scene = new Scene("GameOverScene");
+
+            using (scene.Activate())
+            {
+                /*
+                var background = new GameObject("GameOverBackground");
+                var bgRenderer = background.AddComponent<FilledRect>();
+                bgRenderer.SetRect(new Rect(0, 0, 1920, 1080));
+                bgRenderer.color = new Color(0, 0, 0, 200);
+                bgRenderer.anchorPoint = AnchorPoint.TopLeft;
+                */
+
+
+                var titleObject = new GameObject("GameOverTitle");
+                titleObject.SetPosition(new Vec2D(0.5, 0.2));
+                var titleRenderer = titleObject.AddComponent<TextRenderer>();
+                titleRenderer.SetFontSize(94);
+                titleRenderer.relativePosition = true;
+                titleRenderer.SetText("Completed");
+                titleRenderer.anchorPoint = AnchorPoint.Center;
+
+                var scoreObject = new GameObject("GameOverScore");
+                scoreObject.SetPosition(new Vec2D(0.3, 0.4));
+                var scoreRenderer = scoreObject.AddComponent<TextRenderer>();
+                scoreRenderer.SetFontSize(48);
+                scoreRenderer.relativePosition = true;
+                scoreRenderer.SetText("Score: " + score);
+                scoreRenderer.anchorPoint = AnchorPoint.Center;
+
+                var timeObject = new GameObject("GameOverTime");
+                timeObject.SetPosition(new Vec2D(0.7, 0.4));
+                var timeRenderer = timeObject.AddComponent<TextRenderer>();
+                timeRenderer.SetFontSize(48);
+                timeRenderer.relativePosition = true;
+                timeRenderer.SetText("Time Left: " + time);
+                timeRenderer.anchorPoint = AnchorPoint.Center;
+
+                var menuButtonTuple = Button("Main Menu", () => { LevelManager.LoadHomeScreen(); return true; }, new Rect(0, 0, 350, 150), Color.White, 440);
+                var menuButton = menuButtonTuple.Item1;
+                menuButton.SetPosition(new Vec2D(0.2, 0.7));
+                menuButtonTuple.Item2.relativePosition = true;
+
+
+                var tryAgainButtonTuple = Button("Try Again", () => { LevelManager.LoadLevel(LevelManager.levelIndex); return true; }, new Rect(0, 0, 350, 150), Color.White, 440);
+                var tryAgainButton = tryAgainButtonTuple.Item1;
+                tryAgainButton.SetPosition(new Vec2D(0.5, 0.7));
+                tryAgainButtonTuple.Item2.relativePosition = true;
+
+                var nextLevelButtonTuple = Button("Next Level", () => { LevelManager.LoadNextLevel(); return true; }, new Rect(0, 0, 350, 150), Color.White, 440);
+                var nextLevelButton = nextLevelButtonTuple.Item1;
+                nextLevelButton.SetPosition(new Vec2D(0.8, 0.7));
+                nextLevelButtonTuple.Item2.relativePosition = true;
+
+            }
+
+
+            return scene;
+        }
         public static GameObject EscapeMenu(string title = "Paused", Func<bool>? onContinue = null)
         {
 

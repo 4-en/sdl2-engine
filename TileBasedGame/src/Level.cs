@@ -166,7 +166,7 @@ namespace TileBasedGame
 
         public void CompleteLevel()
         {
-            LevelManager.UnlockNextLevel(score);
+            LevelManager.CompleteCurrentLevel(score);
 
             // TODO: show level completed scene
             LevelManager.LoadHomeScreen();

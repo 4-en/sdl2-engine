@@ -8,12 +8,14 @@ namespace TileBasedGame
         public double camera_height = 160;
         public double camera_width = 160 * 16 / 9;
 
+        private double shake_strength = 0;
         private double shake_x = 0;
         private double shake_y = 0;
 
         private Player? player;
 
         private EventListener<PlayerDamagedEvent>? player_damaged_listener;
+        private EventListener<ShakeEvent>? shake_listener;
         private TileMapData? tileMapData;
 
         public override void Start() {
@@ -22,6 +24,7 @@ namespace TileBasedGame
 
             // listen to player damage events (shake camera on damage)
             player_damaged_listener = EventBus.AddListener<PlayerDamagedEvent>(OnPlayerDamagedEvent);
+            shake_listener = EventBus.AddListener<ShakeEvent>(e => shake_strength += e.magnitude);
 
             // set camera size
             GetCamera().WorldSize = new Vec2D(camera_width, camera_height);
@@ -31,8 +34,7 @@ namespace TileBasedGame
         }
 
         private void OnPlayerDamagedEvent(PlayerDamagedEvent e) {
-            shake_x = 10;
-            shake_y = 10;
+            shake_strength += 10;
         }
 
         public override void OnDestroy()
@@ -44,12 +46,25 @@ namespace TileBasedGame
                 player_damaged_listener = null;
             }
 
+            if (shake_listener != null)
+            {
+                EventBus.RemoveListener(shake_listener);
+                shake_listener = null;
+            }
+
         }
 
         public override void Update() {
             if(player == null) {
                 return;
             }
+
+
+            // testing: add 10 shake_strength when l is pressed
+            if(Input.GetKeyDown(SDL2.SDL.SDL_Keycode.SDLK_l)) {
+                shake_strength += 10;
+            }
+            
 
             // get player position
             Vec2D player_position = player.GetGameObject().GetPosition();
@@ -84,7 +99,7 @@ namespace TileBasedGame
             Vec2D camera_position = camera.GetPosition();
             Vec2D target_position = new Vec2D(camera_x, camera_y);
 
-            if ((camera_position - target_position).Length() < 1)
+            if ((camera_position - target_position).Length() < 0.2)
             {
                 camera.SetPosition(target_position);
             }
@@ -97,7 +112,18 @@ namespace TileBasedGame
             }
 
             // shake camera
-            // TODO
+            // decay shake_strength
+            if(shake_strength > 0)
+            {
+                shake_strength = shake_strength / (1 + Time.deltaTime * 2);
+                shake_strength = Math.Max(0, shake_strength - Time.deltaTime * 10);
+
+                shake_x = (shake_x + (random.NextDouble() - 0.5) * shake_strength * 0.1) / (1 + Time.deltaTime * 10);
+                shake_y = (shake_y + (random.NextDouble() - 0.5) * shake_strength * 0.1) / (1 + Time.deltaTime * 10);
+
+                camera.SetPosition(camera.GetPosition() + new Vec2D(shake_x, shake_y));
+            }
+            
 
 
             // limit camera to world bounds

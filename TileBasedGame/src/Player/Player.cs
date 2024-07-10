@@ -130,7 +130,11 @@ namespace TileBasedGame
             bool isShooting = false;
             if(Input.GetKeyPressed(SDL_Keycode.SDLK_1))
             {
-                TryShoot();
+                bool shot = TryShoot();
+                if(shot)
+                {
+                    EventBus.Dispatch(new ShakeEvent(3));
+                }
                 isShooting = true;
             }
             bool movementKeyPressed = false;

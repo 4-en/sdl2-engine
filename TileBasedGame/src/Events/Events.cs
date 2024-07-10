@@ -9,6 +9,19 @@ using TileBasedGame.Entities;
 namespace TileBasedGame
 {
 
+    public class ShakeEvent
+    {
+        public double magnitude = 10;
+
+        public ShakeEvent()
+        {
+        }
+
+        public ShakeEvent(double magnitude)
+        {
+            this.magnitude = magnitude;
+        }
+    }
     public class PlayerScoreEvent
     {
         public int score;

@@ -192,16 +192,17 @@ namespace TileBasedGame.Entities
         }
 
         private double lastShot = 0;
-        protected void TryShoot()
+        protected bool TryShoot()
         {
-            if (died) return;
+            if (died) return false;
             if (lastShot + 1 / attackSpeed > Time.time)
             {
-                return;
+                return false;
             }
             lastShot = Time.time;
             AddRecoil();
             Shoot();
+            return true;
         }
 
         protected void MoveLeft(double boost=1.0)

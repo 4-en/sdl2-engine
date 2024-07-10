@@ -18,6 +18,17 @@ namespace SDL2Engine.Tiled
                 // create collider
                 collider = BoxCollider.FromDrawableRect(gameObject);
             }
+
+            BoxCollider? boxCollider = collider as BoxCollider;
+            if(boxCollider != null)
+            {
+                // shrink collider a bit to avoid collision with adjacent tiles
+                double shrinkW = 0.1 * boxCollider.box.w;
+                double shrinkH = 0.1 * boxCollider.box.h;
+                
+                Rect newBox = new Rect(shrinkW, shrinkH, boxCollider.box.w - 2 * shrinkW, boxCollider.box.h - 2 * shrinkH);
+                boxCollider.box = newBox;
+            }
         }
 
         public override void OnCollisionEnter(CollisionPair collision)

@@ -28,6 +28,11 @@
    </object>
   </objectgroup>
  </tile>
+ <tile id="7">
+  <properties>
+   <property name="components" value="TileBasedGame.Goal"/>
+  </properties>
+ </tile>
  <tile id="16" type="Obstacle">
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="16" height="16"/>
@@ -45,6 +50,11 @@
  </tile>
  <tile id="19" type="Obstacle"/>
  <tile id="20" type="Obstacle"/>
+ <tile id="23">
+  <properties>
+   <property name="components" value="TileBasedGame.Goal"/>
+  </properties>
+ </tile>
  <tile id="32" type="Obstacle">
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="16" height="16"/>
@@ -122,7 +132,220 @@
    <frame tileid="206" duration="200"/>
   </animation>
  </tile>
+ <tile id="214">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="215">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="216">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="217">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="220">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="221">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="222">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="223">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="226">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="228">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="229">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="230">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="231">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="233">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="234">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="235">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
  <tile id="244">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="245">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="246">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="247">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="248">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="249">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="250">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="251">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="264">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="265">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="268">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="269">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="270">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="271">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="276">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="277">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="292">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+  <animation>
+   <frame tileid="292" duration="200"/>
+   <frame tileid="293" duration="200"/>
+   <frame tileid="294" duration="200"/>
+   <frame tileid="295" duration="200"/>
+   <frame tileid="296" duration="200"/>
+   <frame tileid="297" duration="200"/>
+  </animation>
+ </tile>
+ <tile id="293">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="294">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="295">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="296">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="297">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="298">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="299">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="324">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
+ <tile id="325">
   <properties>
    <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
   </properties>

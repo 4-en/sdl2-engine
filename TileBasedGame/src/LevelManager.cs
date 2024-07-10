@@ -201,7 +201,15 @@ namespace TileBasedGame
 
         public static Scene CreateLevel3()
         {
-            var level = CreateBaseLevel();
+            var level = new ChunkedScene("Level 3");
+            level.SetGravity(200);
+            level.LoadTMX("level3.tmx");
+
+            using (level.Activate())
+            {
+                var levelScript = Component.CreateWithGameObject<Level>("Level");
+            }
+
             return level;
         }
 

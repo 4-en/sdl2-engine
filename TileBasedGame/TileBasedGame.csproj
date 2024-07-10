@@ -21,6 +21,7 @@
     <None Remove="Assets\Tiled\background.tsx" />
     <None Remove="Assets\Tiled\level1.tmx" />
     <None Remove="Assets\Tiled\level2.tmx" />
+    <None Remove="Assets\Tiled\level3.tmx" />
     <None Remove="Assets\Tiled\tileset2.tsx" />
   </ItemGroup>
   

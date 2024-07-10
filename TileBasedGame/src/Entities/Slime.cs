@@ -52,9 +52,9 @@ namespace TileBasedGame.Entities
             spriteRenderer.SetSpriteSizeByCount(6, 7);
             spriteRenderer.SetSize(12, 12);
             spriteRenderer.AddAnimation(new AnimationInfo("idle1", 0, 1, 1));
-            spriteRenderer.AddAnimation(new AnimationInfo("run", 14, 7, 0.10));
+            spriteRenderer.AddAnimation(new AnimationInfo("run", 14, 6, 0.10));
             spriteRenderer.AddAnimation(new AnimationInfo("jump", 7, 7, 0.1));
-            spriteRenderer.AddAnimation(new AnimationInfo("death", 28, 8, 0.1));
+            spriteRenderer.AddAnimation(new AnimationInfo("death", 28, 6, 0.1));
             spriteRenderer.PlayAnimation("idle1");
             spriteRenderer.SetAnimationType(AnimationType.OnceAndHold);
 
@@ -64,6 +64,9 @@ namespace TileBasedGame.Entities
             physicsBody = AddComponent<PhysicsBody>();
             physicsBody.Bounciness = 0.0;
             physicsBody.Friction = 0;
+
+            maxSpeed = 40;
+            acceleration = 40;
         }
 
         private string currentAnimation = "idle1";
@@ -111,18 +114,19 @@ namespace TileBasedGame.Entities
                     spriteRenderer.SetFlipX(false);
                 }
 
-                switch(currentAnimation) {
-                    case "run_left":
-                    case "run_right":
-                        spriteRenderer.SetAnimationType(AnimationType.Loop);
-                        break;
-                    default:
-                        spriteRenderer.SetAnimationType(AnimationType.OnceAndHold);
-                        break;
+                AnimationType aType = AnimationType.OnceAndHold;
+                if(newAnimation == "run") {
+                    aType = AnimationType.Loop;
                 }
 
-                spriteRenderer.PlayAnimation(currentAnimation);
+                spriteRenderer.PlayAnimation(newAnimation, aType);
             }
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            ChangeAnimation();
         }
 
     }

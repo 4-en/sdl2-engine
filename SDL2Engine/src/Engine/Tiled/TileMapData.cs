@@ -34,6 +34,7 @@ namespace SDL2Engine.Tiled
     
     public class TileMapData : Script {
 
+        public static readonly int OUT_OF_BOUNDS = -1;
         public static readonly int AIR = 0;
         public static readonly int OBSTACLE = 1;
         public static readonly int DANGER = 2;
@@ -118,16 +119,16 @@ namespace SDL2Engine.Tiled
         public Vec2D TilePosToWorldPos(int x, int y)
         {
             return new Vec2D(
-                (mapStartX + x * tileWidth),
-                (mapStartY + y * tileHeight)
+                (x * tileWidth),
+                (y * tileHeight)
                 );
         }
 
         public Vec2D WorldPosToTilePos(Vec2D pos)
         {
             return new Vec2D(
-                (int)((pos.x - mapStartX) / tileWidth),
-                (int)((pos.y - mapStartY) / tileHeight)
+                (int)((pos.x) / tileWidth),
+                (int)((pos.y) / tileHeight)
                 );
         }
 
@@ -147,16 +148,31 @@ namespace SDL2Engine.Tiled
             return GetTileAt((int)(pos.x / tileWidth), (int)(pos.y / tileHeight));
         }
 
+        public List<Tuple<int, int>> Pathfind(int startX, int startY, int endX, int endY, PathfindingSettings settings)
+        {
+            // TODO: implement this
+            return new List<Tuple<int, int>>();
+        }
 
-        public List<Vec2D> AStar(int[,] map, Vec2D start, Vec2D goal, int entityWidth, int entityHeight) {
+        public List<Vec2D> Pathfind(Vec2D start, Vec2D end, PathfindingSettings settings)
+        {
+            int startX = (int)(start.x / tileWidth);
+            int startY = (int)(start.y / tileHeight);
+            int endX = (int)(end.x / tileWidth);
+            int endY = (int)(end.y / tileHeight);
 
-            // path: list of points from start to goal
-            //
-            List<Vec2D> path = new List<Vec2D>();
+            var path = Pathfind(startX, startY, endX, endY, settings);
 
-            // todo: implement A* algorithm to find path from start to goal
-            
-            return path;
+            List<Vec2D> worldPath = new List<Vec2D>();
+
+            foreach (var tile in path)
+            {
+                int x = tile.Item1;
+                int y = tile.Item2;
+                worldPath.Add(TilePosToWorldPos(x, y));
+            }
+
+            return worldPath;
         }
 
     }

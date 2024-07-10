@@ -28,6 +28,7 @@ namespace TileBasedGame
 
             this.attackSpeed = 4;
             this.team = Team.Player;
+            damage = 0;
 
             this.SetMaxHealth(maxHealth);
             this.SetHealth(maxHealth);

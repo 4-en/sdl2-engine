@@ -20,9 +20,9 @@ namespace TileBasedGame.Entities
         [JsonProperty]
         protected double jumpForce = 120;
         [JsonProperty]
-        protected double health = 100;
+        protected double health = 30;
         [JsonProperty]
-        protected double maxHealth = 100;
+        protected double maxHealth = 30;
         [JsonProperty]
         protected double damage = 1000;
         [JsonProperty]
@@ -120,7 +120,7 @@ namespace TileBasedGame.Entities
                             var otherBody = other.GetComponent<PhysicsBody>();
                             if (otherBody != null)
                             {
-                                otherBody.AddVelocity(new Vec2D(0, -90));
+                                otherBody.SetVelocity(new Vec2D(otherBody.Velocity.x, -100));
                             }
 
                             var otherEntity = other.GetComponent<Entity>();

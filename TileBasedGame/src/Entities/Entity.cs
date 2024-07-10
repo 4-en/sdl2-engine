@@ -45,7 +45,7 @@ namespace TileBasedGame.Entities
         private ulong lastGroundedTime = 0;
 
         protected PhysicsBody? physicsBody;
-        private bool died = false;
+        protected bool died = false;
 
 
         public override void Start()
@@ -81,7 +81,8 @@ namespace TileBasedGame.Entities
             var physicsBody = gameObject.GetComponent<PhysicsBody>();
             if(physicsBody != null)
             {
-                physicsBody.Velocity = new Vec2D(0, -100);
+                physicsBody.Velocity = new Vec2D(0, -80);
+                physicsBody.AngularVelocity = 220;
             }
 
             Delay(2, () => {
@@ -119,9 +120,7 @@ namespace TileBasedGame.Entities
                             var otherBody = other.GetComponent<PhysicsBody>();
                             if (otherBody != null)
                             {
-                                otherBody.AddVelocity(new Vec2D(0, -80));
-                                // angular velocity doesnt seem to work
-                                otherBody.AngularVelocity = Math.PI * 2;
+                                otherBody.AddVelocity(new Vec2D(0, -90));
                             }
 
                             var otherEntity = other.GetComponent<Entity>();

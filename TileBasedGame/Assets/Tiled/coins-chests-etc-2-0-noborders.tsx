@@ -78,6 +78,20 @@
    <frame tileid="828" duration="100"/>
   </animation>
  </tile>
+ <tile id="1387">
+  <properties>
+   <property name="Coin.value" type="int" value="100"/>
+   <property name="components" value="TileBasedGame.Items.Coin"/>
+  </properties>
+  <animation>
+   <frame tileid="1387" duration="150"/>
+   <frame tileid="1388" duration="150"/>
+   <frame tileid="1389" duration="150"/>
+   <frame tileid="1390" duration="150"/>
+   <frame tileid="1391" duration="150"/>
+   <frame tileid="1392" duration="150"/>
+  </animation>
+ </tile>
  <tile id="2404">
   <properties>
    <property name="components" value="TileBasedGame.Goal"/>

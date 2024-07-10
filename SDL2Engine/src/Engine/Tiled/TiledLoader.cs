@@ -185,6 +185,7 @@ namespace SDL2Engine.Tiled
 
             // create tile data component
             GameObject tileData = new GameObject("TileData");
+            tileData.KeepInScene = true;
             var dataComp = tileData.AddComponent<TileMapData>();
             int mapHeight = maxY - minY + 1;
             int mapWidth = maxX - minX + 1;

@@ -67,6 +67,16 @@ namespace TileBasedGame.Entities
 
             maxSpeed = 40;
             acceleration = 40;
+
+            tileMapData = FindComponent<TileMapData>();
+
+            /*
+            if(tileMapData == null )
+            {
+                GameObject? data = Find("TileData");
+                Console.WriteLine("TileData: " + data);
+                Console.WriteLine("No tilemapdata found");
+            }*/
         }
 
         private string currentAnimation = "idle1";
@@ -125,6 +135,10 @@ namespace TileBasedGame.Entities
 
         public override void Update()
         {
+            if (tileMapData == null)
+            {
+                tileMapData = FindComponent<TileMapData>();
+            }
             base.Update();
             ChangeAnimation();
         }

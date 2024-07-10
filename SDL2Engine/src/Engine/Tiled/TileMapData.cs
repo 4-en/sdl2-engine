@@ -84,7 +84,7 @@ namespace SDL2Engine.Tiled
 
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
-                    data[i, j] = mapData[x + i, y + j];
+                    data[j, i] = mapData[y + j, x + i];
                 }
             }
 
@@ -124,11 +124,11 @@ namespace SDL2Engine.Tiled
                 );
         }
 
-        public Vec2D WorldPosToTilePos(Vec2D pos)
+        public Tuple<int, int> WorldPosToTilePos(Vec2D pos)
         {
-            return new Vec2D(
-                (int)((pos.x) / tileWidth),
-                (int)((pos.y) / tileHeight)
+            return new Tuple<int, int>(
+                (int)(pos.x / tileWidth),
+                (int)(pos.y / tileHeight)
                 );
         }
 
@@ -140,7 +140,7 @@ namespace SDL2Engine.Tiled
                 return -1;
             }
 
-            return mapData[x, y];
+            return mapData[y, x];
         }
 
         public int GetTileAt(Vec2D pos)

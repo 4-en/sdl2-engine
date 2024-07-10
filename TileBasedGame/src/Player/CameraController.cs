@@ -3,8 +3,9 @@ using SDL2Engine.Tiled;
 
 namespace TileBasedGame
 {
-    public class CameraController : Script {
-        
+    public class CameraController : Script
+    {
+
         public double camera_height = 160;
         public double camera_width = 160 * 16 / 9;
 
@@ -18,7 +19,8 @@ namespace TileBasedGame
         private EventListener<ShakeEvent>? shake_listener;
         private TileMapData? tileMapData;
 
-        public override void Start() {
+        public override void Start()
+        {
             // get player component from same game object
             player = GetComponent<Player>();
 
@@ -33,7 +35,8 @@ namespace TileBasedGame
             tileMapData = FindComponent<TileMapData>();
         }
 
-        private void OnPlayerDamagedEvent(PlayerDamagedEvent e) {
+        private void OnPlayerDamagedEvent(PlayerDamagedEvent e)
+        {
             shake_strength += 10;
         }
 
@@ -54,17 +57,20 @@ namespace TileBasedGame
 
         }
 
-        public override void Update() {
-            if(player == null) {
+        public override void Update()
+        {
+            if (player == null)
+            {
                 return;
             }
 
 
             // testing: add 10 shake_strength when l is pressed
-            if(Input.GetKeyDown(SDL2.SDL.SDL_Keycode.SDLK_l)) {
+            if (Input.GetKeyDown(SDL2.SDL.SDL_Keycode.SDLK_l))
+            {
                 shake_strength += 10;
             }
-            
+
 
             // get player position
             Vec2D player_position = player.GetGameObject().GetPosition();
@@ -74,9 +80,10 @@ namespace TileBasedGame
 
             // calculate optimal camera position
             double camera_x_ratio = 0.30;
-            double camera_y_ratio = 0.75;
+            double camera_y_ratio = 0.65;
 
-            if(!isFacingRight) {
+            if (!isFacingRight)
+            {
                 camera_x_ratio = 1 - camera_x_ratio;
             }
 
@@ -113,7 +120,7 @@ namespace TileBasedGame
 
             // shake camera
             // decay shake_strength
-            if(shake_strength > 0)
+            if (shake_strength > 0)
             {
                 shake_strength = shake_strength / (1 + Time.deltaTime * 2);
                 shake_strength = Math.Max(0, shake_strength - Time.deltaTime * 10);
@@ -123,11 +130,11 @@ namespace TileBasedGame
 
                 camera.SetPosition(camera.GetPosition() + new Vec2D(shake_x, shake_y));
             }
-            
+
 
 
             // limit camera to world bounds
-            if(tileMapData == null)
+            if (tileMapData == null)
             {
                 return;
             }

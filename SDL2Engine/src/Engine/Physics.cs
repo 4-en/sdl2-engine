@@ -573,6 +573,10 @@ namespace SDL2Engine
             return other.CollidesWith(this);
         }
 
+        public void SetSize(int v1, int v2)
+        {
+            this.box = new Rect(box.x + 7, box.y+5, v1, v2);
+        }
     }
     // defines a circle collider
     // a circle collider is a circle that can be used to detect collisions

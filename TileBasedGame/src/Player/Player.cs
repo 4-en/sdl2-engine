@@ -62,6 +62,13 @@ namespace TileBasedGame
             physicsBody.Bounciness = 0.0;
             physicsBody.Friction = 0;
 
+            var collider = gameObject.GetComponent<BoxCollider>();
+            if (collider != null)
+            {
+                collider.SetSize(10, 20);
+            }
+            
+
         }
 
         private void Testing()

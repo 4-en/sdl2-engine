@@ -12,6 +12,16 @@ namespace TileBasedGame
 
             var engine = new Engine(scene, "TileBasedGame");
             engine.Init();
+
+            // print controls
+            Console.WriteLine("Controls:");
+            Console.WriteLine("W/D to move");
+            Console.WriteLine("Space to jump");
+            Console.WriteLine("Space in air to air jump");
+            Console.WriteLine("Shift to sprint");
+            Console.WriteLine("1 to attack");
+
+
             engine.Run();
 
 

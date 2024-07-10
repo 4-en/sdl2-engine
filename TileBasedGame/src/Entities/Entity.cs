@@ -32,7 +32,7 @@ namespace TileBasedGame.Entities
         [JsonProperty]
         protected Team team = Team.Enemy;
         [JsonProperty]
-        protected int points = 10;
+        protected int points = 50;
         [JsonProperty]
         protected double range = 100;
         [JsonProperty]

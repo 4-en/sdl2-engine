@@ -58,7 +58,7 @@ namespace TileBasedGame
             bool isFacingRight = player.IsFacingRight();
 
             // calculate optimal camera position
-            double camera_x_ratio = 0.4;
+            double camera_x_ratio = 0.30;
             double camera_y_ratio = 0.75;
 
             if(!isFacingRight) {
@@ -78,8 +78,8 @@ namespace TileBasedGame
             double dist = (camera.GetPosition() - new Vec2D(camera_x, camera_y)).Length();
 
             double maxCameraSpeed = 1000;
-            double minCameraSpeed = 100;
-            double speed = Math.Max(minCameraSpeed, Math.Min(maxCameraSpeed, dist * 10));
+            double minCameraSpeed = 10;
+            double speed = Math.Max(minCameraSpeed, Math.Min(maxCameraSpeed, dist * dist / 10));
 
             Vec2D camera_position = camera.GetPosition();
             Vec2D target_position = new Vec2D(camera_x, camera_y);

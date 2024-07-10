@@ -142,7 +142,7 @@ namespace SDL2Engine
         }
 
         // TODO: use something like this to limit the number of new objects per frame
-        public static readonly int MAX_ADDS_PER_FRAME = 100;
+        public static readonly int MAX_ADDS_PER_FRAME = 1000;
 
         protected string name = "Scene";
         protected int gameObjectsCount = 0;

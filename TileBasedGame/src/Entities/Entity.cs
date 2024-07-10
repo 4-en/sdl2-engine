@@ -47,11 +47,23 @@ namespace TileBasedGame.Entities
         protected PhysicsBody? physicsBody;
         protected bool died = false;
 
+        SoundPlayer? jumpSound = null;
+        SoundPlayer? stepSound = null;
+
 
         public override void Start()
         {
             player = Find("Player");
             physicsBody = gameObject.GetComponent<PhysicsBody>();
+
+            stepSound = AddComponent<SoundPlayer>();
+            stepSound?.Load("Assets/Audio/step.wav");
+            stepSound?.SetVolume(0.2);
+
+            jumpSound = AddComponent<SoundPlayer>();
+            jumpSound?.Load("Assets/Audio/jump.wav");
+            jumpSound?.SetVolume(0.2);
+
         }
 
         public override void Update()
@@ -246,6 +258,13 @@ namespace TileBasedGame.Entities
 
                 physicsBody.AddVelocity(new Vec2D(acceleration * boost * Time.deltaTime, 0));
             }
+           
+            /*
+            if (!stepSound.IsPlaying())
+            {
+                stepSound?.Play();
+            }*/
+            
         }
 
         protected void Jump()
@@ -265,7 +284,11 @@ namespace TileBasedGame.Entities
                     airJumps++;
                     // Console.WriteLine("Air jumps: " + airJumps);
                 }
-            }
+
+               
+               jumpSound?.Play();
+                
+        }
         }
 
         protected void Decellerate()

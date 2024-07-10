@@ -122,6 +122,11 @@
    <frame tileid="206" duration="200"/>
   </animation>
  </tile>
+ <tile id="244">
+  <properties>
+   <property name="components" value="SDL2Engine.Tiled.DamageTile"/>
+  </properties>
+ </tile>
  <wangsets>
   <wangset name="Stone1" type="mixed" tile="-1">
    <wangcolor name="" color="#ff0000" tile="-1" probability="1"/>

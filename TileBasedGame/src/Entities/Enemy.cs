@@ -56,12 +56,6 @@ namespace TileBasedGame.Entities
         public override void OnCollisionEnter(CollisionPair collision)
         {
             base.OnCollisionEnter(collision);
-
-            IDamageable? damageable = collision.GetOther(gameObject).GetComponent<IDamageable>();
-            if(damageable != null && damageable.GetTeam() != team)
-            {
-                damageable.Damage(new Damage(100, gameObject, team));
-            }
         }
     }
 }

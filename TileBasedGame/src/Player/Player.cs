@@ -30,7 +30,7 @@ namespace TileBasedGame
             this.team = Team.Player;
 
             this.SetMaxHealth(maxHealth);
-            this.SetHealth(currentHealth);
+            this.SetHealth(maxHealth);
 
             var spriteRenderer = AddComponent<SpriteRenderer>();
             if (spriteRenderer != null)

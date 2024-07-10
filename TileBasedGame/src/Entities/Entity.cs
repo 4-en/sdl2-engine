@@ -24,7 +24,7 @@ namespace TileBasedGame.Entities
         [JsonProperty]
         protected double maxHealth = 100;
         [JsonProperty]
-        protected double damage = 10;
+        protected double damage = 1000;
         [JsonProperty]
         protected double attackSpeed = 1;
 
@@ -45,6 +45,7 @@ namespace TileBasedGame.Entities
         private ulong lastGroundedTime = 0;
 
         protected PhysicsBody? physicsBody;
+        private bool died = false;
 
 
         public override void Start()
@@ -61,8 +62,36 @@ namespace TileBasedGame.Entities
             }
         }
 
+        private void OnDeath()
+        {
+            if(this.died)
+            {
+                return;
+            }
+            this.died = true;
+
+            // remove collider
+            var collider = gameObject.GetComponent<Collider>();
+            if(collider != null)
+            {
+                collider.IsTrigger = true;
+            }
+
+            // get physics body
+            var physicsBody = gameObject.GetComponent<PhysicsBody>();
+            if(physicsBody != null)
+            {
+                physicsBody.Velocity = new Vec2D(0, -100);
+            }
+
+            Delay(2, () => {
+                gameObject.Destroy();
+            });
+        }
+
         public override void OnCollisionEnter(CollisionPair collision)
         {
+            if (died) return;
             // check for collisions with walls
 
             var other = collision.GetOther(gameObject);
@@ -90,10 +119,19 @@ namespace TileBasedGame.Entities
                             var otherBody = other.GetComponent<PhysicsBody>();
                             if (otherBody != null)
                             {
-                                otherBody.AddVelocity(new Vec2D(0, -200));
+                                otherBody.AddVelocity(new Vec2D(0, -80));
+                                // angular velocity doesnt seem to work
+                                otherBody.AngularVelocity = Math.PI * 2;
                             }
 
-                            gameObject.Destroy();
+                            var otherEntity = other.GetComponent<Entity>();
+                            if (otherEntity != null)
+                            {
+                                // bonus air jumps
+                                otherEntity.airJumps = -1;
+                            }
+
+                            OnDeath();
 
                             return;
                         }
@@ -110,6 +148,7 @@ namespace TileBasedGame.Entities
 
         public override void OnCollisionStay(CollisionPair collision)
         {
+            if (died) return;
             var other = collision.GetOther(gameObject);
             if (other.GetName() == "Obstacle")
             {
@@ -156,7 +195,8 @@ namespace TileBasedGame.Entities
         private double lastShot = 0;
         protected void TryShoot()
         {
-            if(lastShot + 1 / attackSpeed > Time.time)
+            if (died) return;
+            if (lastShot + 1 / attackSpeed > Time.time)
             {
                 return;
             }
@@ -167,6 +207,7 @@ namespace TileBasedGame.Entities
 
         protected void MoveLeft(double boost=1.0)
         {
+            if (died) return;
             if (physicsBody == null)
             {
                 return;
@@ -187,6 +228,7 @@ namespace TileBasedGame.Entities
 
         protected void MoveRight(double boost=1.0)
         {
+            if (died) return;
             if (physicsBody == null)
             {
                 return;
@@ -208,6 +250,7 @@ namespace TileBasedGame.Entities
 
         protected void Jump()
         {
+            if (died) return;
             if (physicsBody == null)
             {
                 return;
@@ -227,6 +270,7 @@ namespace TileBasedGame.Entities
 
         protected void Decellerate()
         {
+            if (died) return;
             if (physicsBody == null)
             {
                 return;
@@ -276,9 +320,16 @@ namespace TileBasedGame.Entities
 
         protected void OnHealthChange()
         {
+            if(died) return;
             if (team == Team.Player)
             {
                 EventBus.Dispatch(new PlayerDamagedEvent(this, new Damage(health)));
+
+                if (GetHealth() <= 0)
+                {
+                    OnDeath();
+                    Effects.ExplosionParticles(gameObject.GetPosition(), 40, Color.Red);
+                }
 
                 return;
             }
@@ -288,15 +339,17 @@ namespace TileBasedGame.Entities
             {
                 EventBus.Dispatch(new EnemyKilledEvent(this));
                 EventBus.Dispatch(new PlayerScoreEvent(points));
-                gameObject.Destroy();
+                
+                OnDeath();
 
-                Effects.ExplosionParticles(gameObject.GetPosition(), 20);
+                Effects.ExplosionParticles(gameObject.GetPosition(), 20, Color.Red);
             }
 
         }
 
         public void Damage(Damage damage)
         {
+            if(died) return;
             this.health -= damage.Value;
             OnHealthChange();
 
@@ -310,6 +363,12 @@ namespace TileBasedGame.Entities
             }
 
             Effects.SpawnBlood(gameObject.GetPosition(), n_particles, direction);
+        }
+
+
+        public void Damage(int damage)
+        {
+            this.Damage(new Damage(damage));
         }
 
         public void Heal(double value)

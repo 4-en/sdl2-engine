@@ -1,4 +1,5 @@
 using SDL2Engine;
+using SDL2Engine.Tiled;
 using System.Collections;
 
 namespace TileBasedGame.Entities
@@ -47,7 +48,7 @@ namespace TileBasedGame.Entities
             Team = team;
         }
     }
-    public interface IDamageable
+    public interface IDamageable : ITiledDamageable
     {
         void Damage(Damage damage);
 

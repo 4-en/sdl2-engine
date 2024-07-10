@@ -158,10 +158,12 @@ namespace TileBasedGame
         private bool failed = false;
         public void FailLevel()
         {
-            Pause();
+            if(failed) return;
             failed = true;
             
-            LevelManager.LoadGameOverScene(score, (int)remainingTime);
+            Delay(2, ()=> {
+                LevelManager.LoadGameOverScene(score, (int)remainingTime);
+            });
         }
 
         public void CompleteLevel()
@@ -238,12 +240,14 @@ namespace TileBasedGame
 
             if (remainingTime < 0)
             {
+                Console.WriteLine("Time's up!");
                 this.FailLevel();
                 return;
             }
 
             if(player.GetHealth() <= 0)
             {
+                Console.WriteLine("Player died");
                 this.FailLevel();
                 return;
             }
@@ -263,6 +267,7 @@ namespace TileBasedGame
             double maxY = levelBounds.y + levelBounds.h;
             if (player_position.y > maxY)
             {
+                Console.WriteLine("Player fell out of bounds");
                 player.Damage(new Entities.Damage(10000));
                 FailLevel();
             }

@@ -139,6 +139,11 @@ namespace TileBasedGame.Entities
             speed = speed * 0.8;
         }
 
+
+        public void Damage(int damage) {
+            this.Damage(new Entities.Damage(damage));
+        }
+
         public void Heal(double value)
         {
             this.health += value;

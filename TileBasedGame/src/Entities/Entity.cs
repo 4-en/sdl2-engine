@@ -11,7 +11,7 @@ namespace TileBasedGame.Entities
      */
     public abstract class Entity : Script, IEnemy, IDamageable
     {
-        private GameObject? player;
+        protected GameObject? player;
 
         [JsonProperty]
         protected double maxSpeed = 80;

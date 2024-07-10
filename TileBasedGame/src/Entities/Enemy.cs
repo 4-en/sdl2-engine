@@ -34,13 +34,42 @@ namespace TileBasedGame.Entities
         }
         double lastStateChange = 0;
         BaseAIStates currentState = BaseAIStates.IDLE;
+
+        private void ChangeState()
+        {
+            if (player != null)
+            {
+                Vec2D dist = player.GetPosition() - gameObject.GetPosition();
+                double distX = dist.x;
+                double distY = dist.y;
+
+                if (Math.Abs(distX) < 100 && Math.Abs(distY) < 30)
+                {
+                    if (distX < 0)
+                    {
+                        currentState = BaseAIStates.LEFT;
+                    }
+                    else
+                    {
+                        currentState = BaseAIStates.RIGHT;
+                    }
+                    return;
+                }
+            } else
+            {
+                player = Find("Player");
+            }
+
+            currentState = (BaseAIStates)random.Next(0, 3);
+        }
+
         public override void Update()
         {
             base.Update();
             if (lastStateChange + 3 < Time.time)
             {
                 lastStateChange = Time.time;
-                currentState = (BaseAIStates)random.Next(0, 3);
+                this.ChangeState();
             }
 
 
@@ -68,9 +97,15 @@ namespace TileBasedGame.Entities
                 return;
             }
 
-            var tilePos = tileMapData.WorldPosToTilePos(gameObject.GetPosition());
+            var tilePos = tileMapData.WorldPosToTilePos(gameObject.GetPosition()  + new Vec2D(0, -1));
             int leftTile = tileMapData.GetTileAt(tilePos.Item1 - 1, tilePos.Item2);
             int bottomLeftTile = tileMapData.GetTileAt(tilePos.Item1 - 1, tilePos.Item2 + 1);
+
+            if(Input.GetKeyPressed(SDL2.SDL.SDL_Keycode.SDLK_x))
+            {
+                Console.WriteLine("Left Tile: " + leftTile);
+                Console.WriteLine("Bottom Left Tile: " + bottomLeftTile);
+            }
 
             if (leftTile != TileMapData.AIR || bottomLeftTile != TileMapData.OBSTACLE)
             {
@@ -91,7 +126,7 @@ namespace TileBasedGame.Entities
                 return;
             }
 
-            var tilePos = tileMapData.WorldPosToTilePos(gameObject.GetPosition());
+            var tilePos = tileMapData.WorldPosToTilePos(gameObject.GetPosition() + new Vec2D(0, -1));
             int rightTile = tileMapData.GetTileAt(tilePos.Item1 + 1, tilePos.Item2);
             int bottomRightTile = tileMapData.GetTileAt(tilePos.Item1 + 1, tilePos.Item2 + 1);
 
@@ -108,6 +143,22 @@ namespace TileBasedGame.Entities
         public override void OnCollisionEnter(CollisionPair collision)
         {
             base.OnCollisionEnter(collision);
+        }
+
+        public override void OnPreCollision(CollisionPair collision)
+        {
+            base.OnPreCollision(collision);
+
+            var other = collision.GetOther(gameObject);
+            IDamageable? otherDamageable = other.GetComponent<IDamageable>();
+            if (otherDamageable != null)
+            {
+                if(otherDamageable.GetTeam() == this.team)
+                {
+                    collision.Cancel();
+                }
+            }
+
         }
     }
 }

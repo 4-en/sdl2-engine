@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="300" height="20" tilewidth="16" tileheight="16" infinite="1" nextlayerid="5" nextobjectid="3">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="300" height="20" tilewidth="16" tileheight="16" infinite="1" nextlayerid="5" nextobjectid="15">
  <tileset firstgid="1" source="Sewer.tsx"/>
  <tileset firstgid="353" source="tileset2.tsx"/>
  <tileset firstgid="978" source="16-bit-spike-Sheet.tsx"/>
@@ -1136,6 +1136,66 @@
  <objectgroup id="4" name="Objects">
   <object id="1" name="PlayerSpawn" type="PlayerSpawn" x="17.6667" y="41.6667" width="8.33333" height="7.33333"/>
   <object id="2" x="304.5" y="256.833" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="3" x="522" y="256.5" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="4" x="741.5" y="271" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="5" x="844.5" y="194" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="6" x="1261.5" y="254" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="7" x="1226.5" y="255.5" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="8" x="1076.5" y="252.5" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="9" x="1908.5" y="238" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="10" x="2049" y="237.5" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="11" x="2090" y="236" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="12" x="2127.5" y="237.5" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="13" x="2166" y="237" width="13" height="13">
+   <properties>
+    <property name="components" value="TileBasedGame.Entities.Slime"/>
+   </properties>
+  </object>
+  <object id="14" x="2200.5" y="239" width="13" height="13">
    <properties>
     <property name="components" value="TileBasedGame.Entities.Slime"/>
    </properties>

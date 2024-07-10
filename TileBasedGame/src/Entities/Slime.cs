@@ -65,8 +65,8 @@ namespace TileBasedGame.Entities
             physicsBody.Bounciness = 0.0;
             physicsBody.Friction = 0;
 
-            maxSpeed = 40;
-            acceleration = 40;
+            maxSpeed = 20;
+            acceleration = 20;
 
             tileMapData = FindComponent<TileMapData>();
 

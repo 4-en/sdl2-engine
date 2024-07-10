@@ -2,9 +2,6 @@
 <tileset version="1.10" tiledversion="1.11.0" name="Sewer" tilewidth="16" tileheight="16" tilecount="352" columns="16" objectalignment="topleft">
  <image source="../Textures/tilesets/sewer_1.png" width="256" height="352"/>
  <tile id="0" type="Obstacle">
-  <properties>
-   <property name="components" type="object" value="0"/>
-  </properties>
   <objectgroup draworder="index" id="3">
    <object id="3" x="0" y="0" width="16" height="16"/>
   </objectgroup>

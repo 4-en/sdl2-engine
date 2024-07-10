@@ -2,6 +2,7 @@ using SDL2Engine;
 using SDL2;
 using static SDL2.SDL;
 using TileBasedGame.Entities;
+using SDL2Engine.Tiled;
 
 namespace TileBasedGame
 {
@@ -9,6 +10,7 @@ namespace TileBasedGame
     public class Player : Entities.Entity
     {
         private DrawableRect? renderer;
+        private TileMapData? tileMapData;
 
         public static double maxHealth = 1000;
         public static double currentHealth = 1000;
@@ -32,6 +34,8 @@ namespace TileBasedGame
 
             this.SetMaxHealth(maxHealth);
             this.SetHealth(maxHealth);
+
+            tileMapData = FindComponent<TileMapData>();
 
             var spriteRenderer = AddComponent<SpriteRenderer>();
             if (spriteRenderer != null)
@@ -89,6 +93,19 @@ namespace TileBasedGame
                 var pos = gameObject.GetPosition();
                 Effects.SpawnBlood(pos, 10, new Vec2D(0, 0), new Color(255, 0, 0));
             }
+            /*
+            if(Input.GetKeyDown(SDL_Keycode.SDLK_x)) {
+                
+                // log tile data
+                if(tileMapData != null)
+                {
+                    var tilePos = tileMapData.WorldPosToTilePos(gameObject.GetPosition());
+                    int tile = tileMapData.GetTileAt(tilePos.Item1, tilePos.Item2);
+                    int bottomTile = tileMapData.GetTileAt(tilePos.Item1, tilePos.Item2 + 1);
+                    Console.WriteLine("Tile: " + tile + " Bottom Tile: " + bottomTile);
+                }
+            }
+            */
         }
 
         public override void Update()

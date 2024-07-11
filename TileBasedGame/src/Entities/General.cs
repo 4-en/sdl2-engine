@@ -244,6 +244,7 @@ namespace TileBasedGame.Entities
             }
 
             //set explosion texture
+            /*
             String currentTexture = gameObject.GetComponent<SpriteRenderer>()?.GetTexture() ?? "";
             if (currentTexture.Equals("Assets/Textures/projectile_sprite_sheet.png"))
             {
@@ -254,6 +255,7 @@ namespace TileBasedGame.Entities
 
                 gameObject.GetComponent<SpriteRenderer>()?.LoadTexture("Assets/Textures/projectile_explosion_sprite_sheet_blue.png");
             }
+            */
             //play hit sound
 
                 hitSound = AddComponent<SoundPlayer>();

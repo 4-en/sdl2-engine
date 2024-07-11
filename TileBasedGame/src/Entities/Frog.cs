@@ -37,11 +37,15 @@ namespace TileBasedGame.Entities
             spriteRenderer.PlayAnimation("idle1");
             spriteRenderer.SetAnimationType(AnimationType.Loop);
 
+            BoxCollider.FromDrawableRect(gameObject);
 
-            spriteRenderer.anchorPoint = AnchorPoint.BottomCenter;
+            spriteRenderer.anchorPoint = AnchorPoint.Center;
             // BoxCollider.FromDrawableRect(gameObject).SetSize(10, 10);
-            var boxco = AddComponent<BoxCollider>();
-            boxco.SetSize(30, 30);
+            var collider = gameObject.GetComponent<BoxCollider>();
+            if (collider != null)
+            {
+                collider.SetSizeFrog(15, 15);
+            }
             physicsBody = AddComponent<PhysicsBody>();
             physicsBody.Bounciness = 0.0;
             physicsBody.Friction = 0;

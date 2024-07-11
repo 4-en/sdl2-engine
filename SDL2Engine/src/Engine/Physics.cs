@@ -51,7 +51,7 @@ namespace SDL2Engine
 
         public LinkedList<T> Query(Rect range)
         {
-            LinkedList<T> found = new ();
+            LinkedList<T> found = new();
             int x = (int)range.x;
             int y = (int)range.y;
             int hash = GetQuadTreeHash(x, y, quadTreeSize);
@@ -210,7 +210,7 @@ namespace SDL2Engine
                     var possibleCollisions = child.GetPossibleCollisions();
                     while (possibleCollisions.MoveNext())
                     {
-                        foreach(var item in this.items)
+                        foreach (var item in this.items)
                         {
                             // possibleCollisions.Current.AddLast(item);
                         }
@@ -575,7 +575,11 @@ namespace SDL2Engine
 
         public void SetSize(int v1, int v2)
         {
-            this.box = new Rect(box.x + 7, box.y+5, v1, v2);
+            this.box = new Rect(box.x + 7, box.y + 5, v1, v2);
+        }
+        public void SetSizeFrog(int v1, int v2)
+        {
+            this.box = new Rect(box.x + (v1 / 2), box.y + (v2 / 2), v1, v2);
         }
     }
     // defines a circle collider
@@ -961,12 +965,13 @@ namespace SDL2Engine
 
                     bool collideWithMovingObjects = physicsBody.CollideWithMovingObjects;
                     bool collideWithStaticObjects = physicsBody.CollideWithStaticObjects;
-                    if(physicsBodyJ!= null)
+                    if (physicsBodyJ != null)
                     {
-                        if(physicsBodyJ.CollideWithMovingObjects)
+                        if (physicsBodyJ.CollideWithMovingObjects)
                         {
                             collideWithMovingObjects = true && collideWithMovingObjects;
-                        } else
+                        }
+                        else
                         {
                             continue;
                         }
@@ -1167,7 +1172,7 @@ namespace SDL2Engine
 
                 if (overlap.x < overlap.y)
                 {
-                    if(rect1.x < rect2.x)
+                    if (rect1.x < rect2.x)
                     {
                         normal = new Vec2D(-1, 0);
                     }
@@ -1212,7 +1217,7 @@ namespace SDL2Engine
 
                     if (pb1 != null && move1)
                     {
-                        pb1.Velocity = new Vec2D(pb1.Velocity.x * -pb1.Bounciness, pb1.Velocity.y * Math.Max(0,1 - combinedFriction));
+                        pb1.Velocity = new Vec2D(pb1.Velocity.x * -pb1.Bounciness, pb1.Velocity.y * Math.Max(0, 1 - combinedFriction));
                         go1.transform.Move(move_x * halfMovement, 0);
                     }
 
@@ -1225,13 +1230,13 @@ namespace SDL2Engine
                 else
                 {
                     double move_y = overlap.y * normal.y;
-                    
-                    if(pb1 != null && move1)
+
+                    if (pb1 != null && move1)
                     {
                         pb1.Velocity = new Vec2D(pb1.Velocity.x * Math.Max(0, 1 - combinedFriction), pb1.Velocity.y * -pb1.Bounciness);
                         go1.transform.Move(0, move_y * halfMovement);
                     }
-                    if(pb2 != null && move2)
+                    if (pb2 != null && move2)
                     {
                         pb2.Velocity = new Vec2D(pb2.Velocity.x * Math.Max(0, 1 - combinedFriction), pb2.Velocity.y * -pb2.Bounciness);
                         go2.transform.Move(0, -move_y * halfMovement);
@@ -1460,7 +1465,8 @@ namespace SDL2Engine
                     if (bounds.Value.Contains(obj.GetPosition()))
                     {
                         objectsInBounds.Add(obj);
-                    } else if (obj.KeepInScene)
+                    }
+                    else if (obj.KeepInScene)
                     {
                         notInBoundsButApplyPhysics.Add(obj);
                     }

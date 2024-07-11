@@ -577,9 +577,9 @@ namespace SDL2Engine
         {
             this.box = new Rect(box.x + 7, box.y + 5, v1, v2);
         }
-        public void SetSizeFrog(int v1, int v2)
+        public void SetSizeAndTransoformPosition(int box1, int box2, int v1, int v2)
         {
-            this.box = new Rect(box.x + (v1 / 2), box.y + (v2 / 2), v1, v2);
+            this.box = new Rect(box.x + box1, box.y + box2, v1, v2);
         }
     }
     // defines a circle collider

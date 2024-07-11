@@ -31,7 +31,7 @@ namespace TileBasedGame.Entities
             //spriteRenderer.SetSpriteSizeByCount(8, 1);
             spriteRenderer.SetSpriteSize(48, 48);
             spriteRenderer.SetSize(30, 30);
-            spriteRenderer.AddAnimation(new AnimationInfo("idle1", 0, 8, 0.3));
+            spriteRenderer.AddAnimation(new AnimationInfo("idle1", 0, 8, 0.1));
             spriteRenderer.AddAnimation(new AnimationInfo("jump", 7, 7, 0.1));
             spriteRenderer.AddAnimation(new AnimationInfo("death", 28, 6, 0.1));
             spriteRenderer.PlayAnimation("idle1");
@@ -44,7 +44,7 @@ namespace TileBasedGame.Entities
             var collider = gameObject.GetComponent<BoxCollider>();
             if (collider != null)
             {
-                collider.SetSizeFrog(15, 15);
+                collider.SetSizeAndTransoformPosition(15 / 2, (15 / 2) - 1, 15, 15);
             }
             physicsBody = AddComponent<PhysicsBody>();
             physicsBody.Bounciness = 0.0;

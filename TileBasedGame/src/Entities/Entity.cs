@@ -56,7 +56,7 @@ namespace TileBasedGame.Entities
 
         public override void Update()
         {
-            if(lastGroundedTime + 10 < Time.tick)
+            if (lastGroundedTime + 10 < Time.tick)
             {
                 isGrounded = false;
             }
@@ -64,7 +64,7 @@ namespace TileBasedGame.Entities
 
         private void OnDeath()
         {
-            if(this.died)
+            if (this.died)
             {
                 return;
             }
@@ -72,20 +72,21 @@ namespace TileBasedGame.Entities
 
             // remove collider
             var collider = gameObject.GetComponent<Collider>();
-            if(collider != null)
+            if (collider != null)
             {
                 collider.IsTrigger = true;
             }
 
             // get physics body
             var physicsBody = gameObject.GetComponent<PhysicsBody>();
-            if(physicsBody != null)
+            if (physicsBody != null)
             {
                 physicsBody.Velocity = new Vec2D(0, -80);
                 physicsBody.AngularVelocity = 220;
             }
 
-            Delay(2, () => {
+            Delay(2, () =>
+            {
                 gameObject.Destroy();
             });
         }
@@ -108,7 +109,7 @@ namespace TileBasedGame.Entities
                     Collider? myCollider = GetComponent<Collider>();
                     Collider? otherCollider = other.GetComponent<Collider>();
 
-                    if(myCollider != null && otherCollider != null)
+                    if (myCollider != null && otherCollider != null)
                     {
                         double otherBottom = otherCollider.GetBounds().y + otherCollider.GetBounds().h;
                         double distance = myCollider.GetCenter().y - otherBottom;
@@ -153,13 +154,13 @@ namespace TileBasedGame.Entities
             {
                 // check if collisionPoint is below the gameObject
                 Collider? otherCollider = other.GetComponent<Collider>();
-                if(otherCollider == null)
+                if (otherCollider == null)
                 {
                     return;
                 }
                 var collisionPoint = otherCollider.GetCenter();
                 Collider? myCollider = GetComponent<Collider>();
-                if(myCollider == null)
+                if (myCollider == null)
                 {
                     return;
                 }
@@ -205,7 +206,7 @@ namespace TileBasedGame.Entities
             return true;
         }
 
-        protected void MoveLeft(double boost=1.0)
+        protected void MoveLeft(double boost = 1.0)
         {
             if (died) return;
             if (physicsBody == null)
@@ -226,7 +227,7 @@ namespace TileBasedGame.Entities
             }
         }
 
-        protected void MoveRight(double boost=1.0)
+        protected void MoveRight(double boost = 1.0)
         {
             if (died) return;
             if (physicsBody == null)
@@ -259,8 +260,8 @@ namespace TileBasedGame.Entities
             if (isGrounded || airJumps < maxAirJumps)
             {
                 physicsBody.SetVelocity(new Vec2D(physicsBody.Velocity.x, -jumpForce));
-                
-                if(!isGrounded)
+
+                if (!isGrounded)
                 {
                     airJumps++;
                     // Console.WriteLine("Air jumps: " + airJumps);
@@ -276,7 +277,7 @@ namespace TileBasedGame.Entities
                 return;
             }
 
-            if(!isGrounded)
+            if (!isGrounded)
             {
                 return;
             }
@@ -320,7 +321,7 @@ namespace TileBasedGame.Entities
 
         protected void OnHealthChange()
         {
-            if(died) return;
+            if (died) return;
             if (team == Team.Player)
             {
                 EventBus.Dispatch(new PlayerDamagedEvent(this, new Damage(health)));
@@ -339,7 +340,7 @@ namespace TileBasedGame.Entities
             {
                 EventBus.Dispatch(new EnemyKilledEvent(this));
                 EventBus.Dispatch(new PlayerScoreEvent(points));
-                
+
                 OnDeath();
 
                 Effects.ExplosionParticles(gameObject.GetPosition(), 20, Color.Red);
@@ -349,14 +350,14 @@ namespace TileBasedGame.Entities
 
         public void Damage(Damage damage)
         {
-            if(died) return;
+            if (died) return;
             this.health -= damage.Value;
             OnHealthChange();
 
             // spawn blood effect
             int n_particles = 5 + (int)Math.Min(20, damage.Value / 10);
             Vec2D? direction = null;
-            if(damage.Source != null)
+            if (damage.Source != null)
             {
                 direction = damage.Source.GetPosition() - gameObject.GetPosition();
                 direction = direction.Value.Normalize() * 100;
@@ -433,7 +434,7 @@ namespace TileBasedGame.Entities
                 gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!facingRight);
                 gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.Once);
             }
-            
+
 
             var projectile = new GameObject("Projectile");
             var projectileScript = projectile.AddComponent<ProjectileScript>();
@@ -443,7 +444,7 @@ namespace TileBasedGame.Entities
 
             //set the position of the projectile to the position of the player
             //add a small offset to the position of the player to avoid collision with the player  
-            
+
             var pb = projectile.AddComponent<PhysicsBody>();
             pb.Mass = 0;
 
@@ -475,15 +476,15 @@ namespace TileBasedGame.Entities
                 spriteRenderer.SetFlipX(facingRight);
             }
             var collider = BoxCollider.FromDrawableRect(projectile);
-            if(collider != null)
+            if (collider != null)
                 collider.IsTrigger = true;
 
 
         }
 
-        
+
     }
 
-    
+
 
 }

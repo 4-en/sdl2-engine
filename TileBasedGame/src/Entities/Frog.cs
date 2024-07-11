@@ -1,4 +1,5 @@
-﻿using SDL2;
+﻿using Newtonsoft.Json;
+using SDL2;
 using SDL2Engine;
 using SDL2Engine.Tiled;
 
@@ -64,6 +65,41 @@ namespace TileBasedGame.Entities
             }*/
         }
 
+        public override void OnCollisionEnter(CollisionPair collision)
+        {
+            if (died) return;
+            // check for collisions with walls
+
+            var other = collision.GetOther(gameObject);
+
+            IDamageable? damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+
+                damageable.Damage(new Damage(damage, gameObject, team));
+
+            }
+        }
+        protected void Jump()
+        {
+            if (died) return;
+            if (physicsBody == null)
+            {
+                return;
+            }
+
+            if (isGrounded || airJumps < maxAirJumps)
+            {
+                physicsBody.SetVelocity(new Vec2D(physicsBody.Velocity.x, -jumpForce));
+
+                if (!isGrounded)
+                {
+                    airJumps++;
+                    // Console.WriteLine("Air jumps: " + airJumps);
+                }
+            }
+        }
+
         private string currentAnimation = "idle1";
         private void ChangeAnimation()
         {
@@ -109,6 +145,11 @@ namespace TileBasedGame.Entities
                 tileMapData = FindComponent<TileMapData>();
             }
             base.Update();
+
+
+            Jump();
+
+
             ChangeAnimation();
         }
 

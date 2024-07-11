@@ -18,9 +18,9 @@ namespace TileBasedGame
 
         public static void Start()
         {
-            
 
-            
+
+
             var engine = new Engine(null, "TileBasedGame");
             engine.Init();
 
@@ -47,7 +47,7 @@ namespace TileBasedGame
         public static void CompleteCurrentLevel(int score = 0)
         {
             totalScore += score;
-            if(levelIndex >= unlockedLevel)
+            if (levelIndex >= unlockedLevel)
             {
                 unlockedLevel++;
 
@@ -59,7 +59,8 @@ namespace TileBasedGame
             }
         }
 
-        public static void ResetProgress() {
+        public static void ResetProgress()
+        {
             totalScore = 0;
             unlockedLevel = 1;
             levelIndex = 0;
@@ -70,9 +71,9 @@ namespace TileBasedGame
             Serialization.SaveObject(saveData, "saveData.json");
         }
 
-        public static void LoadLevel(int levelIndex=-1)
+        public static void LoadLevel(int levelIndex = -1)
         {
-            if(levelIndex == -1)
+            if (levelIndex == -1)
             {
                 levelIndex = LevelManager.levelIndex;
             }
@@ -87,7 +88,7 @@ namespace TileBasedGame
             levelIndex++;
 
             // make sure level is also unlocked
-            if(!(levelIndex <= unlockedLevel))
+            if (!(levelIndex <= unlockedLevel))
             {
                 levelIndex = unlockedLevel;
                 Console.WriteLine($"Level {levelIndex} is not unlocked yet.");

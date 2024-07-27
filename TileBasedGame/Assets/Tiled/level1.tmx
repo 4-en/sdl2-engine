@@ -2093,5 +2093,10 @@
     <property name="components" value="TileBasedGame.Entities.Enemy"/>
    </properties>
   </object>
+	 <object id="18" name="EnemyFrog" x="592.333" y="86.5" width="14" height="12.3333">
+		 <properties>
+			 <property name="components" value="TileBasedGame.Entities.Frog"/>
+		 </properties>
+	 </object>
  </objectgroup>
 </map>

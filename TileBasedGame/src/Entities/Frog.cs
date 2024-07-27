@@ -25,7 +25,8 @@ namespace TileBasedGame.Entities
             // random slime type
             slimeType = (FrogType)random.Next(0, 3);
 
-            string path = "Assets/Textures\\Frog\\GreenBrown\\ToxicFrogGreenBrown_Idle.png";
+            string path = "Assets/Textures\\Frog\\GreenBrown\\ToxicFrogGreenBrown_Sheet.png";
+
 
             spriteRenderer = AddComponent<SpriteRenderer>();
             spriteRenderer.SetTexture(path);
@@ -33,10 +34,10 @@ namespace TileBasedGame.Entities
             spriteRenderer.SetSpriteSize(48, 48);
             spriteRenderer.SetSize(30, 30);
             spriteRenderer.AddAnimation(new AnimationInfo("idle1", 0, 8, 0.1));
-            spriteRenderer.AddAnimation(new AnimationInfo("jump", 7, 7, 0.1));
-            spriteRenderer.AddAnimation(new AnimationInfo("death", 28, 6, 0.1));
+            spriteRenderer.AddAnimation(new AnimationInfo("jump", 11, 5, 0.07));
+            spriteRenderer.AddAnimation(new AnimationInfo("death", 26, 7, 0.1));
             spriteRenderer.PlayAnimation("idle1");
-            spriteRenderer.SetAnimationType(AnimationType.Loop);
+            spriteRenderer.SetAnimationType(AnimationType.OnceAndHold);
 
             BoxCollider.FromDrawableRect(gameObject);
 
@@ -101,6 +102,8 @@ namespace TileBasedGame.Entities
         }
 
         private string currentAnimation = "idle1";
+        private bool jumpAnimationPlayed = false;
+
         private void ChangeAnimation()
         {
             if (physicsBody == null || spriteRenderer == null)
@@ -116,27 +119,28 @@ namespace TileBasedGame.Entities
             {
                 newAnimation = "death";
             }
-            else if (inAir)
+            else if (inAir && !jumpAnimationPlayed)
             {
                 newAnimation = "jump";
+                jumpAnimationPlayed = true; // Mark jump animation as played
             }
-
-            else
+            else if (!inAir)
             {
                 newAnimation = "idle1";
+                jumpAnimationPlayed = false; // Reset for next jump
             }
 
-            string newAnimationCheck = newAnimation;
-
-            if (currentAnimation != newAnimationCheck)
+            if (currentAnimation != newAnimation)
             {
-                currentAnimation = newAnimationCheck;
+                currentAnimation = newAnimation;
 
-                AnimationType aType = AnimationType.Loop;
+                AnimationType aType = (newAnimation == "jump") ? AnimationType.Once : AnimationType.Loop;
 
                 spriteRenderer.PlayAnimation(newAnimation, aType);
             }
         }
+        private TileMapData tileMapData;
+        private float nextJumpTime;
 
         public override void Update()
         {
@@ -146,9 +150,15 @@ namespace TileBasedGame.Entities
             }
             base.Update();
 
+            // Check if it's time to jump
+            if (Time.time >= nextJumpTime)
+            {
+                Jump();
+                //Shoot();
 
-            Jump();
-
+                int randomInterval = random.Next(2, 5); // Generates a random integer between 2 (inclusive) and 5 (exclusive)
+                nextJumpTime = (float)(Time.time + randomInterval);
+            }
 
             ChangeAnimation();
         }

@@ -186,7 +186,7 @@ namespace TileBasedGame
             return level;
         }
 
-        public static Scene CreateLevel2()
+        public static Scene CreateLevel4()
         {
             var level = new ChunkedScene("Level 2");
             level.SetGravity(200);
@@ -200,7 +200,7 @@ namespace TileBasedGame
             return level;
         }
 
-        public static Scene CreateLevel3()
+        public static Scene CreateLevel2()
         {
             var level = new ChunkedScene("Level 3");
             level.SetGravity(200);
@@ -214,7 +214,7 @@ namespace TileBasedGame
             return level;
         }
 
-        public static Scene CreateLevel4()
+        public static Scene CreateLevel3()
         {
             var level = new ChunkedScene("Level 4");
             level.SetGravity(200);

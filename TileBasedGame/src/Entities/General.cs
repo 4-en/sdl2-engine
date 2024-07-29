@@ -162,7 +162,7 @@ namespace TileBasedGame.Entities
             shotSound = AddComponent<SoundPlayer>();
             if (team == Team.Player)
             {
-                shotSound?.Load("Assets/Audio/shot.wav");
+                shotSound?.Load("Assets/Audio/sword.mp3");
                 shotSound?.SetVolume(0.2);
                 shotSound?.Play();
             }

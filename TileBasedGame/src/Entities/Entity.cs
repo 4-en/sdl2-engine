@@ -162,6 +162,11 @@ namespace TileBasedGame.Entities
         {
             if (died) return;
             var other = collision.GetOther(gameObject);
+
+            
+
+
+
             if (other.GetName() == "Obstacle")
             {
                 // check if collisionPoint is below the gameObject

@@ -121,7 +121,7 @@ namespace TileBasedGame.Entities
         {
             if (tileMapData == null)
             {
-                Console.WriteLine("No tilemap data");
+                //Console.WriteLine("No tilemap data");
                 MoveRight();
                 return;
             }

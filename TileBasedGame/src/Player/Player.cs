@@ -128,7 +128,7 @@ namespace TileBasedGame
             }
 
             bool isShooting = false;
-            if(Input.GetKeyPressed(SDL_Keycode.SDLK_1))
+            if(Input.GetMouseButtonDown(0))
             {
                 bool shot = TryShoot();
                 if(shot)
@@ -183,12 +183,6 @@ namespace TileBasedGame
             }
 
 
-            if (Input.GetMouseButtonDown(0))
-            {
-                gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("attack");
-                gameObject.GetComponent<SpriteRenderer>()?.SetFlipX(!isFacingRight);
-                gameObject.GetComponent<SpriteRenderer>()?.SetAnimationType(AnimationType.Once);
-            }
             if (Input.GetKeyPressed(SDL_Keycode.SDLK_s) && !Input.GetKeyPressed(SDL_Keycode.SDLK_a) && !Input.GetKeyPressed(SDL_Keycode.SDLK_d))
             {
                 gameObject.GetComponent<SpriteRenderer>()?.PlayAnimation("crouch");

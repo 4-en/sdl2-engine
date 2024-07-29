@@ -108,9 +108,6 @@ namespace TileBasedGame
                 case 4:
                     level = CreateLevel4();
                     break;
-                case 5:
-                    level = CreateLevel5();
-                    break;
                 default:
                     level = CreateBaseLevel();
                     return;
@@ -228,11 +225,7 @@ namespace TileBasedGame
             return level;
         }
 
-        public static Scene CreateLevel5()
-        {
-            var level = CreateBaseLevel();
-            return level;
-        }
+       
 
         private static Scene CreateHomeScreen()
         {

@@ -32,7 +32,6 @@ namespace TileBasedGame
                 GameObject level2Text = HomeScreenText("Level 2", 0.5, 0.5, 100);
                 GameObject level3Text = HomeScreenText("Level 3", 0.5, 0.6, 100);
                 GameObject level4Text = HomeScreenText("Level 4", 0.5, 0.7, 100);
-                GameObject level5Text = HomeScreenText("Level 5", 0.5, 0.8, 100);
 
                 var resetProgressButton = TileBasedGame.UI.Button(
                     "Reset Progress",
@@ -86,10 +85,6 @@ namespace TileBasedGame
                 textObject.AddChild(LockObject(x, y));
             }
             if (text.Equals("Level 4") && unlockedLevel < 4)
-            {
-                textObject.AddChild(LockObject(x, y));
-            }
-            if (text.Equals("Level 5") && unlockedLevel < 5)
             {
                 textObject.AddChild(LockObject(x, y));
             }
@@ -153,14 +148,6 @@ namespace TileBasedGame
                     if (unlockedLevel > 3)
                     {
                         LevelManager.levelIndex = 3;
-                        LevelManager.LoadNextLevel();
-                    }
-                }
-                if (textObject.GetName().Equals("Level 5"))
-                {
-                    if (unlockedLevel > 4)
-                    {
-                        LevelManager.levelIndex = 4;
                         LevelManager.LoadNextLevel();
                     }
                 }

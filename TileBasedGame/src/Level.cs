@@ -19,6 +19,8 @@ namespace TileBasedGame
 
         private Rect levelBounds = new Rect(-49999, -49999, 99999, 99999);
 
+        SoundPlayer? deathSound = null;
+
 
         // eventlisteners
         private EventListener<PlayerScoreEvent>? playerScoreListener;
@@ -26,6 +28,11 @@ namespace TileBasedGame
 
         public override void Start()
         {
+
+            deathSound = AddComponent<SoundPlayer>();
+            deathSound?.Load("Assets/Audio/death.mp3");
+            deathSound?.SetVolume(0.2);
+
             player = Player.CreatePlayer();
 
             // set to position of PlayerSpawn object
@@ -248,6 +255,7 @@ namespace TileBasedGame
             if(player.GetHealth() <= 0)
             {
                 Console.WriteLine("Player died");
+                deathSound?.Play();
                 this.FailLevel();
                 return;
             }

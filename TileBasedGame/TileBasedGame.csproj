@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <None Remove="Assets\Audio\coin.mp3" />
+    <None Remove="Assets\Audio\death.mp3" />
     <None Remove="Assets\Audio\hit.wav" />
     <None Remove="Assets\Audio\jump.wav" />
     <None Remove="Assets\Audio\shot.wav" />

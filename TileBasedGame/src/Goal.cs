@@ -5,9 +5,14 @@ namespace TileBasedGame
 {
     public class Goal : Script
     {
-
+        SoundPlayer? goalSound = null;
         public override void Start()
         {
+
+            goalSound = AddComponent<SoundPlayer>();
+            goalSound?.Load("Assets/Audio/win.mp3");
+            goalSound?.SetVolume(0.2);
+
             BoxCollider collider = gameObject.AddComponent<BoxCollider>();
             
             var tiledData = FindComponent<TileMapData>();
@@ -35,6 +40,7 @@ namespace TileBasedGame
                 if (level != null)
                 {
                     level.CompleteLevel();
+                    goalSound?.Play();
                 }
             }
         }

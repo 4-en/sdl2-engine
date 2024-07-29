@@ -14,6 +14,7 @@
     <None Remove="Assets\Audio\shot.wav" />
     <None Remove="Assets\Audio\step.wav" />
     <None Remove="Assets\Audio\sword.mp3" />
+    <None Remove="Assets\Audio\win.mp3" />
     <None Remove="Assets\Fonts\Arcadeclassic.ttf" />
     <None Remove="Assets\Textures\adventurer-Sheet.png" />
     <None Remove="Assets\Textures\bk.jpg" />

@@ -503,7 +503,7 @@ namespace TileBasedGame.Entities
             {
                 spriteRenderer.SetTexture("Assets/Textures/projectile_sheet.png");
                 spriteRenderer.SetSpriteSize(116, 115);
-                spriteRenderer.SetSize(30, 30);
+                spriteRenderer.SetSize(12, 12);
                 spriteRenderer.AddAnimation(new AnimationInfo("projectile", 0, 4, 0.075));
                 spriteRenderer.PlayAnimation("projectile");
                 spriteRenderer.SetAnimationType(AnimationType.LoopReversed);

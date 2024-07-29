@@ -5,8 +5,13 @@ namespace TileBasedGame.Items
     internal class Coin : Script
     {
         public int value = 1;
+        SoundPlayer? coinSound = null;
         public override void Start()
         {
+            coinSound = AddComponent<SoundPlayer>();
+            coinSound?.Load("Assets/Audio/coin.mp3");
+            coinSound?.SetVolume(0.2);
+
             // add a collider
             var c = BoxCollider.FromDrawableRect(gameObject);
             if (c != null)
@@ -22,6 +27,7 @@ namespace TileBasedGame.Items
         private bool gavePoints = false;
         public override void OnCollisionEnter(CollisionPair collision)
         {
+
             if (gavePoints) {
                 return;
             }
@@ -35,7 +41,9 @@ namespace TileBasedGame.Items
                 // destroy coin
                 gameObject.Destroy();
 
-                // TODO: play sound here
+                
+                //play sound
+                coinSound?.Play();
             }
         }
     }

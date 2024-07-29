@@ -242,6 +242,11 @@ namespace TileBasedGame.Entities
 
                 physicsBody.AddVelocity(new Vec2D(-acceleration * boost * Time.deltaTime, 0));
             }
+
+            if (stepSound != null && physicsBody.Velocity.x < 0 && isGrounded && !stepSound!.IsPlaying())
+            {
+                stepSound?.Play();
+            }
         }
 
         protected void MoveRight(double boost = 1.0)
@@ -264,13 +269,14 @@ namespace TileBasedGame.Entities
 
                 physicsBody.AddVelocity(new Vec2D(acceleration * boost * Time.deltaTime, 0));
             }
-           
-            /*
-            if (!stepSound.IsPlaying())
+
+
+
+            if (stepSound != null && physicsBody.Velocity.x > 0 && isGrounded && !stepSound!.IsPlaying())
             {
                 stepSound?.Play();
-            }*/
-            
+            }
+
         }
 
         protected void Jump()
